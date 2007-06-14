@@ -1080,6 +1080,7 @@ Begin
         cz := z;
      End;
      
+     c := LowerCase(c);
      Case c Of
           'a' : Begin tu := 0.000 ; tv := 0.000 ; End;
           'b' : Begin tu := 0.125 ; tv := 0.000 ; End;

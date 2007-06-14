@@ -46,13 +46,14 @@ Var tPlayer : CBomberman;
 Var nIntroLayer : Integer;
     fIntroTime : Single;
 
+Var nRound : Integer;
+    fRoundTime : Single;
+    fGameTime : Single;
 
        
-Procedure NextGame () ;
+Procedure NextRound () ;
 Var i : Integer;
 Begin
-     //nRound += 1;
-
      // attention restore sera pour l'inter-round, ce ne sera plus nécessaire dans initgame
      //de meme que FreeTimer et FreeBomb et FreeFlame et LoadScheme ... en fait toute cette fonction quoi ...
      //donc en fait t'as ecrit de la merde c'est juste que cette fonction elle devra etre appeler ou il faut =)
@@ -64,6 +65,9 @@ Begin
      If GetBombermanCount() <> 0 Then
         For i := 1 To GetBombermanCount() Do
             GetBombermanByCount(i).Restore();
+
+     nRound += 1;
+     fRoundTime := GetTime();
 End;
 
 
@@ -93,8 +97,10 @@ Begin
      // désactivation de la souris
      BindButton( BUTTON_LEFT, NIL );
 
-     //nRound := -1;
-     NextGame();
+     fGameTime := GetTime();
+
+     nRound := 0;
+     NextRound();
 End;
 
 
@@ -253,15 +259,36 @@ Var i, j : Integer;
     r,g,b : single;
     t : Boolean;
 Begin
-     If CheckEndGame() Then NextGame();
-
-     If nCamera = CAMERA_OVERALL Then Begin
+     If GetTime() - fGameTime < 3.0 Then Begin
+        vPointer.x := 8.0 + (fGameTime - GetTime() + 3.0) * 8.0 * cos((GetTime() - fGameTime) / 3.0 * PI + PI);
+        vPointer.y := 8.5 + (fGameTime - GetTime() + 3.0) * 8.0;
+        vPointer.z := 6.0 + (fGameTime - GetTime() + 3.0) * 8.0 * sin((GetTime() - fGameTime) / 3.0 * PI + PI);
+        vCenter.x := 8.0;
+        vCenter.y := 0.0;
+        vCenter.z := 5.5;
+        vCamera.x := vPointer.x;
+        vCamera.y := vPointer.y;
+        vCamera.z := vPointer.z;
+     End Else If GetTime() - fRoundTime < 1.0 Then Begin
+        vPointer.x := 8.0;
+        vPointer.y := 8.5 - (GetTime() - fRoundTime) * 3.0;
+        vPointer.z := 6.0 + (fRoundTime - GetTime() + 1.0) * 16.0;
+        vCenter.x := 8.0;
+        vCenter.y := 0.0;
+        vCenter.z := 5.5;
+        vCamera.x := vPointer.x;
+        vCamera.y := vPointer.y;
+        vCamera.z := vPointer.z;
+     End Else If nCamera = CAMERA_OVERALL Then Begin
         vPointer.x := 8.0;
         vPointer.y := 8.5;
         vPointer.z := 6.0;
         vCenter.x := 8.0;
         vCenter.y := 0.0;
         vCenter.z := 5.5;
+        vCamera.x := vPointer.x;
+        vCamera.y := vPointer.y;
+        vCamera.z := vPointer.z;
      End Else If nCamera = CAMERA_FLY Then Begin
         vAngle.x -= GetMouseDX() * 2000.0 * GetDelta();
         vAngle.y += GetMouseDY() * 2000.0 * GetDelta();
@@ -319,7 +346,7 @@ Begin
      If vCamera.z > vPointer.z Then vCamera.z -= vPointer.z * GetDelta() * 1.0;
      If vCamera.z < vPointer.z Then vCamera.z += vPointer.z * GetDelta() * 1.0;
 
-     SetProjectionMatrix ( 90.0, 1.0, 1.0, 2048.0 ) ;
+     SetProjectionMatrix ( 90.0, 1.0, 0.1, 2048.0 ) ;
      SetCameraMatrix ( vCamera.x, vCamera.y, vCamera.z, vCenter.x, vCenter.y, vCenter.z, 0, 1, 0 ) ;
 
      EnableLighting();
@@ -502,7 +529,10 @@ Begin
      End;
 
      // mise à jour de la minuterie
-     CheckTimer;
+     CheckTimer();
+
+     // vérifie s'il reste des bomberman en jeu
+     If CheckEndGame() Then NextRound();
 End;
 
 Procedure GameLoop () ; cdecl;
@@ -603,7 +633,7 @@ Begin
      End;
 
      // initialisation de la camera
-     nCamera := -1;
+     nCamera := CAMERA_OVERALL;
 
      ExecGlut();
 End.
