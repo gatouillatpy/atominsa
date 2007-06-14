@@ -73,7 +73,6 @@ End;
 
 
 Procedure InitGame () ;
-Var i : Integer;
 Begin
      tScheme := pScheme;
      tGrid := CGrid.Create( tScheme );
@@ -105,13 +104,26 @@ End;
 
 
 
+Procedure InitMenu () ;
+Begin
+     CreateRenderTexture();
+
+     nState := STATE_MENU;
+End;
+
+
+
 Procedure ProcessIntro () ;
 Var t : Single;
+    w, h : Single;
 Begin
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
      If GetTime() > fIntroTime Then Begin
         nIntroLayer += 1;
         fIntroTime := GetTime() + 1.0;
-        If nIntroLayer = 21 Then nState := STATE_MENU;
+        If nIntroLayer = 21 Then InitMenu();
      End;
 
      // permet d'ajuster la vitesse de zoom en fonction par rapport à la projection
@@ -119,32 +131,32 @@ Begin
      
      SetTexture( 1, SPRITE_INTRO_LAYER(nIntroLayer) );
      // zoom sur la Terre
-     If nIntroLayer = 0 Then DrawImage( -0.007 * t, -0.012 * t, 0.537 * t - 1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
-     If nIntroLayer = 1 Then DrawImage( 0, 0, 0.669 * t - 1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
-     If nIntroLayer = 2 Then DrawImage( -0.022 * t, -0.034 * t, 0.490 * t - 1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
-     If nIntroLayer = 3 Then DrawImage( -0.175 * t, -0.016 * t, 0.469 * t - 1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
-     If (nIntroLayer > 3) And (nIntroLayer < 18) Then DrawImage( 0.055 * t, -0.045 * t, 0.500 * t - 1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
-     If nIntroLayer = 18 Then DrawImage( 0, 0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
+     If nIntroLayer = 0 Then DrawImage( -0.007 * t, -0.012 * t, 0.537 * t - 1.0, w / h, 1, 1, 1, 1, 1, True );
+     If nIntroLayer = 1 Then DrawImage( 0, 0, 0.669 * t - 1.0, w / h, 1, 1, 1, 1, 1, True );
+     If nIntroLayer = 2 Then DrawImage( -0.022 * t, -0.034 * t, 0.490 * t - 1.0, w / h, 1, 1, 1, 1, 1, True );
+     If nIntroLayer = 3 Then DrawImage( -0.175 * t, -0.016 * t, 0.469 * t - 1.0, w / h, 1, 1, 1, 1, 1, True );
+     If (nIntroLayer > 3) And (nIntroLayer < 18) Then DrawImage( 0.055 * t, -0.045 * t, 0.500 * t - 1.0, w / h, 1, 1, 1, 1, 1, True );
+     If nIntroLayer = 18 Then DrawImage( 0, 0, -1.0, w / h, 1, 1, 1, 1, 1, True );
      // fondu et affichage de la grille
      If nIntroLayer = 19 Then Begin
         SetTexture( 1, SPRITE_INTRO_LAYER(18) );
-        DrawImage( 0, 0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 0.5 + (fIntroTime - GetTime()) * 0.5, True );
+        DrawImage( 0, 0, -1.0, w / h, 1, 1, 1, 1, 0.5 + (fIntroTime - GetTime()) * 0.5, True );
         SetTexture( 1, SPRITE_INTRO_LAYER(19) );
-        DrawImage( 0, 0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, (1.0 + GetTime() - fIntroTime) * 0.5, True );
+        DrawImage( 0, 0, -1.0, w / h, 1, 1, 1, 1, (1.0 + GetTime() - fIntroTime) * 0.5, True );
         SetTexture( 1, SPRITE_INTRO_LAYER(20) );
-        DrawImage( -2.0 + (1.0 + GetTime() - fIntroTime) * 2.0, 0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
+        DrawImage( -2.0 + (1.0 + GetTime() - fIntroTime) * 2.0, 0, -1.0, w / h, 1, 1, 1, 1, 1, True );
         SetTexture( 1, SPRITE_INTRO_LAYER(21) );
-        DrawImage( 0, 2.0 - (1.0 + GetTime() - fIntroTime) * 2.0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
+        DrawImage( 0, 2.0 - (1.0 + GetTime() - fIntroTime) * 2.0, -1.0, w / h, 1, 1, 1, 1, 1, True );
      End;
      If nIntroLayer = 20 Then Begin
         SetTexture( 1, SPRITE_INTRO_LAYER(18) );
-        DrawImage( 0, 0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, (fIntroTime - GetTime()) * 0.5, True );
+        DrawImage( 0, 0, -1.0, w / h, 1, 1, 1, 1, (fIntroTime - GetTime()) * 0.5, True );
         SetTexture( 1, SPRITE_INTRO_LAYER(19) );
-        DrawImage( 0, 0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 0.5 + (1.0 + GetTime() - fIntroTime) * 0.5, True );
+        DrawImage( 0, 0, -1.0, w / h, 1, 1, 1, 1, 0.5 + (1.0 + GetTime() - fIntroTime) * 0.5, True );
         SetTexture( 1, SPRITE_INTRO_LAYER(20) );
-        DrawImage( (1.0 + GetTime() - fIntroTime) * 2.0, 0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
+        DrawImage( (1.0 + GetTime() - fIntroTime) * 2.0, 0, -1.0, w / h, 1, 1, 1, 1, 1, True );
         SetTexture( 1, SPRITE_INTRO_LAYER(21) );
-        DrawImage( 0, 0.0 - (1.0 + GetTime() - fIntroTime) * 2.0, -1.0, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, True );
+        DrawImage( 0, 0.0 - (1.0 + GetTime() - fIntroTime) * 2.0, -1.0, w / h, 1, 1, 1, 1, 1, True );
      End;
 
 End;
@@ -186,25 +198,85 @@ Var w, h : Single; // taille de la fenêtre
     k : LongInt;
     r, g, b : Byte;
 Begin
-     w := GetWidth();
-     h := GetHeight();
-     x := GetMouseX();
-     y := GetMouseY();
-     u := Round((2 * x / h - w / h) / (w / h / 9)) * (w / h / 9);
-     v := Round((1 - 2 * y / h) / (1 / 9)) * (1 / 9);
-
      Case nMenu Of
           MENU_MAIN :
           Begin
                BindButton( BUTTON_LEFT, @CheckMainButton );
 
-               // affichage du fond et de la croix
-               SetTexture( 1, SPRITE_MENU_BACK );
-               DrawImage( 0, 0, -1, GetWidth() / GetHeight(), 1, 1, 1, 1, 1, False );
+               PutRenderTexture();
+
+               w := GetRenderWidth();
+               h := GetRenderHeight();
+               x := GetMouseX() / GetWindowWidth() * w;
+               y := GetMouseY() / GetWindowHeight() * h;
+               u := Round((2 * x / h - w / h) / (w / h / 9)) * (w / h / 9);
+               v := Round((1 - 2 * y / h) / (1 / 9)) * (1 / 9);
+
+               // affichage de la croix
+               //SetTexture( 1, SPRITE_MENU_BACK );
+               //DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
                SetTexture( 1, SPRITE_MENU_CROSS );
-               DrawImage( u, v, -1, 2 * w / h, 2, 1, 1, 1, 0.5, True );
+               DrawImage( u, v, -1, 2 * w / h, 2, 1, 1, 1, 0.1, True );
                DrawText( w - 170, h - 20, 1, 1, 1, FONT_NORMAL, 'atominsa ' + VERSION );
                
+               i := Round(x / w * Window.Mask.Picture.Width);
+               j := Round(y / h * Window.Mask.Picture.Height);
+               k := 4 * (j * Window.Mask.Picture.Width + i);
+               b := MaskIntfImg.PixelData[k+0];
+               g := MaskIntfImg.PixelData[k+1];
+               r := MaskIntfImg.PixelData[k+2];
+               If (r = 0) And (g = 0) And (b = 0) Then nButton := BUTTON_NONE;
+               If (r = 0) And (g = 255) And (b = 255) Then nButton := BUTTON_EXIT;
+               If (r = 255) And (g = 0) And (b = 0) Then nButton := BUTTON_QUICKGAME;
+               If (r = 0) And (g = 255) And (b = 0) Then nButton := BUTTON_MULTIGAME;
+               If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLOGAME;
+               If (r = 255) And (g = 255) And (b = 0) Then nButton := BUTTON_SETUP;
+
+               If nButton <> BUTTON_NONE Then Begin
+                  Case nButton Of
+                       BUTTON_EXIT : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON0 );
+                       BUTTON_MULTIGAME : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON4 );
+                       BUTTON_SOLOGAME : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON1 );
+                       BUTTON_SETUP : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON3 );
+                       BUTTON_QUICKGAME : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON2 );
+                  End;
+                  DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.1, True );
+                  If (nButton <> nLastButton) And (nButton <> BUTTON_NONE) Then Begin
+                     PlaySound( SOUND_MENU_MOVE );
+                     Case nButton Of
+                          BUTTON_EXIT : SetString( STRING_MENU_MAIN, 'exit', 0.5, 0.4, 20 );
+                          BUTTON_MULTIGAME : SetString( STRING_MENU_MAIN, 'multiplayer', 0.5, 1.1, 20 );
+                          BUTTON_SOLOGAME : SetString( STRING_MENU_MAIN, 'solo', 0.5, 0.4, 20 );
+                          BUTTON_SETUP : SetString( STRING_MENU_MAIN, 'setup', 0.5, 0.5, 20 );
+                          BUTTON_QUICKGAME : SetString( STRING_MENU_MAIN, 'practice', 0.5, 0.8, 20 );
+                     End;
+                  End;
+                  SetTexture( 1, SPRITE_CHARSET_TERMINAL );
+                  Case nButton Of
+                       BUTTON_EXIT : DrawString( STRING_MENU_MAIN, -0.551 * w / h, -0.831, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //-0.734
+                       BUTTON_MULTIGAME : DrawString( STRING_MENU_MAIN, 0.425 * w / h, -0.263, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //0.566
+                       BUTTON_SOLOGAME : DrawString( STRING_MENU_MAIN, -0.082 * w / h, -0.319, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //-0.109
+                       BUTTON_SETUP : DrawString( STRING_MENU_MAIN, 0.213 * w / h, 0.090, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //0.284
+                       BUTTON_QUICKGAME : DrawString( STRING_MENU_MAIN, -0.218 * w / h, 0.194, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //-0.291
+                  End;
+               End;
+               nLastButton := nButton;
+
+               SetRenderTexture();
+               DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.9, True );
+
+               GetRenderTexture();
+
+               w := GetRenderWidth();
+               h := GetRenderHeight();
+
+               // affichage du fond
+               SetTexture( 1, SPRITE_MENU_BACK );
+               DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+               {SetTexture( 1, SPRITE_MENU_CROSS );
+               DrawImage( u, v, -1, 2 * w / h, 2, 1, 1, 1, 0.5, True );
+               DrawText( w - 170, h - 20, 1, 1, 1, FONT_NORMAL, 'atominsa ' + VERSION );
+
                i := Round(x / w * Window.Mask.Picture.Width);
                j := Round(y / h * Window.Mask.Picture.Height);
                k := 4 * (j * Window.Mask.Picture.Width + i);
@@ -246,7 +318,10 @@ Begin
                        BUTTON_QUICKGAME : DrawString( STRING_MENU_MAIN, -0.291, 0.194, -1, 0.03, 0.03, 1, 1, 1, 0.8, True );
                   End;
                End;
-               nLastButton := nButton;
+               nLastButton := nButton;}
+
+               SetRenderTexture();
+               DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, True );
           End;
      End;
 End;
@@ -255,14 +330,18 @@ End;
 Var bScoreTable : Boolean;
 
 Procedure ProcessGame () ;
-Var i, j : Integer;
+Var w, h : Single;
+    i, j : Integer;
     r,g,b : single;
     t : Boolean;
 Begin
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
      If GetTime() - fGameTime < 3.0 Then Begin
-        vPointer.x := 8.0 + (fGameTime - GetTime() + 3.0) * 8.0 * cos((GetTime() - fGameTime) / 3.0 * PI + PI);
+        vPointer.x := 8.0 + (fGameTime - GetTime() + 3.0) * 8.0 * cos((GetTime() - fGameTime) / 3.0 * PI + PI * 3 / 2);
         vPointer.y := 8.5 + (fGameTime - GetTime() + 3.0) * 8.0;
-        vPointer.z := 6.0 + (fGameTime - GetTime() + 3.0) * 8.0 * sin((GetTime() - fGameTime) / 3.0 * PI + PI);
+        vPointer.z := 6.0 + (fGameTime - GetTime() + 3.0) * 8.0 * sin((GetTime() - fGameTime) / 3.0 * PI + PI * 3 / 2);
         vCenter.x := 8.0;
         vCenter.y := 0.0;
         vCenter.z := 5.5;
@@ -271,7 +350,7 @@ Begin
         vCamera.z := vPointer.z;
      End Else If GetTime() - fRoundTime < 1.0 Then Begin
         vPointer.x := 8.0;
-        vPointer.y := 8.5 - (GetTime() - fRoundTime) * 3.0;
+        vPointer.y := 8.5 + (fRoundTime - GetTime() + 1.0) * 3.0;
         vPointer.z := 6.0 + (fRoundTime - GetTime() + 1.0) * 16.0;
         vCenter.x := 8.0;
         vCenter.y := 0.0;
@@ -518,11 +597,11 @@ Begin
         If Not bScoreTable Then Begin
            If GetBombermanCount() <> 0 Then
               For i := 1 To GetBombermanCount() Do
-                  SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %d kills.', [GetBombermanByCount(i).Kills]), Single(i) * 0.1 + 0.1, 1.0, 20 );
+                  SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %d ; %d kill(s), %d death(s).', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths]), Single(i) * 0.1 + 0.1, 1.0, 20 );
         End;
         If GetBombermanCount() <> 0 Then
            For i := 1 To GetBombermanCount() Do
-               DrawString( STRING_SCORE_TABLE(i), -0.5, 0.8 - 0.2 * Single(i), -1, 0.03, 0.03, 1, 1, 1, 0.8, True );
+               DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.4 - 0.1 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True );
         bScoreTable := True;
      End Else Begin
         bScoreTable := False;

@@ -145,6 +145,11 @@ Procedure DisableLighting() ;
 Procedure SetLight( k : Integer ; x, y, z : Single ; r, g, b, a : Single ; a0, a1, a2 : Single ; t : Boolean ) ;
 Procedure SetMaterial( r, g, b : Single ; t : Boolean ) ;
 
+Procedure CreateRenderTexture() ;
+Procedure PutRenderTexture() ;
+Procedure GetRenderTexture() ;
+Procedure SetRenderTexture() ;
+
 
 
 Function GetTime () : Single ;
@@ -189,8 +194,10 @@ Procedure ExecGlut () ;
 
 
 
-Function GetWidth : Integer;
-Function GetHeight : Integer;
+Function GetRenderWidth : Integer;
+Function GetRenderHeight : Integer;
+Function GetWindowWidth : Integer;
+Function GetWindowHeight : Integer;
 
 
 
@@ -774,7 +781,7 @@ Begin
      // définie les techniques de rendu
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-     glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+     glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 End;
 
 
@@ -952,7 +959,7 @@ Begin
      glMatrixMode( GL_PROJECTION );
      glPushMatrix;
      glLoadIdentity;
-     gluOrtho2D( 0, GetWidth, 0, GetHeight );
+     gluOrtho2D( 0, GetRenderWidth, 0, GetRenderHeight );
 
      glMatrixMode( GL_MODELVIEW );
      glPushMatrix;
@@ -962,7 +969,7 @@ Begin
      glDisable( GL_DEPTH_TEST );
 
      glColor3f( r, g, b );
-     glRasterPos2f( x, GetHeight - y );
+     glRasterPos2f( x, GetRenderHeight - y );
      For i := 1 To Length(sText) Do
          glutBitmapCharacter( pFont, Integer(sText[i]) );
 
@@ -985,7 +992,7 @@ Var i : Integer;
 Begin
      glMatrixMode( GL_PROJECTION );
      glLoadIdentity;
-     gluPerspective( 90, GetWidth() / GetHeight(), 0.1, 1000 );
+     gluPerspective( 90, GetRenderWidth / GetRenderHeight, 0.1, 1000 );
 
      glMatrixMode(GL_MODELVIEW);
      glLoadIdentity;
@@ -1135,7 +1142,7 @@ Begin
      
      glMatrixMode( GL_PROJECTION );
      glLoadIdentity;
-     gluPerspective( 90, GetWidth() / GetHeight(), 0.1, 1000 );
+     gluPerspective( 90, GetRenderWidth / GetRenderHeight, 0.1, 1000 );
 
      glMatrixMode(GL_MODELVIEW);
      glLoadIdentity;
@@ -1239,7 +1246,7 @@ End;
 
 
 
-Function GetWidth : Integer;
+Function GetRenderWidth : Integer;
 Var Rect : Array[0..3] Of Integer;
 Begin
      glGetIntegerv(GL_VIEWPORT, @Rect);
@@ -1248,11 +1255,26 @@ End;
 
 
 
-Function GetHeight : Integer;
+Function GetRenderHeight : Integer;
 Var Rect : Array[0..3] Of Integer;
 Begin
-  glGetIntegerv(GL_VIEWPORT, @Rect);
-  Result := Rect[3] - Rect[1];
+     glGetIntegerv(GL_VIEWPORT, @Rect);
+     Result := Rect[3] - Rect[1];
+End;
+
+
+Var WindowWidth : Integer;
+Function GetWindowWidth : Integer;
+Begin
+     Result := WindowWidth;
+End;
+
+
+
+Var WindowHeight : Integer;
+Function GetWindowHeight : Integer;
+Begin
+     Result := WindowHeight;
 End;
 
 
@@ -1314,6 +1336,60 @@ Begin
 End;
 
 
+
+Var RenderTexture : GLUInt;
+    RenderWidth : Integer;
+    RenderHeight : Integer;
+    
+    
+
+Procedure CreateRenderTexture() ;
+Var Data : Pointer;
+Begin
+     GetMem( Data, 512*256*3 );
+     glGenTextures( 1, @RenderTexture );
+     glBindTexture( GL_TEXTURE_2D, RenderTexture );
+     glTexImage2D( GL_TEXTURE_2D, 0, 3, 512, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, Data );
+     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+     FreeMem(Data);
+End;
+
+
+
+Procedure PutRenderTexture() ;
+Begin
+     RenderWidth := GetRenderWidth;
+     RenderHeight := GetRenderHeight;
+     glViewport( 0, 0, 512, 256 );
+     glBindTexture( GL_TEXTURE_2D, RenderTexture );
+End;
+
+
+
+Procedure GetRenderTexture() ;
+Begin
+     glBindTexture( GL_TEXTURE_2D, RenderTexture );
+     glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, 512, 256, 0 );
+     glViewport( 0, 0, RenderWidth, RenderHeight );
+     glClearColor( 0.0, 0.0, 0.0, 0.0 );
+     glClear( GL_COLOR_BUFFER_BIT Or GL_DEPTH_BUFFER_BIT );
+     glClearDepth( 1.0 );
+End;
+
+
+
+Procedure SetRenderTexture() ;
+Begin
+     glEnable( GL_TEXTURE_2D );
+
+     glBindTexture( GL_TEXTURE_2D, RenderTexture );
+
+     // définie les techniques de rendu
+     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+     glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+End;
 
 
 
@@ -1809,6 +1885,19 @@ End;
 
 
 
+Procedure OGLWindow( w, h : Integer ); cdecl;
+Begin
+     If h = 0 Then h := 1;
+     If w = 0 Then w := 1;
+
+     glViewport( 0, 0, w, h );
+
+     WindowWidth := w;
+     WindowHeight := h;
+End;
+
+
+
 Procedure InitGlut ( sTitle : String ; pCallback : GameCallback ) ;
 Begin
      OGLCallback := pCallback;
@@ -1819,6 +1908,7 @@ Begin
      glutInitWindowSize( SCREENWIDTH, SCREENHEIGHT );
      glutInitWindowPosition( 120, 80 );
      glutCreateWindow( PChar(sTitle) );
+     glutReshapeFunc( @OGLWindow );
      //glutFullscreen();
      glutDisplayFunc( @OGLRender );
      glutIdleFunc( @OGLIdle );
