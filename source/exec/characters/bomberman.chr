@@ -1,0 +1,27 @@
+
+; NOTE! This is an atominsa Character File.
+; Modify at your own risk. It is machine-generated and updated.
+
+
+; version control number
+-V,2
+
+; character name
+-N,Original Bomberman
+
+; mesh file
+-M,.\bomberman\bomberman.m12
+
+; animation file
+-A,.\bomberman\bomberman.a12
+
+; skin file
+-S,0,.\bomberman\bomberman0.jpg
+-S,1,.\bomberman\bomberman1.jpg
+-S,2,.\bomberman\bomberman2.jpg
+-S,3,.\bomberman\bomberman3.jpg
+-S,4,.\bomberman\bomberman4.jpg
+-S,5,.\bomberman\bomberman5.jpg
+-S,6,.\bomberman\bomberman6.jpg
+-S,7,.\bomberman\bomberman7.jpg
+

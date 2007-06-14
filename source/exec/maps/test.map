@@ -1,0 +1,16 @@
+
+; NOTE! This is an atominsa Map File.
+; Modify at your own risk. It is machine-generated and updated.
+
+
+; version control number
+-V,2
+
+; map name
+-N,*TEST*
+
+; solid block mesh file
+-S,.\test\solid.m12
+
+; brick block mesh file
+-B,.\test\brick.m12
