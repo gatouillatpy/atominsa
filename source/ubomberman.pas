@@ -1,6 +1,3 @@
-//Probleme a regler : Refaire la fonction move completement
-//je m'en occupe dès que j'ai le temps :)
-//
 unit UBomberman;
 
 {$mode objfpc}{$H+}
@@ -88,7 +85,7 @@ type
   property Speed : single Read fSpeed Write fSpeed;
   property Alive : boolean Read bAlive;
   property NoBomb : Boolean Read bNoBomb Write bNoBomb;
-  property Shoot : boolean Read bKick Write bKick;
+  property Kick : boolean Read bKick Write bKick;
 
   end;
   
@@ -362,7 +359,7 @@ procedure CBomberman.Move(dx, dy : integer; dt : single);
          function ChangeCase(aX,aY : integer):boolean;
          {True = On change de case}
          begin
-           result:= Not((aX=Trunc(fX)) AND (aY=Trunc(fY)));
+           result:= Not((aX=Trunc(fX+0.5)) AND (aY=Trunc(fY+0.5)));
          end;
 
          function TestGrid(aX,aY : integer):boolean;
@@ -438,111 +435,69 @@ procedure CBomberman.Move(dx, dy : integer; dt : single);
       end;
   //**************************END::SOUS FONCTIONS PRINC***********************//
   
-var  _X, _Y, aX, aY : integer;
-     _fX, _fY : Single;
+var   aX, aY : integer;
+     _X, _Y,_fX, _fY, delta : Single;
      _Bomb : CBomb;
      bBomb, bResult : boolean;
 begin
-{On repere d'abord dans quel case on est cence arriver}
-_fX:=fX + dx*fSpeed*dt;
-_fY:=fY + dy*fSpeed*dt;
-_X := Trunc(_fX);
-_Y := Trunc(_fY);
-aX:=_X;
-aY:=_Y;
-
 {On modifie le vecteur orientation du bomberman}
 nDirection:=-dX*90+90*dY*(dY-1);
 
+{On repere d'abord dans quel case on est cence arriver}
+delta := 0.8;
+_fX:=fX + dx*fSpeed*dt;
+_fY:=fY + dy*fSpeed*dt;
+_X:=_fX;
+_Y:=_fY;
+if dY=1 then _Y:=_Y+delta
+else if dX=1 then _X:=_X+delta;
+aX:=Trunc(_X);
+aY:=Trunc(_Y);
 
-if (dY<>0) then
-{Deplacement Vertical}
-begin
-  {On regarde d'abord si notre origine passe}
-  if dY=1 then aY:=Trunc(_fY+0.9);
-  TestMove(aX,aY,bBomb,bResult);
-  if bResult then
-  begin
-    {Si ca passe on on regarde si c'est pas grace au kick d'une bombe}
-    if bBomb then
-    {Auquel cas on ne la shoot que si au moins la moitie du bomberman est en face}
-     begin
-      if (Trunc(_fX+0.5)=aX) then
-      begin
-       _Bomb:=GetBombByGridCoo(aX,aY);
-       if dY=1 then _Bomb.MoveDown(dt)
-       else _Bomb.MoveUp(dt);
-      end;
-    end
-    else
-    {Sinon bha on test l'autre extremite}
-    begin
-      aX:=Trunc(_fX+0.9);
-      TestMove(aX,aY,bBomb,bResult);
-      {Si elle passe aussi, rebelote}
-      if bResult then
-      begin
-        if bBomb then
-        begin
-          if (Trunc(_fX+0.9-0.5)=aX) then
-          begin
-           _Bomb:=GetBombByGridCoo(aX,aY);
-           if dY=1 then _Bomb.MoveDown(dt)
-           else _Bomb.MoveUp(dt);
-          end;
-        end
-        else DoMove(_fX,_fY);
-      end
-    end;
-    {Sinon on bouge pas}
-  end;
-  {Sinon on fait rien}
-end
 
-else
-{Deplacement horizontal}
-if (dX<>0) then
+TestMove(aX,aY,bBomb,bResult);
+if bResult then
 begin
-  {On regarde d'abord si notre origine passe}
-  if dX=1 then aX:=Trunc(_fX+0.9);
-  TestMove(aX,aY,bBomb,bResult);
-  if bResult then
-  begin
-    {Si ca passe on on regarde si c'est pas grace au kick d'une bombe}
-    if bBomb then
-    {Auquel cas on ne la shoot que si au moins la moitie du bomberman est en face}
-     begin
-      if (Trunc(_fY+0.5)=aY) then
-      begin
-       _Bomb:=GetBombByGridCoo(aX,aY);
-       if dX=1 then _Bomb.MoveRight(dt)
-       else _Bomb.MoveLeft(dt);
-      end;
-    end
-    else
-    {Sinon bha on test l'autre extremite}
+  {Si ca passe on on regarde si c'est pas grace au kick d'une bombe}
+  if bBomb then
+  {Auquel cas on ne la shoot que si au moins la moitie du bomberman est en face}
+   begin
+    if ((Trunc(_fX+0.5)=aX) or (Trunc(_fY+0.5)=aY)) then
     begin
-      aY:=Trunc(_fY+0.9);
-      TestMove(aX,aY,bBomb,bResult);
-      {Si elle passe aussi, rebelote}
-      if bResult then
-      begin
-        if bBomb then
-        begin
-          if (Trunc(_fY+0.9-0.5)=aY) then
-          begin
-           _Bomb:=GetBombByGridCoo(aX,aY);
-           if dX=1 then _Bomb.MoveRight(dt)
-           else _Bomb.MoveLeft(dt);
-          end;
-        end
-        else DoMove(_fX,_fY);
-      end
+     _Bomb:=GetBombByGridCoo(aX,aY);
+     if dX=1 then _Bomb.MoveRight(dt)
+     else if dX=-1 then _Bomb.MoveLeft(dt)
+     else if dY=1 then _Bomb.MoveDown(dt)
+     else if dY=-1 then _Bomb.MoveUp(dt);
     end;
-    {Sinon on bouge pas}
+  end
+  else
+  {Sinon bha on test l'autre extremite}
+  begin
+    aX:=Trunc(_X+abs(dY)*0.5);
+    aY:=Trunc(_Y+abs(dX)*0.5);
+    TestMove(aX,aY,bBomb,bResult);
+    {Si elle passe aussi, rebelote}
+    if bResult then
+    begin
+      if bBomb then
+      begin
+        if ((Trunc(_fX+abs(dY)*delta+0.5)=aX) or (Trunc(_fY+abs(dX)*delta+0.5)=aY)) then
+        begin
+         _Bomb:=GetBombByGridCoo(aX,aY);
+         if dX=1 then _Bomb.MoveRight(dt)
+         else if dX=-1 then _Bomb.MoveLeft(dt)
+         else if dY=1 then _Bomb.MoveDown(dt)
+         else if dY=-1 then _Bomb.MoveUp(dt);
+        end;
+      end
+      else DoMove(_fX,_fY);
+    end
   end;
-  {Sinon on fait rien}
+  {Sinon on force un deplacement lateral en plus}
 end;
+
+
 
 {var aX, aY : Integer;
     _fX, _fY : single;

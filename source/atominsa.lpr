@@ -449,7 +449,7 @@ Begin
           If GetBombermanByCount(i).Alive then
           Begin
                SetTexture( 1, TEXTURE_BOMBERMAN(i) );
-               PushObjectMatrix( GetBombermanByCount(i).X, 0, GetBombermanByCount(i).Y, 0.05, 0.05, 0.05, 0, GetBombermanByCount(i).Direction, 0 );
+               PushObjectMatrix( GetBombermanByCount(i).X-0.15, 0, GetBombermanByCount(i).Y-0.15, 0.05, 0.05, 0.05, 0, GetBombermanByCount(i).Direction, 0 );
                DrawMesh( MESH_BOMBERMAN, r, g, b, False );
                PopObjectMatrix();
           End;
@@ -537,9 +537,9 @@ Begin
       SetMaterial( 1, 1, 1, True );
       SetTexture( 1, TEXTURE_NONE );
       PushObjectMatrix( GetBombByCount(i).X, 0, GetBombByCount(i).Y,
-                         1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)),
-                         1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)),
-                         1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)),
+                         1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
+                         1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
+                         1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
                         0, 0, 0 );
       DrawMesh( MESH_BOMB, 0.6, 0, 0, False );
       PopObjectMatrix();
