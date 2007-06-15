@@ -12,6 +12,14 @@ Var nVersion : Integer;
 
 Var bIntro : Boolean;
 
+Var nRoundCount : Integer;
+
+Var bDisplayFullscreen : Boolean;
+Var nDisplayWidth : Integer;
+Var nDisplayHeight : Integer;
+Var nDisplayFramerate : Integer;
+Var nDisplayRefreshrate : Integer;
+
 Var aSchemeList : Array [0..255] Of CScheme;
 Var nSchemeCount : Integer;
 Var bSchemeRandom : Boolean;
@@ -155,6 +163,14 @@ Begin
      End;
 
      bIntro := True;
+     
+     bDisplayFullscreen := False;
+     nDisplayWidth := 640;
+     nDisplayHeight := 480;
+     nDisplayFramerate := 60;
+     nDisplayRefreshrate := 85;
+
+     nRoundCount := 3;
 
      bSchemeRandom := False;
      pScheme := NIL;

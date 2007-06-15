@@ -54,10 +54,6 @@ Var nRound : Integer;
 Procedure NextRound () ;
 Var i : Integer;
 Begin
-     // attention restore sera pour l'inter-round, ce ne sera plus nécessaire dans initgame
-     //de meme que FreeTimer et FreeBomb et FreeFlame et LoadScheme ... en fait toute cette fonction quoi ...
-     //donc en fait t'as ecrit de la merde c'est juste que cette fonction elle devra etre appeler ou il faut =)
-     //c boooooooooooooooon on rigoooooooooooole
      FreeFlame();
      FreeBomb();
      FreeTimer();
@@ -589,8 +585,6 @@ Begin
           If Not GetFlameByCount(i).Update() Then i += 1;
      End;
 
-
-
      // affichage des scores
      If GetKeyS(KEY_TAB) Then Begin
         SetTexture( 1, SPRITE_CHARSET_TERMINAL );
@@ -614,7 +608,7 @@ Begin
      If CheckEndGame() Then NextRound();
 End;
 
-Procedure GameLoop () ; cdecl;
+Procedure MainLoop () ; cdecl;
 Begin
      Case nState Of
           STATE_INTRO : ProcessIntro();
@@ -651,7 +645,7 @@ Begin
 
      // CHECKER UNE OPTION POUR LE PASSAGE EN FULLSCREEN ET POUR LA RESOLUTION
      // LE PASSAGE EN FULLSCREEN DOIT SE FAIRE DANS OGLExec APRES LE CHARGEMENT
-     InitGlut( 'atominsa - Game', @gameloop );
+     InitGlut( 'atominsa - Game', @MainLoop );
 
      //----------------------------BEGIN::TEMP----------------------------//
      AddMesh( './characters/bomberman/bomberman.m12', MESH_BOMBERMAN );

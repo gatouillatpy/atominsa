@@ -1,31 +1,30 @@
 object Window: TWindow
-  ActiveControl = Memo
-  Caption = 'atominsa - Console'
-  ClientHeight = 300
-  ClientWidth = 673
-  PixelsPerInch = 72
-  HorzScrollBar.Page = 672
-  VertScrollBar.Page = 299
   Left = 312
   Height = 300
   Top = 378
   Width = 673
+  HorzScrollBar.Page = 672
+  VertScrollBar.Page = 299
+  ActiveControl = Memo
+  Caption = 'atominsa - Console'
   object Image: TImage
-    Transparent = True
-    Visible = False
     Left = 10
     Height = 100
     Top = 10
     Width = 100
+    Visible = False
   end
   object Mask: TImage
-    Transparent = True
     Left = 10
     Height = 100
     Top = 10
     Width = 100
   end
   object Memo: TMemo
+    Left = 10
+    Height = 278
+    Top = 10
+    Width = 654
     Color = clNavy
     Font.CharSet = ANSI_CHARSET
     Font.Color = clYellow
@@ -33,9 +32,5 @@ object Window: TWindow
     Font.Name = 'Courier New'
     Font.Pitch = fpFixed
     TabOrder = 0
-    Left = 19
-    Height = 278
-    Top = 16
-    Width = 654
   end
 end

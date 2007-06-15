@@ -8,14 +8,11 @@ Interface
 Uses Classes, SysUtils, LazJPEG, Math, Graphics, IntfGraphics,
      GL, GLU, GLUT, GLEXT,
      fmod, fmodtypes, fmoderrors,
-     UForm, UUtils;
+     UForm, UUtils, USetup;
 
 
 
-Const SCREENWIDTH = 640;
-      SCREENHEIGHT = 480;
-
-      KEY_UP = GLUT_KEY_UP;
+Const KEY_UP = GLUT_KEY_UP;
       KEY_DOWN = GLUT_KEY_DOWN;
       KEY_LEFT = GLUT_KEY_LEFT;
       KEY_RIGHT = GLUT_KEY_RIGHT;
@@ -153,6 +150,7 @@ Procedure SetRenderTexture() ;
 
 
 Function GetTime () : Single ;
+Function GetTimeExt () : Double ;
 Function GetFPS () : Single ;
 Function GetDelta () : Single;
 
@@ -388,18 +386,30 @@ Var pTimerStack : LPTimerItem = NIL;
 
 
 Var nFrame : Integer;
-    fTime  : Single;
+    fTime  : Double;
     nFPS   : Integer;
-    fDelta : Single;
+    fDelta : Double;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // GetTime : Renvoie le temps passé (en secondes) depuis l'exécution du jeu.  //
 ////////////////////////////////////////////////////////////////////////////////
+Function QueryPerformanceCounter( Var lpPerformanceCount : Int64 ) : Integer ; stdcall; external 'kernel32' name 'QueryPerformanceCounter';
+Function QueryPerformanceFrequency( Var lpFrequency : Int64 ) : Integer ; stdcall; external 'kernel32' name 'QueryPerformanceFrequency';
+
 Function GetTime () : Single ;
 Begin
      GetTime := glutGet(GLUT_ELAPSED_TIME) * 0.001;
+End;
+
+Function GetTimeExt () : Double ;
+Var lpPerformanceCount : Int64;
+Var lpFrequency : Int64;
+Begin
+     QueryPerformanceCounter( lpPerformanceCount );
+     QueryPerformanceFrequency( lpFrequency );
+     GetTimeExt := lpPerformanceCount / lpFrequency;
 End;
 
 
@@ -781,7 +791,7 @@ Begin
      // définie les techniques de rendu
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-     glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+     glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 End;
 
 
@@ -1833,18 +1843,10 @@ Begin
      If GetTime() - fTime > 1 Then
      Begin
           nFPS := nFrame;
-          nFrame := 0;
+          nFrame := -1;
           fTime := GetTime();
      End;
      fDelta := GetTime();
-End;
-
-
-
-Procedure OGLTimer ( value : Integer ) ; cdecl;
-Begin
-     glutPostRedisplay;
-     glutTimerFunc( 8, @OGLTimer, 0 );
 End;
 
 
@@ -1879,8 +1881,13 @@ End;
 
 
 
-Procedure OGLIdle () ; cdecl;
+Var fIdleTime : Double;
+Procedure OGLTimer () ; cdecl;
 Begin
+     If GetTimeExt() >= fIdleTime Then Begin
+        fIdleTime := GetTimeExt() + 1.0 / nDisplayFramerate;
+        glutPostRedisplay();
+     End;
 End;
 
 
@@ -1905,14 +1912,13 @@ Begin
      glutInit( @argc, argv );
 
      glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
-     glutInitWindowSize( SCREENWIDTH, SCREENHEIGHT );
+     glutInitWindowSize( nDisplayWidth, nDisplayHeight );
      glutInitWindowPosition( 120, 80 );
      glutCreateWindow( PChar(sTitle) );
      glutReshapeFunc( @OGLWindow );
      //glutFullscreen();
      glutDisplayFunc( @OGLRender );
-     glutIdleFunc( @OGLIdle );
-     glutTimerFunc( 8, @OGLTimer, 0 );
+     glutIdleFunc( @OGLTimer );
      glutKeyboardFunc( @OGLKeyDown );
      glutKeyboardUpFunc( @OGLKeyUp );
      glutSpecialFunc( @OGLKeyDownS );
