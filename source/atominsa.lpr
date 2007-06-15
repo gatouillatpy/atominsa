@@ -74,20 +74,20 @@ Begin
      tGrid := CGrid.Create( tScheme );
 
      tPlayer := AddBomberman( sName1, 1, 1, tGrid, tScheme.Spawn(1).X, tScheme.Spawn(1).Y ); // le spawn du bomberman est variable : à voir
-     BindKey( nKey1MoveUp, False, True, @tPlayer.MoveUp );
-     BindKey( nKey1MoveDown, False, True, @tPlayer.MoveDown );
-     BindKey( nKey1MoveLeft, False, True, @tPlayer.MoveLeft );
-     BindKey( nKey1MoveRight, False, True, @tPlayer.MoveRight );
-     BindKey( nKey1Primary, True, False, @tPlayer.CreateBomb );
-     //BindKey( nKey1Secondary, True, False, @tPlayer.??? );
+     BindKeyObj( nKey1MoveUp, False, True, @tPlayer.MoveUp );
+     BindKeyObj( nKey1MoveDown, False, True, @tPlayer.MoveDown );
+     BindKeyObj( nKey1MoveLeft, False, True, @tPlayer.MoveLeft );
+     BindKeyObj( nKey1MoveRight, False, True, @tPlayer.MoveRight );
+     BindKeyObj( nKey1Primary, True, False, @tPlayer.CreateBomb );
+     //BindKeyObj( nKey1Secondary, True, False, @tPlayer.??? );
 
      tPlayer := AddBomberman( sName2, 2, 2, tGrid, tScheme.Spawn(2).X, tScheme.Spawn(2).Y );
-     BindKey( nKey2MoveUp, False, False, @tPlayer.MoveUp );
-     BindKey( nKey2MoveDown, False, False, @tPlayer.MoveDown );
-     BindKey( nKey2MoveLeft, False, False, @tPlayer.MoveLeft );
-     BindKey( nKey2MoveRight, False, False, @tPlayer.MoveRight );
-     BindKey( nKey2Primary, True, False, @tPlayer.CreateBomb );
-     //BindKey( nKey2Secondary, True, False, @tPlayer.??? );
+     BindKeyObj( nKey2MoveUp, False, False, @tPlayer.MoveUp );
+     BindKeyObj( nKey2MoveDown, False, False, @tPlayer.MoveDown );
+     BindKeyObj( nKey2MoveLeft, False, False, @tPlayer.MoveLeft );
+     BindKeyObj( nKey2MoveRight, False, False, @tPlayer.MoveRight );
+     BindKeyObj( nKey2Primary, True, False, @tPlayer.CreateBomb );
+     //BindKeyObj( nKey2Secondary, True, False, @tPlayer.??? );
 
      // désactivation de la souris
      BindButton( BUTTON_LEFT, NIL );
@@ -103,7 +103,10 @@ End;
 Procedure InitMenu () ;
 Begin
      CreateRenderTexture();
-
+     PutRenderTexture();
+     Clear( 1, 1, 1, 1 );
+     GetRenderTexture();
+     
      nState := STATE_MENU;
 End;
 
@@ -247,13 +250,12 @@ Begin
                           BUTTON_QUICKGAME : SetString( STRING_MENU_MAIN, 'practice', 0.5, 0.8, 20 );
                      End;
                   End;
-                  SetTexture( 1, SPRITE_CHARSET_TERMINAL );
                   Case nButton Of
-                       BUTTON_EXIT : DrawString( STRING_MENU_MAIN, -0.551 * w / h, -0.831, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //-0.734
-                       BUTTON_MULTIGAME : DrawString( STRING_MENU_MAIN, 0.425 * w / h, -0.263, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //0.566
-                       BUTTON_SOLOGAME : DrawString( STRING_MENU_MAIN, -0.082 * w / h, -0.319, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //-0.109
-                       BUTTON_SETUP : DrawString( STRING_MENU_MAIN, 0.213 * w / h, 0.090, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //0.284
-                       BUTTON_QUICKGAME : DrawString( STRING_MENU_MAIN, -0.218 * w / h, 0.194, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True ); //-0.291
+                       BUTTON_EXIT : DrawString( STRING_MENU_MAIN, -0.551 * w / h, -0.831, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //-0.734
+                       BUTTON_MULTIGAME : DrawString( STRING_MENU_MAIN, 0.425 * w / h, -0.263, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //0.566
+                       BUTTON_SOLOGAME : DrawString( STRING_MENU_MAIN, -0.082 * w / h, -0.319, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //-0.109
+                       BUTTON_SETUP : DrawString( STRING_MENU_MAIN, 0.213 * w / h, 0.090, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //0.284
+                       BUTTON_QUICKGAME : DrawString( STRING_MENU_MAIN, -0.218 * w / h, 0.194, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //-0.291
                   End;
                End;
                nLastButton := nButton;
@@ -262,6 +264,8 @@ Begin
                DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.9, True );
 
                GetRenderTexture();
+               
+               Clear( 0, 0, 0, 0 );
 
                w := GetRenderWidth();
                h := GetRenderHeight();
@@ -586,16 +590,16 @@ Begin
      End;
 
      // affichage des scores
-     If GetKeyS(KEY_TAB) Then Begin
+     If GetKey(KEY_TAB) Then Begin
         SetTexture( 1, SPRITE_CHARSET_TERMINAL );
         If Not bScoreTable Then Begin
            If GetBombermanCount() <> 0 Then
               For i := 1 To GetBombermanCount() Do
-                  SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %d ; %d kill(s), %d death(s).', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths]), Single(i) * 0.1 + 0.1, 1.0, 20 );
+                  SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %2d ; %d kill(s), %d death(s).', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths]), Single(i) * 0.1 + 0.1, 1.0, 20 );
         End;
         If GetBombermanCount() <> 0 Then
            For i := 1 To GetBombermanCount() Do
-               DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.4 - 0.1 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True );
+               DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.4 - 0.1 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
         bScoreTable := True;
      End Else Begin
         bScoreTable := False;
@@ -682,6 +686,7 @@ Begin
 
      // chargement des polices de caractères
      AddTexture( './textures/charset0.jpg', SPRITE_CHARSET_TERMINAL );
+     AddTexture( './textures/charset0x.jpg', SPRITE_CHARSET_TERMINALX );
      AddTexture( './textures/charset1.jpg', SPRITE_CHARSET_DIGITAL );
 
      // chargement des images de l'intro
@@ -698,15 +703,17 @@ Begin
 
      // initialisation de la machine d'état
      If bIntro Then Begin
-        nState := STATE_MENU;
+        nState := STATE_INTRO;
         nIntroLayer := -1;
         fIntroTime := 0.0;
      End Else Begin
-        nState := STATE_MENU;
+        InitMenu();
      End;
 
      // initialisation de la camera
      nCamera := CAMERA_OVERALL;
+
+     BindKeyStd( KEY_F11, True, True, @SwitchDisplay );
 
      ExecGlut();
 End.

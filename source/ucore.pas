@@ -16,20 +16,14 @@ Const KEY_UP = GLUT_KEY_UP;
       KEY_DOWN = GLUT_KEY_DOWN;
       KEY_LEFT = GLUT_KEY_LEFT;
       KEY_RIGHT = GLUT_KEY_RIGHT;
-      KEY_ESC = 27;
-      KEY_SPACE = 32;
-      KEY_TAB = GLUT_KEY_F1;
-      KEY_ZERO = 48;
-      
-      KEY_Z = 122;
-      KEY_S = 115;
-      KEY_Q = 113;
-      KEY_D = 100;
-      KEY_B = 98;
+      KEY_F11 = GLUT_KEY_F11;
+      KEY_TAB = 9;
 
-      FONT_NORMAL  = 1 ;
-      FONT_BOLD  = 2 ;
-      FONT_HELVETICA_18 = 3 ;
+Const EFFECT_TERMINAL = 1;
+
+Const FONT_NORMAL    = 1;
+Const FONT_BOLD      = 2;
+Const FONT_HELVETICA = 3;
 
 Const BUTTON_LEFT    = 1;
 Const BUTTON_RIGHT   = 2;
@@ -106,26 +100,32 @@ Type LPOGLTexture = ^OGLTexture;
 
 				
 Type GameCallback = Procedure () ; cdecl;
-     KeyCallback = Procedure ( fTime : Single ) Of Object ; cdecl;
+     KeyCallbackStd = Procedure () ; cdecl;
+     KeyCallbackObj = Procedure ( fTime : Single ) Of Object ; cdecl;
      ButtonCallback = Procedure () ; cdecl;
      TimerCallback = Procedure () Of Object ; cdecl;
 
 
 Procedure InitDataStack () ;
 Procedure FreeDataStack () ;
+Procedure ReloadDataStack () ;
 
 Function AddTexture ( sFile : String ; nIndex : LongInt ) : LPOGLTexture;
 Procedure SetTexture( nStage : Integer ; nIndex : LongInt ) ;
+Procedure FreeTexture ( pTexture : LPOGLTexture ) ;
 
-Function AddMesh ( strFile : String ; nIndex : LongInt ) : LPOGLMesh ;
+Function AddMesh ( sFile : String ; nIndex : LongInt ) : LPOGLMesh ;
 Procedure DrawMesh ( nIndex : LongInt ; r, g, b : Single ; t : Boolean ) ;
+Procedure FreeMesh ( pMesh : LPOGLMesh ) ;
+
+Procedure Clear ( r, g, b, a : Single ) ;
 
 Procedure DrawText ( x, y : Single ; r, g, b : Single ; nFont : integer ;sText : String ) ;
 
 Procedure DrawImage ( x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
 Procedure DrawSprite ( u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
 
-Procedure DrawChar ( c : Char ; p : Boolean ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
+Procedure DrawChar ( c : Char ; p : Boolean ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ; nCharsetStandard : Integer ; nCharsetExtended : Integer ) ;
 
 Procedure SetProjectionMatrix ( fFOV : Single ; fRatio : Single ; fNearPlane, fFarPlane : Single ) ;
 Procedure SetCameraMatrix ( ex, ey, ez, cx, cy, cz, upx, upy, upz : Single ) ;
@@ -133,7 +133,7 @@ Procedure PushObjectMatrix ( tx, ty, tz, sx, sy, sz, rx, ry, rz : Single ) ;
 Procedure PopObjectMatrix () ;
 
 Procedure SetString ( id : Integer ; s : String ; t1, t2, t3 : Single ) ;
-Procedure DrawString ( id : Integer ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
+Procedure DrawString ( id : Integer ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ; nCharsetStandard : Integer ; nCharsetExtended : Integer ; nEffect : Integer ) ;
 
 Procedure PushBillboardMatrix( camX, camY, camZ, objPosX, objPosY, objPosZ : Single );
 
@@ -160,7 +160,8 @@ Procedure FreeTimer();
 
 
 
-Procedure BindKey ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallback ) ;
+Procedure BindKeyStd ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallbackStd ) ;
+Procedure BindKeyObj ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallbackObj ) ;
 Procedure ExecKey ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ) ;
 
 Procedure BindButton ( nButton : Integer ; pCallback : ButtonCallback ) ;
@@ -178,12 +179,16 @@ Function GetKeyS( nKey : Integer ) : Boolean ;
 Procedure InitFMod () ;
 Procedure ExitFMod () ;
 
-Procedure AddSound ( strFile : String ; nIndex : LongInt ) ;
-Procedure AddMusic ( strFile : String ; nIndex : LongInt ) ;
+Procedure AddSound ( sFile : String ; nIndex : LongInt ) ;
+Procedure AddMusic ( sFile : String ; nIndex : LongInt ) ;
 Procedure PlaySound ( nIndex : LongInt ) ;
 Procedure PlayMusic ( nIndex : LongInt ) ;
 Procedure StopSound ( nIndex : LongInt ) ;
 Procedure StopMusic ( nIndex : LongInt ) ;
+
+
+
+Procedure SwitchDisplay () ; cdecl;
 
 
 
@@ -249,6 +254,7 @@ Type LPDataItem = ^DataItem;
                       index : LongInt;
                       data : Integer;
                       item : Pointer;
+                      path : String;
                       next : LPDataItem;
                 END;
 Var pDataStack : LPDataItem = NIL;
@@ -265,6 +271,7 @@ Begin
      pDataStack^.index := 0;
      pDataStack^.data := DATA_NONE;
      pDataStack^.item := NIL;
+     pDataStack^.path := '';
      pDataStack^.next := NIL;
 End;
 
@@ -288,12 +295,12 @@ Begin
                DATA_MESH :
                Begin
                     pMesh := pDataStack^.item;
-                    If pMesh <> NIL Then Dispose( pMesh );
+                    If pMesh <> NIL Then FreeMesh( pMesh );
                End;
                DATA_TEXTURE :
                Begin
                     pTexture := pDataStack^.item;
-                    If pTexture <> NIL Then Dispose( pTexture );
+                    If pTexture <> NIL Then FreeTexture( pTexture );
                End;
                DATA_SOUND :
                Begin
@@ -313,7 +320,73 @@ End;
 
 
 
-Procedure AddItem( nData : Integer ; nIndex : Integer ; pItem : Pointer ) ;
+////////////////////////////////////////////////////////////////////////////////
+// ReloadDataStack : Recharge les éléments de la pile de données.             //
+////////////////////////////////////////////////////////////////////////////////
+Procedure ReloadDataStack () ;
+Var i : LongInt;
+    pDataTemp : LPDataItem;
+    pDataItem : LPDataItem;
+    pMesh : LPOGLMesh;
+    pTexture : LPOGLTexture;
+    pSound : PFSoundSample;
+    pMusic : PFMusicModule;
+Begin
+     pDataTemp := pDataStack;
+
+     While pDataTemp <> NIL Do
+     Begin
+          pDataItem := pDataTemp^.next;
+          Case pDataTemp^.data Of
+               DATA_MESH :
+               Begin
+                    pMesh := pDataTemp^.item;
+                    If pMesh <> NIL Then FreeMesh( pMesh );
+               End;
+               DATA_TEXTURE :
+               Begin
+                    pTexture := pDataTemp^.item;
+                    If pTexture <> NIL Then FreeTexture( pTexture );
+               End;
+               DATA_SOUND :
+               Begin
+                    pSound := pDataTemp^.item;
+                    If pSound <> NIL Then FSOUND_Sample_Free( pSound );
+               End;
+               DATA_MUSIC :
+               Begin
+                    pMusic := pDataTemp^.item;
+                    If pMusic <> NIL Then FMUSIC_FreeSong( pMusic );
+               End;
+          End;
+          pDataTemp := pDataItem;
+     End;
+
+     pDataTemp := pDataStack;
+
+     InitDataStack();
+
+     While pDataTemp <> NIL Do
+     Begin
+          pDataItem := pDataTemp^.next;
+          Case pDataTemp^.data Of
+               DATA_MESH :
+                    AddMesh( pDataTemp^.path, pDataTemp^.index );
+               DATA_TEXTURE :
+                    AddTexture( pDataTemp^.path, pDataTemp^.index );
+               DATA_SOUND :
+                    AddSound( pDataTemp^.path, pDataTemp^.index );
+               DATA_MUSIC :
+                    AddMusic( pDataTemp^.path, pDataTemp^.index );
+          End;
+          Dispose( pDataTemp );
+          pDataTemp := pDataItem;
+     End;
+End;
+
+
+
+Procedure AddItem( nData : Integer ; nIndex : Integer ; pItem : Pointer ; sPath : String ) ;
 Var pDataItem : LPDataItem;
 Begin
      pDataItem := pDataStack;
@@ -322,6 +395,7 @@ Begin
      pDataStack^.index := nIndex;
      pDataStack^.data := nData;
      pDataStack^.item := pItem;
+     pDataStack^.path := sPath;
      pDataStack^.next := pDataItem;
 End;
 
@@ -634,10 +708,7 @@ Var pTexture : LPOGLTexture;
     dst : ^Byte;
     c : Integer;
     r, g, b : Byte;
-Procedure inc();
-Begin
-     k := 3 * ((h - j) * (w + 1) + i);
-End;
+Procedure inc() ; Begin k := 3 * ((h - j) * (w + 1) + i); End;
 Begin
      AddLineToConsole( 'Loading texture ' + sFile + '...' );
 
@@ -754,11 +825,20 @@ Begin
      glTexImage2D( GL_TEXTURE_2D, 0, 3, pTexture^.Width, pTexture^.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, @pTexture^.Data[0] );
 
      // ajout de la texture à la pile de données
-     AddItem( DATA_TEXTURE, nIndex, pTexture );
+     AddItem( DATA_TEXTURE, nIndex, pTexture, sFile );
 
      AddStringToConsole( Format('OK. (%d bytes)', [3 * pTexture^.Height * pTexture^.Width]) );
 
      AddTexture := pTexture;
+End;
+
+
+
+Procedure FreeTexture ( pTexture : LPOGLTexture ) ;
+Begin
+     glDeleteTextures( 1, @pTexture^.ID );
+     Finalize( pTexture^.Data );
+     Dispose( pTexture );
 End;
 
 
@@ -800,7 +880,7 @@ End;
 // AddMesh : Charge un OGLMesh depuis un fichier (*.M12), l'ajoute à la pile  //
 //           de données, puis renvoie son pointeur.                           //
 ////////////////////////////////////////////////////////////////////////////////
-Function AddMesh ( strFile : String ; nIndex : LongInt ) : LPOGLMesh ;
+Function AddMesh ( sFile : String ; nIndex : LongInt ) : LPOGLMesh ;
 Var ioLong : File Of LongInt ; ioPolygon : File Of OGLPolygon ; ioVertex : File Of OGLVertex ;
     pMesh : LPOGLMesh ;
     nSize : LongInt ;
@@ -810,13 +890,13 @@ Var ioLong : File Of LongInt ; ioPolygon : File Of OGLPolygon ; ioVertex : File 
 Begin
      j := 0;
 
-     AddLineToConsole( 'Loading mesh ' + strFile + '...' );
+     AddLineToConsole( 'Loading mesh ' + sFile + '...' );
 
      // création du pointeur vers le nouveau mesh
      New( pMesh );
 
      // lecture du nombre de polygones
-     Assign( ioLong, strFile );
+     Assign( ioLong, sFile );
      Reset( ioLong, 4 );
      Seek( ioLong, j );
      Read( ioLong, nSize ); j += 1;
@@ -828,7 +908,7 @@ Begin
      SetLength( pMesh^.IndexArray, nSize );
 
      // lecture de chaque polygone
-     Assign( ioPolygon, strFile );
+     Assign( ioPolygon, sFile );
      Reset( ioPolygon, 4 );
      For i := 0 To nSize - 1 Do
      Begin
@@ -842,7 +922,7 @@ Begin
      Close( ioPolygon );
 
      // lecture du nombre de vertices
-     Assign( ioLong, strFile );
+     Assign( ioLong, sFile );
      Reset( ioLong );
      Seek( ioLong, j ); j += 1;
      Read( ioLong, nSize );
@@ -857,7 +937,7 @@ Begin
      SetLength( pMesh^.TextureArray, nSize );
 
      // lecture de chaque vertex
-     Assign( ioVertex, strFile );
+     Assign( ioVertex, sFile );
      Reset( ioVertex, 4 );
      For i := 0 To nSize - 1 Do
      Begin
@@ -879,7 +959,7 @@ Begin
      Close( ioVertex );
 
      // ajout du mesh à la pile de données
-     AddItem( DATA_MESH, nIndex, pMesh );
+     AddItem( DATA_MESH, nIndex, pMesh, sFile );
 
      AddStringToConsole( Format('OK. (%d bytes)', [j*4]) );
 
@@ -953,6 +1033,19 @@ End;
 
 
 
+Procedure FreeMesh ( pMesh : LPOGLMesh ) ;
+Begin
+     Finalize( pMesh^.VectorArray );
+     Finalize( pMesh^.NormalArray );
+     Finalize( pMesh^.ColorArray );
+     Finalize( pMesh^.TextureArray );
+     Finalize( pMesh^.PolygonData );
+     Finalize( pMesh^.VertexData );
+     Dispose( pMesh );
+End;
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // DrawText : Procède au rendu d'une ligne de texte à l'écran.                //
 ////////////////////////////////////////////////////////////////////////////////
@@ -961,11 +1054,12 @@ sText : String ) ;
 Var i : Integer;
     pFont : Pointer;
 Begin
- Case nFont of
-      FONT_NORMAL : pFont:=GLUT_BITMAP_8_BY_13;
-      FONT_BOLD :  pFont:= GLUT_BITMAP_9_BY_15;
-      FONT_HELVETICA_18 : pFont:=GLUT_BITMAP_HELVETICA_18;
- end;
+     Case nFont of
+          FONT_NORMAL    : pFont := GLUT_BITMAP_8_BY_13;
+          FONT_BOLD      : pFont := GLUT_BITMAP_9_BY_15;
+          FONT_HELVETICA : pFont := GLUT_BITMAP_HELVETICA_18;
+     End;
+     
      glMatrixMode( GL_PROJECTION );
      glPushMatrix;
      glLoadIdentity;
@@ -1083,7 +1177,7 @@ End;
 Var cx : Single =  0.0;
     cy : Single =  0.0;
     cz : Single = -1.0;
-Procedure DrawChar ( c : Char ; p : Boolean ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
+Procedure DrawChar ( c : Char ; p : Boolean ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ; nCharsetStandard : Integer ; nCharsetExtended : Integer ) ;
 Var tu, tv : Single;
 Begin
      If p = True Then Begin
@@ -1096,6 +1190,9 @@ Begin
         cy := y;
         cz := z;
      End;
+     
+     tu := -1;
+     tv := -1;
      
      c := LowerCase(c);
      Case c Of
@@ -1147,7 +1244,15 @@ Begin
           '[' : Begin tu := 0.625 ; tv := 0.833 ; End;
           ']' : Begin tu := 0.750 ; tv := 0.833 ; End;
           '*' : Begin tu := 0.875 ; tv := 0.833 ; End;
-          Else Exit;
+     End;
+     If (tu = -1) And (tv = -1) Then Begin
+        Case c Of
+             '-' : Begin tu := 0.000 ; tv := 0.000 ; End;
+             Else Exit;
+        End;
+        SetTexture( 1, nCharsetExtended );
+     End Else Begin
+        SetTexture( 1, nCharsetStandard );
      End;
      
      glMatrixMode( GL_PROJECTION );
@@ -1222,7 +1327,7 @@ var tg : integer = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // DrawString : Procède au rendu d'une OGLString en avec un effet.            //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure DrawString ( id : Integer ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
+Procedure DrawString ( id : Integer ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ; nCharsetStandard : Integer ; nCharsetExtended : Integer ; nEffect : Integer ) ;
 Var count : Integer;
     alpha : Single;
     value : Integer;
@@ -1236,22 +1341,32 @@ Begin
      If (count >= 500) And (count < 950) Then alpha := a * 0.0;
      If (count >= 950) And (count < 1000) Then alpha := a * Single(count - 950) * 0.02;
 
-     If GetTime() <= aString[id].fTime1 Then Begin
-        DrawChar( '*', False, x, y, z, u, v, r, g, b, alpha, t );
-     End;
-
-     If (GetTime() > aString[id].fTime1) And (GetTime() <= aString[id].fTime2) Then Begin
-        value := Round((GetTime() - aString[id].fTime1) * aString[id].fRate);
-        For k := 1 To value Do
-            DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t );
-        DrawChar( '*', False, x + u * 2.2 * k, y, z, u, v, r, g, b, alpha, t );
+     If nEffect = EFFECT_TERMINAL Then Begin
+        If GetTime() <= aString[id].fTime1 Then Begin
+           DrawChar( '*', False, x, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
+        End;
+        If (GetTime() > aString[id].fTime1) And (GetTime() <= aString[id].fTime2) Then Begin
+           value := Round((GetTime() - aString[id].fTime1) * aString[id].fRate);
+           For k := 1 To value Do
+               DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
+           DrawChar( '*', False, x + u * 2.2 * k, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
+        End;
+        If (GetTime() > aString[id].fTime2) And (GetTime() <= aString[id].fTime3) Then Begin
+           For k := 1 To Length(aString[id].sData) Do
+               DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
+           DrawChar( '*', False, x + u * 2.2 * k, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
+        End;
      End;
      
-     If (GetTime() > aString[id].fTime2) And (GetTime() <= aString[id].fTime3) Then Begin
-        For k := 1 To Length(aString[id].sData) Do
-            DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t );
-        DrawChar( '*', False, x + u * 2.2 * k, y, z, u, v, r, g, b, alpha, t );
-     End;
+End;
+
+
+
+Procedure Clear ( r, g, b, a : Single ) ;
+Begin
+     glClearColor( r, g, b, a );
+     glClear( GL_COLOR_BUFFER_BIT Or GL_DEPTH_BUFFER_BIT );
+     glClearDepth( 1.0 );
 End;
 
 
@@ -1372,6 +1487,8 @@ Begin
      RenderWidth := GetRenderWidth;
      RenderHeight := GetRenderHeight;
      glViewport( 0, 0, 512, 256 );
+
+     glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
 End;
 
@@ -1379,12 +1496,11 @@ End;
 
 Procedure GetRenderTexture() ;
 Begin
+     glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
      glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, 512, 256, 0 );
+
      glViewport( 0, 0, RenderWidth, RenderHeight );
-     glClearColor( 0.0, 0.0, 0.0, 0.0 );
-     glClear( GL_COLOR_BUFFER_BIT Or GL_DEPTH_BUFFER_BIT );
-     glClearDepth( 1.0 );
 End;
 
 
@@ -1392,7 +1508,6 @@ End;
 Procedure SetRenderTexture() ;
 Begin
      glEnable( GL_TEXTURE_2D );
-
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
 
      // définie les techniques de rendu
@@ -1468,20 +1583,20 @@ End;
 // AddSound : Charge un son depuis un fichier (*.wav ; *.mp3), et l'ajoute à  //
 //            la pile de données.                                             //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure AddSound ( strFile : String ; nIndex : LongInt ) ;
+Procedure AddSound ( sFile : String ; nIndex : LongInt ) ;
 Var pSound : PFSoundSample;
 Begin
-     AddLineToConsole( 'Loading sound ' + strFile + '...' );
+     AddLineToConsole( 'Loading sound ' + sFile + '...' );
 
      // chargement du son
-     pSound := FSOUND_Sample_Load( FSOUND_FREE, PChar(strFile), FSOUND_2D, 0, 0 );
+     pSound := FSOUND_Sample_Load( FSOUND_FREE, PChar(sFile), FSOUND_2D, 0, 0 );
      If pSound = NIL Then Begin
         AddStringToConsole( 'FAILED. ' + FMOD_ErrorString(FSOUND_GetError()) );
         Exit;
      End;
 
      // ajout du son à la pile de données
-     AddItem( DATA_SOUND, nIndex, pSound );
+     AddItem( DATA_SOUND, nIndex, pSound, sFile );
      
      AddStringToConsole( Format('OK. (%d bytes)', [FSOUND_Sample_GetLength(pSound)*2]) );
 End;
@@ -1492,20 +1607,20 @@ End;
 // AddMusic : Charge une musique depuis un fichier (*.mod ; *.s3m), et        //
 //            l'ajoute à la pile de données.                                  //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure AddMusic ( strFile : String ; nIndex : LongInt ) ;
+Procedure AddMusic ( sFile : String ; nIndex : LongInt ) ;
 Var pMusic : PFMusicModule;
 Begin
-     AddLineToConsole( 'Loading music ' + strFile + '...' );
+     AddLineToConsole( 'Loading music ' + sFile + '...' );
 
      // chargement de la musique
-     pMusic := FMUSIC_LoadSong( PChar(strFile) );
+     pMusic := FMUSIC_LoadSong( PChar(sFile) );
      If pMusic = NIL Then Begin
         AddStringToConsole( 'FAILED. ' + FMOD_ErrorString(FSOUND_GetError()) );
         Exit;
      End;
 
      // ajout de la musique à la pile de données
-     AddItem( DATA_MUSIC, nIndex, pMusic );
+     AddItem( DATA_MUSIC, nIndex, pMusic, sFile );
 
      AddStringToConsole( Format('OK. (%d bytes)', [FMUSIC_GetNumSamples(pMusic)]) );
 End;
@@ -1612,7 +1727,8 @@ Type LPKeyItem = ^KeyItem;
                       key : Integer;
                       instant : Boolean;
                       special : Boolean;
-                      callback : KeyCallback;
+                      callbackstd : KeyCallbackStd;
+                      callbackobj : KeyCallbackObj;
                       next : LPKeyItem;
                 END;
 Var pKeyStack : LPKeyItem = NIL;
@@ -1652,27 +1768,44 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 // BindKey : Ajoute une callback à la pile de touches.                        //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure BindKey ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallback ) ;
+Procedure BindKeyStd ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallbackStd ) ;
 Var pKeyItem : LPKeyItem ;
 Begin
      If pKeyStack = NIL Then Begin
           New( pKeyStack );
           pKeyStack^.count := 0;
-          pKeyStack^.key := nKey;
-          pKeyStack^.instant := bInstant;
-          pKeyStack^.special := bSpecial;
-          pKeyStack^.callback := pCallback;
           pKeyStack^.next := NIL;
      End Else Begin
           pKeyItem := pKeyStack;
           New( pKeyStack );
           pKeyStack^.count := pKeyItem^.count + 1;
-          pKeyStack^.key := nKey;
-          pKeyStack^.instant := bInstant;
-          pKeyStack^.special := bSpecial;
-          pKeyStack^.callback := pCallback;
           pKeyStack^.next := pKeyItem;
      End;
+     pKeyStack^.key := nKey;
+     pKeyStack^.instant := bInstant;
+     pKeyStack^.special := bSpecial;
+     pKeyStack^.callbackstd := pCallback;
+     pKeyStack^.callbackobj := NIL;
+End;
+
+Procedure BindKeyObj ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallbackObj ) ;
+Var pKeyItem : LPKeyItem ;
+Begin
+     If pKeyStack = NIL Then Begin
+          New( pKeyStack );
+          pKeyStack^.count := 0;
+          pKeyStack^.next := NIL;
+     End Else Begin
+          pKeyItem := pKeyStack;
+          New( pKeyStack );
+          pKeyStack^.count := pKeyItem^.count + 1;
+          pKeyStack^.next := pKeyItem;
+     End;
+     pKeyStack^.key := nKey;
+     pKeyStack^.instant := bInstant;
+     pKeyStack^.special := bSpecial;
+     pKeyStack^.callbackstd := NIL;
+     pKeyStack^.callbackobj := pCallback;
 End;
 
 
@@ -1687,7 +1820,8 @@ Begin
      pKeyItem := pKeyStack;
      While pKeyItem <> NIL Do
      Begin
-          If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = bSpecial) Then pKeyItem^.callback( GetDelta() );
+          If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = bSpecial) Then
+             If (pKeyItem^.callbackstd = NIL) Then pKeyItem^.callbackobj( GetDelta() ) Else pKeyItem^.callbackstd();
           pKeyItem := pKeyItem^.next;
      End;
 End;
@@ -1817,20 +1951,12 @@ Begin
      glDepthFunc( GL_LEQUAL );
      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
      glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
-     
-     {glEnable(GL_COLOR_MATERIAL);
-     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-     glEnable(GL_LIGHTING);
-     glLightfv(GL_LIGHT0, GL_DIFFUSE, LightColor);
-     GlLightfv(GL_LIGHT0, GL_POSITION, LightVector);
-     glEnable(GL_LIGHT0);}
 
      OGLCallback();
 
      glDisable(GL_LIGHTING);
 
-     DrawText( 10, 20, 0, 0, 1, FONT_HELVETICA_18, Format( 'atominsa - %.3f FPS',[GetFPS()] ) );
+     DrawText( 10, 20, 1, 1, 1, FONT_HELVETICA, Format( 'atominsa - %.3f FPS',[GetFPS()] ) );
 
      glutSwapBuffers;
 
@@ -1885,7 +2011,7 @@ Var fIdleTime : Double;
 Procedure OGLTimer () ; cdecl;
 Begin
      If GetTimeExt() >= fIdleTime Then Begin
-        fIdleTime := GetTimeExt() + 1.0 / nDisplayFramerate;
+        fIdleTime := GetTimeExt() + 1.0 / nFramerate;
         glutPostRedisplay();
      End;
 End;
@@ -1905,6 +2031,38 @@ End;
 
 
 
+Procedure SwitchDisplay () ; cdecl;
+Begin
+     If bDisplayFullscreen Then Begin
+        bDisplayFullscreen := False;
+        glutLeaveGameMode();
+        glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
+        glutInitWindowSize( nWindowWidth, nWindowHeight );
+        glutInitWindowPosition( 120, 80 );
+        glutCreateWindow( 'tg' );
+     End Else Begin
+        bDisplayFullscreen := True;
+        glutDestroyWindow( glutGetWindow() );
+        glutGameModeString( PChar( Format( '%dx%d:%d@%d', [nDisplayWidth, nDisplayHeight, nDisplayBPP, nDisplayRefreshrate] ) ) );
+        glutEnterGameMode();
+        glutSetCursor( GLUT_CURSOR_NONE );
+     End;
+
+     glutReshapeFunc( @OGLWindow );
+     glutDisplayFunc( @OGLRender );
+     glutIdleFunc( @OGLTimer );
+     glutKeyboardFunc( @OGLKeyDown );
+     glutKeyboardUpFunc( @OGLKeyUp );
+     glutSpecialFunc( @OGLKeyDownS );
+     glutSpecialUpFunc( @OGLKeyUpS );
+     glutMouseFunc( @OGLMouseButton );
+     glutPassiveMotionFunc( @OGLMouseMove );
+
+     ReloadDataStack();
+End;
+
+
+
 Procedure InitGlut ( sTitle : String ; pCallback : GameCallback ) ;
 Begin
      OGLCallback := pCallback;
@@ -1912,11 +2070,11 @@ Begin
      glutInit( @argc, argv );
 
      glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
-     glutInitWindowSize( nDisplayWidth, nDisplayHeight );
+     glutInitWindowSize( nWindowWidth, nWindowHeight );
      glutInitWindowPosition( 120, 80 );
      glutCreateWindow( PChar(sTitle) );
+
      glutReshapeFunc( @OGLWindow );
-     //glutFullscreen();
      glutDisplayFunc( @OGLRender );
      glutIdleFunc( @OGLTimer );
      glutKeyboardFunc( @OGLKeyDown );

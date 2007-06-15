@@ -1,7 +1,7 @@
 object Window: TWindow
-  Left = 312
+  Left = 599
   Height = 300
-  Top = 378
+  Top = 605
   Width = 673
   HorzScrollBar.Page = 672
   VertScrollBar.Page = 299

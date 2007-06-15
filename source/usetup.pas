@@ -14,10 +14,13 @@ Var bIntro : Boolean;
 
 Var nRoundCount : Integer;
 
+Var nWindowWidth : Integer;
+Var nWindowHeight : Integer;
+Var nFramerate : Integer;
 Var bDisplayFullscreen : Boolean;
 Var nDisplayWidth : Integer;
 Var nDisplayHeight : Integer;
-Var nDisplayFramerate : Integer;
+Var nDisplayBPP : Integer;
 Var nDisplayRefreshrate : Integer;
 
 Var aSchemeList : Array [0..255] Of CScheme;
@@ -164,10 +167,13 @@ Begin
 
      bIntro := True;
      
+     nWindowWidth := 640;
+     nWindowHeight := 480;
+     nFramerate := 60;
      bDisplayFullscreen := False;
-     nDisplayWidth := 640;
-     nDisplayHeight := 480;
-     nDisplayFramerate := 60;
+     nDisplayWidth := 1280;
+     nDisplayHeight := 960;
+     nDisplayBPP := 32;
      nDisplayRefreshrate := 85;
 
      nRoundCount := 3;
