@@ -481,7 +481,7 @@ end;
 
 function CBomb.UpdateBomb(dt : Single):boolean;
 begin
-ftime += dt;
+ftime += dt; // C'EST PAS EXACT D'UTILISER DT (temps entre deux frames, grosse incertitude)
 if bMoving then Move(dt);   // fait bouger la bombe si elle le doit
 result:=(ftime >= BOMBTIME);
 if result then Explose;

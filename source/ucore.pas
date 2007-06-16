@@ -115,7 +115,7 @@ Procedure SetTexture( nStage : Integer ; nIndex : LongInt ) ;
 Procedure FreeTexture ( pTexture : LPOGLTexture ) ;
 
 Function AddMesh ( sFile : String ; nIndex : LongInt ) : LPOGLMesh ;
-Procedure DrawMesh ( nIndex : LongInt ; r, g, b : Single ; t : Boolean ) ;
+Procedure DrawMesh ( nIndex : LongInt ; t : Boolean ) ;
 Procedure FreeMesh ( pMesh : LPOGLMesh ) ;
 
 Procedure Clear ( r, g, b, a : Single ) ;
@@ -140,7 +140,7 @@ Procedure PushBillboardMatrix( camX, camY, camZ, objPosX, objPosY, objPosZ : Sin
 Procedure EnableLighting() ;
 Procedure DisableLighting() ;
 Procedure SetLight( k : Integer ; x, y, z : Single ; r, g, b, a : Single ; a0, a1, a2 : Single ; t : Boolean ) ;
-Procedure SetMaterial( r, g, b : Single ; t : Boolean ) ;
+Procedure SetMaterial( r, g, b, a : Single ) ;
 
 Procedure CreateRenderTexture() ;
 Procedure PutRenderTexture() ;
@@ -969,7 +969,7 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 // DrawMesh : Procède au rendu d'un OGLMesh en fonction de son indice.        //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure DrawMesh ( nIndex : LongInt ; r, g, b : Single ; t : Boolean ) ;
+Procedure DrawMesh ( nIndex : LongInt ; t : Boolean ) ;
 Var i : LongInt ;
     pMesh : LPOGLMesh ;
     pDataItem : LPDataItem;
@@ -1008,8 +1008,6 @@ Begin
          glColor3f(r, g, b);
      End;
      glEnd;}
-
-     //glDisable( GL_TEXTURE_2D );
 
      glEnableClientState(GL_VERTEX_ARRAY);
      glEnableClientState(GL_NORMAL_ARRAY);
@@ -1449,13 +1447,13 @@ End;
 
 
 
-Procedure SetMaterial( r, g, b : Single ; t : Boolean ) ;
+Procedure SetMaterial( r, g, b, a : Single ) ;
 Var MaterialColor : Array[0..3] Of glFloat;
 Begin
      MaterialColor[0] := r;
      MaterialColor[1] := g;
      MaterialColor[2] := b;
-     MaterialColor[3] := 1.0;
+     MaterialColor[3] := a;
 
      glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, MaterialColor);
 End;
@@ -1908,6 +1906,10 @@ Var OGLCallback : GameCallback;
 
 
 
+Var sWindowTitle : String;
+
+
+
 Procedure OGLKeyDown( k : Byte ; x, y : LongInt ); cdecl; overload;
 Begin
      If bKey[k] = False Then ExecKey( k, True, False );
@@ -2039,7 +2041,7 @@ Begin
         glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
         glutInitWindowSize( nWindowWidth, nWindowHeight );
         glutInitWindowPosition( 120, 80 );
-        glutCreateWindow( 'tg' );
+        glutCreateWindow( PChar(sWindowTitle) );
      End Else Begin
         bDisplayFullscreen := True;
         glutDestroyWindow( glutGetWindow() );
@@ -2067,12 +2069,14 @@ Procedure InitGlut ( sTitle : String ; pCallback : GameCallback ) ;
 Begin
      OGLCallback := pCallback;
   
+     sWindowTitle := sTitle;
+     
      glutInit( @argc, argv );
 
      glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
      glutInitWindowSize( nWindowWidth, nWindowHeight );
      glutInitWindowPosition( 120, 80 );
-     glutCreateWindow( PChar(sTitle) );
+     glutCreateWindow( PChar(sWindowTitle) );
 
      glutReshapeFunc( @OGLWindow );
      glutDisplayFunc( @OGLRender );

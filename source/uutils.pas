@@ -4,7 +4,7 @@ Unit UUtils;
 
 ////////////////////////////////////////////////////////////////////////////////
 // UUtils : Unité où sont stockées toutes les constantes et fonctions         //
-//          utilisées partout dans le projet.                                 //
+//          utilisées dans l'ensemble du projet.                              //
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -40,6 +40,22 @@ Const PI = 3.141592654;
 
 
 
+Const VERSION = 'v.1.0.b';
+
+
+
+Const PHASE_EXIT          =  0;
+Const PHASE_INTRO         =  1;
+Const STATE_INTRO         = 11;
+Const PHASE_MENU          =  2;
+Const STATE_MENU          = 12;
+Const PHASE_PRACTICE      =  3;
+Const STATE_PRACTICE      = 13;
+
+Var nState : Integer;
+
+
+
 // constantes du jeu
 Const GRIDWIDTH = 15;           // largeur de la grille
       GRIDHEIGHT = 11;          // longueur de la grille
@@ -54,7 +70,7 @@ Const GRIDWIDTH = 15;           // largeur de la grille
       FLAMECHANGE = 1;          // valeur d'augmentation de la portee des flammes
       FLAMELIMIT = 10;          // portée des flammes maximale
       FLAMETIME = 0.8;          // durée avant suppression d'une flamme
-      BOMBTIME = 1.5;           // durée avant explosion d'une bombe
+      BOMBTIME = 4.0;           // durée avant explosion d'une bombe
       BOMBMOVESPEED = 5;        // vitesse de deplacement d'une bombe
 
 
