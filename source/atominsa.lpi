@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="2"/>
+      <ActiveEditorIndexAtStart Value="3"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -27,7 +27,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="44">
+    <Units Count="45">
       <Unit0>
         <Filename Value="atominsa.lpr"/>
         <UnitName Value="atominsa"/>
@@ -374,6 +374,13 @@
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit43>
+      <Unit44>
+        <Filename Value="..\..\atominsa\source\ugame.pas"/>
+        <UnitName Value="UGame"/>
+        <CursorPos X="32" Y="197"/>
+        <TopLine Value="163"/>
+        <UsageCount Value="10"/>
+      </Unit44>
     </Units>
     <JumpHistory Count="0" HistoryIndex="-1"/>
   </ProjectOptions>
