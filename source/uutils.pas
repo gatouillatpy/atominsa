@@ -60,7 +60,7 @@ Var nState : Integer;
 Const GRIDWIDTH = 15;           // largeur de la grille
       GRIDHEIGHT = 11;          // longueur de la grille
       DEFAULTFLAMESIZE = 3;     // taille initiale de la portee des flames
-      DEFAULTBOMBCOUNT = 1;     // nombre initial de bombes
+      DEFAULTBOMBCOUNT = 10;     // nombre initial de bombes
       DEFAULTSPEED = 4;         // vitesse initiale des joueurs
       SPAWNCOUNT = 256;         // nombre maximum de points d'apparitions
       POWERUPCOUNT = 13;        // nombre de powerups différents
@@ -70,7 +70,7 @@ Const GRIDWIDTH = 15;           // largeur de la grille
       FLAMECHANGE = 1;          // valeur d'augmentation de la portee des flammes
       FLAMELIMIT = 10;          // portée des flammes maximale
       FLAMETIME = 0.8;          // durée avant suppression d'une flamme
-      BOMBTIME = 4.0;           // durée avant explosion d'une bombe
+      BOMBTIME = 15.0;           // durée avant explosion d'une bombe
       BOMBMOVESPEED = 5;        // vitesse de deplacement d'une bombe
 
 

@@ -463,6 +463,7 @@ Var nFrame : Integer;
     fTime  : Double;
     nFPS   : Integer;
     fDelta : Double;
+    fFrame : Double;
 
 
 
@@ -504,7 +505,7 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 Function GetDelta () : Single ;
 Begin
-     GetDelta := GetTime() - fDelta;
+     GetDelta := fDelta;
 End;
 
 
@@ -954,7 +955,7 @@ Begin
           pMesh^.ColorArray[i].g := pMesh^.VertexData[i]^.g;
           pMesh^.ColorArray[i].b := pMesh^.VertexData[i]^.b;
           pMesh^.TextureArray[i].u := pMesh^.VertexData[i]^.tu;
-          pMesh^.TextureArray[i].v := pMesh^.VertexData[i]^.tv;
+          pMesh^.TextureArray[i].v := 1.0-pMesh^.VertexData[i]^.tv;
      End;
      Close( ioVertex );
 
@@ -1974,7 +1975,8 @@ Begin
           nFrame := -1;
           fTime := GetTime();
      End;
-     fDelta := GetTime();
+     fDelta := GetTime() - fFrame;
+     fFrame := GetTime();
 End;
 
 

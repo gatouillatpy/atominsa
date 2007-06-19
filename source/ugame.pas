@@ -68,6 +68,8 @@ Begin
 
      // ajout d'un round
      nRound += 1;
+
+     If nRound = 4 Then nState := PHASE_MENU;
      
      // mise à zero de la minuterie du round
      fRoundTime := GetTime();
@@ -229,6 +231,8 @@ Begin
      SetLight( 2,                 0, h, GRIDHEIGHT     - 2, 1, 1, 1, 1, a0, a1, a2, True );
      SetLight( 3, GRIDWIDTH     - 1, h, GRIDHEIGHT     - 2, 1, 1, 1, 1, a0, a1, a2, True );
      SetLight( 4, GRIDWIDTH / 2 + 1, h, GRIDHEIGHT / 2 - 2, 1, 1, 1, 1, a0, a1, a2, True );
+     SetLight( 5, GetBombermanByCount(1).X, h, GetBombermanByCount(1).Y-2, 1, 0, 0, 1, a0*0.1, a1*0.5, a2*1.0, True );
+     SetLight( 6, GetBombermanByCount(2).X, h, GetBombermanByCount(2).Y-2, 0, 0, 1, 1, a0*0.1, a1*0.5, a2*1.0, True );
 End;
 
 

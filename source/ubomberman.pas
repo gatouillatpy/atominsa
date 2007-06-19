@@ -586,7 +586,7 @@ begin
   nScore         := 0;
   bNoBomb        := False;
   bReverse       := False;
-  bKick          := False;
+  bKick          := True;
   bAlive         := True;
   nBombCount     := DEFAULTBOMBCOUNT;
   nFlameSize     := DEFAULTFLAMESIZE;
@@ -676,7 +676,7 @@ begin
   fY            := fYOrigin;
   bNoBomb       := False;
   bReverse      := False;
-  bKick         := False;
+  bKick         := True;
   nBombCount    := DEFAULTBOMBCOUNT;
   nFlameSize    := DEFAULTFLAMESIZE;
   fSpeed        := DEFAULTSPEED;
