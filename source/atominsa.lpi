@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="3"/>
+      <ActiveEditorIndexAtStart Value="2"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -27,7 +27,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="45">
+    <Units Count="44">
       <Unit0>
         <Filename Value="atominsa.lpr"/>
         <UnitName Value="atominsa"/>
@@ -348,8 +348,8 @@
         <Filename Value="ugame.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="40" Y="338"/>
-        <TopLine Value="319"/>
+        <CursorPos X="54" Y="315"/>
+        <TopLine Value="425"/>
         <EditorIndex Value="2"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>
@@ -374,15 +374,73 @@
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit43>
-      <Unit44>
-        <Filename Value="..\..\atominsa\source\ugame.pas"/>
-        <UnitName Value="UGame"/>
-        <CursorPos X="32" Y="197"/>
-        <TopLine Value="163"/>
-        <UsageCount Value="10"/>
-      </Unit44>
     </Units>
-    <JumpHistory Count="0" HistoryIndex="-1"/>
+    <JumpHistory Count="16" HistoryIndex="15">
+      <Position1>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="8" Column="16" TopLine="1"/>
+      </Position1>
+      <Position2>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="240" Column="14" TopLine="218"/>
+      </Position2>
+      <Position3>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="97" Column="18" TopLine="68"/>
+      </Position3>
+      <Position4>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="2072" Column="28" TopLine="2028"/>
+      </Position4>
+      <Position5>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="208" Column="55" TopLine="45"/>
+      </Position5>
+      <Position6>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="98" Column="54" TopLine="70"/>
+      </Position6>
+      <Position7>
+        <Filename Value="umenu.pas"/>
+        <Caret Line="48" Column="1" TopLine="2"/>
+      </Position7>
+      <Position8>
+        <Filename Value="umenu.pas"/>
+        <Caret Line="37" Column="31" TopLine="20"/>
+      </Position8>
+      <Position9>
+        <Filename Value="umenu.pas"/>
+        <Caret Line="61" Column="1" TopLine="54"/>
+      </Position9>
+      <Position10>
+        <Filename Value="umenu.pas"/>
+        <Caret Line="73" Column="16" TopLine="46"/>
+      </Position10>
+      <Position11>
+        <Filename Value="umenu.pas"/>
+        <Caret Line="74" Column="1" TopLine="54"/>
+      </Position11>
+      <Position12>
+        <Filename Value="umenu.pas"/>
+        <Caret Line="78" Column="1" TopLine="65"/>
+      </Position12>
+      <Position13>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="25" Column="26" TopLine="13"/>
+      </Position13>
+      <Position14>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="6" Column="21" TopLine="1"/>
+      </Position14>
+      <Position15>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="4" Column="30" TopLine="1"/>
+      </Position15>
+      <Position16>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="9" Column="1" TopLine="1"/>
+      </Position16>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>
@@ -406,12 +464,6 @@
     </Other>
   </CompilerOptions>
   <Debugging>
-    <BreakPoints Count="1">
-      <Item1>
-        <Source Value="ugame.pas"/>
-        <Line Value="377"/>
-      </Item1>
-    </BreakPoints>
     <Watches Count="1">
       <Item1>
         <Expression Value="sFile"/>

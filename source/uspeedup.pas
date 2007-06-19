@@ -4,7 +4,7 @@ unit USpeedUp;
 
 Interface
 
-Uses Classes, SysUtils, UItem8976, UBomberman, UUtils;
+Uses Classes, SysUtils, UItem, UBomberman, UUtils;
 
 Type
 
@@ -13,7 +13,7 @@ Type
 CSpeedUp = Class ( CItem )
 
           Public
-                Procedure Bonus ( 12nPlayer : CBomberman ) ; override; // procedure qui va augmenter la vitesse du joueur de 1
+                Procedure Bonus ( nPlayer : CBomberman ) ; override; // procedure qui va augmenter la vitesse du joueur de 1
 
 End;
 

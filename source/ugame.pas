@@ -335,12 +335,84 @@ Begin
                              1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
                              0, 0, 0 );
            DrawMesh( MESH_BOMB, False );
-           PopObjectMatrix();     _(èol
+           PopObjectMatrix();
+           If Not GetBombByCount(i).UpdateBomb(GetDelta()) Then i += 1;
+    End;
+End;
+
+
+
+Procedure DrawFlame ( w : Single ) ;
+Var i : Integer;
+Begin
+     DisableLighting();
+
+     i := 1;
+     While ( i <= GetFlameCount() ) Do Begin
+          SetTexture( 1, TEXTURE_BOMBERMAN_FLAME );
+          // flamme intérieure
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.001, 0, GetFlameByCount(i).Y - 0.001 ); // on évite les cas particuliers (les angles à 90° bug)
           DrawSprite( 1.0 + 2.0 * GetFlameByCount(i).Itensity, 1.0 + 2.0 * GetFlameByCount(i).Itensity, 1, 1, 1, GetFlameByCount(i).Itensity, True );
           PopObjectMatrix();
           // flammes centrales
-          PushBillboardMatrix( vColk(_-èol
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y );
+          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, 1, 0.5, 0, GetFlameByCount(i).Itensity * 0.8, True );
+          PopObjectMatrix();
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y );
+          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, 1, 0.5, 0, GetFlameByCount(i).Itensity * 0.8, True );
+          PopObjectMatrix();
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X, 0, GetFlameByCount(i).Y - 0.301 );
+          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, 1, 0.5, 0, GetFlameByCount(i).Itensity * 0.8, True );
+          PopObjectMatrix();
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X, 0, GetFlameByCount(i).Y + 0.299 );
+          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, 1, 0.5, 0, GetFlameByCount(i).Itensity * 0.8, True );
+          PopObjectMatrix();
+          // flammes extérieures
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y - 0.301 );
+          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, 1, 0.0, 0, GetFlameByCount(i).Itensity * 0.4, True );
+          PopObjectMatrix();
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y + 0.299 );
+          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, 1, 0.0, 0, GetFlameByCount(i).Itensity * 0.4, True );
+          PopObjectMatrix();
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y - 0.301 );
+          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, 1, 0.0, 0, GetFlameByCount(i).Itensity * 0.4, True );
+          PopObjectMatrix();
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y + 0.299 );
+          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, 1, 0.0, 0, GetFlameByCount(i).Itensity * 0.4, True );
+          PopObjectMatrix();
+          // mise à jour
+          If Not GetFlameByCount(i).Update() Then i += 1;
+     End;
+End;
+
+
+
+Procedure DrawPlane ( w : Single ) ;
+Begin
+     EnableLighting();
+     SetLighting( 2.0, 1.0, 0.3, 0.6 );
+
+     SetMaterial( w, w, w, 1.0 );
+
+     SetTexture( 1, TEXTURE_MAP_PLANE );
+     PushObjectMatrix( 8.0, -0.5, 6.0, 0.11, 0.11, 0.11, 0, 0, 0 );
+     DrawMesh( MESH_PLANE, True );
+     PopObjectMatrix();
+End;
+
+
+
+Procedure DrawScore () ;
+Var w, h : Single;
+    i : Integer;
+Begin
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
+     If GetKey(KEY_TAB) Then Begin
+        SetTexture( 1, SPRITE_CHARSET_TERMINAL );
+        If Not bScoreTable Then Begin
+           If GetBombermanCount() <> 0 Then
               For i := 1 To GetBombermanCount() Do
                   SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %2d ; %d kill(s), %d death(s).', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths]), Single(i) * 0.1 + 0.1, 1.0, 20 );
         End;
@@ -349,7 +421,41 @@ Begin
                DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.4 - 0.1 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
         bScoreTable := True;
      End Else Begin
-        bS_ç(èop(è_-tr
+        bScoreTable := False;
+     End;
+End;
+
+
+
+Procedure ProcessGame () ;
+Begin
+     // définition de la camera
+     SetCamera();
+
+     // rendu des reflets
+     PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
+     DrawBomberman( 0.4 );
+     DrawGrid( 0.4 );
+     DrawBomb( 0.4 );
+     DrawFlame( 0.4 );
+     PopObjectMatrix();
+
+     // rendu global
+     DrawPlane( 1.0 );
+     DrawBomberman( 1.0 );
+     DrawGrid( 1.0 );
+     DrawBomb( 1.0 );
+     DrawFlame( 1.0 );
+
+     // affichage des scores
+     DrawScore();
+     
+     // mise à jour de la minuterie
+     CheckTimer();
+
+     // vérifie s'il reste des bomberman en jeu
+     If CheckEndGame() Then InitRound();
+End;
 
 
 
