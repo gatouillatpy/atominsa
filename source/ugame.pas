@@ -82,7 +82,7 @@ Var pPlayer1 : CBomberman;
     pPlayer2 : CBomberman;
 Begin
      // initialisation de la camera
-     nCamera := CAMERA_OVERALL;
+     nCamera := CAMERA_FLY;
 
      // création de la grille en fonction du scheme
      pGrid := CGrid.Create( pScheme );
@@ -414,7 +414,6 @@ Begin
      h := GetRenderHeight();
 
      If GetKey(KEY_TAB) Then Begin
-        SetTexture( 1, SPRITE_CHARSET_TERMINAL );
         If Not bScoreTable Then Begin
            If GetBombermanCount() <> 0 Then
               For i := 1 To GetBombermanCount() Do
@@ -450,6 +449,12 @@ Begin
      DrawGrid( 1.0 );
      DrawBomb( 1.0 );
      DrawFlame( 1.0 );
+
+     DisableLighting();
+     SetTexture( 1, TEXTURE_NONE );
+     PushObjectMatrix( 0.0, 0.0, 0.0, 0.3, 0.3, 0.3, 0, 0, 0 );
+     DrawMesh( 9595, True );
+     PopObjectMatrix();
 
      // affichage des scores
      DrawScore();

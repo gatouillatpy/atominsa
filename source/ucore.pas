@@ -18,6 +18,7 @@ Const KEY_UP = GLUT_KEY_UP;
       KEY_RIGHT = GLUT_KEY_RIGHT;
       KEY_F11 = GLUT_KEY_F11;
       KEY_TAB = 9;
+      KEY_ESC = 27;
 
 Const EFFECT_TERMINAL = 1;
 
@@ -967,6 +968,8 @@ Begin
      AddMesh := pMesh;
 End;
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // DrawMesh : Procède au rendu d'un OGLMesh en fonction de son indice.        //
 ////////////////////////////////////////////////////////////////////////////////
@@ -974,8 +977,8 @@ Procedure DrawMesh ( nIndex : LongInt ; t : Boolean ) ;
 Var i : LongInt ;
     pMesh : LPOGLMesh ;
     pDataItem : LPDataItem;
-    p : OGLPolygon;
-    v : OGLVertex;
+    p : GLIndex;
+    v : GLVector;
 Begin
      // recherche du mesh à afficher en fonction de son indice
      pMesh := FindItem( DATA_MESH, nIndex );
@@ -987,26 +990,22 @@ Begin
      End;
 
      // affiche l'ensemble des polygones du mesh
-
      {glBegin(GL_TRIANGLES);
      For i := 0 To pMesh^.PolygonCount - 1 Do
      Begin
-         p := pMesh^.PolygonData[i]^;
+         p := pMesh^.IndexArray[i];
 
-         v := pMesh^.VertexData[p.id0]^;
-         glNormal3f(v.nx, v.ny, v.nz);
+         v := pMesh^.VectorArray[p.id0];
+         glColor3f(1, 1, 1);
          glVertex3f(v.x, v.y, v.z);
-         glColor3f(r, g, b);
 
-         v := pMesh^.VertexData[p.id1]^;
-         glNormal3f(v.nx, v.ny, v.nz);
+         v := pMesh^.VectorArray[p.id1];
+         glColor3f(1, 1, 1);
          glVertex3f(v.x, v.y, v.z);
-         glColor3f(r, g, b);
 
-         v := pMesh^.VertexData[p.id2]^;
-         glNormal3f(v.nx, v.ny, v.nz);
+         v := pMesh^.VectorArray[p.id2];
+         glColor3f(1, 1, 1);
          glVertex3f(v.x, v.y, v.z);
-         glColor3f(r, g, b);
      End;
      glEnd;}
 
@@ -1299,6 +1298,7 @@ Type OGLString = RECORD
 		       fTime1 : Single;
 		       fTime2 : Single;
 		       fTime3 : Single;
+		       fTime4 : Single;
                        fRate  : Single;
 		       sData  : String;
                   END;
@@ -1315,7 +1315,8 @@ Begin
      
      aString[id].fTime1 := GetTime() + t1;
      aString[id].fTime2 := GetTime() + t1 + t2;
-     aString[id].fTime3 := GetTime() + t1 + t2 + t3;
+     aString[id].fTime3 := GetTime() + t1 + t2 + t1;
+     aString[id].fTime4 := GetTime() + t1 + t2 + t1 + t3;
      aString[id].fRate  := Single(Length(s)) / t2;
      aString[id].sData  := s;
 End;
@@ -1354,6 +1355,10 @@ Begin
            For k := 1 To Length(aString[id].sData) Do
                DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
            DrawChar( '*', False, x + u * 2.2 * k, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
+        End;
+        If (GetTime() > aString[id].fTime3) And (GetTime() <= aString[id].fTime4) Then Begin
+           For k := 1 To Length(aString[id].sData) Do
+               DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
         End;
      End;
      

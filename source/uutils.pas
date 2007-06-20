@@ -51,6 +51,8 @@ Const PHASE_MENU          =  2;
 Const STATE_MENU          = 12;
 Const PHASE_PRACTICE      =  3;
 Const STATE_PRACTICE      = 13;
+Const PHASE_EDITOR        =  4;
+Const STATE_EDITOR        = 14;
 
 Var nState : Integer;
 
@@ -122,7 +124,8 @@ Const TEXTURE_NONE              = 0;
       SPRITE_MENU_MAIN_BUTTON2  = 1004;
       SPRITE_MENU_MAIN_BUTTON3  = 1005;
       SPRITE_MENU_MAIN_BUTTON4  = 1006;
-      SPRITE_MENU_CROSS         = 1007;
+      SPRITE_MENU_MAIN_BUTTON5  = 1007;
+      SPRITE_MENU_CROSS         = 1008;
       SPRITE_CHARSET_TERMINAL   = 1101;
       SPRITE_CHARSET_TERMINALX  = 1111;
       SPRITE_CHARSET_DIGITAL    = 1102;
@@ -166,8 +169,10 @@ Const POWERUP_NONE                 = -1;
 // constantes de définition des chaines de caractères affichées avec effet
 Const STRING_SCORE_TABLE_NULL   = 0;
       STRING_MENU_MAIN          = 1;
-
+      STRING_EDITOR_MENU_NULL   = 0;
+      
 Function STRING_SCORE_TABLE( k : Integer ) : Integer ;
+Function STRING_EDITOR_MENU( k : Integer ) : Integer ;
 
 
 
@@ -202,6 +207,11 @@ End;
 Function STRING_SCORE_TABLE( k : Integer ) : Integer ;
 Begin
      STRING_SCORE_TABLE := k + STRING_SCORE_TABLE_NULL;
+End;
+
+Function STRING_EDITOR_MENU( k : Integer ) : Integer ;
+Begin
+     STRING_EDITOR_MENU := k + STRING_EDITOR_MENU_NULL;
 End;
 
 Function TEXTURE_BOMBERMAN( k : Integer ) : Integer ;

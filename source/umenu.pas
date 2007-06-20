@@ -39,6 +39,7 @@ Const BUTTON_PRACTICE     = 2;
 Const BUTTON_NETWORK      = 3;
 Const BUTTON_SOLO         = 4;
 Const BUTTON_SETUP        = 5;
+Const BUTTON_EDITOR       = 6;
 
 Var nButton : Integer;
     nLastButton : Integer;
@@ -71,6 +72,11 @@ Begin
           Begin
                PlaySound( SOUND_MENU_SELECT );
                nState := PHASE_PRACTICE;
+          End;
+          BUTTON_EDITOR :
+          Begin
+               PlaySound( SOUND_MENU_SELECT );
+               nState := PHASE_EDITOR;
           End;
           BUTTON_EXIT :
           Begin
@@ -124,6 +130,7 @@ Begin
                If (r = 0) And (g = 255) And (b = 0) Then nButton := BUTTON_NETWORK;
                If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLO;
                If (r = 255) And (g = 255) And (b = 0) Then nButton := BUTTON_SETUP;
+               If (r = 255) And (g = 0) And (b = 255) Then nButton := BUTTON_EDITOR;
 
                // affichage du bouton ainsi que du texte correspondant
                If nButton <> BUTTON_NONE Then Begin
@@ -133,6 +140,7 @@ Begin
                        BUTTON_SOLO : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON1 );
                        BUTTON_SETUP : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON3 );
                        BUTTON_PRACTICE : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON2 );
+                       BUTTON_EDITOR : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON5 );
                   End;
                   DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.1, True );
                   If (nButton <> nLastButton) And (nButton <> BUTTON_NONE) Then Begin
@@ -143,14 +151,16 @@ Begin
                           BUTTON_SOLO : SetString( STRING_MENU_MAIN, 'solo', 0.5, 0.4, 20 );
                           BUTTON_SETUP : SetString( STRING_MENU_MAIN, 'setup', 0.5, 0.5, 20 );
                           BUTTON_PRACTICE : SetString( STRING_MENU_MAIN, 'practice', 0.5, 0.8, 20 );
+                          BUTTON_EDITOR : SetString( STRING_MENU_MAIN, 'editor', 0.5, 0.6, 20 );
                      End;
                   End;
                   Case nButton Of
-                       BUTTON_EXIT : DrawString( STRING_MENU_MAIN, -0.551 * w / h, -0.831, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //-0.734
-                       BUTTON_NETWORK : DrawString( STRING_MENU_MAIN, 0.425 * w / h, -0.263, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //0.566
-                       BUTTON_SOLO : DrawString( STRING_MENU_MAIN, -0.082 * w / h, -0.319, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //-0.109
-                       BUTTON_SETUP : DrawString( STRING_MENU_MAIN, 0.213 * w / h, 0.090, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //0.284
-                       BUTTON_PRACTICE : DrawString( STRING_MENU_MAIN, -0.218 * w / h, 0.194, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); //-0.291
+                       BUTTON_EXIT : DrawString( STRING_MENU_MAIN, -0.551 * w / h, -0.831, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+                       BUTTON_NETWORK : DrawString( STRING_MENU_MAIN, 0.425 * w / h, -0.263, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+                       BUTTON_SOLO : DrawString( STRING_MENU_MAIN, -0.082 * w / h, -0.319, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+                       BUTTON_SETUP : DrawString( STRING_MENU_MAIN, 0.213 * w / h, 0.090, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+                       BUTTON_PRACTICE : DrawString( STRING_MENU_MAIN, -0.218 * w / h, 0.194, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+                       BUTTON_EDITOR : DrawString( STRING_MENU_MAIN, 0.119 * w / h, 0.702, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
                   End;
                End;
                nLastButton := nButton;

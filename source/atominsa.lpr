@@ -5,7 +5,7 @@ Program atominsa;
 Uses Classes, Forms, Interfaces, Graphics, SysUtils,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
-     UGame, UMenu, UIntro;
+     UGame, UMenu, UIntro, UEditor;
 
 
 
@@ -38,6 +38,8 @@ Begin
           STATE_MENU      : ProcessMenu();
           PHASE_PRACTICE  : InitPractice();
           STATE_PRACTICE  : ProcessGame();
+          PHASE_EDITOR    : InitEditor();
+          STATE_EDITOR    : ProcessEditor();
      End;
 End;
 
@@ -99,6 +101,7 @@ Begin
      AddTexture( './textures/mainbt2.jpg', SPRITE_MENU_MAIN_BUTTON2 );
      AddTexture( './textures/mainbt3.jpg', SPRITE_MENU_MAIN_BUTTON3 );
      AddTexture( './textures/mainbt4.jpg', SPRITE_MENU_MAIN_BUTTON4 );
+     AddTexture( './textures/mainbt5.jpg', SPRITE_MENU_MAIN_BUTTON5 );
      AddTexture( './textures/cross.jpg', SPRITE_MENU_CROSS );
 
      // chargement des polices de caractères
