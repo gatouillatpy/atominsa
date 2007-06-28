@@ -11,19 +11,42 @@ Uses Classes, Forms, Interfaces, Graphics, SysUtils,
 
 Procedure Exit () ;
 Begin
-     PlaySound( SOUND_MENU_SELECT );
+     DrawBox( 0.7, 0.4, 0.2, -0.4 );
+
+     If GetKey(KEY_Y) Then Begin
+        FreeBomberman();
+        FreeBomb();
+        FreeFlame();
+        FreeDataStack();
+        FreeTimer();
      
-     FreeBomberman();
-     FreeBomb();
-     FreeFlame();
-     FreeDataStack();
-     FreeTimer();
+        ExitFMod();
+        ExitGlut();
      
-     ExitFMod();
+        WriteSettings( 'atominsa.cfg' );
+
+        Application.Terminate;
      
-     Application.Terminate;
-     
-     Halt(0);
+        Halt(0);
+     End Else If GetKey(KEY_N) Then Begin
+         SetString( STRING_MENU_MAIN, ' ', 0.5, 0.1, 20 );
+
+         PlaySound( SOUND_MENU_BACK );
+
+         nState := PHASE_MENU;
+     End;
+End;
+
+
+
+Procedure AskExit () ;
+Begin
+     InitBox( 'do you really want to quit ?', 'yes - no' );
+
+     // désactivation de la souris
+     BindButton( BUTTON_LEFT, NIL );
+
+     nState := STATE_EXIT;
 End;
 
 
@@ -31,7 +54,8 @@ End;
 Procedure MainLoop () ; cdecl;
 Begin
      Case nState Of
-          PHASE_EXIT      : Exit();
+          PHASE_EXIT      : AskExit();
+          STATE_EXIT      : Exit();
           PHASE_INTRO     : InitIntro();
           STATE_INTRO     : ProcessIntro();
           PHASE_MENU      : InitMenu();
@@ -40,6 +64,8 @@ Begin
           STATE_PRACTICE  : ProcessGame();
           PHASE_EDITOR    : InitEditor();
           STATE_EDITOR    : ProcessEditor();
+          PHASE_SETUP     : InitSetup();
+          STATE_SETUP     : ProcessSetup();
      End;
 End;
 
@@ -60,8 +86,7 @@ Begin
      
      // lecture du fichier atominsa.cfg
      ReadSettings( 'atominsa.cfg' );
-     WriteSettings( 'tg.txt' );
-     
+
      // création de la pile de données
      InitDataStack();
      

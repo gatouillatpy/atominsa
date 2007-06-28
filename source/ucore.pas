@@ -17,9 +17,13 @@ Const KEY_UP = GLUT_KEY_UP;
       KEY_LEFT = GLUT_KEY_LEFT;
       KEY_RIGHT = GLUT_KEY_RIGHT;
       KEY_F11 = GLUT_KEY_F11;
-      KEY_TAB = 9;
-      KEY_ESC = 27;
 
+Const KEY_TAB = 9;
+      KEY_ESC = 27;
+      KEY_ENTER = 13;
+      KEY_N = 110;
+      KEY_Y = 121;
+      
 Const EFFECT_TERMINAL = 1;
 
 Const FONT_NORMAL    = 1;
@@ -143,10 +147,14 @@ Procedure DisableLighting() ;
 Procedure SetLight( k : Integer ; x, y, z : Single ; r, g, b, a : Single ; a0, a1, a2 : Single ; t : Boolean ) ;
 Procedure SetMaterial( r, g, b, a : Single ) ;
 
-Procedure CreateRenderTexture() ;
 Procedure PutRenderTexture() ;
 Procedure GetRenderTexture() ;
 Procedure SetRenderTexture() ;
+
+
+
+Procedure InitBox ( s1, s2 : String ) ;
+Procedure DrawBox ( x1, y1, x2, y2 : Single ) ;
 
 
 
@@ -167,10 +175,14 @@ Procedure ExecKey ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ) ;
 
 Procedure BindButton ( nButton : Integer ; pCallback : ButtonCallback ) ;
 
+Function KeyToStr( nKey : Integer ) : String ;
+
 Function GetMouseX() : Integer ;
 Function GetMouseY() : Integer ;
 Function GetMouseDX() : Single ;
 Function GetMouseDY() : Single ;
+
+Procedure ClearInput () ;
 
 Function GetKey( nKey : Integer ) : Boolean ;
 Function GetKeyS( nKey : Integer ) : Boolean ;
@@ -189,19 +201,27 @@ Procedure StopMusic ( nIndex : LongInt ) ;
 
 
 
+Function CheckDisplay () : Boolean ;
 Procedure SwitchDisplay () ; cdecl;
 
 
 
 Procedure InitGlut ( sTitle : String ; pCallback : GameCallback ) ;
 Procedure ExecGlut () ;
+Procedure ExitGlut () ;
 
 
 
+Function GetSquareWidth : Integer;
+Function GetSquareHeight : Integer;
 Function GetRenderWidth : Integer;
 Function GetRenderHeight : Integer;
 Function GetWindowWidth : Integer;
 Function GetWindowHeight : Integer;
+
+
+
+Var BackBuffer : GLUInt;
 
 
 
@@ -698,7 +718,10 @@ End;
 //              pile de données, puis renvoie son pointeur.                   //
 ////////////////////////////////////////////////////////////////////////////////
 Var w, h : Integer;
-    i, j, k : Integer;
+    u, v : Single;
+    i, j : Integer;
+    k, l : Integer;
+    p, q : Integer;
 Function AddTexture ( sFile : String ; nIndex : LongInt ) : LPOGLTexture; register;
 Var pTexture : LPOGLTexture;
     pDataItem : LPDataItem;
@@ -710,7 +733,12 @@ Var pTexture : LPOGLTexture;
     dst : ^Byte;
     c : Integer;
     r, g, b : Byte;
-Procedure inc() ; Begin k := 3 * ((h - j) * (w + 1) + i); End;
+Procedure inc();
+Begin
+     k := 3 * ((p - j) * (q + 1) + i);
+     l := 4 * (Round(j * v) * (w + 1) + Round(i * u));
+End;
+//Procedure inc() ; Begin k := 3 * Round((nTexturing - 1.0) * (1.0 - j / h) * nTexturing + i / w); End;
 Begin
      AddLineToConsole( 'Loading texture ' + sFile + '...' );
 
@@ -736,7 +764,8 @@ Begin
      pTexture^.Height := Window.Image.Picture.Height;
 
      // récupère les pixels du TImage et les attribue à la texture
-     SetLength( pTexture^.Data, 3 * pTexture^.Width * pTexture^.Height );
+     SetLength( pTexture^.Data, 3 * Round(pow(4,nTexturing)) );
+     //SetLength( pTexture^.Data, 3 * nTexturing * nTexturing );
      {For j := 0 To pTexture^.Height - 1 Do Begin
          For i := 0 To pTexture^.Width - 1 Do Begin
 	     k := 3 * ((pTexture^.Height - 1 - j) * pTexture^.Width + i);
@@ -749,6 +778,10 @@ Begin
      // ON PEUT SUREMENT FAIRE CA MIEUX, LA ON PREND TROP DE TEMPS
      w := pTexture^.Width - 1;
      h := pTexture^.Height - 1;
+     p := Round(pow(2,nTexturing)) - 1;
+     q := Round(pow(2,nTexturing)) - 1;
+     u := pTexture^.Width / pow(2,nTexturing);
+     v := pTexture^.Height / pow(2,nTexturing);
      dst := @pTexture^.Data[0];
      //Window.Caption := Format('addr:%d',[w]);
      Asm
@@ -778,37 +811,34 @@ Begin
 
                     mov ecx, k
                     add ecx, dst
-                    add src, 2
-                    mov edx, src
+                    mov edx, l
+                    add edx, src
+                    add edx, 2
                     mov al, byte ptr [edx]
                     mov r, al;
                     mov byte ptr [ecx], al // composante rouge
 
                     add ecx, 1
-                    sub src, 1
-                    mov edx, src
+                    sub edx, 1
                     mov al, byte ptr [edx]
                     mov byte ptr [ecx], al // composante verte
                     mov g, al;
 
                     add ecx, 1
-                    sub src, 1
-                    mov edx, src
+                    sub edx, 1
                     mov al, byte ptr [edx]
                     mov byte ptr [ecx], al // composante bleue
                     mov b, al;
 
-                    add src, 4
-
                     add i, 1
                     mov eax, i
-                    mov ebx, w
+                    mov ebx, p
                     cmp eax, ebx
                     jle @xloop
                     
               add j, 1
               mov eax, j
-              mov ebx, h
+              mov ebx, q
               cmp eax, ebx
               jle @yloop
               
@@ -824,12 +854,12 @@ Begin
      glGenTextures( 1, @pTexture^.ID );
      glBindTexture( GL_TEXTURE_2D, pTexture^.ID );
      glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-     glTexImage2D( GL_TEXTURE_2D, 0, 3, pTexture^.Width, pTexture^.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, @pTexture^.Data[0] );
+     glTexImage2D( GL_TEXTURE_2D, 0, 3, Round(pow(2,nTexturing)), Round(pow(2,nTexturing)), 0, GL_RGB, GL_UNSIGNED_BYTE, @pTexture^.Data[0] );
 
      // ajout de la texture à la pile de données
      AddItem( DATA_TEXTURE, nIndex, pTexture, sFile );
 
-     AddStringToConsole( Format('OK. (%d bytes)', [3 * pTexture^.Height * pTexture^.Width]) );
+     AddStringToConsole( Format('OK. (%.0f bytes)', [3.0 * pow(4,nTexturing)]) );
 
      AddTexture := pTexture;
 End;
@@ -1375,6 +1405,46 @@ End;
 
 
 
+Function GetSquareWidth : Integer;
+Var Rect : Array[0..3] Of Integer;
+Begin
+     glGetIntegerv(GL_VIEWPORT, @Rect);
+     If Rect[2] - Rect[0] >= 0 Then Result := 0;
+     If Rect[2] - Rect[0] >= 1 Then Result := 1;
+     If Rect[2] - Rect[0] >= 2 Then Result := 2;
+     If Rect[2] - Rect[0] >= 4 Then Result := 4;
+     If Rect[2] - Rect[0] >= 8 Then Result := 8;
+     If Rect[2] - Rect[0] >= 16 Then Result := 16;
+     If Rect[2] - Rect[0] >= 32 Then Result := 32;
+     If Rect[2] - Rect[0] >= 64 Then Result := 64;
+     If Rect[2] - Rect[0] >= 128 Then Result := 128;
+     If Rect[2] - Rect[0] >= 256 Then Result := 256;
+     If Rect[2] - Rect[0] >= 512 Then Result := 512;
+     If Rect[2] - Rect[0] >= 1024 Then Result := 1024;
+End;
+
+
+
+Function GetSquareHeight : Integer;
+Var Rect : Array[0..3] Of Integer;
+Begin
+     glGetIntegerv(GL_VIEWPORT, @Rect);
+     If Rect[3] - Rect[1] >= 0 Then Result := 0;
+     If Rect[3] - Rect[1] >= 1 Then Result := 1;
+     If Rect[3] - Rect[1] >= 2 Then Result := 2;
+     If Rect[3] - Rect[1] >= 4 Then Result := 4;
+     If Rect[3] - Rect[1] >= 8 Then Result := 8;
+     If Rect[3] - Rect[1] >= 16 Then Result := 16;
+     If Rect[3] - Rect[1] >= 32 Then Result := 32;
+     If Rect[3] - Rect[1] >= 64 Then Result := 64;
+     If Rect[3] - Rect[1] >= 128 Then Result := 128;
+     If Rect[3] - Rect[1] >= 256 Then Result := 256;
+     If Rect[3] - Rect[1] >= 512 Then Result := 512;
+     If Rect[3] - Rect[1] >= 1024 Then Result := 1024;
+End;
+
+
+
 Function GetRenderWidth : Integer;
 Var Rect : Array[0..3] Of Integer;
 Begin
@@ -1472,25 +1542,12 @@ Var RenderTexture : GLUInt;
     
     
 
-Procedure CreateRenderTexture() ;
-Var Data : Pointer;
-Begin
-     GetMem( Data, 512*256*3 );
-     glGenTextures( 1, @RenderTexture );
-     glBindTexture( GL_TEXTURE_2D, RenderTexture );
-     glTexImage2D( GL_TEXTURE_2D, 0, 3, 512, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, Data );
-     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-     FreeMem(Data);
-End;
-
-
-
 Procedure PutRenderTexture() ;
 Begin
      RenderWidth := GetRenderWidth;
      RenderHeight := GetRenderHeight;
-     glViewport( 0, 0, 512, 256 );
+
+     glViewport( 0, 0, GetSquareWidth, GetSquareHeight );
 
      glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
@@ -1502,7 +1559,7 @@ Procedure GetRenderTexture() ;
 Begin
      glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
-     glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, 512, 256, 0 );
+     glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, GetSquareWidth, GetSquareHeight, 0 );
 
      glViewport( 0, 0, RenderWidth, RenderHeight );
 End;
@@ -1519,6 +1576,57 @@ Begin
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
      glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 End;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// InitBox : Initialise une boite de dialogue.                                //
+////////////////////////////////////////////////////////////////////////////////
+Procedure InitBox ( s1, s2 : String ) ;
+Var u, v, w : Single;
+Var Data : Pointer;
+Begin
+     u := GetSquareWidth * 2 / GetRenderWidth;
+     v := GetSquareHeight * 2 / GetRenderHeight;
+     w := GetSquareWidth / GetSquareHeight;
+     
+     // appel d'une texture de rendu
+     PutRenderTexture();
+
+     glEnable( GL_TEXTURE_2D );
+     glBindTexture( GL_TEXTURE_2D, BackBuffer );
+
+     DrawImage( (u - 1.0) * w, v - 1.0, -1.0, u * w, v, 1.0, 1.0, 1.0, 1.0, False );
+
+     // récupération de la texture de rendu
+     GetRenderTexture();
+
+     glDisable( GL_TEXTURE_2D );
+
+     SetString( 1, s1, 0.2, 1.0, 60 );
+     SetString( 2, s2, 0.4, 1.0, 60 );
+End;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DrawBox : Affiche une boite de dialogue.                                   //
+////////////////////////////////////////////////////////////////////////////////
+Procedure DrawBox ( x1, y1, x2, y2 : Single ) ;
+Var w, h : Single;
+Begin
+     w := GetRenderWidth;
+     h := GetRenderHeight;
+
+     SetRenderTexture();
+     DrawImage( 0.0, 0.0, -1.0, 1.0 * w / h, 1.0, 0.5, 0.5, 0.5, 0.5, True );
+
+     DrawString( 1, -w / h * x1, y1, -1, 0.024 * w / h, 0.036, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     DrawString( 2, -w / h * x2, y2, -1, 0.024 * w / h, 0.036, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+End;
+
+
+
 
 
 
@@ -1755,6 +1863,17 @@ Var pMiddleButtonCallback : ButtonCallback = NIL;
 
 
 
+Procedure ClearInput () ;
+Var k : Integer;
+Begin
+     For k := 0 To 255 Do Begin
+         bKey[k] := False;
+         bKeyS[k] := False;
+     End;
+End;
+
+
+
 Function GetKey( nKey : Integer ) : Boolean ;
 Begin
      GetKey := bKey[nKey];
@@ -1765,6 +1884,13 @@ End;
 Function GetKeyS( nKey : Integer ) : Boolean ;
 Begin
      GetKeyS := bKeyS[nKey];
+End;
+
+
+
+Function KeyToStr( nKey : Integer ) : String ;
+Begin
+     KeyToStr := IntToStr( nKey );
 End;
 
 
@@ -1846,21 +1972,25 @@ End;
 
 
 
-Function GetMouseX() : Integer ;
+Function GetMouseX : Integer ;
 Begin
+     If nX < 0 Then nX := 0;
+     If nX > GetWindowWidth Then nX := GetWindowWidth;
      GetMouseX := nX;
 End;
 
 
 
-Function GetMouseY() : Integer ;
+Function GetMouseY : Integer ;
 Begin
+     If nY < 0 Then nY := 0;
+     If nY > GetWindowHeight Then nY := GetWindowHeight;
      GetMouseY := nY;
 End;
 
 
 
-Function GetMouseDX() : Single ;
+Function GetMouseDX : Single ;
 Begin
      GetMouseDX := dX;
      dX := 0;
@@ -1868,7 +1998,7 @@ End;
 
 
 
-Function GetMouseDY() : Single ;
+Function GetMouseDY : Single ;
 Begin
      GetMouseDY := dY;
      dY := 0;
@@ -1913,7 +2043,7 @@ Var OGLCallback : GameCallback;
 
 
 Var sWindowTitle : String;
-
+Var bReshape : Boolean;
 
 
 Procedure OGLKeyDown( k : Byte ; x, y : LongInt ); cdecl; overload;
@@ -1946,9 +2076,49 @@ End;
 
 
 
+Procedure OGLWindow( w, h : Integer ); cdecl;
+Begin
+     If h = 0 Then h := 1;
+     If w = 0 Then w := 1;
+
+     glViewport( 0, 0, w, h );
+
+     WindowWidth := w;
+     WindowHeight := h;
+
+     bReshape := True;
+End;
+
+
+
 Procedure OGLRender () ; cdecl;
 Var k : Integer;
+Var Data : Pointer;
 Begin
+     If bReshape Then Begin
+        glDeleteTextures( 1, @RenderTexture );
+        GetMem( Data, GetSquareWidth * GetSquareHeight * 3 );
+        glGenTextures( 1, @RenderTexture );
+        glBindTexture( GL_TEXTURE_2D, RenderTexture );
+        glTexImage2D( GL_TEXTURE_2D, 0, 3, GetSquareWidth, GetSquareHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, Data );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+        FreeMem(Data);
+
+        glDeleteTextures( 1, @BackBuffer );
+        GetMem( Data, GetSquareWidth * 2 * GetSquareHeight * 2 * 3 );
+        glGenTextures( 1, @BackBuffer );
+        glBindTexture( GL_TEXTURE_2D, BackBuffer );
+        glTexImage2D( GL_TEXTURE_2D, 0, 3, GetSquareWidth * 2, GetSquareHeight * 2, 0, GL_RGB, GL_UNSIGNED_BYTE, Data );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+        FreeMem(Data);
+        
+        bReshape := False;
+     End;
+
      glClearColor( 0.0, 0.0, 0.0, 0.0 );
      glClear( GL_COLOR_BUFFER_BIT Or GL_DEPTH_BUFFER_BIT );
      glClearDepth( 1.0 );
@@ -1961,6 +2131,10 @@ Begin
      glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 
      OGLCallback();
+
+     glEnable( GL_TEXTURE_2D );
+     glBindTexture( GL_TEXTURE_2D, BackBuffer );
+     glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, GetSquareWidth * 2, GetSquareHeight * 2, 0 );
 
      glDisable(GL_LIGHTING);
 
@@ -2027,15 +2201,10 @@ End;
 
 
 
-Procedure OGLWindow( w, h : Integer ); cdecl;
+Function CheckDisplay () : Boolean ;
 Begin
-     If h = 0 Then h := 1;
-     If w = 0 Then w := 1;
-
-     glViewport( 0, 0, w, h );
-
-     WindowWidth := w;
-     WindowHeight := h;
+     glutGameModeString( PChar( Format( '%dx%d:%d@%d', [nDisplayWidth, nDisplayHeight, nDisplayBPP, nDisplayRefreshrate] ) ) );
+     If glutGameModeGet( GLUT_GAME_MODE_POSSIBLE ) = 0 Then CheckDisplay := False Else CheckDisplay := True;
 End;
 
 
@@ -2047,7 +2216,7 @@ Begin
         glutLeaveGameMode();
         glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
         glutInitWindowSize( nWindowWidth, nWindowHeight );
-        glutInitWindowPosition( 120, 80 );
+        glutInitWindowPosition( nWindowLeft, nWindowTop );
         glutCreateWindow( PChar(sWindowTitle) );
      End Else Begin
         bDisplayFullscreen := True;
@@ -2080,10 +2249,17 @@ Begin
      
      glutInit( @argc, argv );
 
-     glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
-     glutInitWindowSize( nWindowWidth, nWindowHeight );
-     glutInitWindowPosition( 120, 80 );
-     glutCreateWindow( PChar(sWindowTitle) );
+     If bDisplayFullscreen Then Begin
+        glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
+        glutGameModeString( PChar( Format( '%dx%d:%d@%d', [nDisplayWidth, nDisplayHeight, nDisplayBPP, nDisplayRefreshrate] ) ) );
+        glutEnterGameMode();
+        glutSetCursor( GLUT_CURSOR_NONE );
+     End Else Begin
+        glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
+        glutInitWindowSize( nWindowWidth, nWindowHeight );
+        glutInitWindowPosition( nWindowLeft, nWindowTop );
+        glutCreateWindow( PChar(sWindowTitle) );
+     End;
 
      glutReshapeFunc( @OGLWindow );
      glutDisplayFunc( @OGLRender );
@@ -2105,6 +2281,18 @@ Begin
      fTime := GetTime();
      fDelta := GetTime();
 End;
+
+
+
+Procedure ExitGlut () ;
+Begin
+     nWindowLeft := glutGet( GLUT_WINDOW_X );
+     nWindowTop := glutGet( GLUT_WINDOW_Y );
+     nWindowWidth := glutGet( GLUT_WINDOW_WIDTH );
+     nWindowHeight := glutGet( GLUT_WINDOW_HEIGHT );
+End;
+
+
 
 Procedure ExecGlut () ;
 Begin

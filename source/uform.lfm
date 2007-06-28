@@ -1,7 +1,7 @@
 object Window: TWindow
   Left = 599
   Height = 300
-  Top = 605
+  Top = 534
   Width = 673
   HorzScrollBar.Page = 672
   VertScrollBar.Page = 299
@@ -25,12 +25,13 @@ object Window: TWindow
     Height = 278
     Top = 10
     Width = 654
-    Color = clNavy
+    Color = clBlack
     Font.CharSet = ANSI_CHARSET
-    Font.Color = clYellow
+    Font.Color = clLime
     Font.Height = -11
     Font.Name = 'Courier New'
     Font.Pitch = fpFixed
+    ScrollBars = ssVertical
     TabOrder = 0
   end
 end

@@ -82,7 +82,7 @@ Var pPlayer1 : CBomberman;
     pPlayer2 : CBomberman;
 Begin
      // initialisation de la camera
-     nCamera := CAMERA_FLY;
+     nCamera := CAMERA_OVERALL;
 
      // création de la grille en fonction du scheme
      pGrid := CGrid.Create( pScheme );

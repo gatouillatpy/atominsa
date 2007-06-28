@@ -45,6 +45,7 @@ Const VERSION = 'v.1.0.b';
 
 
 Const PHASE_EXIT          =  0;
+Const STATE_EXIT          = 10;
 Const PHASE_INTRO         =  1;
 Const STATE_INTRO         = 11;
 Const PHASE_MENU          =  2;
@@ -53,6 +54,8 @@ Const PHASE_PRACTICE      =  3;
 Const STATE_PRACTICE      = 13;
 Const PHASE_EDITOR        =  4;
 Const STATE_EDITOR        = 14;
+Const PHASE_SETUP         =  5;
+Const STATE_SETUP         = 15;
 
 Var nState : Integer;
 
@@ -72,7 +75,7 @@ Const GRIDWIDTH = 15;           // largeur de la grille
       FLAMECHANGE = 1;          // valeur d'augmentation de la portee des flammes
       FLAMELIMIT = 10;          // portée des flammes maximale
       FLAMETIME = 0.8;          // durée avant suppression d'une flamme
-      BOMBTIME = 15.0;           // durée avant explosion d'une bombe
+      BOMBTIME = 4.0;           // durée avant explosion d'une bombe
       BOMBMOVESPEED = 5;        // vitesse de deplacement d'une bombe
 
 
@@ -170,9 +173,11 @@ Const POWERUP_NONE                 = -1;
 Const STRING_SCORE_TABLE_NULL   = 0;
       STRING_MENU_MAIN          = 1;
       STRING_EDITOR_MENU_NULL   = 0;
-      
+      STRING_SETUP_MENU_NULL   = 0;
+
 Function STRING_SCORE_TABLE( k : Integer ) : Integer ;
 Function STRING_EDITOR_MENU( k : Integer ) : Integer ;
+Function STRING_SETUP_MENU( k : Integer ) : Integer ;
 
 
 
@@ -180,6 +185,10 @@ Function STRING_EDITOR_MENU( k : Integer ) : Integer ;
 Function CheckX ( x : Integer ) : Boolean ;
 Function CheckY ( y : Integer ) : Boolean ;
 Function CheckCoordinates ( x, y : Integer ) : Boolean ;
+
+
+
+Function BoolToStr( b : Boolean ) : String ;
 
 
 
@@ -212,6 +221,11 @@ End;
 Function STRING_EDITOR_MENU( k : Integer ) : Integer ;
 Begin
      STRING_EDITOR_MENU := k + STRING_EDITOR_MENU_NULL;
+End;
+
+Function STRING_SETUP_MENU( k : Integer ) : Integer ;
+Begin
+     STRING_SETUP_MENU := k + STRING_SETUP_MENU_NULL;
 End;
 
 Function TEXTURE_BOMBERMAN( k : Integer ) : Integer ;
@@ -274,6 +288,13 @@ End;
 Function DotProduct ( a, b : Vector ) : single ;
 Begin
      DotProduct := a.x * b.x + a.y * b.y + a.z * b.z;
+End;
+
+
+
+Function BoolToStr( b : Boolean ) : String ;
+Begin
+     If b Then BoolToStr := 'true' Else BoolToStr := 'false';
 End;
 
 

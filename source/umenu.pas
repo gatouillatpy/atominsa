@@ -53,8 +53,7 @@ Begin
      MaskIntfImg := TLazIntfImage.Create(0,0);
      MaskIntfImg.LoadFromBitmap( Window.Mask.Picture.Bitmap.Handle, Window.Mask.Picture.Bitmap.MaskHandle );
 
-     // création de la texture de rendu
-     CreateRenderTexture();
+     // vidage de la texture de rendu
      PutRenderTexture();
      Clear( 1, 1, 1, 1 );
      GetRenderTexture();
@@ -80,7 +79,13 @@ Begin
           End;
           BUTTON_EXIT :
           Begin
+               PlaySound( SOUND_MENU_SELECT );
                nState := PHASE_EXIT;
+          End;
+          BUTTON_SETUP :
+          Begin
+               PlaySound( SOUND_MENU_SELECT );
+               nState := PHASE_SETUP;
           End;
      End;
 End;
@@ -105,10 +110,10 @@ Begin
                // appel d'une texture de rendu
                PutRenderTexture();
 
-               w := GetRenderWidth();
-               h := GetRenderHeight();
-               x := GetMouseX() / GetWindowWidth() * w;
-               y := GetMouseY() / GetWindowHeight() * h;
+               w := GetRenderWidth;
+               h := GetRenderHeight;
+               x := GetMouseX / GetWindowWidth * w;
+               y := GetMouseY / GetWindowHeight * h;
                u := Round((2 * x / h - w / h) / (w / h / 9)) * (w / h / 9);
                v := Round((1 - 2 * y / h) / (1 / 9)) * (1 / 9);
 
