@@ -27,6 +27,12 @@ TYPE Vector = RECORD
                     z : single;
               END;
 
+// type vecteur d'entier
+TYPE VectorN = RECORD
+                    x : integer;
+                    y : integer;
+                    z : integer;
+              END;
 // foncitons d'opérations vectorielles de base
 Procedure Normalize ( Var v : Vector ) ;
 Function CrossProduct ( a, b : Vector ) : Vector ;
@@ -65,18 +71,20 @@ Var nState : Integer;
 Const GRIDWIDTH = 15;           // largeur de la grille
       GRIDHEIGHT = 11;          // longueur de la grille
       DEFAULTFLAMESIZE = 3;     // taille initiale de la portee des flames
-      DEFAULTBOMBCOUNT = 10;     // nombre initial de bombes
+      DEFAULTBOMBCOUNT = 1;     // nombre initial de bombes
       DEFAULTSPEED = 4;         // vitesse initiale des joueurs
       SPAWNCOUNT = 256;         // nombre maximum de points d'apparitions
       POWERUPCOUNT = 13;        // nombre de powerups différents
       TIMEDISEASE = 10;         // duree d'action des maladies
       SPEEDCHANGE = 1;          // valeur d'augmentation de la vitesse
-      SPEEDLIMIT = 5;           // vitesse maximale
+      SPEEDLIMIT = 7;           // vitesse maximale
       FLAMECHANGE = 1;          // valeur d'augmentation de la portee des flammes
       FLAMELIMIT = 10;          // portée des flammes maximale
       FLAMETIME = 0.8;          // durée avant suppression d'une flamme
-      BOMBTIME = 4.0;           // durée avant explosion d'une bombe
-      BOMBMOVESPEED = 5;        // vitesse de deplacement d'une bombe
+      BOMBTIME = 3.0;           // durée avant explosion d'une bombe en situation normale
+      BOMBTIMEDISEASE = 0.75 ;    // duree avant explosion d'une bombe d'un malade =)
+      BOMBMOVESPEED = 6;        // vitesse de deplacement d'une bombe
+
 
 
 

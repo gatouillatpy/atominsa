@@ -17,7 +17,7 @@ Type
 {******************************************************************************}
 CFlame = Class
 
-         Protected // POURQUOI EN PROTECTED ???
+         Private // POURQUOI EN PROTECTED ???  .... et pourquoi pas .... non en private c'est pareil =)
                    bombPlayer : CBomberman;                        //Pointe sur le bomberman qui a cree la flame via la bombe
                    nX, nY : Integer;                                              //Coordonnees de la Flame
                    fTime : Single;                                  //temps depuis lequel la flame est cree (pour la faire disparaitre)
@@ -30,8 +30,8 @@ CFlame = Class
                
                property X : integer Read nX;
                property Y : integer Read nY;
+	       Property Owner : CBomberman Read bombPlayer;
                
-               Property Owner : CBomberman Read bombPlayer;
 End;
     
 
@@ -320,13 +320,16 @@ begin
    
    
   PlayerKilled:=GetBombermanByCoo(Self.X,Self.Y);
-  if (PlayerKilled<>nil) then                                     //cherche si y'a un bomberman dans le coin
+  While (PlayerKilled<>nil) do
+  //if (PlayerKilled<>nil) then                                     //cherche si y'a un bomberman dans le coin
   begin
   if PlayerKilled.Alive then
    begin
    PlayerKilled.Dead();                                           //fait tomber de 1 le score ...
-   if (PlayerKilled<>bombPlayer) then bombPlayer.UpKills;         //on incremente le score du joueur qui a
+   if (PlayerKilled<>bombPlayer) then bombPlayer.UpKills()         //on incremente le score du joueur qui a
+   else bombPlayer.DownKills();
   end;                                                            //cree la flame que si il s'est pas tue tout seul
+  PlayerKilled:=GetBombermanByCoo(Self.X,Self.Y);
   end;
 
 
@@ -355,4 +358,3 @@ End;
 
 
 end.
-

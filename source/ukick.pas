@@ -6,7 +6,7 @@ Unit UKick;
 
 Interface
 
-Uses Classes, SysUtils, UItem, UBomberman, UUtils;
+Uses Classes, SysUtils, UItem, UBomberman;
 
 Type
 
