@@ -1,0 +1,6 @@
+rappel : il ne doit pas y avoir des scores, des kills ou des deaths négatifs
+         si le bomberman en tue un autre alors il gagne un kill
+         si le bomberman meurt alors il gagne un death
+         si le bomberman remporte un round alors il gagne un point au score
+
+

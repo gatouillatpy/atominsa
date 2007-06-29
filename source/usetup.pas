@@ -8,11 +8,20 @@ Interface
 
 Uses Classes, SysUtils, UUtils, UMap, UScheme, UCharacter, UForm;
 
+Const PLAYER_NIL = 0;
+Const PLAYER_KB1 = 1;
+Const PLAYER_KB2 = 2;
+Const PLAYER_COM = 3;
+Const PLAYER_NET = 4;
+
 Var nVersion : Integer;
+
+Var bDebug : Boolean;
 
 Var bIntro : Boolean;
 
 Var nRoundCount : Integer;
+Var fRoundDuration : Single;
 
 Var nWindowLeft : Integer;
 Var nWindowTop : Integer;
@@ -21,6 +30,7 @@ Var nWindowHeight : Integer;
 Var nFramerate : Integer;
 Var bLighting : Boolean;
 Var bShadowing : Boolean;
+Var bReflection : Boolean;
 Var nTexturing : Integer;
 Var bDisplayFullscreen : Boolean;
 Var nDisplayWidth : Integer;
@@ -30,21 +40,22 @@ Var nDisplayRefreshrate : Integer;
 
 Var aSchemeList : Array [0..255] Of CScheme;
 Var nSchemeCount : Integer;
-Var bSchemeRandom : Boolean;
 Var pScheme : CScheme;
+Var nScheme : Integer;
 
 Var aMapList : Array [0..255] Of CMap;
 Var nMapCount : Integer;
-Var bMapRandom : Boolean;
 Var pMap : CMap;
+Var nMap : Integer;
 
 Var aCharacterList : Array [0..255] Of CCharacter;
 Var nCharacterCount : Integer;
-Var pCharacter1 : CCharacter;
-Var pCharacter2 : CCharacter;
 
-Var sName1 : String;
-Var sName2 : String;
+Var pPlayerCharacter : Array [1..8] Of CCharacter;
+Var nPlayerCharacter : Array [1..8] Of Integer;
+Var sPlayerName : Array [1..8] Of String;
+Var nPlayerType : Array [1..8] Of Integer;
+Var nPlayerSkill : Array [1..8] Of Integer;
 
 Var nKey1Primary : Integer;
 Var nKey1Secondary : Integer;
@@ -92,7 +103,8 @@ Const MENU_INTRO         = 11;
 Const MENU_FRAMERATE     = 21;
 Const MENU_LIGHTING      = 22;
 Const MENU_SHADOWING     = 23;
-Const MENU_TEXTURING     = 24;
+Const MENU_REFLECTION    = 24;
+Const MENU_TEXTURING     = 25;
 
 Const MENU_FULLSCREEN    = 31;
 Const MENU_RESOLUTION    = 32;
@@ -135,7 +147,8 @@ Begin
      SetString( STRING_SETUP_MENU(21), 'desired framerate : ' + IntToStr(nFramerate), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(22), 'lighting : ' + BoolToStr(bLighting), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(23), 'shadowing : ' + BoolToStr(bShadowing), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(24), 'texturing quality : ' + IntToStr(nTexturing), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(24), 'reflection : ' + BoolToStr(bReflection), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(25), 'texturing quality : ' + IntToStr(nTexturing), 0.2, 1.0, 600 );
      
      SetString( STRING_SETUP_MENU(31), 'fullscreen : ' + BoolToStr(bDisplayFullscreen), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(32), 'resolution : ' + Format('%d x %d', [nDisplayWidth,nDisplayHeight]), 0.2, 1.0, 600 );
@@ -164,6 +177,8 @@ Begin
      bDown := False;
      bLeft := False;
      bRight := False;
+     bEnter := False;
+     bEscape := False;
 End;
 
 
@@ -173,7 +188,11 @@ Var k : Integer ;
 Begin
      DrawBox( 0.4, 0.4, 0.3, -0.4 );
 
-     If GetKey( KEY_ESC ) Then nSetup := SETUP_MENU Else Begin
+     If GetKey( KEY_ESC ) Then Begin
+        nSetup := SETUP_MENU;
+        PlaySound( SOUND_MENU_BACK );
+        ClearInput();
+     End Else Begin
         If Not GetKey( KEY_ENTER ) Then Begin
            For k := 0 To 255 Do Begin
                If GetKey( k ) Then Begin
@@ -212,6 +231,7 @@ Begin
                End;
            End;
            If nSetup = SETUP_MENU Then Begin
+              PlaySound( SOUND_MENU_CLICK );
               Case nMenu Of
                    MENU_P1MOVEUP    : SetString( STRING_SETUP_MENU(41), 'p1 move up    : ' + KeyToStr(nKey1MoveUp), 0.0, 0.02, 600 );
                    MENU_P1MOVEDOWN  : SetString( STRING_SETUP_MENU(42), 'p1 move down  : ' + KeyToStr(nKey1MoveDown), 0.0, 0.02, 600 );
@@ -235,78 +255,71 @@ End;
 
 
 
-Function IsActive( nConst : Integer ) : Single ;
-Begin
-     If nConst = nMenu Then IsActive := 0.0 Else IsActive := 1.0;
-End;
-
 Procedure ProcessMenu () ;
+          Function IsActive( nConst : Integer ) : Single ;
+          Begin
+               If nConst = nMenu Then IsActive := 0.0 Else IsActive := 1.0;
+          End;
 Var w, h : Single;
     x, y, z : Integer;
+    t : Single;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
 
      DrawString( STRING_SCORE_TABLE(1), -w / h * 0.5,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
-     If fScroll <= 0.0 Then
-        DrawString( STRING_SCORE_TABLE(11), -w / h * 0.5,  0.6 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_INTRO), IsActive(MENU_INTRO), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     t := 0.0;
      
-     If fScroll <= 0.4 Then
-        DrawString( STRING_SCORE_TABLE(21), -w / h * 0.5,  0.2 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_FRAMERATE), IsActive(MENU_FRAMERATE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 0.6 Then
-        DrawString( STRING_SCORE_TABLE(22), -w / h * 0.5,  0.0 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_LIGHTING), IsActive(MENU_LIGHTING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 0.8 Then
-        DrawString( STRING_SCORE_TABLE(23), -w / h * 0.5, -0.2 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_SHADOWING), IsActive(MENU_SHADOWING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 1.0 Then
-        DrawString( STRING_SCORE_TABLE(24), -w / h * 0.5, -0.4 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_TEXTURING), IsActive(MENU_TEXTURING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(11), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_INTRO), IsActive(MENU_INTRO), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
 
-     If fScroll <= 1.4 Then
-        DrawString( STRING_SCORE_TABLE(31), -w / h * 0.5, -0.8 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_FULLSCREEN), IsActive(MENU_FULLSCREEN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 1.6 Then
-        DrawString( STRING_SCORE_TABLE(32), -w / h * 0.5, -1.0 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_RESOLUTION), IsActive(MENU_RESOLUTION), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 1.8 Then
-        DrawString( STRING_SCORE_TABLE(33), -w / h * 0.5, -1.2 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_FORMAT), IsActive(MENU_FORMAT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 2.0 Then
-        DrawString( STRING_SCORE_TABLE(34), -w / h * 0.5, -1.4 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_REFRESHRATE), IsActive(MENU_REFRESHRATE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     t += 0.2;
+     
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(21), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_FRAMERATE), IsActive(MENU_FRAMERATE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(22), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_LIGHTING), IsActive(MENU_LIGHTING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(23), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_SHADOWING), IsActive(MENU_SHADOWING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(24), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_REFLECTION), IsActive(MENU_REFLECTION), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(25), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_TEXTURING), IsActive(MENU_TEXTURING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
 
-     If fScroll <= 2.4 Then
-        DrawString( STRING_SCORE_TABLE(41), -w / h * 0.5, -1.8 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1MOVEUP), IsActive(MENU_P1MOVEUP), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 2.6 Then
-        DrawString( STRING_SCORE_TABLE(42), -w / h * 0.5, -2.0 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1MOVEDOWN), IsActive(MENU_P1MOVEDOWN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 2.8 Then
-        DrawString( STRING_SCORE_TABLE(43), -w / h * 0.5, -2.2 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1MOVELEFT), IsActive(MENU_P1MOVELEFT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 3.0 Then
-        DrawString( STRING_SCORE_TABLE(44), -w / h * 0.5, -2.4 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1MOVERIGHT), IsActive(MENU_P1MOVERIGHT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 3.2 Then
-        DrawString( STRING_SCORE_TABLE(45), -w / h * 0.5, -2.6 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1PRIMARY), IsActive(MENU_P1PRIMARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 3.4 Then
-        DrawString( STRING_SCORE_TABLE(46), -w / h * 0.5, -2.8 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1SECONDARY), IsActive(MENU_P1SECONDARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     t += 0.2;
 
-     If fScroll <= 3.8 Then
-        DrawString( STRING_SCORE_TABLE(51), -w / h * 0.5, -3.2 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVEUP), IsActive(MENU_P2MOVEUP), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 4.0 Then
-        DrawString( STRING_SCORE_TABLE(52), -w / h * 0.5, -3.4 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVEDOWN), IsActive(MENU_P2MOVEDOWN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 4.2 Then
-        DrawString( STRING_SCORE_TABLE(53), -w / h * 0.5, -3.6 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVELEFT), IsActive(MENU_P2MOVELEFT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 4.4 Then
-        DrawString( STRING_SCORE_TABLE(54), -w / h * 0.5, -3.8 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVERIGHT), IsActive(MENU_P2MOVERIGHT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 4.6 Then
-        DrawString( STRING_SCORE_TABLE(55), -w / h * 0.5, -4.0 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2PRIMARY), IsActive(MENU_P2PRIMARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If fScroll <= 4.8 Then
-        DrawString( STRING_SCORE_TABLE(56), -w / h * 0.5, -4.2 + fScroll, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2SECONDARY), IsActive(MENU_P2SECONDARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(31), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_FULLSCREEN), IsActive(MENU_FULLSCREEN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(32), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_RESOLUTION), IsActive(MENU_RESOLUTION), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(33), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_FORMAT), IsActive(MENU_FORMAT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(34), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_REFRESHRATE), IsActive(MENU_REFRESHRATE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+
+     t += 0.2;
+
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(41), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1MOVEUP), IsActive(MENU_P1MOVEUP), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(42), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1MOVEDOWN), IsActive(MENU_P1MOVEDOWN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(43), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1MOVELEFT), IsActive(MENU_P1MOVELEFT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(44), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1MOVERIGHT), IsActive(MENU_P1MOVERIGHT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(45), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1PRIMARY), IsActive(MENU_P1PRIMARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(46), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P1SECONDARY), IsActive(MENU_P1SECONDARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+
+     t += 0.2;
+
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(51), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVEUP), IsActive(MENU_P2MOVEUP), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(52), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVEDOWN), IsActive(MENU_P2MOVEDOWN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(53), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVELEFT), IsActive(MENU_P2MOVELEFT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(54), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVERIGHT), IsActive(MENU_P2MOVERIGHT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(55), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2PRIMARY), IsActive(MENU_P2PRIMARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(56), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2SECONDARY), IsActive(MENU_P2SECONDARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
 
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
         nState := PHASE_MENU;
+        ClearInput();
      End;
      
      If GetKeyS( KEY_UP ) Then Begin
         If Not bUp Then Begin
+           PlaySound( SOUND_MENU_CLICK );
            If nMenu = MENU_FRAMERATE Then nMenu := MENU_INTRO Else
            If nMenu = MENU_LIGHTING Then nMenu := MENU_FRAMERATE Else
            If nMenu = MENU_SHADOWING Then nMenu := MENU_LIGHTING Else
-           If nMenu = MENU_TEXTURING Then nMenu := MENU_SHADOWING Else
+           If nMenu = MENU_REFLECTION Then nMenu := MENU_SHADOWING Else
+           If nMenu = MENU_TEXTURING Then nMenu := MENU_REFLECTION Else
            If nMenu = MENU_FULLSCREEN Then nMenu := MENU_TEXTURING Else
            If nMenu = MENU_RESOLUTION Then nMenu := MENU_FULLSCREEN Else
            If nMenu = MENU_FORMAT Then nMenu := MENU_RESOLUTION Else
@@ -325,22 +338,28 @@ Begin
            If nMenu = MENU_P2SECONDARY Then nMenu := MENU_P2PRIMARY Else
            If nMenu = MENU_INTRO Then nMenu := MENU_P2SECONDARY;
 
-           If (nMenu = MENU_INTRO) And (fScroll > 0.0) Then fScroll := 0.0;
-           If (nMenu = MENU_FRAMERATE) And (fScroll > 0.2) Then fScroll := 0.2;
-           If (nMenu = MENU_LIGHTING) And (fScroll > 0.4) Then fScroll := 0.4;
-           If (nMenu = MENU_SHADOWING) And (fScroll > 0.6) Then fScroll := 0.6;
-           If (nMenu = MENU_TEXTURING) And (fScroll > 0.8) Then fScroll := 0.8;
-           If (nMenu = MENU_FULLSCREEN) And (fScroll > 1.0) Then fScroll := 1.0;
-           If (nMenu = MENU_RESOLUTION) And (fScroll > 1.2) Then fScroll := 1.2;
-           If (nMenu = MENU_FORMAT) And (fScroll > 1.4) Then fScroll := 1.4;
-           If (nMenu = MENU_REFRESHRATE) And (fScroll > 1.6) Then fScroll := 1.6;
-           If (nMenu = MENU_P1MOVEUP) And (fScroll > 2.0) Then fScroll := 2.0;
-           If (nMenu = MENU_P1MOVEDOWN) And (fScroll > 2.2) Then fScroll := 2.2;
-           If (nMenu = MENU_P1MOVELEFT) And (fScroll > 2.4) Then fScroll := 2.4;
-           If (nMenu = MENU_P1MOVERIGHT) And (fScroll > 2.6) Then fScroll := 2.6;
-           If (nMenu = MENU_P1PRIMARY) And (fScroll > 2.8) Then fScroll := 2.8;
-           If (nMenu = MENU_P1SECONDARY) And (fScroll > 3.0) Then fScroll := 3.0;
-           If nMenu = MENU_P2SECONDARY Then fScroll := 3.4;
+           t := 0.0;
+           If (nMenu = MENU_INTRO) And (fScroll > t) Then fScroll := t; t += 0.2;
+           t += 0.2;
+           If (nMenu = MENU_FRAMERATE) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_LIGHTING) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_SHADOWING) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_REFLECTION) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_TEXTURING) And (fScroll > t) Then fScroll := t; t += 0.2;
+           t += 0.2;
+           If (nMenu = MENU_FULLSCREEN) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_RESOLUTION) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_FORMAT) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_REFRESHRATE) And (fScroll > t) Then fScroll := t; t += 0.2;
+           t += 0.2;
+           If (nMenu = MENU_P1MOVEUP) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1MOVEDOWN) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1MOVELEFT) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1MOVERIGHT) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1PRIMARY) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1SECONDARY) And (fScroll > t) Then fScroll := t; t += 0.2;
+           t -= 0.2;
+           If nMenu = MENU_P2SECONDARY Then fScroll := t;
         End;
         bUp := True;
      End Else Begin
@@ -349,6 +368,7 @@ Begin
 
      If GetKeyS( KEY_DOWN ) Then Begin
         If Not bDown Then Begin
+           PlaySound( SOUND_MENU_CLICK );
            If nMenu = MENU_P2SECONDARY Then nMenu := MENU_INTRO Else
            If nMenu = MENU_P2PRIMARY Then nMenu := MENU_P2SECONDARY Else
            If nMenu = MENU_P2MOVERIGHT Then nMenu := MENU_P2PRIMARY Else
@@ -366,27 +386,33 @@ Begin
            If nMenu = MENU_RESOLUTION Then nMenu := MENU_FORMAT Else
            If nMenu = MENU_FULLSCREEN Then nMenu := MENU_RESOLUTION Else
            If nMenu = MENU_TEXTURING Then nMenu := MENU_FULLSCREEN Else
-           If nMenu = MENU_SHADOWING Then nMenu := MENU_TEXTURING Else
+           If nMenu = MENU_SHADOWING Then nMenu := MENU_REFLECTION Else
+           If nMenu = MENU_REFLECTION Then nMenu := MENU_TEXTURING Else
            If nMenu = MENU_LIGHTING Then nMenu := MENU_SHADOWING Else
            If nMenu = MENU_FRAMERATE Then nMenu := MENU_LIGHTING Else
            If nMenu = MENU_INTRO Then nMenu := MENU_FRAMERATE;
 
-           If (nMenu = MENU_RESOLUTION) And (fScroll < 0.2) Then fScroll := 0.2;
-           If (nMenu = MENU_FORMAT) And (fScroll < 0.4) Then fScroll := 0.4;
-           If (nMenu = MENU_REFRESHRATE) And (fScroll < 0.6) Then fScroll := 0.6;
-           If (nMenu = MENU_P1MOVEUP) And (fScroll < 1.0) Then fScroll := 1.0;
-           If (nMenu = MENU_P1MOVEDOWN) And (fScroll < 1.2) Then fScroll := 1.2;
-           If (nMenu = MENU_P1MOVELEFT) And (fScroll < 1.4) Then fScroll := 1.4;
-           If (nMenu = MENU_P1MOVERIGHT) And (fScroll < 1.6) Then fScroll := 1.6;
-           If (nMenu = MENU_P1PRIMARY) And (fScroll < 1.8) Then fScroll := 1.8;
-           If (nMenu = MENU_P1SECONDARY) And (fScroll < 2.0) Then fScroll := 2.0;
-           If (nMenu = MENU_P2MOVEUP) And (fScroll < 2.4) Then fScroll := 2.4;
-           If (nMenu = MENU_P2MOVEDOWN) And (fScroll < 2.6) Then fScroll := 2.6;
-           If (nMenu = MENU_P2MOVELEFT) And (fScroll < 2.8) Then fScroll := 2.8;
-           If (nMenu = MENU_P2MOVERIGHT) And (fScroll < 3.0) Then fScroll := 3.0;
-           If (nMenu = MENU_P2PRIMARY) And (fScroll < 3.2) Then fScroll := 3.2;
-           If (nMenu = MENU_P2SECONDARY) And (fScroll < 3.4) Then fScroll := 3.4;
+           t := 0.0;
            If nMenu = MENU_INTRO Then fScroll := 0.0;
+           t += 0.2;
+           If (nMenu = MENU_FULLSCREEN) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_RESOLUTION) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_FORMAT) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_REFRESHRATE) And (fScroll < t) Then fScroll := t; t += 0.2;
+           t += 0.2;
+           If (nMenu = MENU_P1MOVEUP) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1MOVEDOWN) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1MOVELEFT) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1MOVERIGHT) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1PRIMARY) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P1SECONDARY) And (fScroll < t) Then fScroll := t; t += 0.2;
+           t += 0.2;
+           If (nMenu = MENU_P2MOVEUP) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P2MOVEDOWN) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P2MOVELEFT) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P2MOVERIGHT) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P2PRIMARY) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P2SECONDARY) And (fScroll < t) Then fScroll := t; t += 0.2;
         End;
         bDown := True;
      End Else Begin
@@ -395,6 +421,7 @@ Begin
 
      If GetKeyS( KEY_LEFT ) Then Begin
         If Not bLeft Then Begin
+           PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
                 MENU_INTRO :
                 Begin
@@ -417,11 +444,16 @@ Begin
                      bShadowing := Not bShadowing;
                      SetString( STRING_SETUP_MENU(23), 'shadowing : ' + BoolToStr(bShadowing), 0.0, 0.02, 600 );
                 End;
+                MENU_REFLECTION :
+                Begin
+                     bReflection := Not bReflection;
+                     SetString( STRING_SETUP_MENU(24), 'reflection : ' + BoolToStr(bReflection), 0.0, 0.02, 600 );
+                End;
                 MENU_TEXTURING :
                 Begin
                      nTexturing -= 1;
                      If nTexturing < 1 Then nTexturing := 1;
-                     SetString( STRING_SETUP_MENU(24), 'texturing quality : ' + IntToStr(nTexturing), 0.0, 0.02, 600 );
+                     SetString( STRING_SETUP_MENU(25), 'texturing quality : ' + IntToStr(nTexturing), 0.0, 0.02, 600 );
                 End;
                 MENU_FULLSCREEN :
                 Begin
@@ -474,6 +506,7 @@ Begin
 
      If GetKeyS( KEY_RIGHT ) Then Begin
         If Not bRight Then Begin
+           PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
                 MENU_INTRO :
                 Begin
@@ -496,11 +529,16 @@ Begin
                      bShadowing := Not bShadowing;
                      SetString( STRING_SETUP_MENU(23), 'shadowing : ' + BoolToStr(bShadowing), 0.0, 0.02, 600 );
                 End;
+                MENU_REFLECTION :
+                Begin
+                     bReflection := Not bReflection;
+                     SetString( STRING_SETUP_MENU(24), 'reflection : ' + BoolToStr(bReflection), 0.0, 0.02, 600 );
+                End;
                 MENU_TEXTURING :
                 Begin
                      nTexturing += 1;
                      If nTexturing > 11 Then nTexturing := 11;
-                     SetString( STRING_SETUP_MENU(24), 'texturing quality : ' + IntToStr(nTexturing), 0.0, 0.02, 600 );
+                     SetString( STRING_SETUP_MENU(25), 'texturing quality : ' + IntToStr(nTexturing), 0.0, 0.02, 600 );
                 End;
                 MENU_FULLSCREEN :
                 Begin
@@ -553,6 +591,7 @@ Begin
 
      If GetKey( KEY_ENTER ) Then Begin
         If Not bEnter Then Begin
+           PlaySound( SOUND_MENU_CLICK );
            nSetup := SETUP_KEY;
            Case nMenu Of
                 MENU_P1MOVEUP : InitBox( 'player 1 move up', 'press any key' );
@@ -581,8 +620,45 @@ End;
 
 
 Procedure InitSetup () ;
+Var tFile : TSearchRec;
+    sFile : String;
+    k : Integer;
 Begin
+     // initialisation du menu
      InitMenu();
+
+     // création de la liste des schemes
+     sFile := '';
+     FindFirst( './schemes/*.sch', faAnyFile, tFile );
+     For k := 0 To 255 Do Begin
+         If sFile = tFile.Name Then Break;
+         sFile := tFile.Name;
+         aSchemeList[k] := CScheme.Create( sFile, False );
+         FindNext( tFile );
+     End;
+     nSchemeCount := k;
+     
+     // création de la liste des maps
+     sFile := '';
+     FindFirst( './maps/*.map', faAnyFile, tFile );
+     For k := 0 To 255 Do Begin
+         If sFile = tFile.Name Then Break;
+         sFile := tFile.Name;
+         aMapList[k] := CMap.Create( sFile, False );
+         FindNext( tFile );
+     End;
+     nMapCount := k;
+
+     // création de la liste des characters
+     sFile := '';
+     FindFirst( './characters/*.chr', faAnyFile, tFile );
+     For k := 0 To 255 Do Begin
+         If sFile = tFile.Name Then Break;
+         sFile := tFile.Name;
+         aCharacterList[k] := CCharacter.Create( sFile, False );
+         FindNext( tFile );
+     End;
+     nCharacterCount := k;
 
      // désactivation de la souris
      BindButton( BUTTON_LEFT, NIL );
@@ -612,13 +688,13 @@ Const STEP_VERSION         =  2;
 Const STEP_PACKAGE         =  3;
 Const STEP_MAP             =  4;
 Const STEP_SCHEME          =  5;
-Const STEP_PLAYERCHARACTER =  6;
-Const STEP_PLAYERNAME      =  7;
-Const STEP_KEY             =  8;
-Const STEP_INTRO           =  9;
-Const STEP_DISPLAY         = 10;
-Const STEP_QUALITY         = 11;
-Const STEP_WINDOW          = 12;
+Const STEP_CHARACTER       =  6;
+Const STEP_KEY             =  7;
+Const STEP_INTRO           =  8;
+Const STEP_DISPLAY         =  9;
+Const STEP_QUALITY         = 10;
+Const STEP_WINDOW          = 11;
+Const STEP_DEBUG           = 12;
 
 Function GetStep ( sCommand : String ) : Integer ;
 Var i : Integer;
@@ -629,17 +705,17 @@ Begin
      For i := 1 To Length(sCommand) Do
      Begin
           If (sCommand[i] = ';') Then nStep := STEP_COMMENT;
-          If (sCommand[i] = '-') And (sCommand[i+1] = 'N') Then nStep := STEP_PLAYERNAME;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'V') Then nStep := STEP_VERSION;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'P') Then nStep := STEP_PACKAGE;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'S') Then nStep := STEP_SCHEME;
-          If (sCommand[i] = '-') And (sCommand[i+1] = 'C') Then nStep := STEP_PLAYERCHARACTER;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'C') Then nStep := STEP_CHARACTER;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'K') Then nStep := STEP_KEY;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'M') Then nStep := STEP_MAP;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'I') Then nStep := STEP_INTRO;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'D') Then nStep := STEP_DISPLAY;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'Q') Then nStep := STEP_QUALITY;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'W') Then nStep := STEP_WINDOW;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'X') Then nStep := STEP_DEBUG;
 
           If nStep > STEP_NONE Then Break;
      End;
@@ -717,6 +793,8 @@ Begin
 
      bIntro := True;
      
+     bDebug := False;
+
      nWindowLeft := 120;
      nWindowTop := 80;
      nWindowWidth := 640;
@@ -724,6 +802,7 @@ Begin
      nFramerate := 20;
      bLighting := False;
      bShadowing := False;
+     bReflection := False;
      nTexturing := 8;
      bDisplayFullscreen := False;
      nDisplayWidth := 640;
@@ -732,18 +811,28 @@ Begin
      nDisplayRefreshrate := 60;
 
      nRoundCount := 3;
-
-     bSchemeRandom := False;
+     fRoundDuration := 180.0;
+     
      pScheme := NIL;
+     nScheme := -1;
      
-     bMapRandom := False;
      pMap := NIL;
-     
-     pCharacter1 := NIL;
-     pCharacter2 := NIL;
+     nMap := -1;
 
-     sName1 := 'Player1';
-     sName2 := 'Player2';
+     For k := 1 To 8 Do Begin
+         pPlayerCharacter[k] := NIL;
+         nPlayerCharacter[k] := -1;
+         nPlayerType[k] := PLAYER_COM;
+         nPlayerSkill[k] := 2;
+     End;
+     sPlayerName[1] := 'John Carmack';
+     sPlayerName[2] := 'Shigeru Miyamoto';
+     sPlayerName[3] := 'Michel Ancel';
+     sPlayerName[4] := 'Warren Spector';
+     sPlayerName[5] := 'Peter Molyneux';
+     sPlayerName[6] := 'Chris Taylor';
+     sPlayerName[7] := 'John Romero';
+     sPlayerName[8] := 'Frederick Raynal';
 
      nKey1Primary := 48;
      nKey1Secondary := 46;
@@ -766,62 +855,64 @@ Begin
      Begin
           ReadLn( ioLine, sLine );
           Case GetStep(sLine) Of
-               STEP_PLAYERNAME :
-               Begin
-                    If GetInteger(sLine, 1) = 1 Then Begin
-                       sName1 := GetString(sLine, 2);
-                       AddLineToConsole( 'Player 1 Name : ' + sName1 );
-                    End;
-                    If GetInteger(sLine, 1) = 2 Then Begin
-                       sName2 := GetString(sLine, 2);
-                       AddLineToConsole( 'Player 2 Name : ' + sName2 );
-                    End;
-               End;
                STEP_VERSION :
                Begin
                     nVersion := GetInteger(sLine, 1);
                     AddLineToConsole( Format('Version : %d', [nVersion]) );
                End;
-               STEP_PLAYERCHARACTER :
+               STEP_CHARACTER :
                Begin
-                    If GetInteger(sLine, 1) = 1 Then Begin
-                       k := GetInteger(sLine, 2);
-                       If aCharacterList[k] <> NIL Then Begin
-                          pCharacter1 := aCharacterList[k];
-                          AddLineToConsole( 'Player 1 Character : ' + pCharacter1.Name );
-                       End Else
-                          AddLineToConsole( 'Player 1 Character : *UNKNOWN*' );
+                    k := GetInteger(sLine, 1);
+                    nPlayerCharacter[k] := GetInteger(sLine, 2);
+                    If nPlayerCharacter[k] > -1 Then Begin
+                       If aCharacterList[nPlayerCharacter[k]] <> NIL Then Begin
+                          pPlayerCharacter[k] := aCharacterList[nPlayerCharacter[k]];
+                          AddLineToConsole( 'Player ' + IntToStr(k) + ' character : ' + pPlayerCharacter[k].Name );
+                       End Else Begin
+                          AddLineToConsole( 'Player ' + IntToStr(k) + ' character : ' + '*UNKNOWN*' );
+                       End;
+                       End Else Begin
+                          AddLineToConsole( 'Player ' + IntToStr(k) + ' character : ' + '*RANDOM*' );
                     End;
-                    If GetInteger(sLine, 1) = 2 Then Begin
-                       k := GetInteger(sLine, 2);
-                       If aCharacterList[k] <> NIL Then Begin
-                          pCharacter2 := aCharacterList[k];
-                          AddLineToConsole( 'Player 2 Character : ' + pCharacter2.Name );
-                       End Else
-                          AddLineToConsole( 'Player 2 Character : *UNKNOWN*' );
-                    End;
+                    sPlayerName[k] := GetString(sLine, 3);
+                    AddLineToConsole( 'Player ' + IntToStr(k) + ' name : ' + sPlayerName[k] );
+                    nPlayerType[k] := GetInteger(sLine, 4);
+                    If nPlayerType[k] = PLAYER_NIL Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : None' );
+                    If nPlayerType[k] = PLAYER_KB1 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Keyboard 1' );
+                    If nPlayerType[k] = PLAYER_KB2 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Keyboard 2' );
+                    If nPlayerType[k] = PLAYER_COM Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Computer' );
+                    If nPlayerType[k] = PLAYER_NET Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Network' );
+                    nPlayerSkill[k] := GetInteger(sLine, 5);
+                    If nPlayerSkill[k] = 1 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' skill : Novice' );
+                    If nPlayerSkill[k] = 2 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' skill : Average' );
+                    If nPlayerSkill[k] = 3 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' skill : Masterful' );
+                    If nPlayerSkill[k] = 4 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' skill : Godlike' );
                End;
                STEP_SCHEME :
                Begin
-                    k := GetInteger(sLine, 2);
-                    If k = -1 Then
-                       bSchemeRandom := True
-                    Else If aSchemeList[k] <> NIL Then Begin
+                    k := GetInteger(sLine, 1);
+                    nScheme := k;
+                    If k = -1 Then Begin
+                       AddLineToConsole( 'Scheme : *RANDOM*' );
+                    End Else If aSchemeList[k] <> NIL Then Begin
                        pScheme := aSchemeList[k];
                        AddLineToConsole( 'Scheme : ' + pScheme.Name );
-                    End Else
+                    End Else Begin
                        AddLineToConsole( 'Scheme : *UNKNOWN*' );
+                    End;
                End;
                STEP_MAP :
                Begin
-                    k := GetInteger(sLine, 2);
-                    If k = -1 Then
-                       bMapRandom := True
-                    Else If aMapList[k] <> NIL Then Begin
+                    k := GetInteger(sLine, 1);
+                    nMap := k;
+                    If k = -1 Then Begin
+                       AddLineToConsole( 'Map : *RANDOM*' );
+                    End Else If aMapList[k] <> NIL Then Begin
                        pMap := aMapList[k];
                        AddLineToConsole( 'Map : ' + pMap.Name );
-                    End Else
+                    End Else Begin
                        AddLineToConsole( 'Map : *UNKNOWN*' );
+                    End;
                End;
                STEP_KEY :
                Begin
@@ -846,17 +937,17 @@ Begin
                Begin
                     If LowerCase(GetString(sLine, 1)) = 'map' Then Begin
                        k := GetInteger(sLine, 2);
-                       aMapList[k] := CMap.Create(GetString(sLine, 3));
+                       aMapList[k] := CMap.Create( GetString(sLine, 3), bDebug );
                        nMapCount += 1;
                     End;
                     If LowerCase(GetString(sLine, 1)) = 'scheme' Then Begin
                        k := GetInteger(sLine, 2);
-                       aSchemeList[k] := CScheme.Create(GetString(sLine, 3));
+                       aSchemeList[k] := CScheme.Create( GetString(sLine, 3), bDebug );
                        nSchemeCount += 1;
                     End;
                     If LowerCase(GetString(sLine, 1)) = 'character' Then Begin
                        k := GetInteger(sLine, 2);
-                       aCharacterList[k] := CCharacter.Create(GetString(sLine, 3));
+                       aCharacterList[k] := CCharacter.Create( GetString(sLine, 3), bDebug );
                        nCharacterCount += 1;
                     End;
                End;
@@ -887,7 +978,10 @@ Begin
                     If LowerCase(GetString(sLine, 3)) = 'true' Then bShadowing := True;
                     If LowerCase(GetString(sLine, 3)) = 'false' Then bShadowing := False;
                     If bShadowing Then AddLineToConsole( 'Shadowing : Enabled' ) Else AddLineToConsole( 'Shadowing : Disabled' );
-                    nTexturing := GetInteger(sLine, 4);
+                    If LowerCase(GetString(sLine, 4)) = 'true' Then bReflection := True;
+                    If LowerCase(GetString(sLine, 4)) = 'false' Then bReflection := False;
+                    If bReflection Then AddLineToConsole( 'Reflection : Enabled' ) Else AddLineToConsole( 'Reflection : Disabled' );
+                    nTexturing := GetInteger(sLine, 5);
                     AddLineToConsole( Format('Texturing quality : %d', [nTexturing]) );
                End;
                STEP_WINDOW :
@@ -898,6 +992,12 @@ Begin
                     nWindowWidth := GetInteger(sLine, 3);
                     nWindowHeight := GetInteger(sLine, 4);
                     AddLineToConsole( Format('Window size : %dx%d', [nWindowWidth,nWindowHeight]) );
+               End;
+               STEP_DEBUG :
+               Begin
+                    If LowerCase(GetString(sLine, 1)) = 'true' Then bDebug := True;
+                    If LowerCase(GetString(sLine, 1)) = 'false' Then bDebug := False;
+                    If bIntro Then AddLineToConsole( 'Debug : Enabled' ) Else AddLineToConsole( 'Debug : Disabled' );
                End;
           End;
      End;
@@ -916,11 +1016,15 @@ Begin
      Rewrite( ioLine );
 
      WriteLn( ioLine );
-     WriteLn( ioLine , '; NOTE! This is an Atominsa Configuration File.' );
+     WriteLn( ioLine , '; NOTE! This is an atominsa Configuration File.' );
      WriteLn( ioLine , '; Modify at your own risk. It is machine-generated and updated.' );
      WriteLn( ioLine );
      WriteLn( ioLine );
 
+     WriteLn( ioLine , '; console debugging enabled ?' );
+     If bDebug Then WriteLn( ioLine , '-X,true' ) Else WriteLn( ioLine , '-X,false' );
+
+     WriteLn( ioLine );
      WriteLn( ioLine , '; version control number' );
      WriteLn( ioLine , '-V,2');
 
@@ -934,13 +1038,7 @@ Begin
      WriteLn( ioLine , '; index of the current map (-1 for random)' );
 
      //recuperation du n° correspondant a pMap
-     i := -1;
-     Repeat
-           i += 1;
-     Until ( pMap = aMapList[i] ) Or ( i > 255 );
-     If ( i > 255 ) Or bMapRandom Then s := '-1' Else s := IntToStr(i);
-
-     WriteLn( ioLine , '-M,' + s );
+     WriteLn( ioLine , '-M,' + IntToStr(nMap) );
 
      WriteLn( ioLine );
      WriteLn( ioLine , '; this is the list of installed schemes (index, file)' );
@@ -952,45 +1050,21 @@ Begin
      WriteLn( ioLine , '; index of the current scheme (-1 for random)' );
 
      //recuperation du n° correspondant a pScheme
-     i:=-1;
-     Repeat
-           i += 1;
-     Until ( pScheme = aSchemeList[i] ) Or ( i > 255 );
-     If ( i > 255 ) Or bSchemeRandom Then s := '-1' Else s := IntToStr(i);
-
-     WriteLn( ioLine , '-S,' + s );
+     WriteLn( ioLine , '-S,' + IntToStr(nScheme) );
 
      WriteLn( ioLine );
-     WriteLn( ioLine , '; name of the first and second players (player, name)' );
-     WriteLn( ioLine , '-N,1,' + sName1 );
-     WriteLn( ioLine , '-N,2,' + sName2 );
+     WriteLn( ioLine , '; this is the list of installed characters (index, file)' );
 
-     WriteLn( ioLine );
-     WriteLn( ioLine , '; this is the list of installed characters (index, file, name)' );
-
-     For i := 0 To nSchemeCount - 1 Do
+     For i := 0 To nCharacterCount - 1 Do
          WriteLn( ioLine , '-P,character,' + IntToStr(i) + ',' + aCharacterList[i].Path );
 
      WriteLn( ioLine );
-     WriteLn( ioLine , '; character index of the first and second players (player, index)' );
+     WriteLn( ioLine , '; this is the list of player settings (player, character, name, type, skill)' );
+     WriteLn( ioLine , '; player type : 0 = none ; 1 = key1 ; 2 = key2 ; 3 = computer ; 4 = network' );
+     WriteLn( ioLine , '; player skill : 1 = novice ; 2 = average ; 3 = masterful ; 4 = godlike' );
 
-     //recuperation du n° correspondant a pCharacter1
-     i := -1;
-     Repeat
-           i += 1;
-     Until ( pCharacter1 = aCharacterList[i] ) Or ( i > 255 );
-     If ( i > 255 ) Then s := '-1' Else s := IntToStr(i);
-
-     WriteLn( ioLine , '-C,1,' + s );
-
-     //recuperation du n° correspondant a pCharacter2
-     i := -1;
-     Repeat
-           i += 1;
-     Until ( pCharacter2 = aCharacterList[i] ) Or ( i > 255 );
-     If ( i > 255 ) Then s := '-1' Else s := IntToStr(i);
-
-     WriteLn( ioLine , '-C,2,' + s );
+     For i := 1 To 8 Do
+         WriteLn( ioLine , Format( '-C,%d,%d,' + sPlayerName[i] + ',%d,%d', [i, nPlayerCharacter[i], nPlayerType[i], nPlayerSkill[i]] ) );
 
      WriteLn( ioLine );
      WriteLn( ioLine , '; this is the list of binded keys' );
@@ -1023,11 +1097,12 @@ Begin
      WriteLn( ioLine, s );
 
      WriteLn( ioLine );
-     WriteLn( ioLine , '; quality settings (framerate, lighting, shadowing, texturing)' );
+     WriteLn( ioLine , '; quality settings (framerate, lighting, shadowing, reflection, texturing)' );
      s := '-Q,';
      s := s + IntToStr(nFramerate) + ',';
      If bLighting Then s := s + 'true,' Else s := s + 'false,';
      If bShadowing Then s := s + 'true,' Else s := s + 'false,';
+     If bReflection Then s := s + 'true,' Else s := s + 'false,';
      s := s + IntToStr(nTexturing);
      WriteLn( ioLine, s );
 

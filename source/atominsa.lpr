@@ -2,10 +2,10 @@ Program atominsa;
 
 {$mode objfpc}{$H+}
 
-Uses Classes, Forms, Interfaces, Graphics, SysUtils,
+Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
-     UGame, UMenu, UIntro, UEditor;
+     UPractice, UMenu, UIntro, UEditor;
 
 
 
@@ -14,6 +14,8 @@ Begin
      DrawBox( 0.7, 0.4, 0.2, -0.4 );
 
      If GetKey(KEY_Y) Then Begin
+        StopSound( SOUND_MENU_SELECT );
+     
         FreeBomberman();
         FreeBomb();
         FreeFlame();
@@ -61,7 +63,7 @@ Begin
           PHASE_MENU      : InitMenu();
           STATE_MENU      : ProcessMenu();
           PHASE_PRACTICE  : InitPractice();
-          STATE_PRACTICE  : ProcessGame();
+          STATE_PRACTICE  : ProcessPractice();
           PHASE_EDITOR    : InitEditor();
           STATE_EDITOR    : ProcessEditor();
           PHASE_SETUP     : InitSetup();
@@ -95,23 +97,10 @@ Begin
 
      InitGlut( 'atominsa - Game', @MainLoop );
 
-     //----------------------------BEGIN::TEMP----------------------------//
-     AddMesh( './characters/bomberman/bomberman.m12', MESH_BOMBERMAN );
-     AddMesh( './maps/test/solid.m12', MESH_BLOCK_SOLID );
-     AddMesh( './maps/test/brick.m12', MESH_BLOCK_BRICK );
-     AddMesh( './meshes/bomb.m12', MESH_BOMB );
-     AddMesh( './maps/test/plane.m12', MESH_PLANE );
-     AddSound( './characters/bomberman/bomb0.wav', SOUND_BOMB(0) );
-     AddSound( './characters/bomberman/bomb1.wav', SOUND_BOMB(1) );
-
-     For k := 0 To 7 Do
-         AddTexture( Format('./characters/bomberman/bomberman%d.jpg', [k]), TEXTURE_BOMBERMAN(k+1) );
-
-     AddTexture( './maps/test/brick.jpg', TEXTURE_MAP_BRICK );
-     AddTexture( './maps/test/solid.jpg', TEXTURE_MAP_SOLID );
-     AddTexture( './maps/test/plane.jpg', TEXTURE_MAP_PLANE );
-     AddTexture( './characters/bomberman/flame.jpg', TEXTURE_BOMBERMAN_FLAME );
-     //-----------------------------END::TEMP-----------------------------//
+     // chargement du masque des zones du menu principal
+     Window.Mask.Picture.Bitmap.LoadFromFile( './textures/mask.bmp' );
+     MaskIntfImg := TLazIntfImage.Create(0,0);
+     MaskIntfImg.LoadFromBitmap( Window.Mask.Picture.Bitmap.Handle, Window.Mask.Picture.Bitmap.MaskHandle );
 
      // chargement des meshes relatifs aux blocs et bonus
      AddMesh( './meshes/disease.m12', MESH_DISEASE );
@@ -144,6 +133,32 @@ Begin
      AddSound( './sounds/move.wav', SOUND_MENU_MOVE );
      AddSound( './sounds/select.wav', SOUND_MENU_SELECT );
      AddSound( './sounds/back.wav', SOUND_MENU_BACK );
+     AddSound( './sounds/click.wav', SOUND_MENU_CLICK );
+
+     // chargement des bombermen
+     For k := 1 To 8 Do Begin
+         If nPlayerCharacter[k] = -1 Then Begin
+            pPlayerCharacter[k] := aCharacterList[Trunc(Random(nCharacterCount))];
+         End Else Begin
+             pPlayerCharacter[k] := aCharacterList[nPlayerCharacter[k]];
+         End;
+         DelMesh( MESH_BOMBERMAN(k) );
+         AddMesh( './characters/' + pPlayerCharacter[k].PlayerMesh, MESH_BOMBERMAN(k) );
+         DelMesh( MESH_BOMB(k) );
+         AddMesh( './characters/' + pPlayerCharacter[k].BombMesh, MESH_BOMB(k) );
+         DelTexture( TEXTURE_BOMBERMAN(k) );
+         AddTexture( './characters/' + pPlayerCharacter[k].PlayerSkin[k], TEXTURE_BOMBERMAN(k) );
+         DelTexture( TEXTURE_BOMB(k) );
+         AddTexture( './characters/' + pPlayerCharacter[k].BombSkin, TEXTURE_BOMB(k) );
+         DelTexture( TEXTURE_FLAME(k) );
+         AddTexture( './characters/' + pPlayerCharacter[k].FlameTexture, TEXTURE_FLAME(k) );
+         DelSound( SOUND_BOMB(10+k) );
+         AddSound( './characters/' + pPlayerCharacter[k].BombSound[1], SOUND_BOMB(10+k) );
+         DelSound( SOUND_BOMB(20+k) );
+         AddSound( './characters/' + pPlayerCharacter[k].BombSound[2], SOUND_BOMB(20+k) );
+         DelSound( SOUND_BOMB(30+k) );
+         AddSound( './characters/' + pPlayerCharacter[k].BombSound[3], SOUND_BOMB(30+k) );
+     End;
 
      // initialisation de la machine d'état
      If bIntro Then Begin
@@ -153,7 +168,7 @@ Begin
      End;
 
      // définition de la touche pour le passage en plein écran
-     BindKeyStd( KEY_F11, True, True, @SwitchDisplay );
+     BindKeyStd( KEY_F11, True, @SwitchDisplay );
 
      ExecGlut();
 End.

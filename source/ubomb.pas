@@ -43,6 +43,8 @@ CBomb = Class(CBlock)
        property Y : Single Read fY;
        property Time : Single Read fTime;
 
+       property BIndex : integer Read nIndex Write nIndex;
+
 end;
 
 
@@ -460,8 +462,8 @@ Procedure CBomb.Explose();
            end;
 var k : integer;
 begin
-  k := Round(Random(2));
-  PlaySound( SOUND_BOMB(k) );
+  k := Trunc(Random(3) + 1.0) * 10;
+  PlaySound( SOUND_BOMB(k + nIndex) );
   RemoveThisBomb(Self);  //On supprime la bombe de la liste
   bExplosive:=False;    //elle pete elle peut plus exploser ... pour eviter qu'une bombe fasse sauter une bombe et celle ci fasse resaute la meme qu au debut ...
   CreateFlame(1,0);     //gauche

@@ -10,18 +10,25 @@
 -N,Original Bomberman
 
 ; mesh file
--M,.\bomberman\bomberman.m12
+-M,player,./bomberman/bomberman.m12
+-M,bomb,./bomberman/bomb.m12
 
 ; animation file
--A,.\bomberman\bomberman.a12
+-A,player,./bomberman/bomberman.a12
 
-; skin file
--S,0,.\bomberman\bomberman0.jpg
--S,1,.\bomberman\bomberman1.jpg
--S,2,.\bomberman\bomberman2.jpg
--S,3,.\bomberman\bomberman3.jpg
--S,4,.\bomberman\bomberman4.jpg
--S,5,.\bomberman\bomberman5.jpg
--S,6,.\bomberman\bomberman6.jpg
--S,7,.\bomberman\bomberman7.jpg
+; texture file
+-T,player1,./bomberman/bomberman0.jpg
+-T,player2,./bomberman/bomberman1.jpg
+-T,player3,./bomberman/bomberman2.jpg
+-T,player4,./bomberman/bomberman3.jpg
+-T,player5,./bomberman/bomberman4.jpg
+-T,player6,./bomberman/bomberman5.jpg
+-T,player7,./bomberman/bomberman6.jpg
+-T,player8,./bomberman/bomberman7.jpg
+-T,bomb,./bomberman/bomb.jpg
+-T,flame,./bomberman/flame.jpg
 
+; sound file
+-S,bomb1,./bomberman/bomb0.wav
+-S,bomb2,./bomberman/bomb1.wav
+-S,bomb3,./bomberman/bomb2.wav

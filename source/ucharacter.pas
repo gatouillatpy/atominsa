@@ -6,13 +6,16 @@ Unit UCharacter;
 
 Interface
 
+
+
 Uses Classes, SysUtils, UUtils, UForm;
 
 Type
 
-StringArray = Array [1..8] Of String;
-
 { CCharacter}
+
+StringArray8 = Array [1..8] Of String;
+StringArray3 = Array [1..3] Of String;
 
 CCharacter = Class
 
@@ -22,21 +25,33 @@ CCharacter = Class
                  
                  sPath         : String                                         ;
 
-                 sMesh         : String                                        	;
-                 sAnim         : String                                        	;
-                 aSkin         : StringArray                       	        ;
+                 sPlayerMesh   : String                                        	;
+                 sPlayerAnim   : String                                        	;
+                 aPlayerSkin   : StringArray8                            	;
 
+                 sBombMesh     : String                                        	;
+                 sBombSkin     : String                       	                ;
+                 aBombSound    : StringArray3                           	;
+
+                 sFlameTexture : String                       	                ;
+                 
           Public
-                Constructor Create ( sFile : String ) ;
+                Constructor Create ( sFile : String ; bDebug : Boolean ) ;
 
                 Property Name : String Read sName ;
                 Property Version : Integer Read nVersion ;
                 
                 Property Path : String Read sPath ;
 
-                Property Mesh : String Read sMesh ;
-                Property Anim : String Read sAnim ;
-                Property Skin : StringArray Read aSkin ;
+                Property PlayerMesh : String Read sPlayerMesh ;
+                Property PlayerAnim : String Read sPlayerAnim ;
+                Property PlayerSkin : StringArray8 Read aPlayerSkin ;
+
+                Property BombMesh : String Read sBombMesh ;
+                Property BombSkin : String Read sBombSkin ;
+                Property BombSound : StringArray3 Read aBombSound ;
+                
+                Property FlameTexture : String Read sFlameTexture ;
 
 End;
 
@@ -44,13 +59,16 @@ End;
 
 Implementation
 
+
+
 Const STEP_NONE          = 0;
 Const STEP_COMMENT       = 1;
 Const STEP_NAME          = 2;
 Const STEP_VERSION       = 3;
 Const STEP_MESH          = 4;
 Const STEP_ANIM          = 5;
-Const STEP_SKIN          = 6;
+Const STEP_TEXTURE       = 6;
+Const STEP_SOUND         = 7;
 
 Function GetStep ( sCommand : String ) : Integer ;
 Var i : Integer;
@@ -65,7 +83,8 @@ Begin
           If (sCommand[i] = '-') And (sCommand[i+1] = 'V') Then nStep := STEP_VERSION;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'M') Then nStep := STEP_MESH;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'A') Then nStep := STEP_ANIM;
-          If (sCommand[i] = '-') And (sCommand[i+1] = 'S') Then nStep := STEP_SKIN;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'T') Then nStep := STEP_TEXTURE;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'S') Then nStep := STEP_SOUND;
 
           If nStep > STEP_NONE Then Break;
      End;
@@ -127,22 +146,22 @@ End;
 
 { CCharacter }
 
-Constructor CCharacter.Create ( sFile : String ) ;
+Constructor CCharacter.Create ( sFile : String ; bDebug : Boolean ) ;
 Var ioLine : TEXT;
     sLine : String;
     i : Integer;
 Begin
-     Window.Memo.Lines.Add( 'Loading Character ' + sFile );
+     Window.Memo.Lines.Add( 'Loading character ' + sFile );
      
      sName := '*UNKNOWN*';
      
      sPath := sFile;
      sFile := PATH_CHARACTER + sFile;
 
-     sMesh := '*UNKNOWN*';
-     sAnim := '*UNKNOWN*';
+     sPlayerMesh := '*UNKNOWN*';
+     sPlayerAnim := '*UNKNOWN*';
      For i := 1 To 8 Do
-         aSkin[i] := '*UNKNOWN*';
+         aPlayerSkin[i] := '*UNKNOWN*';
 
      Assign( ioLine, sFile );
      Reset( ioLine );
@@ -154,28 +173,88 @@ Begin
                STEP_NAME          :
                Begin
                     sName := GetString(sLine, 1);
-                    AddLineToConsole( 'Name : ' + sName );
+                    If bDebug Then AddLineToConsole( 'Name : ' + sName );
                End;
                STEP_VERSION       :
                Begin
                     nVersion := GetInteger(sLine, 1);
-                    AddLineToConsole( Format('Version : %d', [nVersion]) );
+                    If bDebug Then AddLineToConsole( Format('Version : %d', [nVersion]) );
                End;
                STEP_MESH          :
                Begin
-                    sMesh := GetString(sLine, 1);
-                    AddLineToConsole( 'Mesh data : ' + sMesh );
+                    If LowerCase(GetString(sLine, 1)) = 'player' Then Begin
+                       sPlayerMesh := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player mesh : ' + sPlayerMesh );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'bomb' Then Begin
+                       sBombMesh := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Bomb mesh : ' + sBombMesh );
+                    End;
                End;
                STEP_ANIM          :
                Begin
-                    sAnim := GetString(sLine, 1);
-                    AddLineToConsole( 'Animation data : ' + sAnim );
+                    If LowerCase(GetString(sLine, 1)) = 'player' Then Begin
+                       sPlayerAnim := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player animation : ' + sPlayerAnim );
+                    End;
                End;
-               STEP_SKIN          :
+               STEP_TEXTURE       :
                Begin
-                    i := GetInteger(sLine, 1);
-                    aSkin[i] := GetString(sLine, 2);
-                    AddLineToConsole( Format('Skin data [%d] : ' + aSkin[i], [i]) );
+                    If LowerCase(GetString(sLine, 1)) = 'player1' Then Begin
+                       aPlayerSkin[1] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player 1 skin : ' + aPlayerSkin[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'player2' Then Begin
+                       aPlayerSkin[2] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player 2 skin : ' + aPlayerSkin[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'player3' Then Begin
+                       aPlayerSkin[3] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player 3 skin : ' + aPlayerSkin[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'player4' Then Begin
+                       aPlayerSkin[4] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player 4 skin : ' + aPlayerSkin[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'player5' Then Begin
+                       aPlayerSkin[5] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player 5 skin : ' + aPlayerSkin[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'player6' Then Begin
+                       aPlayerSkin[6] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player 6 skin : ' + aPlayerSkin[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'player7' Then Begin
+                       aPlayerSkin[7] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player 7 skin : ' + aPlayerSkin[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'player8' Then Begin
+                       aPlayerSkin[8] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Player 8 skin : ' + aPlayerSkin[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'bomb' Then Begin
+                       sBombSkin := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Bomb skin : ' + sBombSkin );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'flame' Then Begin
+                       sFlameTexture := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Flame texture : ' + sFlameTexture );
+                    End;
+               End;
+               STEP_SOUND         :
+               Begin
+                    If LowerCase(GetString(sLine, 1)) = 'bomb1' Then Begin
+                       aBombSound[1] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Bomb sound 1 : ' + aBombSound[1] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'bomb2' Then Begin
+                       aBombSound[2] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Bomb sound 2 : ' + aBombSound[2] );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'bomb3' Then Begin
+                       aBombSound[3] := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Bomb sound 3 : ' + aBombSound[3] );
+                    End;
                End;
 	  End;
      End;

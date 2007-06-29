@@ -116,10 +116,12 @@ Procedure FreeDataStack () ;
 Procedure ReloadDataStack () ;
 
 Function AddTexture ( sFile : String ; nIndex : LongInt ) : LPOGLTexture;
+Procedure DelTexture ( nIndex : LongInt ) ;
 Procedure SetTexture( nStage : Integer ; nIndex : LongInt ) ;
 Procedure FreeTexture ( pTexture : LPOGLTexture ) ;
 
 Function AddMesh ( sFile : String ; nIndex : LongInt ) : LPOGLMesh ;
+Procedure DelMesh ( nIndex : LongInt ) ;
 Procedure DrawMesh ( nIndex : LongInt ; t : Boolean ) ;
 Procedure FreeMesh ( pMesh : LPOGLMesh ) ;
 
@@ -169,8 +171,8 @@ Procedure FreeTimer();
 
 
 
-Procedure BindKeyStd ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallbackStd ) ;
-Procedure BindKeyObj ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallbackObj ) ;
+Procedure BindKeyStd ( nKey : Integer ; bInstant : Boolean ; pCallback : KeyCallbackStd ) ;
+Procedure BindKeyObj ( nKey : Integer ; bInstant : Boolean ; pCallback : KeyCallbackObj ) ;
 Procedure ExecKey ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ) ;
 
 Procedure BindButton ( nButton : Integer ; pCallback : ButtonCallback ) ;
@@ -193,6 +195,7 @@ Procedure InitFMod () ;
 Procedure ExitFMod () ;
 
 Procedure AddSound ( sFile : String ; nIndex : LongInt ) ;
+Procedure DelSound ( nIndex : LongInt ) ;
 Procedure AddMusic ( sFile : String ; nIndex : LongInt ) ;
 Procedure PlaySound ( nIndex : LongInt ) ;
 Procedure PlayMusic ( nIndex : LongInt ) ;
@@ -436,6 +439,31 @@ Begin
      
      FindItem := pItem;
 End;
+
+
+
+Procedure DelItem( nData : Integer ; nIndex : Integer ) ;
+Var pDataItem : LPDataItem;
+    pTempItem : LPDataItem;
+    pItem : Pointer;
+Begin
+     pDataItem := pDataStack;
+     pTempItem := NIL;
+     pItem := NIL;
+     While pDataItem <> NIL Do Begin
+          If (pDataItem^.data = nData) And (pDataItem^.index = nIndex) Then pItem := pDataItem^.item;
+          If pItem <> NIL Then Break;
+          pTempItem := pDataItem;
+          pDataItem := pDataItem^.next;
+     End;
+
+     If pTempItem = NIL Then pDataStack := pDataStack^.next;
+     If pDataStack = NIL Then InitDataStack();
+     If pTempItem <> NIL Then pTempItem^.next := pDataItem^.next;
+     
+     Dispose(pDataItem);
+End;
+
 
 
 
@@ -866,6 +894,22 @@ End;
 
 
 
+Procedure DelTexture ( nIndex : LongInt ) ;
+Var pTexture : LPOGLTexture;
+Begin
+     // recherche de la texture à sélectionner en fonction de son indice
+     pTexture := FindItem( DATA_TEXTURE, nIndex );
+     If pTexture = NIL Then Exit;
+
+     // destruction de la texture
+     FreeTexture( pTexture );
+
+     // destruction de l'objet dans la pile de données
+     DelItem( DATA_TEXTURE, nIndex );
+End;
+
+
+
 Procedure FreeTexture ( pTexture : LPOGLTexture ) ;
 Begin
      glDeleteTextures( 1, @pTexture^.ID );
@@ -1070,6 +1114,22 @@ Begin
      Finalize( pMesh^.PolygonData );
      Finalize( pMesh^.VertexData );
      Dispose( pMesh );
+End;
+
+
+
+Procedure DelMesh ( nIndex : LongInt ) ;
+Var pMesh : LPOGLMesh;
+Begin
+     // recherche du mesh à sélectionner en fonction de son indice
+     pMesh := FindItem( DATA_MESH, nIndex );
+     If pMesh = NIL Then Exit;
+
+     // destruction de la texture
+     FreeMesh( pMesh );
+
+     // destruction de l'objet dans la pile de données
+     DelItem( DATA_MESH, nIndex );
 End;
 
 
@@ -1526,6 +1586,13 @@ End;
 Procedure SetMaterial( r, g, b, a : Single ) ;
 Var MaterialColor : Array[0..3] Of glFloat;
 Begin
+     If Not bLighting Then Begin
+        r *= 5.0;
+        g *= 5.0;
+        b *= 5.0;
+        a *= 5.0;
+     End;
+     
      MaterialColor[0] := r;
      MaterialColor[1] := g;
      MaterialColor[2] := b;
@@ -1716,6 +1783,25 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// DelSound : Supprime un son de la pile de données.                          //
+////////////////////////////////////////////////////////////////////////////////
+Procedure DelSound ( nIndex : LongInt ) ;
+Var pSound : PFSoundSample;
+Begin
+     // recherche du son à sélectionner en fonction de son indice
+     pSound := FindItem( DATA_SOUND, nIndex );
+     If pSound = NIL Then Exit;
+
+     // destruction de lu son
+     FSOUND_Sample_Free( pSound );
+
+     // destruction de l'objet dans la pile de données
+     DelItem( DATA_SOUND, nIndex );
+End;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // AddMusic : Charge une musique depuis un fichier (*.mod ; *.s3m), et        //
 //            l'ajoute à la pile de données.                                  //
 ////////////////////////////////////////////////////////////////////////////////
@@ -1750,7 +1836,7 @@ Begin
      If pSound = NIL Then Exit;
      
      // lecture du son
-     FSOUND_PlaySound( nIndex, pSound );
+     FSOUND_PlaySound( 1, pSound );
 End;
 
 
@@ -1762,7 +1848,7 @@ Procedure StopSound ( nIndex : LongInt ) ;
 Var pSound : PFSoundSample;
 Begin
      // arrêt du son
-     FSOUND_StopSound( nIndex );
+     FSOUND_StopSound( 1 );
 End;
 
 
@@ -1898,9 +1984,23 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 // BindKey : Ajoute une callback à la pile de touches.                        //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure BindKeyStd ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallbackStd ) ;
+Procedure BindKeyStd ( nKey : Integer ; bInstant : Boolean ; pCallback : KeyCallbackStd ) ;
 Var pKeyItem : LPKeyItem ;
 Begin
+     pKeyItem := pKeyStack;
+     While pKeyItem <> NIL Do
+     Begin
+          If (pKeyItem^.key = -nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = True) Then Begin
+             pKeyItem^.callbackstd := pCallback;
+             Exit;
+          End;
+          If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = False) Then Begin
+             pKeyItem^.callbackstd := pCallback;
+             Exit;
+          End;
+          pKeyItem := pKeyItem^.next;
+     End;
+
      If pKeyStack = NIL Then Begin
           New( pKeyStack );
           pKeyStack^.count := 0;
@@ -1911,16 +2011,30 @@ Begin
           pKeyStack^.count := pKeyItem^.count + 1;
           pKeyStack^.next := pKeyItem;
      End;
-     pKeyStack^.key := nKey;
+     If nKey < 0 Then pKeyStack^.key := -nKey Else pKeyStack^.key := nKey;
      pKeyStack^.instant := bInstant;
-     pKeyStack^.special := bSpecial;
+     If nKey < 0 Then pKeyStack^.special := True Else pKeyStack^.special := False;
      pKeyStack^.callbackstd := pCallback;
      pKeyStack^.callbackobj := NIL;
 End;
 
-Procedure BindKeyObj ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ; pCallback : KeyCallbackObj ) ;
+Procedure BindKeyObj ( nKey : Integer ; bInstant : Boolean ; pCallback : KeyCallbackObj ) ;
 Var pKeyItem : LPKeyItem ;
 Begin
+     pKeyItem := pKeyStack;
+     While pKeyItem <> NIL Do
+     Begin
+          If (pKeyItem^.key = -nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = True) Then Begin
+             pKeyItem^.callbackobj := pCallback;
+             Exit;
+          End;
+          If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = False) Then Begin
+             pKeyItem^.callbackobj := pCallback;
+             Exit;
+          End;
+          pKeyItem := pKeyItem^.next;
+     End;
+
      If pKeyStack = NIL Then Begin
           New( pKeyStack );
           pKeyStack^.count := 0;
@@ -1931,9 +2045,9 @@ Begin
           pKeyStack^.count := pKeyItem^.count + 1;
           pKeyStack^.next := pKeyItem;
      End;
-     pKeyStack^.key := nKey;
+     If nKey < 0 Then pKeyStack^.key := -nKey Else pKeyStack^.key := nKey;
      pKeyStack^.instant := bInstant;
-     pKeyStack^.special := bSpecial;
+     If nKey < 0 Then pKeyStack^.special := True Else pKeyStack^.special := False;
      pKeyStack^.callbackstd := NIL;
      pKeyStack^.callbackobj := pCallback;
 End;
@@ -1950,8 +2064,10 @@ Begin
      pKeyItem := pKeyStack;
      While pKeyItem <> NIL Do
      Begin
-          If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = bSpecial) Then
-             If (pKeyItem^.callbackstd = NIL) Then pKeyItem^.callbackobj( GetDelta() ) Else pKeyItem^.callbackstd();
+          If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = bSpecial) Then Begin
+             If (pKeyItem^.callbackstd = NIL) And (pKeyItem^.callbackobj <> NIL) Then pKeyItem^.callbackobj( GetDelta() );
+             If (pKeyItem^.callbackobj = NIL) And (pKeyItem^.callbackstd <> NIL) Then pKeyItem^.callbackstd();
+          End;
           pKeyItem := pKeyItem^.next;
      End;
 End;
@@ -2271,12 +2387,13 @@ Begin
      glutMouseFunc( @OGLMouseButton );
      glutPassiveMotionFunc( @OGLMouseMove );
 
-     Window.Memo.Lines.Add( '' );
-     Window.Memo.Lines.Add( 'OpenGL Infos :' );
-     Window.Memo.Lines.Add( '   Vendor : ' + PChar(glGetString(GL_VENDOR)) );
-     Window.Memo.Lines.Add( '   Renderer : ' + PChar(glGetString(GL_RENDERER)) );
-     Window.Memo.Lines.Add( '   Version : ' + PChar(glGetString(GL_VERSION)) );
-     Window.Memo.Lines.Add( '   Extensions : ' + PChar(glGetString(GL_EXTENSIONS)) );
+     If bDebug Then Begin
+        Window.Memo.Lines.Add( 'OpenGL Infos :' );
+        Window.Memo.Lines.Add( '   Vendor : ' + PChar(glGetString(GL_VENDOR)) );
+        Window.Memo.Lines.Add( '   Renderer : ' + PChar(glGetString(GL_RENDERER)) );
+        Window.Memo.Lines.Add( '   Version : ' + PChar(glGetString(GL_VERSION)) );
+        Window.Memo.Lines.Add( '   Extensions : ' + PChar(glGetString(GL_EXTENSIONS)) );
+     End;
 
      fTime := GetTime();
      fDelta := GetTime();

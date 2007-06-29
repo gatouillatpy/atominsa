@@ -95,27 +95,36 @@ Const BLOCK_BLANK = 0;
 
 
 // constantes de définition des sons
-Const SOUND_MENU_MOVE    = 01;
-      SOUND_MENU_SELECT  = 02;
-      SOUND_MENU_BACK    = 03;
+Const SOUND_MENU_MOVE    = 1;
+      SOUND_MENU_SELECT  = 2;
+      SOUND_MENU_BACK    = 3;
+      SOUND_MENU_CLICK   = 4;
 
       SOUND_BOMB_NULL    = 10;
 
 Function SOUND_BOMB( k : Integer ) : Integer ;
 
 
-// constantes de définition des meshes
-Const MESH_BOMBERMAN    = 1;
-      MESH_BLOCK_SOLID  = 2;
-      MESH_BLOCK_BRICK  = 3;
-      MESH_BLOCK_BLANK  = 4;
-      MESH_DISEASE      = 5;
-      MESH_BOMB         = 6;
-      MESH_EXTRABOMB    = 7;
-      MESH_FLAMEUP      = 8;
-      MESH_SPEEDUP      = 9;
-      MESH_PLANE        = 10;
 
+// constantes de définition des meshes
+Const MESH_BOMBERMAN_NULL    = 5300;
+
+      MESH_BLOCK_SOLID       = 5001;
+      MESH_BLOCK_BRICK       = 5002;
+      MESH_BLOCK_BLANK       = 5003;
+      
+      MESH_DISEASE           = 5101;
+      MESH_EXTRABOMB         = 5102;
+      MESH_FLAMEUP           = 5103;
+      MESH_SPEEDUP           = 5104;
+
+      MESH_PLANE             = 5201;
+
+      MESH_BOMB_NULL         = 5400;
+
+Function MESH_BOMBERMAN( k : Integer ) : Integer ;
+
+Function MESH_BOMB( k : Integer ) : Integer ;
 
 
 // constantes de définition des textures et sprites
@@ -135,8 +144,8 @@ Const TEXTURE_NONE              = 0;
       SPRITE_INTRO_LAYER_NULL   = 1200;
       
       TEXTURE_BOMBERMAN_NULL    = 1300;
-      TEXTURE_BOMBERMAN_FLAME   = 1311;
-      TEXTURE_BOMBERMAN_BOMB    = 1312;
+      TEXTURE_FLAME_NULL        = 1500;
+      TEXTURE_BOMB_NULL         = 1600;
 
       TEXTURE_MAP_BRICK         = 1401;
       TEXTURE_MAP_SOLID         = 1402;
@@ -145,6 +154,8 @@ Const TEXTURE_NONE              = 0;
 Function SPRITE_INTRO_LAYER( k : Integer ) : Integer ;
 
 Function TEXTURE_BOMBERMAN( k : Integer ) : Integer ;
+Function TEXTURE_FLAME( k : Integer ) : Integer ;
+Function TEXTURE_BOMB( k : Integer ) : Integer ;
 
 
 
@@ -173,11 +184,13 @@ Const POWERUP_NONE                 = -1;
 Const STRING_SCORE_TABLE_NULL   = 0;
       STRING_MENU_MAIN          = 1;
       STRING_EDITOR_MENU_NULL   = 0;
-      STRING_SETUP_MENU_NULL   = 0;
+      STRING_SETUP_MENU_NULL    = 0;
+      STRING_PRACTICE_MENU_NULL = 0;
 
 Function STRING_SCORE_TABLE( k : Integer ) : Integer ;
 Function STRING_EDITOR_MENU( k : Integer ) : Integer ;
 Function STRING_SETUP_MENU( k : Integer ) : Integer ;
+Function STRING_PRACTICE_MENU( k : Integer ) : Integer ;
 
 
 
@@ -228,14 +241,39 @@ Begin
      STRING_SETUP_MENU := k + STRING_SETUP_MENU_NULL;
 End;
 
+Function STRING_PRACTICE_MENU( k : Integer ) : Integer ;
+Begin
+     STRING_PRACTICE_MENU := k + STRING_PRACTICE_MENU_NULL;
+End;
+
 Function TEXTURE_BOMBERMAN( k : Integer ) : Integer ;
 Begin
      TEXTURE_BOMBERMAN := k + TEXTURE_BOMBERMAN_NULL;
 End;
 
+Function TEXTURE_FLAME( k : Integer ) : Integer ;
+Begin
+     TEXTURE_FLAME := k + TEXTURE_FLAME_NULL;
+End;
+
+Function TEXTURE_BOMB( k : Integer ) : Integer ;
+Begin
+     TEXTURE_BOMB := k + TEXTURE_BOMB_NULL;
+End;
+
 Function SOUND_BOMB( k : Integer ) : Integer ;
 Begin
      SOUND_BOMB := k + SOUND_BOMB_NULL;
+End;
+
+Function MESH_BOMBERMAN( k : Integer ) : Integer ;
+Begin
+     MESH_BOMBERMAN := k + MESH_BOMBERMAN_NULL;
+End;
+
+Function MESH_BOMB( k : Integer ) : Integer ;
+Begin
+     MESH_BOMB := k + MESH_BOMB_NULL;
 End;
 
 

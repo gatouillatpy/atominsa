@@ -109,7 +109,8 @@ type
     Function GetBombermanByIndex(i : integer):CBomberman;
     function GetBombermanByCoo(aX, aY: integer): CBomberman;
     function IsBombermanAtCoo(aX,aY : integer):boolean;cdecl;
-    Function CheckEndGame():boolean;
+
+    Function CheckEndGame() : Integer;
 
 implementation
 
@@ -205,18 +206,24 @@ begin
  end;
 end;
 
-function CheckEndGame(): boolean;
-var i : integer;
-    Count : integer;
-begin
- Count:=0;
- if (BombermanCount<>0) then
-  begin
-  For i:=1 to BombermanCount do
-   if GetBombermanByCount(i).Alive then Inc(Count);
-  end;
- result:=(Count<2);
-end;
+Function CheckEndGame() : Integer;
+Var i : Integer;
+    c : Integer;
+    k : Integer;
+Begin
+     c := 0;
+     If BombermanCount <> 0 Then Begin
+        For i := 1 To BombermanCount Do Begin
+            If GetBombermanByCount(i).Alive Then Begin
+               k := GetBombermanByCount(i).BIndex;
+               c += 1;
+            End;
+        End;
+     End;
+     If c > 1 Then Result :=  0; // on renvoie 0 si le jeu n'est pas terminé
+     If c = 1 Then Result :=  k; // on renvoie l'index du joueur vainqueur
+     If c = 0 Then Result := -1; // on renvoie -1 s'il y a égalité
+End;
 
 Function GetBombermanCount():Integer;
 Begin

@@ -31,6 +31,7 @@ CFlame = Class
                property X : integer Read nX;
                property Y : integer Read nY;
                
+               Property Owner : CBomberman Read bombPlayer;
 End;
     
 

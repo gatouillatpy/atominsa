@@ -33,7 +33,7 @@ CScheme = Class
                  Procedure CheckSpawn( x, y : Integer ) ;
 
           Public
-                Constructor Create ( sFile : String ) ;
+                Constructor Create ( sFile : String ; bDebug : Boolean ) ;
 
                 Property Name : String Read sName ;
                 Property Version : Integer Read nVersion ;
@@ -153,26 +153,9 @@ Begin
      If CheckCoordinates( x, y ) Then aBlock[x,y] := BLOCK_BLANK;
      y += 2;
      If CheckCoordinates( x, y ) Then aBlock[x,y] := BLOCK_BLANK;
-
-     {//If (x > 0) And (y > 0) Then
-     //   If aBlock[x-1,y-1] = BLOCK_BRICK Then aBlock[x-1,y-1] := BLOCK_BLANK;
-     If (x > 0) Then
-        If aBlock[x-1,y] = BLOCK_BRICK Then aBlock[x-1,y] := BLOCK_BLANK;
-     //If (x > 0) And (y < GRIDHEIGHT) Then
-     //   If aBlock[x-1,y+1] = BLOCK_BRICK Then aBlock[x-1,y+1] := BLOCK_BLANK;
-     If (y > 0) Then
-        If aBlock[x,y-1] = BLOCK_BRICK Then aBlock[x,y-1] := BLOCK_BLANK;
-     If (y < GRIDHEIGHT) Then
-        If aBlock[x,y+1] = BLOCK_BRICK Then aBlock[x,y+1] := BLOCK_BLANK;
-     //If (x < GRIDWIDTH) And (y > 0) Then
-     //   If aBlock[x+1,y-1] = BLOCK_BRICK Then aBlock[x+1,y-1] := BLOCK_BLANK;
-     If (x < GRIDWIDTH) Then
-        If aBlock[x+1,y] = BLOCK_BRICK Then aBlock[x+1,y] := BLOCK_BLANK;
-     //If (x < GRIDWIDTH) And (y < GRIDHEIGHT) Then
-     //   If aBlock[x+1,y+1] = BLOCK_BRICK Then aBlock[x+1,y+1] := BLOCK_BLANK;}
 End;
 
-Constructor CScheme.Create ( sFile : String ) ;
+Constructor CScheme.Create ( sFile : String ; bDebug : Boolean ) ;
 Var ioLine : TEXT;
     sLine : String;
     nX, nY : Integer;
@@ -181,7 +164,7 @@ Var ioLine : TEXT;
     nPowerUp : Integer;
     i : Integer;
 Begin
-     AddLineToConsole( 'Loading Scheme ' + sFile );
+     AddLineToConsole( 'Loading scheme ' + sFile );
      
      sPath := sFile;
      sFile := PATH_SCHEME + sFile;
@@ -210,17 +193,17 @@ Begin
                STEP_NAME          :
                Begin
                     sName := GetString(sLine, 1);
-                    AddLineToConsole( 'Name : ' + sName );
+                    If bDebug Then AddLineToConsole( 'Name : ' + sName );
                End;
                STEP_VERSION       :
                Begin
                     nVersion := GetInteger(sLine, 1);
-                    AddLineToConsole( Format('Version : %d', [nVersion]) );
+                    If bDebug Then AddLineToConsole( Format('Version : %d', [nVersion]) );
                End;
                STEP_BRICKDENSITY  :
                Begin
                     nBrickDensity := GetInteger(sLine, 1);
-                    AddLineToConsole( Format('Brick density :  %d', [nBrickDensity]) );
+                    If bDebug Then AddLineToConsole( Format('Brick density :  %d', [nBrickDensity]) );
                End;
                STEP_BLOCK         :
                Begin
@@ -244,7 +227,7 @@ Begin
                                                      GetInteger(sLine, 4),
                                                      GetSingle(sLine, 5) );
                     CheckSpawn( aSpawn[nSpawn].X, aSpawn[nSpawn].Y );
-                    AddLineToConsole( Format( 'Spawn point : Player %d ; Team %d ; X %d ; Y %d ; Delay %f',
+                    If bDebug Then AddLineToConsole( Format( 'Spawn point : Player %d ; Team %d ; X %d ; Y %d ; Delay %f',
                                                    [aSpawn[nSpawn].Color, aSpawn[nSpawn].Team, aSpawn[nSpawn].X, aSpawn[nSpawn].Y, aSpawn[nSpawn].Delay] ) );
                End;
                STEP_POWERUP       :
@@ -255,7 +238,7 @@ Begin
                                                            GetBoolean(sLine, 3),
                                                            GetInteger(sLine, 4),
                                                            GetBoolean(sLine, 5) );
-                    AddLineToConsole( Format( 'PowerUp : Code %d ; InitQuantity %d ; GameQuantity %d ; Forbidden %b',
+                    If bDebug Then AddLineToConsole( Format( 'PowerUp : Code %d ; InitQuantity %d ; GameQuantity %d ; Forbidden %b',
                                                    [aPowerUp[nPowerUp].Code, aPowerUp[nPowerUp].InitQuantity, aPowerUp[nPowerUp].GameQuantity, aPowerUp[nPowerUp].Forbidden] ) );
                End;
           End;
@@ -287,7 +270,7 @@ Begin
                   End;
              End;
          End;
-         AddLineToConsole( sLine );
+         If bDebug Then AddLineToConsole( sLine );
      End;
 End;
 

@@ -22,9 +22,14 @@ CMap = Class
 
                  sSolidMesh    : String                                        	;
                  sBrickMesh    : String                                        	;
+                 sPlaneMesh    : String                                        	;
+
+                 sSolidTexture    : String                                      ;
+                 sBrickTexture    : String                                      ;
+                 sPlaneTexture    : String                                      ;
 
           Public
-                Constructor Create ( sFile : String ) ;
+                Constructor Create ( sFile : String ; bDebug : Boolean ) ;
 
                 Property Path : String Read sPath ;
 
@@ -33,6 +38,11 @@ CMap = Class
 
                 Property SolidMesh : String Read sSolidMesh ;
                 Property BrickMesh : String Read sBrickMesh ;
+                Property PlaneMesh : String Read sPlaneMesh ;
+
+                Property SolidTexture : String Read sSolidTexture ;
+                Property BrickTexture : String Read sBrickTexture ;
+                Property PlaneTexture : String Read sPlaneTexture ;
 
 End;
 
@@ -44,8 +54,8 @@ Const STEP_NONE          = 0;
 Const STEP_COMMENT       = 1;
 Const STEP_NAME          = 2;
 Const STEP_VERSION       = 3;
-Const STEP_SOLIDMESH	 = 4;
-Const STEP_BRICKMESH     = 5;
+Const STEP_MESH	         = 4;
+Const STEP_TEXTURE       = 5;
 
 Function GetStep ( sCommand : String ) : Integer ;
 Var i : Integer;
@@ -58,8 +68,8 @@ Begin
           If (sCommand[i] = ';') Then nStep := STEP_COMMENT;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'N') Then nStep := STEP_NAME;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'V') Then nStep := STEP_VERSION;
-          If (sCommand[i] = '-') And (sCommand[i+1] = 'S') Then nStep := STEP_SOLIDMESH;
-          If (sCommand[i] = '-') And (sCommand[i+1] = 'B') Then nStep := STEP_BRICKMESH;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'M') Then nStep := STEP_MESH;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'T') Then nStep := STEP_TEXTURE;
 
           If nStep > STEP_NONE Then Break;
      End;
@@ -121,12 +131,12 @@ End;
 
 { CMap }
 
-Constructor CMap.Create ( sFile : String ) ;
+Constructor CMap.Create ( sFile : String ; bDebug : Boolean ) ;
 Var ioLine : TEXT;
     sLine : String;
     i : Integer;
 Begin
-     Window.Memo.Lines.Add( 'Loading Map ' + sFile );
+     Window.Memo.Lines.Add( 'Loading map ' + sFile );
      
      sName := '*UNKNOWN*';
 	 
@@ -143,25 +153,45 @@ Begin
      Begin
           ReadLn( ioLine, sLine );
           Case GetStep(sLine) Of
-               STEP_NAME          :
+               STEP_NAME :
                Begin
                     sName := GetString(sLine, 1);
-                    AddLineToConsole( 'Name : ' + sName );
+                    If bDebug Then AddLineToConsole( 'Name : ' + sName );
                End;
-               STEP_VERSION       :
+               STEP_VERSION :
                Begin
                     nVersion := GetInteger(sLine, 1);
-                    AddLineToConsole( Format('Version : %d', [nVersion]) );
+                    If bDebug Then AddLineToConsole( Format('Version : %d', [nVersion]) );
                End;
-               STEP_SOLIDMESH     :
+               STEP_MESH :
                Begin
-                    sSolidMesh := GetString(sLine, 1);
-                    AddLineToConsole( 'Solid mesh data : ' + sSolidMesh );
+                    If LowerCase(GetString(sLine, 1)) = 'solid' Then Begin
+                       sSolidMesh := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Solid mesh : ' + sSolidMesh );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'brick' Then Begin
+                       sBrickMesh := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Brick mesh : ' + sBrickMesh );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'plane' Then Begin
+                       sPlaneMesh := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Plane mesh : ' + sPlaneMesh );
+                    End;
                End;
-               STEP_BRICKMESH     :
+               STEP_TEXTURE :
                Begin
-                    sBrickMesh := GetString(sLine, 1);
-                    AddLineToConsole( 'Brick mesh data : ' + sBrickMesh );
+                    If LowerCase(GetString(sLine, 1)) = 'solid' Then Begin
+                       sSolidTexture := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Solid texture : ' + sSolidTexture );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'brick' Then Begin
+                       sBrickTexture := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Brick texture : ' + sBrickTexture );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'plane' Then Begin
+                       sPlaneTexture := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Plane texture : ' + sPlaneTexture );
+                    End;
                End;
           End;
      End;
