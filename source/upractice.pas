@@ -11,7 +11,7 @@ Interface
 
 Uses Classes, SysUtils,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
-     USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
+     USpeedUp, UExtraBomb, UFlameUp, UKick, UGrid, UFlame, UBomb, USetup, UForm,
      UCharacter;
 
 
@@ -391,6 +391,7 @@ Begin
                PushObjectMatrix( GetBombermanByCount(i).X-0.15, 0, GetBombermanByCount(i).Y-0.15, 0.05, 0.05, 0.05, 0, GetBombermanByCount(i).Direction, 0 );
                DrawMesh( MESH_BOMBERMAN(GetBombermanByCount(i).BIndex), False );
                PopObjectMatrix();
+               GetBombermanByCount(i).Update(GetDelta());
           End;
      End;
 End;
@@ -432,6 +433,12 @@ Begin
                     PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
                     DrawMesh( MESH_FLAMEUP, True );
                     PopObjectMatrix();
+                 End Else If (pBlock Is CKick) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( w, w, 0, 1.0 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////Mette le mesh du Kick
+                    PopObjectMatrix();
                  End Else If (pBlock Is CItem) Then Begin
                     SetMaterial( w, w, w, 1.0 );
                     SetTexture( 1, TEXTURE_MAP_BRICK );
@@ -471,14 +478,14 @@ Begin
      While ( i <= GetBombCount() ) Do Begin
            SetMaterial( w, w, w, 1.0 );
            SetTexture( 1, TEXTURE_BOMB(GetBombByCount(i).BIndex) );
-           PushObjectMatrix( GetBombByCount(i).X, 0, GetBombByCount(i).Y,
+           PushObjectMatrix( GetBombByCount(i).Position.X, 0, GetBombByCount(i).Position.Y,
                              1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
                              1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
                              1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
                              0, 0, 0 );
            DrawMesh( MESH_BOMB(GetBombByCount(i).BIndex), False );
            PopObjectMatrix();
-           If Not GetBombByCount(i).UpdateBomb(GetDelta()) Then i += 1;
+           If Not GetBombByCount(i).UpdateBomb() Then i += 1;
     End;
 End;
 

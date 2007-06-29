@@ -533,7 +533,7 @@ procedure CBomb.Jump(dt : Single);
 var dX, dY : integer;
     aX, aY : integer;
 begin
-  {On détermine d'abord la direction du mouvement}
+{  {On détermine d'abord la direction du mouvement}
   dX:=0;
   dY:=0;
   case nMoveDir of
@@ -587,7 +587,7 @@ begin
       nMoveDir:=Random(4)+1;
       fPosition.z:=1.05;
     end;
-  end;
+  end; }
 end;
 
 
