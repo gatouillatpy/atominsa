@@ -84,6 +84,7 @@ Const GRIDWIDTH = 15;           // largeur de la grille
       BOMBTIME = 3.0;           // durée avant explosion d'une bombe en situation normale
       BOMBTIMEDISEASE = 0.75 ;    // duree avant explosion d'une bombe d'un malade =)
       BOMBMOVESPEED = 6;        // vitesse de deplacement d'une bombe
+      MAXBOMBCOUNT = 10;        // nombre maximum de bombe par bomberman
 
 
 
