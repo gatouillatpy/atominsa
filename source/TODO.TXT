@@ -1,8 +1,68 @@
-Finir fonction jump des bombes
+Technique :
+ - ajouter la minuterie
+ - ajouter le panneau d'affichage
+ - ajouter une skybox
+ - mode réseau
+ - éditeur de static mesh
+ - éditeur de skeletal mesh
+ - éditeur d'animation
+ - éditeur de character + voice bank
+ - éditeur de map
+ - éditeur de scheme
+ - éditeur de voice pack
+ - terminer l'intro
+ - mode online
+ - mode solo
 
-Ajouter des maladies
+Gameplay :
+ - BUG : LES SCORES RESTENT A ZERO !!! ON NE GAGNE PAS DE POINT EN REMPORTANT LE ROUND
+ - finir la fonction jump des bombes
+ - implémenter les bonus kick, grab, push, spooger, trigger, jelly, goldflame, baddisease
+ - terminer l'implémentation des maladies 
+ - rendre les maladies contagieuses
+ - rendre certaines bombes défectueuses (leur minuterie est random)
 
-Interface Reseau
+Divers :
+ - mettre la licence en entête de chaque fichier
+ - maintenir le site web
 
-?
+Graphismes :
+ - chercher modèle de sphere + textures Terre, Lune, Soleil, nuages
+ - trouver différents modèles représentant les bonus
+ - faire les animations une fois l'éditeur terminé
 
+Rappels :
+ - de base l'action 1 permet de poser une bombe, l'action 2 n'a pas encore été implémentée ; voir pour
+   transformer la méthode CreateBomb en Primary pour l'action 1 et créer une méthode Secondary pour l'action 2
+ - voir ce site pour l'inspiration http://www.geocities.com/mheid.geo/about.html
+
+ Liste des bonus :
+  - extrabomb    > ajoute la possibilité de poser une bombe supplémentaire    > fait
+  - flameup      > ajoute un degré d'expansion de flammes                     > fait
+  - disease      > maladie aléatoire                                          > à finir
+  - kick         > permet de shooter dans les bombes avec l'action 2          > à finir
+  - punch        > permet de pousser les bombes dans une direction au contact > à finir (manque le mesh)
+  - grab         > permet de prendre une bombe dans ses mains avec l'action 1 
+                   lorsqu'elle vient d'être posée                             > à faire
+  - spooger      > permet d'aligner tout son stock de bombes dans une
+                   direction avec l'action 1 lorsqu'une première bombe vient
+                   d'être posée                                               > à faire
+  - goldflame    > met le degré d'expansion de flammes au maximum             > à faire
+  - trigger      > transforme les trois bombes suivantes en pipe bombes
+                   déclenchables à distance avec l'action 2                   > à faire
+  - jelly        > transforme les bombes posées en bombes rebondissantes
+                   contre les murs lorsque quelqu'un les pousse avec le punch > à faire
+  - superdisease > 3 maladies aléatoires                                      > à faire
+  - random       > bonus random                                               > à faire
+
+ Liste des maladies :
+  - joueur ralenti (vitesse minimum)
+  - joueur accéléré (vitesse maximum
+  - joueur ne peut plus poser de bombes
+  - joueur téléporté à la place d'un autre
+  - joueur chie des bombes et est plus rapide
+  - joueur chie des bombes et les kick automatiquement
+  - joueur a les touches inversées
+  - taille des flammes au max
+  - taille des flammes au min
+  - les bombes explosent trois fois plus vite 

@@ -405,12 +405,7 @@
         <Loaded Value="True"/>
       </Unit47>
     </Units>
-    <JumpHistory Count="1" HistoryIndex="0">
-      <Position1>
-        <Filename Value="uextrabomb.pas"/>
-        <Caret Line="30" Column="40" TopLine="1"/>
-      </Position1>
-    </JumpHistory>
+    <JumpHistory Count="0" HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>
