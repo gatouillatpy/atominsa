@@ -12,7 +12,7 @@ Interface
 Uses Classes, SysUtils,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UKick, UGrid, UFlame, UBomb, USetup, UForm,
-     UCharacter;
+     UCharacter, UComputer;
 
 
 
@@ -152,6 +152,7 @@ Begin
         pScheme := aSchemeList[nScheme];
      End;
      pGrid := CGrid.Create( pScheme );
+     FreeBomberman();
      For k := 1 To 8 Do
          AddBomberman( 'temp', pScheme.Spawn(k).Team, pScheme.Spawn(k).Color, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
 End;
@@ -386,6 +387,11 @@ Begin
      SetLight( 2,                 0, h, GRIDHEIGHT     - 2, 1, 1, 1, 1, a0, a1, a2, True );
      SetLight( 3, GRIDWIDTH     - 1, h, GRIDHEIGHT     - 2, 1, 1, 1, 1, a0, a1, a2, True );
      SetLight( 4, GRIDWIDTH / 2 + 1, h, GRIDHEIGHT / 2 - 2, 1, 1, 1, 1, a0, a1, a2, True );}
+
+     For k := 1 To 8 Do Begin
+         SetLight( k - 1, 4999.999, 4999.999, 4999.999, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, False );
+     End;
+
      If bLighting Then Begin
         If nPlayerType[1] > 0 Then If GetBombermanByIndex(1).Alive Then
            SetLight( 0, GetBombermanByIndex(1).X, h, GetBombermanByIndex(1).Y - 2, 1, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
@@ -403,10 +409,6 @@ Begin
            SetLight( 6, GetBombermanByIndex(7).X, h, GetBombermanByIndex(7).Y - 2, 1, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         If nPlayerType[8] > 0 Then If GetBombermanByIndex(8).Alive Then
            SetLight( 7, GetBombermanByIndex(8).X, h, GetBombermanByIndex(8).Y - 2, 0, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
-     End Else Begin
-        For k := 1 To 8 Do Begin
-            SetLight( k - 1, 4999.999, 4999.999, 4999.999, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, False );
-        End;
      End;
 End;
 
@@ -932,6 +934,9 @@ End;
 Procedure InitGame () ;
 Var k : Integer;
 Begin
+     // enregistrement des paramètres
+     WriteSettings( 'atominsa.cfg' );
+
      // suppression de tous les bomberman
      FreeBomberman();
      
@@ -981,12 +986,12 @@ Begin
      AddBlankToScreen();
      AddStringToScreen( 'Good luck!   Have fun!' );
      AddBlankToScreen();
-
 End;
 
 
 
 Procedure ProcessGame () ;
+Var k : Integer;
 Begin
      // définition de la camera
      SetCamera();
@@ -1021,6 +1026,14 @@ Begin
      // affichage du panneau d'affichage
      DrawScreen();
 
+     // gestion de l'intelligence artificielle
+     For k := 1 To GetBombermanCount() Do Begin
+         If GetBombermanByCount(k).Alive Then Begin
+            If nPlayerType[GetBombermanByCount(k).BIndex] = PLAYER_COM Then
+               ProcessComputer( GetBombermanByCount(k), nPlayerSkill[GetBombermanByCount(k).BIndex] );
+         End;
+     End;
+     
      // mise à jour de la minuterie
      CheckTimer();
 

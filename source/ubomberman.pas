@@ -16,7 +16,10 @@ type
 
   CBomberman = class
   private
-    { private declarations }
+    fCX, fCY : Single;       // coordonnées ciblées par l'intelligence artificielle
+    fLX, fLY : Single;       // dernières coordonnées
+    fDanger : Single;        // pourcentage de risque aux coordonnées courantes
+    
     fXOrigin,                //Position lors de la creation du bomberman
     fYOrigin,
     fX,
@@ -83,6 +86,12 @@ type
   property X : single Read fX Write fX;
   property Y : single Read fY Write fY;
   property Direction : integer Read nDirection;
+
+  Property LX : Single Read fLX Write fLX;
+  Property LY : Single Read fLY Write fLY;
+  Property CX : Single Read fCX Write fCX;
+  Property CY : Single Read fCY Write fCY;
+  Property Danger : Single Read fDanger Write fDanger;
 
   property BIndex : integer Read nIndex Write nIndex;
   property Name : string Read sName Write sName;

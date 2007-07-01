@@ -41,6 +41,8 @@ Begin
      Application.ProcessMessages;
 End;
 
+{ TWindow }
+
 Initialization
   {$I uform.lrs}
 

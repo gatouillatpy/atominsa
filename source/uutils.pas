@@ -16,7 +16,7 @@ Uses Classes, SysUtils;
 
 
 // macro de la fonction exposant
-Function  pow ( base, exponent : single ) : single ;
+function pow ( base, exponent : single ) : single ;
 
 
 

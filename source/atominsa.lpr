@@ -15,7 +15,7 @@ Begin
 
      If GetKey(KEY_Y) Then Begin
         StopSound( SOUND_MENU_SELECT );
-     
+
         FreeBomberman();
         FreeBomb();
         FreeFlame();
