@@ -28,6 +28,13 @@ CMap = Class
                  sBrickTexture    : String                                      ;
                  sPlaneTexture    : String                                      ;
 
+                 sSkyboxBottom    : String                                      ;
+                 sSkyboxTop       : String                                      ;
+                 sSkyboxFront     : String                                      ;
+                 sSkyboxBack      : String                                      ;
+                 sSkyboxLeft      : String                                      ;
+                 sSkyboxRight     : String                                      ;
+
           Public
                 Constructor Create ( sFile : String ; bDebug : Boolean ) ;
 
@@ -44,6 +51,13 @@ CMap = Class
                 Property BrickTexture : String Read sBrickTexture ;
                 Property PlaneTexture : String Read sPlaneTexture ;
 
+                Property SkyboxBottom : String Read sSkyboxBottom ;
+                Property SkyboxTop    : String Read sSkyboxTop ;
+                Property SkyboxFront  : String Read sSkyboxFront ;
+                Property SkyboxBack   : String Read sSkyboxBack ;
+                Property SkyboxLeft   : String Read sSkyboxLeft ;
+                Property SkyboxRight  : String Read sSkyboxRight ;
+                
 End;
 
 
@@ -56,6 +70,7 @@ Const STEP_NAME          = 2;
 Const STEP_VERSION       = 3;
 Const STEP_MESH	         = 4;
 Const STEP_TEXTURE       = 5;
+Const STEP_SKYBOX        = 6;
 
 Function GetStep ( sCommand : String ) : Integer ;
 Var i : Integer;
@@ -70,6 +85,7 @@ Begin
           If (sCommand[i] = '-') And (sCommand[i+1] = 'V') Then nStep := STEP_VERSION;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'M') Then nStep := STEP_MESH;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'T') Then nStep := STEP_TEXTURE;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'S') Then nStep := STEP_SKYBOX;
 
           If nStep > STEP_NONE Then Break;
      End;
@@ -191,6 +207,33 @@ Begin
                     If LowerCase(GetString(sLine, 1)) = 'plane' Then Begin
                        sPlaneTexture := GetString(sLine, 2);
                        If bDebug Then AddLineToConsole( 'Plane texture : ' + sPlaneTexture );
+                    End;
+               End;
+               STEP_SKYBOX :
+               Begin
+                    If LowerCase(GetString(sLine, 1)) = 'bottom' Then Begin
+                       sSkyboxBottom := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Skybox bottom : ' + sSkyboxBottom );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'top' Then Begin
+                       sSkyboxTop := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Skybox top : ' + sSkyboxTop );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'front' Then Begin
+                       sSkyboxFront := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Skybox front : ' + sSkyboxFront );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'back' Then Begin
+                       sSkyboxBack := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Skybox back : ' + sSkyboxBack );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'left' Then Begin
+                       sSkyboxLeft := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Skybox left : ' + sSkyboxLeft );
+                    End;
+                    If LowerCase(GetString(sLine, 1)) = 'right' Then Begin
+                       sSkyboxRight := GetString(sLine, 2);
+                       If bDebug Then AddLineToConsole( 'Skybox right : ' + sSkyboxRight );
                     End;
                End;
           End;

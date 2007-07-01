@@ -150,6 +150,7 @@ Const TEXTURE_NONE              = 0;
       SPRITE_CHARSET_TERMINAL   = 1101;
       SPRITE_CHARSET_TERMINALX  = 1111;
       SPRITE_CHARSET_DIGITAL    = 1102;
+      SPRITE_CHARSET_DIGITALX   = 1112;
       SPRITE_INTRO_LAYER_NULL   = 1200;
       
       TEXTURE_BOMBERMAN_NULL    = 1300;
@@ -160,11 +161,14 @@ Const TEXTURE_NONE              = 0;
       TEXTURE_MAP_SOLID         = 1402;
       TEXTURE_MAP_PLANE         = 1403;
 
+      TEXTURE_MAP_SKYBOX_NULL   = 1410;
+
 Function SPRITE_INTRO_LAYER( k : Integer ) : Integer ;
 
 Function TEXTURE_BOMBERMAN( k : Integer ) : Integer ;
 Function TEXTURE_FLAME( k : Integer ) : Integer ;
 Function TEXTURE_BOMB( k : Integer ) : Integer ;
+Function TEXTURE_MAP_SKYBOX( k : Integer ) : Integer ;
 
 
 
@@ -190,11 +194,13 @@ Const POWERUP_NONE                 = -1;
 
 
 // constantes de définition des chaines de caractères affichées avec effet
-Const STRING_SCORE_TABLE_NULL   = 0;
-      STRING_MENU_MAIN          = 1;
-      STRING_EDITOR_MENU_NULL   = 0;
-      STRING_SETUP_MENU_NULL    = 0;
-      STRING_PRACTICE_MENU_NULL = 0;
+Const STRING_SCORE_TABLE_NULL   =  0;
+      STRING_MENU_MAIN          =  1;
+      STRING_EDITOR_MENU_NULL   =  0;
+      STRING_SETUP_MENU_NULL    =  0;
+      STRING_PRACTICE_MENU_NULL =  0;
+      STRING_TIMER              = 10;
+      STRING_SCREEN             = 11;
 
 Function STRING_SCORE_TABLE( k : Integer ) : Integer ;
 Function STRING_EDITOR_MENU( k : Integer ) : Integer ;
@@ -283,6 +289,11 @@ End;
 Function MESH_BOMB( k : Integer ) : Integer ;
 Begin
      MESH_BOMB := k + MESH_BOMB_NULL;
+End;
+
+Function TEXTURE_MAP_SKYBOX( k : Integer ) : Integer ;
+Begin
+     TEXTURE_MAP_SKYBOX := k + TEXTURE_MAP_SKYBOX_NULL;
 End;
 
 

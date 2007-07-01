@@ -143,27 +143,27 @@ Var pPlayer1 : CBomberman;
 
 
 
-Procedure InitRound () ;
-Var i : Integer;
+Procedure LoadScheme () ;
+Var k : Integer;
 Begin
-     // supression des différents éléments du jeu
-     FreeFlame();
-     FreeBomb();
-     FreeTimer();
-     
-     // rechargement de la grille
-     pGrid.LoadScheme( pScheme );
-     
-     // restauration des bomberman
-     If GetBombermanCount() <> 0 Then
-        For i := 1 To GetBombermanCount() Do
-            GetBombermanByCount(i).Restore();
+     If nScheme = -1 Then Begin
+        pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
+     End Else Begin
+        pScheme := aSchemeList[nScheme];
+     End;
+     pGrid := CGrid.Create( pScheme );
+     For k := 1 To 8 Do
+         AddBomberman( 'temp', pScheme.Spawn(k).Team, pScheme.Spawn(k).Color, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+End;
 
-     // chargement de la map
+
+
+Procedure LoadMap () ;
+Begin
      If nMap = -1 Then Begin
         pMap := aMapList[Trunc(Random(nMapCount))];
      End Else Begin
-         pMap := aMapList[nMap];
+        pMap := aMapList[nMap];
      End;
      DelMesh( MESH_BLOCK_SOLID );
      AddMesh( './maps/' + pMap.SolidMesh, MESH_BLOCK_SOLID );
@@ -177,6 +177,43 @@ Begin
      AddTexture( './maps/' + pMap.BrickTexture, TEXTURE_MAP_BRICK );
      DelTexture( TEXTURE_MAP_PLANE );
      AddTexture( './maps/' + pMap.PlaneTexture, TEXTURE_MAP_PLANE );
+     DelTexture( TEXTURE_MAP_SKYBOX(1) );
+     AddTexture( './maps/' + pMap.SkyboxBottom, TEXTURE_MAP_SKYBOX(1) );
+     DelTexture( TEXTURE_MAP_SKYBOX(2) );
+     AddTexture( './maps/' + pMap.SkyboxTop, TEXTURE_MAP_SKYBOX(2) );
+     DelTexture( TEXTURE_MAP_SKYBOX(3) );
+     AddTexture( './maps/' + pMap.SkyboxFront, TEXTURE_MAP_SKYBOX(3) );
+     DelTexture( TEXTURE_MAP_SKYBOX(4) );
+     AddTexture( './maps/' + pMap.SkyboxBack, TEXTURE_MAP_SKYBOX(4) );
+     DelTexture( TEXTURE_MAP_SKYBOX(5) );
+     AddTexture( './maps/' + pMap.SkyboxLeft, TEXTURE_MAP_SKYBOX(5) );
+     DelTexture( TEXTURE_MAP_SKYBOX(6) );
+     AddTexture( './maps/' + pMap.SkyboxRight, TEXTURE_MAP_SKYBOX(6) );
+End;
+
+
+
+Procedure InitRound () ;
+Var i : Integer;
+Begin
+     // supression des différents éléments du jeu
+     FreeFlame();
+     FreeBomb();
+     FreeTimer();
+     
+     // initialisation de la camera
+     nCamera := CAMERA_OVERALL;
+
+     // rechargement de la grille
+     pGrid.LoadScheme( pScheme );
+     
+     // restauration des bomberman
+     If GetBombermanCount() <> 0 Then
+        For i := 1 To GetBombermanCount() Do
+            GetBombermanByCount(i).Restore();
+
+     // chargement de la map
+     LoadMap();
 
      // lancement du jeu
      nPractice := PRACTICE_GAME;
@@ -220,9 +257,9 @@ Procedure SetCamera () ;
 Begin
      If GetTime - fGameTime < 3.0 Then Begin
      // on fait le tour du plateau durant les trois premières secondes de jeu
-        vPointer.x := 8.0 + (fGameTime - GetTime + 3.0) * 8.0 * cos((GetTime - fGameTime) / 3.0 * PI + PI * 3 / 2);
+        vPointer.x := 8.0 + (fGameTime - GetTime + 3.0) * 24.0 * cos((GetTime - fGameTime) / 3.0 * PI + PI * 3 / 2);
         vPointer.y := 8.5 + (fGameTime - GetTime + 3.0) * 8.0;
-        vPointer.z := 6.0 + (fGameTime - GetTime + 3.0) * 8.0 * sin((GetTime - fGameTime) / 3.0 * PI + PI * 3 / 2);
+        vPointer.z := 6.0 + (fGameTime - GetTime + 3.0) * 24.0 * sin((GetTime - fGameTime) / 3.0 * PI + PI * 3 / 2);
         vCenter.x := 8.0;
         vCenter.y := 0.0;
         vCenter.z := 5.5;
@@ -468,24 +505,37 @@ End;
 
 Procedure DrawBomb ( w : Single ) ;
 Var i : Integer;
+Var r, g, b : Single;
 Begin
      EnableLighting();
      SetLighting( 5.0, 1.0, 1.8, 2.4 );
 
-     SetMaterial( w, w, w, 1.0 );
-
      i := 1;
      While ( i <= GetBombCount() ) Do Begin
-           SetMaterial( w, w, w, 1.0 );
-           SetTexture( 1, TEXTURE_BOMB(GetBombByCount(i).BIndex) );
-           PushObjectMatrix( GetBombByCount(i).Position.X, 0, GetBombByCount(i).Position.Y,
-                             1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
-                             1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
-                             1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
-                             0, 0, 0 );
-           DrawMesh( MESH_BOMB(GetBombByCount(i).BIndex), False );
-           PopObjectMatrix();
-           If Not GetBombByCount(i).UpdateBomb() Then i += 1;
+          If bColor Then Begin
+             Case GetBombByCount(i).BIndex Of
+                  1 : Begin r := 3.0; g := 0.0; b := 0.0; End;
+                  2 : Begin r := 0.0; g := 0.0; b := 3.0; End;
+                  3 : Begin r := 0.0; g := 3.0; b := 0.0; End;
+                  4 : Begin r := 3.0; g := 3.0; b := 0.0; End;
+                  5 : Begin r := 0.0; g := 3.0; b := 3.0; End;
+                  6 : Begin r := 3.0; g := 0.0; b := 3.0; End;
+                  7 : Begin r := 3.0; g := 3.0; b := 3.0; End;
+                  8 : Begin r := 1.0; g := 1.0; b := 1.0; End;
+             End;
+          End Else Begin
+             r := 1.0; g := 1.0; b := 1.0;
+          End;
+          SetMaterial( w * r, w * g, w * b, 1.0 );
+          SetTexture( 1, TEXTURE_BOMB(GetBombByCount(i).BIndex) );
+          PushObjectMatrix( GetBombByCount(i).Position.X, 0, GetBombByCount(i).Position.Y,
+                            1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
+                            1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
+                            1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
+                            0, 0, 0 );
+          DrawMesh( MESH_BOMB(GetBombByCount(i).BIndex), False );
+          PopObjectMatrix();
+          If Not GetBombByCount(i).UpdateBomb() Then i += 1;
     End;
 End;
 
@@ -493,6 +543,7 @@ End;
 
 Procedure DrawFlame ( w : Single ) ;
 Var i : Integer;
+Var r, g, b : Single;
 Begin
      DisableLighting();
 
@@ -500,34 +551,76 @@ Begin
      While ( i <= GetFlameCount() ) Do Begin
           SetTexture( 1, TEXTURE_FLAME(GetFlameByCount(i).Owner.BIndex) );
           // flamme intérieure
+          If bColor Then Begin
+             Case GetFlameByCount(i).Owner.BIndex Of
+                  1 : Begin r := 1.0; g := 0.6; b := 0.6; End;
+                  2 : Begin r := 0.6; g := 0.6; b := 1.0; End;
+                  3 : Begin r := 0.6; g := 1.0; b := 0.6; End;
+                  4 : Begin r := 1.0; g := 1.0; b := 0.6; End;
+                  5 : Begin r := 0.6; g := 1.0; b := 1.0; End;
+                  6 : Begin r := 1.0; g := 0.6; b := 1.0; End;
+                  7 : Begin r := 1.0; g := 1.0; b := 1.0; End;
+                  8 : Begin r := 0.6; g := 0.6; b := 0.6; End;
+             End;
+          End Else Begin
+             r := 1.0; g := 1.0; b := 1.0;
+          End;
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.001, 0, GetFlameByCount(i).Y - 0.001 ); // on évite les cas particuliers (les angles à 90° bug)
-          DrawSprite( 1.0 + 2.0 * GetFlameByCount(i).Itensity, 1.0 + 2.0 * GetFlameByCount(i).Itensity, 1, 1, 1, GetFlameByCount(i).Itensity, True );
+          DrawSprite( 1.0 + 2.0 * GetFlameByCount(i).Itensity, 1.0 + 2.0 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity, True );
           PopObjectMatrix();
           // flammes centrales
+          If bColor Then Begin
+             Case GetFlameByCount(i).Owner.BIndex Of
+                  1 : Begin r := 0.8; g := 0.2; b := 0.2; End;
+                  2 : Begin r := 0.2; g := 0.2; b := 0.8; End;
+                  3 : Begin r := 0.2; g := 0.8; b := 0.2; End;
+                  4 : Begin r := 0.8; g := 0.8; b := 0.2; End;
+                  5 : Begin r := 0.2; g := 0.8; b := 0.8; End;
+                  6 : Begin r := 0.8; g := 0.2; b := 0.8; End;
+                  7 : Begin r := 0.8; g := 0.8; b := 0.8; End;
+                  8 : Begin r := 0.2; g := 0.2; b := 0.2; End;
+             End;
+          End Else Begin
+             r := 1.0; g := 0.5; b := 0.0;
+          End;
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y );
-          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, 1, 0.5, 0, GetFlameByCount(i).Itensity * 0.8, True );
+          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.8, True );
           PopObjectMatrix();
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y );
-          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, 1, 0.5, 0, GetFlameByCount(i).Itensity * 0.8, True );
+          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.8, True );
           PopObjectMatrix();
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X, 0, GetFlameByCount(i).Y - 0.301 );
-          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, 1, 0.5, 0, GetFlameByCount(i).Itensity * 0.8, True );
+          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.8, True );
           PopObjectMatrix();
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X, 0, GetFlameByCount(i).Y + 0.299 );
-          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, 1, 0.5, 0, GetFlameByCount(i).Itensity * 0.8, True );
+          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.8, True );
           PopObjectMatrix();
           // flammes extérieures
+          If bColor Then Begin
+             Case GetFlameByCount(i).Owner.BIndex Of
+                  1 : Begin r := 0.4; g := 0.0; b := 0.0; End;
+                  2 : Begin r := 0.0; g := 0.0; b := 0.4; End;
+                  3 : Begin r := 0.0; g := 0.4; b := 0.0; End;
+                  4 : Begin r := 0.4; g := 0.4; b := 0.0; End;
+                  5 : Begin r := 0.0; g := 0.4; b := 0.4; End;
+                  6 : Begin r := 0.4; g := 0.0; b := 0.4; End;
+                  7 : Begin r := 0.4; g := 0.4; b := 0.4; End;
+                  8 : Begin r := 0.1; g := 0.1; b := 0.1; End;
+             End;
+          End Else Begin
+             r := 1.0; g := 0.0; b := 0.0;
+          End;
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y - 0.301 );
-          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, 1, 0.0, 0, GetFlameByCount(i).Itensity * 0.4, True );
+          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
           PopObjectMatrix();
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y + 0.299 );
-          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, 1, 0.0, 0, GetFlameByCount(i).Itensity * 0.4, True );
+          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
           PopObjectMatrix();
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y - 0.301 );
-          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, 1, 0.0, 0, GetFlameByCount(i).Itensity * 0.4, True );
+          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
           PopObjectMatrix();
           PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y + 0.299 );
-          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, 1, 0.0, 0, GetFlameByCount(i).Itensity * 0.4, True );
+          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
           PopObjectMatrix();
           // mise à jour
           If Not GetFlameByCount(i).Update() Then i += 1;
@@ -547,6 +640,105 @@ Begin
      PushObjectMatrix( 8.0, -0.5, 6.0, 0.11, 0.11, 0.11, 0, 0, 0 );
      DrawMesh( MESH_PLANE, True );
      PopObjectMatrix();
+End;
+
+
+
+Var fBlinkTime : Single;
+    bBlinkState : Boolean;
+
+Procedure DrawTimer () ;
+Var w, h : Single;
+Var nMin, nSec : Integer;
+    fTime : Single;
+Begin
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
+     fTime := fRoundDuration + fRoundTime - GetTime + 3.0;
+     nMin := Trunc(fTime / 60.0);
+     nSec := Trunc(fTime) - nMin * 60;
+     
+     DisableLighting();
+
+     SetString( STRING_TIMER, Format('****', [nMin, nSec]), 0.0, 0.0, 0.0 );
+     DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, 1, 1, 1, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+
+     If nSec < 10 Then Begin
+        SetString( STRING_TIMER, Format('%d:0%d', [nMin, nSec]), 0.0, 0.0, 0.0 );
+     End Else Begin
+        SetString( STRING_TIMER, Format('%d:%d', [nMin, nSec]), 0.0, 0.0, 0.0 );
+     End;
+
+     If GetTime > fRoundTime + fRoundDuration Then Begin
+        bBlinkState := True;
+     End Else If GetTime > fRoundTime + fRoundDuration - 3.0 Then Begin
+        If GetTime > fBlinkTime + 0.1 Then Begin
+           fBlinkTime := GetTime;
+           bBlinkState := Not bBlinkState;
+        End;
+     End Else If GetTime > fRoundTime + fRoundDuration - 8.0 Then Begin
+        If GetTime > fBlinkTime + 0.5 Then Begin
+           fBlinkTime := GetTime;
+           bBlinkState := Not bBlinkState;
+        End;
+     End Else Begin
+        bBlinkState := False;
+     End;
+     
+     If bBlinkState Then Begin
+        DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, 1.0, 0.0, 0.0, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+     End Else Begin
+        DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+     End;
+End;
+
+
+
+Var fScreenTime : Single;
+    sScreenMessage : String;
+    
+Procedure InitScreen () ;
+Begin
+     fScreenTime := 0.0;
+     sScreenMessage := '                        ';
+End;
+
+Procedure AddBlankToScreen () ;
+Begin
+     sScreenMessage := sScreenMessage + '                        ';
+End;
+
+Procedure AddStringToScreen ( sMessage : String ) ;
+Begin
+     sScreenMessage := sScreenMessage + '   ' + sMessage + ' ';
+End;
+
+Procedure DrawScreen () ;
+Var w, h : Single;
+    k : Integer;
+    s : String;
+Begin
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
+     If GetTime > fScreenTime + 0.1 Then Begin
+        fScreenTime := GetTime;
+        For k := 1 To Length(sScreenMessage) - 1 Do
+            sScreenMessage[k] := sScreenMessage[k+1];
+     End;
+     
+     DisableLighting();
+
+     SetString( STRING_SCREEN, '************************', 0.0, 0.0, 0.0 );
+     DrawString( STRING_SCREEN, w / h * -0.9, 0.8, -1, 0.064 * w / h, 0.096, 1, 1, 1, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+
+     SetLength( s, 24 );
+     For k := 1 To 24 Do
+         s[k] := sScreenMessage[k];
+
+     SetString( STRING_SCREEN, s, 0.0, 0.0, 0.0 );
+     DrawString( STRING_SCREEN, w / h * -0.9, 0.8, -1, 0.064 * w / h, 0.096, 1, 1, 1, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
 End;
 
 
@@ -592,11 +784,13 @@ Begin
      BindKeyObj( nKey2Primary, True, NIL );
      BindKeyObj( nKey2Secondary, True, NIL );
 
+     // identification du vainqueur
      If GetBombermanCount() <> 0 Then
         For i := 1 To GetBombermanCount() Do
             If GetBombermanByCount(i).Score = nRoundCount Then
                nPlayer := GetBombermanByCount(i).BIndex;
 
+     // affichage du vainqueur
      SetString( STRING_SCORE_TABLE(0), sPlayerName[nPlayer] + ' wins the match !', 1.0, 0.5, 300.0 );
 
      // affichage des scores
@@ -674,7 +868,7 @@ Begin
      BindKeyObj( nKey2Secondary, True, NIL );
 
      // affichage du vainqueur
-     If CheckEndGame() = -1 Then Begin
+     If CheckEndGame() <= 0 Then Begin
         SetString( STRING_SCORE_TABLE(0), 'draw game!', 1.0, 0.5, 300.0 );
      End Else Begin
         SetString( STRING_SCORE_TABLE(0), GetBombermanByCount(CheckEndGame()).Name + ' wins the round.', 1.0, 0.5, 300.0 );
@@ -704,19 +898,23 @@ Begin
      // rendu des reflets
      If bReflection Then Begin
         PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
-        DrawBomberman( 0.2 );
-        DrawGrid( 0.2 );
-        DrawBomb( 0.2 );
-        DrawFlame( 0.2 );
+        DrawBomberman( 0.4 );
+        DrawGrid( 0.4 );
+        DrawBomb( 0.4 );
+        DrawFlame( 0.4 );
+        PopObjectMatrix();
+        PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
+        DrawSkybox( 0.4, 0.4, 0.4, 0.4, TEXTURE_MAP_SKYBOX(0) );
         PopObjectMatrix();
      End;
 
      // rendu global
-     DrawPlane( 0.5 );
-     DrawBomberman( 0.5 );
-     DrawGrid( 0.5 );
-     DrawBomb( 0.5 );
-     DrawFlame( 0.5 );
+     DrawPlane( 1.0 );
+     DrawBomberman( 1.0 );
+     DrawGrid( 1.0 );
+     DrawBomb( 1.0 );
+     DrawFlame( 1.0 );
+     DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
 
      // affichage du vainqueur
      DrawString( STRING_SCORE_TABLE(0), -w / h * 0.9, 0.9, -1, 0.036 * w / h, 0.048, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
@@ -769,12 +967,21 @@ Begin
          End;
      End;
 
-     // mise à zero de la minuterie du jeu
+     // mise à zéro de la minuterie du jeu
      fGameTime := GetTime();
 
      // initialisation du premier round
      nRound := 0;
      InitRound();
+     
+     // initialisation du panneau d'affichage
+     InitScreen();
+     AddBlankToScreen();
+     AddStringToScreen( 'Welcome to Bomberman Returns!' ); // IL VA FALLOIR QU'ON TROUVE UN VRAI TITRE
+     AddBlankToScreen();
+     AddStringToScreen( 'Good luck!   Have fun!' );
+     AddBlankToScreen();
+
 End;
 
 
@@ -792,6 +999,9 @@ Begin
         DrawBomb( 0.4 );
         DrawFlame( 0.4 );
         PopObjectMatrix();
+        PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
+        DrawSkybox( 0.4, 0.4, 0.4, 0.4, TEXTURE_MAP_SKYBOX(0) );
+        PopObjectMatrix();
      End;
 
      // rendu global
@@ -800,15 +1010,22 @@ Begin
      DrawGrid( 1.0 );
      DrawBomb( 1.0 );
      DrawFlame( 1.0 );
-
+     DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
+     
      // affichage des scores
      DrawScore();
      
+     // affichage de la minuterie
+     DrawTimer();
+
+     // affichage du panneau d'affichage
+     DrawScreen();
+
      // mise à jour de la minuterie
      CheckTimer();
 
      // vérifie s'il reste des bomberman en jeu ou si la minuterie est à zéro
-     If (CheckEndGame() <> 0) Or (GetTime > fRoundTime + fRoundDuration) Then InitWait();
+     If (CheckEndGame() <> 0) Or (GetTime > fRoundTime + fRoundDuration + 3.0) Then InitWait();
 End;
 
 
@@ -1241,37 +1458,20 @@ Begin
      SetString( STRING_PRACTICE_MENU(18), PlayerInfo(8), 0.2, 1.0, 600 );
 
      // chargement et ajout du scheme
+     LoadScheme();
      If nScheme = -1 Then Begin
-        SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
-        pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
+        SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + 'random', 0.2, 1.0, 600 );
      End Else Begin
-        SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + aSchemeList[nScheme].Name, 0.0, 0.02, 600 );
-        pScheme := aSchemeList[nScheme];
+        SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + pScheme.Name, 0.2, 1.0, 600 );
      End;
-     pGrid := CGrid.Create( pScheme );
-     For k := 1 To 8 Do
-         AddBomberman( 'temp', pScheme.Spawn(k).Team, pScheme.Spawn(k).Color, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
 
      // chargement et ajout de la map
+     LoadMap();
      If nMap = -1 Then Begin
-        SetString( STRING_PRACTICE_MENU(31), 'map : ' + 'random', 0.0, 0.02, 600 );
-        pMap := aMapList[Trunc(Random(nMapCount))];
+        SetString( STRING_PRACTICE_MENU(31), 'map : ' + 'random', 0.2, 1.0, 600 );
      End Else Begin
-         SetString( STRING_PRACTICE_MENU(31), 'map : ' + aMapList[nMap].Name, 0.0, 0.02, 600 );
-         pMap := aMapList[nMap];
+        SetString( STRING_PRACTICE_MENU(31), 'map : ' + pMap.Name, 0.2, 1.0, 600 );
      End;
-     DelMesh( MESH_BLOCK_SOLID );
-     AddMesh( './maps/' + pMap.SolidMesh, MESH_BLOCK_SOLID );
-     DelMesh( MESH_BLOCK_BRICK );
-     AddMesh( './maps/' + pMap.BrickMesh, MESH_BLOCK_BRICK );
-     DelMesh( MESH_PLANE );
-     AddMesh( './maps/' + pMap.PlaneMesh, MESH_PLANE );
-     DelTexture( TEXTURE_MAP_SOLID );
-     AddTexture( './maps/' + pMap.SolidTexture, TEXTURE_MAP_SOLID );
-     DelTexture( TEXTURE_MAP_BRICK );
-     AddTexture( './maps/' + pMap.BrickTexture, TEXTURE_MAP_BRICK );
-     DelTexture( TEXTURE_MAP_PLANE );
-     AddTexture( './maps/' + pMap.PlaneTexture, TEXTURE_MAP_PLANE );
 
      // ajout du compteur de rounds
      SetString( STRING_PRACTICE_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.2, 1.0, 600 );
@@ -1314,10 +1514,11 @@ Begin
      // définition de la camera
      SetCamera();
 
-     // rendu de la grille
+     // rendu du plateau
      DrawPlane( 0.3 );
      DrawBomberman( 0.3 );
      DrawGrid( 0.3 );
+     DrawSkybox( 0.3, 0.3, 0.3, 0.3, TEXTURE_MAP_SKYBOX(0) );
 
      // affichage du menu
      DrawString( STRING_PRACTICE_MENU(1), -w / h * 0.4,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
@@ -1394,41 +1595,23 @@ Begin
                 Begin
                      nScheme -= 1;
                      If nScheme < -1 Then nScheme := nSchemeCount - 1;
+                     LoadScheme();
                      If nScheme = -1 Then Begin
                         SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
-                        pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
                      End Else Begin
-                        SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + aSchemeList[nScheme].Name, 0.0, 0.02, 600 );
-                        pScheme := aSchemeList[nScheme];
+                        SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + pScheme.Name, 0.0, 0.02, 600 );
                      End;
-                     pGrid := CGrid.Create( pScheme );
-                     FreeBomberman();
-                     For k := 1 To 8 Do
-                         AddBomberman( 'temp', pScheme.Spawn(k).Team, pScheme.Spawn(k).Color, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 End;
                 MENU_MAP :
                 Begin
                      nMap -= 1;
                      If nMap < -1 Then nMap := nMapCount - 1;
+                     LoadMap();
                      If nMap = -1 Then Begin
                         SetString( STRING_PRACTICE_MENU(31), 'map : ' + 'random', 0.0, 0.02, 600 );
-                        pMap := aMapList[Trunc(Random(nMapCount))];
                      End Else Begin
-                        SetString( STRING_PRACTICE_MENU(31), 'map : ' + aMapList[nMap].Name, 0.0, 0.02, 600 );
-                        pMap := aMapList[nMap];
+                        SetString( STRING_PRACTICE_MENU(31), 'map : ' + pMap.Name, 0.0, 0.02, 600 );
                      End;
-                     DelMesh( MESH_BLOCK_SOLID );
-                     AddMesh( './maps/' + pMap.SolidMesh, MESH_BLOCK_SOLID );
-                     DelMesh( MESH_BLOCK_BRICK );
-                     AddMesh( './maps/' + pMap.BrickMesh, MESH_BLOCK_BRICK );
-                     DelMesh( MESH_PLANE );
-                     AddMesh( './maps/' + pMap.PlaneMesh, MESH_PLANE );
-                     DelTexture( TEXTURE_MAP_SOLID );
-                     AddTexture( './maps/' + pMap.SolidTexture, TEXTURE_MAP_SOLID );
-                     DelTexture( TEXTURE_MAP_BRICK );
-                     AddTexture( './maps/' + pMap.BrickTexture, TEXTURE_MAP_BRICK );
-                     DelTexture( TEXTURE_MAP_PLANE );
-                     AddTexture( './maps/' + pMap.PlaneTexture, TEXTURE_MAP_PLANE );
                 End;
                 MENU_ROUNDCOUNT :
                 Begin
@@ -1451,41 +1634,23 @@ Begin
                 Begin
                      nScheme += 1;
                      If nScheme = nSchemeCount Then nScheme := -1;
+                     LoadScheme();
                      If nScheme = -1 Then Begin
                         SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
-                        pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
                      End Else Begin
-                        SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + aSchemeList[nScheme].Name, 0.0, 0.02, 600 );
-                        pScheme := aSchemeList[nScheme];
+                        SetString( STRING_PRACTICE_MENU(21), 'scheme : ' + pScheme.Name, 0.0, 0.02, 600 );
                      End;
-                     pGrid := CGrid.Create( pScheme );
-                     FreeBomberman();
-                     For k := 1 To 8 Do
-                         AddBomberman( 'temp', pScheme.Spawn(k).Team, pScheme.Spawn(k).Color, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 End;
                 MENU_MAP :
                 Begin
                      nMap += 1;
                      If nMap = nMapCount Then nMap := -1;
+                     LoadMap();
                      If nMap = -1 Then Begin
                         SetString( STRING_PRACTICE_MENU(31), 'map : ' + 'random', 0.0, 0.02, 600 );
-                        pMap := aMapList[Trunc(Random(nMapCount))];
                      End Else Begin
-                        SetString( STRING_PRACTICE_MENU(31), 'map : ' + aMapList[nMap].Name, 0.0, 0.02, 600 );
-                        pMap := aMapList[nMap];
+                        SetString( STRING_PRACTICE_MENU(31), 'map : ' + pMap.Name, 0.0, 0.02, 600 );
                      End;
-                     DelMesh( MESH_BLOCK_SOLID );
-                     AddMesh( './maps/' + pMap.SolidMesh, MESH_BLOCK_SOLID );
-                     DelMesh( MESH_BLOCK_BRICK );
-                     AddMesh( './maps/' + pMap.BrickMesh, MESH_BLOCK_BRICK );
-                     DelMesh( MESH_PLANE );
-                     AddMesh( './maps/' + pMap.PlaneMesh, MESH_PLANE );
-                     DelTexture( TEXTURE_MAP_SOLID );
-                     AddTexture( './maps/' + pMap.SolidTexture, TEXTURE_MAP_SOLID );
-                     DelTexture( TEXTURE_MAP_BRICK );
-                     AddTexture( './maps/' + pMap.BrickTexture, TEXTURE_MAP_BRICK );
-                     DelTexture( TEXTURE_MAP_PLANE );
-                     AddTexture( './maps/' + pMap.PlaneTexture, TEXTURE_MAP_PLANE );
                 End;
                 MENU_ROUNDCOUNT :
                 Begin

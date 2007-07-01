@@ -1,0 +1,36 @@
+
+; NOTE! This is an atominsa Map File.
+; Modify at your own risk. It is machine-generated and updated.
+
+
+; version control number
+-V,2
+
+; map name
+-N,Sunset
+
+; solid block mesh
+-M,solid,./sunset/solid.m12
+
+; brick block mesh
+-M,brick,./sunset/brick.m12
+
+; plane mesh
+-M,plane,./sunset/plane.m12
+
+; solid block texture
+-T,solid,./sunset/solid.jpg
+
+; brick block texture
+-T,brick,./sunset/brick.jpg
+
+; plane texture
+-T,plane,./sunset/plane.jpg
+
+; skybox textures
+-S,bottom,./sunset/sb-bottom.jpg
+-S,top,./sunset/sb-top.jpg
+-S,front,./sunset/sb-front.jpg
+-S,back,./sunset/sb-back.jpg
+-S,left,./sunset/sb-left.jpg
+-S,right,./sunset/sb-right.jpg

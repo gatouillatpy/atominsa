@@ -12,11 +12,11 @@ Uses Classes, SysUtils, LazJPEG, Math, Graphics, IntfGraphics,
 
 
 
-Const KEY_UP = GLUT_KEY_UP;
-      KEY_DOWN = GLUT_KEY_DOWN;
-      KEY_LEFT = GLUT_KEY_LEFT;
-      KEY_RIGHT = GLUT_KEY_RIGHT;
-      KEY_F11 = GLUT_KEY_F11;
+Const KEY_UP = -GLUT_KEY_UP;
+      KEY_DOWN = -GLUT_KEY_DOWN;
+      KEY_LEFT = -GLUT_KEY_LEFT;
+      KEY_RIGHT = -GLUT_KEY_RIGHT;
+      KEY_F11 = -GLUT_KEY_F11;
 
 Const KEY_TAB = 9;
       KEY_ESC = 27;
@@ -24,6 +24,7 @@ Const KEY_TAB = 9;
       KEY_N = 110;
       KEY_Y = 121;
       
+Const EFFECT_NONE     = 0;
 Const EFFECT_TERMINAL = 1;
 
 Const FONT_NORMAL    = 1;
@@ -127,10 +128,12 @@ Procedure FreeMesh ( pMesh : LPOGLMesh ) ;
 
 Procedure Clear ( r, g, b, a : Single ) ;
 
-Procedure DrawText ( x, y : Single ; r, g, b : Single ; nFont : integer ;sText : String ) ;
+Procedure DrawText ( x, y : Single ; r, g, b : Single ; nFont : Integer ; sText : String ) ;
 
 Procedure DrawImage ( x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
 Procedure DrawSprite ( u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
+
+Procedure DrawSkybox ( r, g, b, a : Single ; nSkybox : Integer ) ;
 
 Procedure DrawChar ( c : Char ; p : Boolean ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ; nCharsetStandard : Integer ; nCharsetExtended : Integer ) ;
 
@@ -766,7 +769,6 @@ Begin
      k := 3 * ((p - j) * (q + 1) + i);
      l := 4 * (Round(j * v) * (w + 1) + Round(i * u));
 End;
-//Procedure inc() ; Begin k := 3 * Round((nTexturing - 1.0) * (1.0 - j / h) * nTexturing + i / w); End;
 Begin
      AddLineToConsole( 'Loading texture ' + sFile + '...' );
 
@@ -783,6 +785,7 @@ Begin
         ImageExt.Free;
      End;
      
+     // récupère l'adresse mémoire des pixels
      TempIntfImg := TLazIntfImage.Create(0,0);
      TempIntfImg.LoadFromBitmap( Window.Image.Picture.Bitmap.Handle, Window.Image.Picture.Bitmap.MaskHandle );
      src := TempIntfImg.PixelData;
@@ -790,10 +793,20 @@ Begin
      // attribution de la taille de la texture
      pTexture^.Width := Window.Image.Picture.Width;
      pTexture^.Height := Window.Image.Picture.Height;
+     If (Window.Image.Picture.Width < Round(pow(2,nTexturing))) Or (Window.Image.Picture.Height < Round(pow(2,nTexturing))) Then Begin
+        p := Round(pow(2,nTexturing)) - 1;
+        q := Round(pow(2,nTexturing)) - 1;
+     End Else Begin
+        p := Window.Image.Picture.Width - 1;
+        q := Window.Image.Picture.Height - 1;
+     End;
+     w := pTexture^.Width - 1;
+     h := pTexture^.Height - 1;
+     u := pTexture^.Width / (p + 1);
+     v := pTexture^.Height / (q + 1);
 
      // récupère les pixels du TImage et les attribue à la texture
-     SetLength( pTexture^.Data, 3 * Round(pow(4,nTexturing)) );
-     //SetLength( pTexture^.Data, 3 * nTexturing * nTexturing );
+     SetLength( pTexture^.Data, 3 * (p + 1) * (q + 1) );
      {For j := 0 To pTexture^.Height - 1 Do Begin
          For i := 0 To pTexture^.Width - 1 Do Begin
 	     k := 3 * ((pTexture^.Height - 1 - j) * pTexture^.Width + i);
@@ -803,38 +816,18 @@ Begin
 	     pTexture^.Data[k+2] := c shr 16;
 	 End;
      End;}
-     // ON PEUT SUREMENT FAIRE CA MIEUX, LA ON PREND TROP DE TEMPS
-     w := pTexture^.Width - 1;
-     h := pTexture^.Height - 1;
-     p := Round(pow(2,nTexturing)) - 1;
-     q := Round(pow(2,nTexturing)) - 1;
-     u := pTexture^.Width / pow(2,nTexturing);
-     v := pTexture^.Height / pow(2,nTexturing);
      dst := @pTexture^.Data[0];
-     //Window.Caption := Format('addr:%d',[w]);
      Asm
         push eax
         push ebx
         push ecx
-        
+        push edx
+
         mov j, 0
         @yloop:
 
               mov i, 0
               @xloop:
-                    {mov eax, h                           // = h
-                    sub eax, 1                           // - 1
-                    sub eax, j                           // - j
-                    mov eax, ebx
-                    mov ebx, w
-                    mul ebx                              // * w
-                    mov ebx, edx
-                    add ebx, i                           // + i
-                    mov eax, ebx
-                    mov ebx, 3
-                    mul ebx                              // * 3
-                    mov ecx, edx}
-                    
                     call inc
 
                     mov ecx, k
@@ -870,6 +863,7 @@ Begin
               cmp eax, ebx
               jle @yloop
               
+        pop edx
         pop ecx
         pop ebx
         pop eax
@@ -882,12 +876,12 @@ Begin
      glGenTextures( 1, @pTexture^.ID );
      glBindTexture( GL_TEXTURE_2D, pTexture^.ID );
      glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-     glTexImage2D( GL_TEXTURE_2D, 0, 3, Round(pow(2,nTexturing)), Round(pow(2,nTexturing)), 0, GL_RGB, GL_UNSIGNED_BYTE, @pTexture^.Data[0] );
+     glTexImage2D( GL_TEXTURE_2D, 0, 3, (p + 1), (q + 1), 0, GL_RGB, GL_UNSIGNED_BYTE, @pTexture^.Data[0] );
 
      // ajout de la texture à la pile de données
      AddItem( DATA_TEXTURE, nIndex, pTexture, sFile );
 
-     AddStringToConsole( Format('OK. (%.0f bytes)', [3.0 * pow(4,nTexturing)]) );
+     AddStringToConsole( Format('OK. (%.0f bytes)', [3.0 * (p + 1) * (q + 1)]) );
 
      AddTexture := pTexture;
 End;
@@ -934,9 +928,6 @@ Begin
      // recherche de la texture à sélectionner en fonction de son indice
      pTexture := FindItem( DATA_TEXTURE, nIndex );
      If pTexture = NIL Then Exit;
-	 
-     // sélectionne l'étage de texture
-     //glActiveTextureARB(GL_TEXTURE0_ARB);
 
      // active le texturing
      glEnable( GL_TEXTURE_2D );
@@ -1180,11 +1171,10 @@ End;
 // DrawImage : Procède au rendu d'une image à l'écran.                       //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawImage ( x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
-Var i : Integer;
 Begin
      glMatrixMode( GL_PROJECTION );
      glLoadIdentity;
-     gluPerspective( 90, GetRenderWidth / GetRenderHeight, 0.1, 1000 );
+     gluPerspective( 90.0, GetRenderWidth / GetRenderHeight, 0.1, 1000.0 );
 
      glMatrixMode(GL_MODELVIEW);
      glLoadIdentity;
@@ -1226,7 +1216,6 @@ End;
 // DrawSprite : Procède au rendu d'un sprite à l'écran.                       //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawSprite ( u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
-Var i : Integer;
 Begin
      glDisable( GL_DEPTH_TEST );
      glDisable( GL_LIGHTING );
@@ -1255,6 +1244,109 @@ Begin
      glEnable( GL_LIGHTING );
 
      glDisable( GL_BLEND );
+End;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DrawSkybox : Procède au rendu d'une skybox à l'écran.                      //
+////////////////////////////////////////////////////////////////////////////////
+Procedure DrawSkybox ( r, g, b, a : Single ; nSkybox : Integer ) ;
+Begin
+     glDisable( GL_LIGHTING );
+
+     SetTexture( 1, nSkybox + 1 ); // XZ- : bottom
+     glBegin( GL_QUADS );
+     glTexCoord2f( 1.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -999.999, -994.999, -999.999 );
+     glTexCoord2f( 1.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +999.999, -994.999, -999.999 );
+     glTexCoord2f( 0.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +999.999, -994.999, +999.999 );
+     glTexCoord2f( 0.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -999.999, -994.999, +999.999 );
+     glEnd;
+     SetTexture( 1, nSkybox + 2 ); // XZ+ : top
+     glBegin( GL_QUADS );
+     glTexCoord2f( 1.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -999.999, +994.999, -999.999 );
+     glTexCoord2f( 1.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +999.999, +994.999, -999.999 );
+     glTexCoord2f( 0.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +999.999, +994.999, +999.999 );
+     glTexCoord2f( 0.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -999.999, +994.999, +999.999 );
+     glEnd;
+     SetTexture( 1, nSkybox + 3 ); // XY- : front
+     glBegin( GL_QUADS );
+     glTexCoord2f( 1.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -999.999, -999.999, -994.999 );
+     glTexCoord2f( 0.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +999.999, -999.999, -994.999 );
+     glTexCoord2f( 0.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +999.999, +999.999, -994.999 );
+     glTexCoord2f( 1.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -999.999, +999.999, -994.999 );
+     glEnd;
+     SetTexture( 1, nSkybox + 4 ); // XY+ : back
+     glBegin( GL_QUADS );
+     glTexCoord2f( 0.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -999.999, -999.999, +994.999 );
+     glTexCoord2f( 1.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +999.999, -999.999, +994.999 );
+     glTexCoord2f( 1.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +999.999, +999.999, +994.999 );
+     glTexCoord2f( 0.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -999.999, +999.999, +994.999 );
+     glEnd;
+     SetTexture( 1, nSkybox + 5 ); // ZY- : left
+     glBegin( GL_QUADS );
+     glTexCoord2f( 0.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -994.999, -999.999, -999.999 );
+     glTexCoord2f( 1.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -994.999, -999.999, +999.999 );
+     glTexCoord2f( 1.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -994.999, +999.999, +999.999 );
+     glTexCoord2f( 0.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( -994.999, +999.999, -999.999 );
+     glEnd;
+     SetTexture( 1, nSkybox + 6 ); // ZY+ : right
+     glBegin( GL_QUADS );
+     glTexCoord2f( 1.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +994.999, -999.999, -999.999 );
+     glTexCoord2f( 0.0, 0.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +994.999, -999.999, +999.999 );
+     glTexCoord2f( 0.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +994.999, +999.999, +999.999 );
+     glTexCoord2f( 1.0, 1.0 );
+     glColor4f( r, g, b, a );
+     glVertex3f( +994.999, +999.999, -999.999 );
+     glEnd;
+
+     glEnable( GL_LIGHTING );
 End;
 
 
@@ -1422,36 +1514,45 @@ Var count : Integer;
     alpha : Single;
     value : Integer;
     k : Integer;
+    s : Single;
 Begin
      If (id < 0) Or (id > 255) Then Exit;
 
-     count := Round(GetTime() * 1000) Mod 1000;
-     If (count >= 0) And (count < 450) Then alpha := a * 1.0;
-     If (count >= 450) And (count < 500) Then alpha := a * Single(500 - count) * 0.02;
-     If (count >= 500) And (count < 950) Then alpha := a * 0.0;
-     If (count >= 950) And (count < 1000) Then alpha := a * Single(count - 950) * 0.02;
+     If nCharsetStandard = SPRITE_CHARSET_TERMINAL Then s := 2.2;
+     If nCharsetStandard = SPRITE_CHARSET_DIGITAL Then s := 1.0;
+
+     If nEffect = EFFECT_NONE Then Begin
+        For k := 1 To Length(aString[id].sData) Do
+            DrawChar( aString[id].sData[k], False, x + u * s * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
+     End;
 
      If nEffect = EFFECT_TERMINAL Then Begin
+        count := Round(GetTime() * 1000) Mod 1000;
+        If (count >= 0) And (count < 450) Then alpha := a * 1.0;
+        If (count >= 450) And (count < 500) Then alpha := a * Single(500 - count) * 0.02;
+        If (count >= 500) And (count < 950) Then alpha := a * 0.0;
+        If (count >= 950) And (count < 1000) Then alpha := a * Single(count - 950) * 0.02;
+
         If GetTime() <= aString[id].fTime1 Then Begin
            DrawChar( '*', False, x, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
         End;
         If (GetTime() > aString[id].fTime1) And (GetTime() <= aString[id].fTime2) Then Begin
            value := Round((GetTime() - aString[id].fTime1) * aString[id].fRate);
            For k := 1 To value Do
-               DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
-           DrawChar( '*', False, x + u * 2.2 * k, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
+               DrawChar( aString[id].sData[k], False, x + u * s * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
+           DrawChar( '*', False, x + u * s * k, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
         End;
         If (GetTime() > aString[id].fTime2) And (GetTime() <= aString[id].fTime3) Then Begin
            For k := 1 To Length(aString[id].sData) Do
-               DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
-           DrawChar( '*', False, x + u * 2.2 * k, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
+               DrawChar( aString[id].sData[k], False, x + u * s * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
+           DrawChar( '*', False, x + u * s * k, y, z, u, v, r, g, b, alpha, t, nCharsetStandard, nCharsetExtended );
         End;
         If (GetTime() > aString[id].fTime3) And (GetTime() <= aString[id].fTime4) Then Begin
            For k := 1 To Length(aString[id].sData) Do
-               DrawChar( aString[id].sData[k], False, x + u * 2.2 * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
+               DrawChar( aString[id].sData[k], False, x + u * s * (k - 1), y, z, u, v, r, g, b, a, t, nCharsetStandard, nCharsetExtended );
         End;
      End;
-     
+
 End;
 
 
@@ -1969,7 +2070,7 @@ End;
 
 Function GetKeyS( nKey : Integer ) : Boolean ;
 Begin
-     GetKeyS := bKeyS[nKey];
+     GetKeyS := bKeyS[-nKey];
 End;
 
 

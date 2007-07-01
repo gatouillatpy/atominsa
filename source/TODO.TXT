@@ -1,8 +1,6 @@
 Technique :
- - ajouter la minuterie
- - ajouter le panneau d'affichage
- - ajouter une skybox
  - mode réseau
+ - ajouter au setup le nombre et le temps de round
  - éditeur de static mesh
  - éditeur de skeletal mesh
  - éditeur d'animation

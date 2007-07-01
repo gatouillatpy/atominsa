@@ -18,6 +18,8 @@ Var nVersion : Integer;
 
 Var bDebug : Boolean;
 
+Var bColor : Boolean;
+
 Var bIntro : Boolean;
 
 Var nRoundCount : Integer;
@@ -793,6 +795,8 @@ Begin
 
      bIntro := True;
      
+     bColor := True;
+
      bDebug := False;
 
      nWindowLeft := 120;
