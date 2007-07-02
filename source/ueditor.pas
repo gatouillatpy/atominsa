@@ -10,8 +10,7 @@ Interface
 
 
 Uses Classes, SysUtils,
-     UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
-     USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm;
+     UCore, UUtils, USetup, UForm;
 
 
 

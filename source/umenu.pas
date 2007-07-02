@@ -9,8 +9,7 @@ Interface
 
 
 Uses Classes, SysUtils, IntfGraphics,
-     UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
-     USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm;
+     UCore, UUtils, USetup, UForm;
 
 
 
@@ -30,7 +29,7 @@ Implementation
 Const BUTTON_NONE         = 0;
 Const BUTTON_EXIT         = 1;
 Const BUTTON_PRACTICE     = 2;
-Const BUTTON_NETWORK      = 3;
+Const BUTTON_MULTI        = 3;
 Const BUTTON_SOLO         = 4;
 Const BUTTON_SETUP        = 5;
 Const BUTTON_EDITOR       = 6;
@@ -53,28 +52,33 @@ End;
 
 
 
-Procedure CheckMainButton () ; cdecl;
+Procedure CheckButton () ; cdecl;
 Begin
      Case nButton Of
-          BUTTON_PRACTICE :
-          Begin
-               PlaySound( SOUND_MENU_SELECT );
-               nState := PHASE_PRACTICE;
-          End;
-          BUTTON_EDITOR :
-          Begin
-               PlaySound( SOUND_MENU_SELECT );
-               nState := PHASE_EDITOR;
-          End;
           BUTTON_EXIT :
           Begin
                PlaySound( SOUND_MENU_SELECT );
                nState := PHASE_EXIT;
           End;
+          BUTTON_PRACTICE :
+          Begin
+               PlaySound( SOUND_MENU_SELECT );
+               nState := PHASE_PRACTICE;
+          End;
+          BUTTON_MULTI :
+          Begin
+               PlaySound( SOUND_MENU_SELECT );
+               nState := PHASE_MULTI;
+          End;
           BUTTON_SETUP :
           Begin
                PlaySound( SOUND_MENU_SELECT );
                nState := PHASE_SETUP;
+          End;
+          BUTTON_EDITOR :
+          Begin
+               PlaySound( SOUND_MENU_SELECT );
+               nState := PHASE_EDITOR;
           End;
      End;
 End;
@@ -91,7 +95,7 @@ Var w, h : Single; // taille de la fenêtre
     r, g, b : Byte;
 Begin
      // ajout de la callback pour le bouton gauche de la souris
-     BindButton( BUTTON_LEFT, @CheckMainButton );
+     BindButton( BUTTON_LEFT, @CheckButton );
 
      // appel d'une texture de rendu
      PutRenderTexture();
@@ -118,7 +122,7 @@ Begin
      If (r = 0) And (g = 0) And (b = 0) Then nButton := BUTTON_NONE;
      If (r = 0) And (g = 255) And (b = 255) Then nButton := BUTTON_EXIT;
      If (r = 255) And (g = 0) And (b = 0) Then nButton := BUTTON_PRACTICE;
-     If (r = 0) And (g = 255) And (b = 0) Then nButton := BUTTON_NETWORK;
+     If (r = 0) And (g = 255) And (b = 0) Then nButton := BUTTON_MULTI;
      If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLO;
      If (r = 255) And (g = 255) And (b = 0) Then nButton := BUTTON_SETUP;
      If (r = 255) And (g = 0) And (b = 255) Then nButton := BUTTON_EDITOR;
@@ -127,7 +131,7 @@ Begin
      If nButton <> BUTTON_NONE Then Begin
         Case nButton Of
              BUTTON_EXIT : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON0 );
-             BUTTON_NETWORK : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON4 );
+             BUTTON_MULTI : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON4 );
              BUTTON_SOLO : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON1 );
              BUTTON_SETUP : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON3 );
              BUTTON_PRACTICE : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON2 );
@@ -138,7 +142,7 @@ Begin
            PlaySound( SOUND_MENU_MOVE );
            Case nButton Of
                 BUTTON_EXIT : SetString( STRING_MENU_MAIN, 'exit', 0.5, 0.4, 20 );
-                BUTTON_NETWORK : SetString( STRING_MENU_MAIN, 'multiplayer', 0.5, 1.1, 20 );
+                BUTTON_MULTI : SetString( STRING_MENU_MAIN, 'multi', 0.5, 0.5, 20 );
                 BUTTON_SOLO : SetString( STRING_MENU_MAIN, 'solo', 0.5, 0.4, 20 );
                 BUTTON_SETUP : SetString( STRING_MENU_MAIN, 'setup', 0.5, 0.5, 20 );
                 BUTTON_PRACTICE : SetString( STRING_MENU_MAIN, 'practice', 0.5, 0.8, 20 );
@@ -147,7 +151,7 @@ Begin
         End;
         Case nButton Of
              BUTTON_EXIT : DrawString( STRING_MENU_MAIN, -0.551 * w / h, -0.831, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-             BUTTON_NETWORK : DrawString( STRING_MENU_MAIN, 0.425 * w / h, -0.263, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+             BUTTON_MULTI : DrawString( STRING_MENU_MAIN, 0.425 * w / h, -0.263, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
              BUTTON_SOLO : DrawString( STRING_MENU_MAIN, -0.082 * w / h, -0.319, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
              BUTTON_SETUP : DrawString( STRING_MENU_MAIN, 0.213 * w / h, 0.090, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
              BUTTON_PRACTICE : DrawString( STRING_MENU_MAIN, -0.218 * w / h, 0.194, -1, 0.023 * w / h, 0.03, 1, 1, 1, 0.1, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );

@@ -5,7 +5,7 @@ Program atominsa;
 Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
-     UPractice, UMenu, UIntro, UEditor;
+     UPractice, UMenu, UIntro, UEditor, UMulti;
 
 
 
@@ -68,6 +68,8 @@ Begin
           STATE_EDITOR    : ProcessEditor();
           PHASE_SETUP     : InitSetup();
           STATE_SETUP     : ProcessSetup();
+          PHASE_MULTI     : InitMulti();
+          STATE_MULTI     : ProcessMulti();
      End;
 End;
 

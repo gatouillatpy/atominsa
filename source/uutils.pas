@@ -62,6 +62,8 @@ Const PHASE_EDITOR        =  4;
 Const STATE_EDITOR        = 14;
 Const PHASE_SETUP         =  5;
 Const STATE_SETUP         = 15;
+Const PHASE_MULTI         =  6;
+Const STATE_MULTI         = 16;
 
 Var nState : Integer;
 
@@ -198,14 +200,14 @@ Const STRING_SCORE_TABLE_NULL   =  0;
       STRING_MENU_MAIN          =  1;
       STRING_EDITOR_MENU_NULL   =  0;
       STRING_SETUP_MENU_NULL    =  0;
-      STRING_PRACTICE_MENU_NULL =  0;
+      STRING_GAME_MENU_NULL =  0;
       STRING_TIMER              = 10;
       STRING_SCREEN             = 11;
 
 Function STRING_SCORE_TABLE( k : Integer ) : Integer ;
 Function STRING_EDITOR_MENU( k : Integer ) : Integer ;
 Function STRING_SETUP_MENU( k : Integer ) : Integer ;
-Function STRING_PRACTICE_MENU( k : Integer ) : Integer ;
+Function STRING_GAME_MENU( k : Integer ) : Integer ;
 
 
 
@@ -256,9 +258,9 @@ Begin
      STRING_SETUP_MENU := k + STRING_SETUP_MENU_NULL;
 End;
 
-Function STRING_PRACTICE_MENU( k : Integer ) : Integer ;
+Function STRING_GAME_MENU( k : Integer ) : Integer ;
 Begin
-     STRING_PRACTICE_MENU := k + STRING_PRACTICE_MENU_NULL;
+     STRING_GAME_MENU := k + STRING_GAME_MENU_NULL;
 End;
 
 Function TEXTURE_BOMBERMAN( k : Integer ) : Integer ;

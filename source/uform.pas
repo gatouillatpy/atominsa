@@ -37,7 +37,7 @@ End;
 Procedure AddLineToConsole( s : String ) ;
 Begin
      Window.Memo.Lines.Add( s );
-     Window.Memo.SelStart:=Length(Window.Memo.Lines.Text);
+     //Window.Memo.SelStart := Length(Window.Memo.Lines.Text);
      Application.ProcessMessages;
 End;
 

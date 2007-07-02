@@ -1,6 +1,14 @@
 Technique :
- - mode réseau
+ - mode réseau :
+   - dès la connexion établie le serveur renvoie toutes les données sur les joueurs
+   - à chaque frame le client s'occupe de ses joueurs uniquement (prévoir un boolean dans CBomberman)
+   - le client renvoie les données concernant ses joueurs
+   - le serveur renvoie a tout le monde
+ - faire l'ajustement des titres du setup, et de multi
+ - faire l'ajustement des noms dans les scores
  - ajouter au setup le nombre et le temps de round
+ - ajouter au setup l'activation des couleurs
+ - ajouter au setup les paramètres réseau : nom local, adresse, port?
  - éditeur de static mesh
  - éditeur de skeletal mesh
  - éditeur d'animation

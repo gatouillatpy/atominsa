@@ -14,6 +14,10 @@ Const PLAYER_KB2 = 2;
 Const PLAYER_COM = 3;
 Const PLAYER_NET = 4;
 
+Var sLocalName : String;
+Var sServerAddress : String;
+Var nServerPort : Word;
+
 Var nVersion : Integer;
 
 Var bDebug : Boolean;
@@ -782,7 +786,6 @@ End;
 Procedure ReadSettings ( sFile : String ) ;
 Var ioLine : TEXT;
     sLine : String;
-    sData : String;
     i, k : Integer;
 Begin
      Window.Memo.Lines.Add( 'Reading ' + sFile );
@@ -793,6 +796,10 @@ Begin
          aCharacterList[i] := NIL;
      End;
 
+     sLocalName := 'atominsa server';
+     sServerAddress := '127.0.0.1';
+     nServerPort := 1212;
+     
      bIntro := True;
      
      bColor := True;

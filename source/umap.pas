@@ -150,7 +150,6 @@ End;
 Constructor CMap.Create ( sFile : String ; bDebug : Boolean ) ;
 Var ioLine : TEXT;
     sLine : String;
-    i : Integer;
 Begin
      Window.Memo.Lines.Add( 'Loading map ' + sFile );
      

@@ -8,6 +8,7 @@ Interface
 Uses Classes, SysUtils, LazJPEG, Math, Graphics, IntfGraphics,
      GL, GLU, GLUT, GLEXT,
      fmod, fmodtypes, fmoderrors,
+     lnet,
      UForm, UUtils, USetup;
 
 
@@ -189,6 +190,8 @@ Function GetMouseDY() : Single ;
 
 Procedure ClearInput () ;
 
+Function CheckKey() : Char ;
+
 Function GetKey( nKey : Integer ) : Boolean ;
 Function GetKeyS( nKey : Integer ) : Boolean ;
 
@@ -231,7 +234,217 @@ Var BackBuffer : GLUInt;
 
 
 
+Var bConnected : Boolean;
+
+Function ServerInit ( Const nPort : Word ) : Boolean ;
+Procedure ServerTerminate () ;
+Procedure ServerLoop () ;
+
+Function ClientInit ( Const sAddress : String ; Const nPort : Word ) : Boolean ;
+Procedure ClientTerminate () ;
+Procedure ClientLoop () ;
+
+
+
 Implementation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FONCTIONS DE GESTION DE LA PILE DE DONNEES                                 //
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+Type TLEvents = Class
+     Public
+           // server
+           Procedure OnErrorServer ( Const msg : String ; aSocket : TLSocket );
+           Procedure OnConnectServer ( aSocket : TLSocket );
+           Procedure OnReceiveServer ( aSocket : TLSocket );
+           Procedure OnDisconnectServer ( aSocket : TLSocket );
+
+           //client
+           Procedure OnDisconnectClient( aSocket : TLSocket );
+           Procedure OnReceiveClient( aSocket : TLSocket );
+           Procedure OnErrorClient( Const msg : String ; aSocket : TLSocket );
+End;
+
+Var pTCP : TLTcp;
+Var pEvent: TLEvents;
+
+
+
+// client
+
+
+
+Procedure TLEvents.OnDisconnectClient ( aSocket : TLSocket ) ;
+Begin
+     AddLineToConsole('Connection lost.');
+End;
+
+
+
+Procedure TLEvents.OnReceiveClient ( aSocket : TLSocket ) ;
+Var s : String;
+Begin
+  //if aSocket.GetMessage(s) > 0 then
+End;
+
+
+
+Procedure TLEvents.OnErrorClient ( Const msg : String ; aSocket : TLSocket ) ;
+Begin
+     AddLineToConsole( 'Network error : ' + msg );
+End;
+
+
+
+Function ClientInit ( Const sAddress : String ; Const nPort : Word ) : Boolean ;
+Var t : Single;
+Begin
+     bConnected := False;
+
+     pEvent := TLEvents.Create;
+     pTCP := TLTcp.Create( NIL );
+     pTCP.OnReceive := @pEvent.OnReceiveClient;
+     pTCP.OnDisconnect := @pEvent.OnDisconnectClient;
+     pTCP.OnError := @pEvent.OnErrorClient;
+     If pTCP.Connect( sAddress, nPort ) Then Begin
+        AddLineToConsole('Connecting...');
+        t := GetTime;
+        Repeat
+           pTCP.CallAction;
+           Sleep(1);
+           If GetTime > t + 10.0 Then Break;
+        Until pTCP.Connected;
+        If pTCP.Connected Then Begin
+           AddStringToConsole('success.');
+           ClientInit := True;
+        End Else Begin
+           AddStringToConsole('failed.');
+           ClientInit := False;
+        End;
+     End Else Begin
+        AddLineToConsole('Can''t connect to server.');
+        ClientInit := False;
+     End;
+End;
+
+
+
+Procedure ClientTerminate () ;
+Begin
+     pTCP.Disconnect;
+     pTCP.Free;
+     pEvent.Free;
+     AddLineToConsole('Disconnected.');
+End;
+
+
+
+Procedure ClientLoop () ;
+Begin
+     pTCP.Callaction;
+     //Sleep(1);
+End;
+
+
+
+// server
+
+
+
+Procedure TLEvents.OnErrorServer ( Const msg : String ; aSocket : TLSocket ) ;
+Begin
+     AddLineToConsole( 'Network error : ' + msg );
+End;
+
+
+
+Procedure TLEvents.OnReceiveServer ( aSocket : TLSocket ) ;
+Var s : String;
+Begin
+     //if aSocket.GetMessage(s) > 0 then
+End;
+
+
+
+Procedure TLEvents.OnDisconnectServer ( aSocket : TLSocket ) ;
+Begin
+     AddLineToConsole('Connection lost.');
+End;
+
+
+
+Procedure TLEvents.OnConnectServer ( aSocket : TLSocket ) ;
+Begin
+     AddLineToConsole( aSocket.PeerAddress + ' connected.' );
+End;
+
+
+
+Function ServerInit ( Const nPort : Word ) : Boolean;
+Begin
+     pEvent := TLEvents.Create;
+     pTCP := TLTcp.Create( NIL );
+     pTCP.OnError := @pEvent.OnErrorServer;
+     pTCP.OnAccept := @pEvent.OnConnectServer;
+     pTCP.OnReceive := @pEvent.OnReceiveServer;
+     pTCP.OnDisconnect := @pEvent.OnDisconnectServer;
+     If pTCP.Listen( nPort ) Then Begin
+        AddLineToConsole('Server started.');
+        ServerInit := True;
+     End Else Begin
+        AddLineToConsole('Can''t start server.');
+        ServerInit := False;
+     End;
+End;
+
+
+
+Procedure ServerTerminate () ;
+Begin
+     pTCP.Disconnect;
+     pTCP.Free;
+     pEvent.Free;
+     AddLineToConsole('Disconnected.');
+End;
+
+
+
+Procedure ServerLoop () ;
+Begin
+     pTCP.Callaction;
+     //Sleep(1);
+End;
 
 
 
@@ -308,8 +521,7 @@ End;
 // FreeDataStack : Vide la pile de données et libère la mémoire.              //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure FreeDataStack () ;
-Var i : LongInt;
-    pDataItem : LPDataItem;
+Var pDataItem : LPDataItem;
     pMesh : LPOGLMesh;
     pTexture : LPOGLTexture;
     pSound : PFSoundSample;
@@ -351,8 +563,7 @@ End;
 // ReloadDataStack : Recharge les éléments de la pile de données.             //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure ReloadDataStack () ;
-Var i : LongInt;
-    pDataTemp : LPDataItem;
+Var pDataTemp : LPDataItem;
     pDataItem : LPDataItem;
     pMesh : LPOGLMesh;
     pTexture : LPOGLTexture;
@@ -918,7 +1129,6 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 Procedure SetTexture( nStage : Integer ; nIndex : LongInt ) ;
 Var pTexture : LPOGLTexture;
-    nID : GLUInt;
 Begin
      If nIndex = 0 Then Begin
         glDisable( GL_TEXTURE_2D );
@@ -952,8 +1162,6 @@ Var ioLong : File Of LongInt ; ioPolygon : File Of OGLPolygon ; ioVertex : File 
     pMesh : LPOGLMesh ;
     nSize : LongInt ;
     i, j : LongInt ;
-    pDataItem : LPDataItem;
-    s : String;
 Begin
      j := 0;
 
@@ -1039,11 +1247,7 @@ End;
 // DrawMesh : Procède au rendu d'un OGLMesh en fonction de son indice.        //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawMesh ( nIndex : LongInt ; t : Boolean ) ;
-Var i : LongInt ;
-    pMesh : LPOGLMesh ;
-    pDataItem : LPDataItem;
-    p : GLIndex;
-    v : GLVector;
+Var pMesh : LPOGLMesh ;
 Begin
      // recherche du mesh à afficher en fonction de son indice
      pMesh := FindItem( DATA_MESH, nIndex );
@@ -1504,7 +1708,6 @@ Begin
 End;
 
 
-var tg : integer = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // DrawString : Procède au rendu d'une OGLString en avec un effet.            //
@@ -1752,7 +1955,6 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 Procedure InitBox ( s1, s2 : String ) ;
 Var u, v, w : Single;
-Var Data : Pointer;
 Begin
      u := GetSquareWidth * 2 / GetRenderWidth;
      v := GetSquareHeight * 2 / GetRenderHeight;
@@ -1946,7 +2148,6 @@ End;
 // StopSound : Procède à l'arrêt d'un son en fonction de son indice.          //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure StopSound ( nIndex : LongInt ) ;
-Var pSound : PFSoundSample;
 Begin
      // arrêt du son
      FSOUND_StopSound( 1 );
@@ -1974,9 +2175,7 @@ End;
 // StopMusic : Procède à l'arrêt d'une musique en fonction de son indice.     //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure StopMusic ( nIndex : LongInt ) ;
-Var i : LongInt;
-    pMusic : PFMusicModule;
-    pDataItem : LPDataItem;
+Var pMusic : PFMusicModule;
 Begin
      // recherche de la musique à lire en fonction de son indice
      pMusic := FindItem( DATA_MUSIC, nIndex );
@@ -2057,6 +2256,36 @@ Begin
          bKey[k] := False;
          bKeyS[k] := False;
      End;
+End;
+
+
+
+Function CheckKey() : Char ;
+Var k : Integer;
+Begin
+     CheckKey := #0;
+
+     If bKey[8] Then CheckKey := #8;
+
+     For k := 97 To 122 Do
+         If bKey[k] Then CheckKey := Chr(k);
+
+     For k := 48 To 57 Do
+         If bKey[k] Then CheckKey := Chr(k);
+
+     If bKey[32] Then CheckKey := #32;
+     If bKey[33] Then CheckKey := #33;
+     If bKey[39] Then CheckKey := #39;
+     If bKey[40] Then CheckKey := #40;
+     If bKey[41] Then CheckKey := #41;
+     If bKey[44] Then CheckKey := #44;
+     If bKey[45] Then CheckKey := #45;
+     If bKey[46] Then CheckKey := #46;
+     If bKey[58] Then CheckKey := #58;
+     If bKey[59] Then CheckKey := #59;
+     If bKey[63] Then CheckKey := #63;
+     If bKey[91] Then CheckKey := #91;
+     If bKey[93] Then CheckKey := #93;
 End;
 
 
