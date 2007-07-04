@@ -27,7 +27,7 @@ Implementation
 
 Procedure CKick.Bonus( nPlayer : CBomberman ) ;
 Begin
-       nPlayer.Kick:=True;
+       nPlayer.ChangeKick();
        self.destroy();
 End;
 

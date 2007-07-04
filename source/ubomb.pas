@@ -594,9 +594,9 @@ begin
   case nMoveDir of
     RIGHT, LEFT : begin
                     fPosition.z:=sin(PI*(fPosition.x-Trunc(fPosition.x)));
-                    if (((fPosition.x-Trunc(fPosition.x))<=0.1) and ( (nOriginX<>Trunc(fPosition.x)) or (nOriginY<>fPosition.y)) )then
+                    if (((fPosition.x-Trunc(fPosition.x))<0.1) and ( (nOriginX<>Trunc(fPosition.x)) or (nOriginY<>fPosition.y)) )then
                     begin
-                      if (uGrid.GetBlock(Trunc(fPosition.x),Trunc(fPosition.y))=nil) then
+                      if (uGrid.GetBlock(Trunc(fPosition.x),Trunc(fPosition.y))=nil) and Not(pIsBomberman(Trunc(fPosition.x),Trunc(fPosition.y))) then
                       begin
                         fPosition.z  := 0;
                         nX           := Trunc(fPosition.x);
@@ -615,9 +615,9 @@ begin
                   end;
     UP, DOWN    : begin
                     fPosition.z:=sin(PI*(fPosition.y-Trunc(fPosition.y)));
-                      if (((fPosition.y-Trunc(fPosition.y))<=0.1) and ( (nOriginX<>Trunc(fPosition.x)) or (nOriginY<>fPosition.y)) )then
+                      if (((fPosition.y-Trunc(fPosition.y))<0.1) and ( (nOriginX<>Trunc(fPosition.x)) or (nOriginY<>fPosition.y)) )then
                       begin
-                        if (uGrid.GetBlock(Trunc(fPosition.x),Trunc(fPosition.y))=nil) then
+                        if (uGrid.GetBlock(Trunc(fPosition.x),Trunc(fPosition.y))=nil)  and Not(pIsBomberman(Trunc(fPosition.x),Trunc(fPosition.y))) then
                         begin
                         fPosition.z  := 0;
                         nX           := Trunc(fPosition.x);

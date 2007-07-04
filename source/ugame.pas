@@ -1060,7 +1060,7 @@ Begin
         BindKeyObj( nKey1MoveLeft, False, @pPlayer1.MoveLeft );
         BindKeyObj( nKey1MoveRight, False, @pPlayer1.MoveRight );
         BindKeyObj( nKey1Primary, True, @pPlayer1.CreateBomb );
-        BindKeyObj( nKey1Secondary, True, @pPlayer1.SecondaryKey );
+        BindKeyObj( nKey1Secondary, False, @pPlayer1.SecondaryKey );
      End;
 
      // affectation des touches au joueur 2
