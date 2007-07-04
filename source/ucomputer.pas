@@ -39,105 +39,105 @@ Begin
           Begin
                // si les coordonnées ciblées sont toutes deux différentes aux coordonnées courantes alors
                // on attribue de nouvelles coordonnées cibles. ça arrive en début de partie ou en cas de téléportation
-               If (pBomberman.CX <> pBomberman.X) And (pBomberman.CY <> pBomberman.Y) Then Begin
+               If (pBomberman.CX <> pBomberman.Position.X) And (pBomberman.CY <> pBomberman.Position.Y) Then Begin
                   If Random < 0.5 Then Begin
-                     pBomberman.CX := pBomberman.X + (2.0 + Random * 6.0) - 4.0;
-                     pBomberman.CY := pBomberman.Y;
+                     pBomberman.CX := pBomberman.Position.X + (2.0 + Random * 6.0) - 4.0;
+                     pBomberman.CY := pBomberman.Position.Y;
                   End Else Begin
-                     pBomberman.CX := pBomberman.X;
-                     pBomberman.CY := pBomberman.Y + (2.0 + Random * 4.0) - 3.0;
+                     pBomberman.CX := pBomberman.Position.X;
+                     pBomberman.CY := pBomberman.Position.Y + (2.0 + Random * 4.0) - 3.0;
                   End;
                End;
                // si les coordonnées ciblées ont été atteintes alors on attribue de nouvelles coordonnées cibles.
                // on a 80% de chances de repartir dans une direction perpendiculaire.
-               If (pBomberman.CX = pBomberman.X)  And (Abs(pBomberman.CY - pBomberman.Y) < 0.5) Then Begin
+               If (pBomberman.CX = pBomberman.Position.X)  And (Abs(pBomberman.CY - pBomberman.Position.Y) < 0.5) Then Begin
                   If Random < 0.8 Then Begin
-                     pBomberman.CX := pBomberman.X + lm * (2.0 + Random * 4.0);
-                     pBomberman.CY := pBomberman.Y;
-                  End Else If pBomberman.LY > pBomberman.Y Then Begin
-                     pBomberman.CX := pBomberman.X;
-                     pBomberman.CY := pBomberman.Y + 1.5 + Random * 3.0;
-                  End Else If pBomberman.LY < pBomberman.Y Then Begin
-                     pBomberman.CX := pBomberman.X;
-                     pBomberman.CY := pBomberman.Y - 1.5 + Random * 3.0;
+                     pBomberman.CX := pBomberman.Position.X + lm * (2.0 + Random * 4.0);
+                     pBomberman.CY := pBomberman.Position.Y;
+                  End Else If pBomberman.LY > pBomberman.Position.Y Then Begin
+                     pBomberman.CX := pBomberman.Position.X;
+                     pBomberman.CY := pBomberman.Position.Y + 1.5 + Random * 3.0;
+                  End Else If pBomberman.LY < pBomberman.Position.Y Then Begin
+                     pBomberman.CX := pBomberman.Position.X;
+                     pBomberman.CY := pBomberman.Position.Y - 1.5 + Random * 3.0;
                   End;
-               End Else If (pBomberman.CY = pBomberman.Y)  And (Abs(pBomberman.CX - pBomberman.X) < 0.5) Then Begin
+               End Else If (pBomberman.CY = pBomberman.Position.Y)  And (Abs(pBomberman.CX - pBomberman.Position.X) < 0.5) Then Begin
                   If Random < 0.8 Then Begin
-                     pBomberman.CX := pBomberman.X;
-                     pBomberman.CY := pBomberman.Y + lm * (2.0 + Random * 4.0);
-                  End Else If pBomberman.LX > pBomberman.X Then Begin
-                     pBomberman.CX := pBomberman.X + 1.5 + Random * 3.0;
-                     pBomberman.CY := pBomberman.Y;
-                  End Else If pBomberman.LX < pBomberman.X Then Begin
-                     pBomberman.CX := pBomberman.X - 1.5 + Random * 3.0;
-                     pBomberman.CY := pBomberman.Y;
+                     pBomberman.CX := pBomberman.Position.X;
+                     pBomberman.CY := pBomberman.Position.Y + lm * (2.0 + Random * 4.0);
+                  End Else If pBomberman.LX > pBomberman.Position.X Then Begin
+                     pBomberman.CX := pBomberman.Position.X + 1.5 + Random * 3.0;
+                     pBomberman.CY := pBomberman.Position.Y;
+                  End Else If pBomberman.LX < pBomberman.Position.X Then Begin
+                     pBomberman.CX := pBomberman.Position.X - 1.5 + Random * 3.0;
+                     pBomberman.CY := pBomberman.Position.Y;
                   End;
                End;
                // si on fait face à un obstacle (coordonnées courantes égales aux dernières) alors on attribue
                // de nouvelles coordonnées cibles. on a 80% de chances de repartir dans la direction opposée.
-               If (pBomberman.LX = pBomberman.X) And (pBomberman.LY = pBomberman.Y) Then Begin
-                  If pBomberman.CX > pBomberman.X Then Begin
+               If (pBomberman.LX = pBomberman.Position.X) And (pBomberman.LY = pBomberman.Position.Y) Then Begin
+                  If pBomberman.CX > pBomberman.Position.X Then Begin
                       If Random < 0.8 Then Begin
-                         pBomberman.CX := pBomberman.X - 2.0 + Random * 4.0;
-                         pBomberman.CY := pBomberman.Y;
+                         pBomberman.CX := pBomberman.Position.X - 2.0 + Random * 4.0;
+                         pBomberman.CY := pBomberman.Position.Y;
                       End Else Begin
-                         pBomberman.CX := pBomberman.X;
-                         pBomberman.CY := pBomberman.Y + lm * (1.5 + Random * 3.0);
+                         pBomberman.CX := pBomberman.Position.X;
+                         pBomberman.CY := pBomberman.Position.Y + lm * (1.5 + Random * 3.0);
                       End;
-                  End Else If pBomberman.CX < pBomberman.X Then Begin
+                  End Else If pBomberman.CX < pBomberman.Position.X Then Begin
                       If Random < 0.8 Then Begin
-                         pBomberman.CX := pBomberman.X + 2.0 + Random * 4.0;
-                         pBomberman.CY := pBomberman.Y;
+                         pBomberman.CX := pBomberman.Position.X + 2.0 + Random * 4.0;
+                         pBomberman.CY := pBomberman.Position.Y;
                       End Else Begin
-                         pBomberman.CX := pBomberman.X;
-                         pBomberman.CY := pBomberman.Y + lm * (1.5 + Random * 3.0);
+                         pBomberman.CX := pBomberman.Position.X;
+                         pBomberman.CY := pBomberman.Position.Y + lm * (1.5 + Random * 3.0);
                       End;
-                  End Else If pBomberman.CY > pBomberman.Y Then Begin
+                  End Else If pBomberman.CY > pBomberman.Position.Y Then Begin
                       If Random < 0.8 Then Begin
-                         pBomberman.CX := pBomberman.X;
-                         pBomberman.CY := pBomberman.Y - 1.5 + Random * 3.0;
+                         pBomberman.CX := pBomberman.Position.X;
+                         pBomberman.CY := pBomberman.Position.Y - 1.5 + Random * 3.0;
                       End Else Begin
-                         pBomberman.CX := pBomberman.X + lm * (2.0 + Random * 4.0);
-                         pBomberman.CY := pBomberman.Y;
+                         pBomberman.CX := pBomberman.Position.X + lm * (2.0 + Random * 4.0);
+                         pBomberman.CY := pBomberman.Position.Y;
                       End;
-                  End Else If pBomberman.CY < pBomberman.Y Then Begin
+                  End Else If pBomberman.CY < pBomberman.Position.Y Then Begin
                       If Random < 0.8 Then Begin
-                         pBomberman.CX := pBomberman.X;
-                         pBomberman.CY := pBomberman.Y + 1.5 + Random * 3.0;
+                         pBomberman.CX := pBomberman.Position.X;
+                         pBomberman.CY := pBomberman.Position.Y + 1.5 + Random * 3.0;
                       End Else Begin
-                         pBomberman.CX := pBomberman.X + lm * (2.0 + Random * 4.0);
-                         pBomberman.CY := pBomberman.Y;
+                         pBomberman.CX := pBomberman.Position.X + lm * (2.0 + Random * 4.0);
+                         pBomberman.CY := pBomberman.Position.Y;
                       End;
                   End;
                End;
                // on remplace les dernières coordonnées par les coordonnées courantes.
-               pBomberman.LX := pBomberman.X;
-               pBomberman.LY := pBomberman.Y;
+               pBomberman.LX := pBomberman.Position.X;
+               pBomberman.LY := pBomberman.Position.Y;
                // on gère le déplacement en fonction des coordonnées ciblées.
-               If pBomberman.CX > pBomberman.X Then pBomberman.MoveRight( GetDelta );
-               If pBomberman.CX < pBomberman.X Then pBomberman.MoveLeft( GetDelta );
-               If pBomberman.CY > pBomberman.Y Then pBomberman.MoveDown( GetDelta );
-               If pBomberman.CY < pBomberman.Y Then pBomberman.MoveUp( GetDelta );
+               If pBomberman.CX > pBomberman.Position.X Then pBomberman.MoveRight( GetDelta );
+               If pBomberman.CX < pBomberman.Position.X Then pBomberman.MoveLeft( GetDelta );
+               If pBomberman.CY > pBomberman.Position.Y Then pBomberman.MoveDown( GetDelta );
+               If pBomberman.CY < pBomberman.Position.Y Then pBomberman.MoveUp( GetDelta );
 
                t := 0.0;
                // on évalue le risque de se prendre une flamme avec les nouvelles coordonnées. comme on est
                // novice on avoir 80% de chances de crever en passant dans des flammes.
                k := 1;
                While ( k <= GetFlameCount() ) Do Begin
-                   If (Trunc(pBomberman.X + 0.5) = GetFlameByCount(k).X) And (Trunc(pBomberman.Y + 0.5) = GetFlameByCount(k).Y) Then t += 0.8;
+                   If (Trunc(pBomberman.Position.X + 0.5) = GetFlameByCount(k).X) And (Trunc(pBomberman.Position.Y + 0.5) = GetFlameByCount(k).Y) Then t += 0.8;
                    k += 1;
                End;
                // on ajoute à cela le risque de crever en étant sur la trajectoire d'une bombe. de même
                // en novice on évalue ce risque à 20%.
                k := 1;
                While ( k <= GetBombCount() ) Do Begin
-                   If (Trunc(pBomberman.X + 0.5) = Trunc(GetBombByCount(k).Position.X + 0.5)) Or (Trunc(pBomberman.Y + 0.5) = Trunc(GetBombByCount(k).Position.Y + 0.5)) Then t += 0.2;
+                   If (Trunc(pBomberman.Position.X + 0.5) = Trunc(GetBombByCount(k).Position.X + 0.5)) Or (Trunc(pBomberman.Position.Y + 0.5) = Trunc(GetBombByCount(k).Position.Y + 0.5)) Then t += 0.2;
                    k += 1;
                End;
                // s'il y a un risque supérieur aux nouvelles coordonnées alors on réattribue les anciennes.
                If (Random < t) And (pBomberman.Danger < t) Then Begin
-                  pBomberman.X := pBomberman.LX;
-                  pBomberman.Y := pBomberman.LY;
+                  pBomberman.Position.X := pBomberman.LX;
+                  pBomberman.Position.Y := pBomberman.LY;
                End;
                pBomberman.Danger := t;
                

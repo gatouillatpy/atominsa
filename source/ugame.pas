@@ -345,9 +345,9 @@ Begin
         vCenter.z := vCamera.z + sin(vAngle.x);
      End Else Begin
      // caméra en mode suivi de bomberman
-        vCenter.x := GetBombermanByCount(nCamera).X;
+        vCenter.x := GetBombermanByCount(nCamera).Position.X;
         vCenter.y := 0.0;
-        vCenter.z := GetBombermanByCount(nCamera).Y;
+        vCenter.z := GetBombermanByCount(nCamera).Position.Y;
         If GetBombermanByCount(nCamera).Direction = 0 Then Begin
            vPointer.x := vCenter.x;
            vPointer.y := 3.0;
@@ -391,21 +391,21 @@ Begin
 
      If bLighting Then Begin
         If nPlayerType[1] > 0 Then If GetBombermanByIndex(1).Alive Then
-           SetLight( 0, GetBombermanByIndex(1).X, h, GetBombermanByIndex(1).Y - 2, 1, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 0, GetBombermanByIndex(1).Position.X, h, GetBombermanByIndex(1).Position.Y - 2, 1, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         If nPlayerType[2] > 0 Then If GetBombermanByIndex(2).Alive Then
-           SetLight( 1, GetBombermanByIndex(2).X, h, GetBombermanByIndex(2).Y - 2, 0, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 1, GetBombermanByIndex(2).Position.X, h, GetBombermanByIndex(2).Position.Y - 2, 0, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         If nPlayerType[3] > 0 Then If GetBombermanByIndex(3).Alive Then
-           SetLight( 2, GetBombermanByIndex(3).X, h, GetBombermanByIndex(3).Y - 2, 0, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 2, GetBombermanByIndex(3).Position.X, h, GetBombermanByIndex(3).Position.Y - 2, 0, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         If nPlayerType[4] > 0 Then If GetBombermanByIndex(4).Alive Then
-           SetLight( 3, GetBombermanByIndex(4).X, h, GetBombermanByIndex(4).Y - 2, 1, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 3, GetBombermanByIndex(4).Position.X, h, GetBombermanByIndex(4).Position.Y - 2, 1, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         If nPlayerType[5] > 0 Then If GetBombermanByIndex(5).Alive Then
-           SetLight( 4, GetBombermanByIndex(5).X, h, GetBombermanByIndex(5).Y - 2, 0, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 4, GetBombermanByIndex(5).Position.X, h, GetBombermanByIndex(5).Position.Y - 2, 0, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         If nPlayerType[6] > 0 Then If GetBombermanByIndex(6).Alive Then
-           SetLight( 5, GetBombermanByIndex(6).X, h, GetBombermanByIndex(6).Y - 2, 1, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 5, GetBombermanByIndex(6).Position.X, h, GetBombermanByIndex(6).Position.Y - 2, 1, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         If nPlayerType[7] > 0 Then If GetBombermanByIndex(7).Alive Then
-           SetLight( 6, GetBombermanByIndex(7).X, h, GetBombermanByIndex(7).Y - 2, 1, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 6, GetBombermanByIndex(7).Position.X, h, GetBombermanByIndex(7).Position.Y - 2, 1, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         If nPlayerType[8] > 0 Then If GetBombermanByIndex(8).Alive Then
-           SetLight( 7, GetBombermanByIndex(8).X, h, GetBombermanByIndex(8).Y - 2, 0, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 7, GetBombermanByIndex(8).Position.X, h, GetBombermanByIndex(8).Position.Y - 2, 0, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
      End;
 End;
 
@@ -424,7 +424,7 @@ Begin
           If GetBombermanByCount(i).Alive then
           Begin
                SetTexture( 1, TEXTURE_BOMBERMAN(i) );
-               PushObjectMatrix( GetBombermanByCount(i).X-0.15, 0, GetBombermanByCount(i).Y-0.15, 0.05, 0.05, 0.05, 0, GetBombermanByCount(i).Direction, 0 );
+               PushObjectMatrix( GetBombermanByCount(i).Position.X-0.15, GetBombermanByCount(i).Position.Z, GetBombermanByCount(i).Position.Y-0.15, 0.05, 0.05, 0.05, 0, GetBombermanByCount(i).Direction, 0 );
                DrawMesh( MESH_BOMBERMAN(GetBombermanByCount(i).BIndex), False );
                PopObjectMatrix();
                GetBombermanByCount(i).Update(GetDelta());
@@ -527,7 +527,7 @@ Begin
           End;
           SetMaterial( w * r, w * g, w * b, 1.0 );
           SetTexture( 1, TEXTURE_BOMB(GetBombByCount(i).BIndex) );
-          PushObjectMatrix( GetBombByCount(i).Position.X, 0, GetBombByCount(i).Position.Y,
+          PushObjectMatrix( GetBombByCount(i).Position.X, GetBombByCount(i).Position.Z, GetBombByCount(i).Position.Y,
                             1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
                             1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
                             1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
@@ -935,6 +935,7 @@ Begin
         SetString( STRING_SCORE_TABLE(0), 'draw game!', 1.0, 0.5, 300.0 );
      End Else Begin
         SetString( STRING_SCORE_TABLE(0), GetBombermanByCount(CheckEndGame()).Name + ' wins the round.', 1.0, 0.5, 300.0 );
+        GetBombermanByCount(CheckEndGame()).UpScore();
      End;
 
      // affichage des scores
@@ -1059,7 +1060,7 @@ Begin
         BindKeyObj( nKey1MoveLeft, False, @pPlayer1.MoveLeft );
         BindKeyObj( nKey1MoveRight, False, @pPlayer1.MoveRight );
         BindKeyObj( nKey1Primary, True, @pPlayer1.CreateBomb );
-        //BindKeyObj( nKey1Secondary, True, @pPlayer1.??? );
+        BindKeyObj( nKey1Secondary, True, @pPlayer1.SecondaryKey );
      End;
 
      // affectation des touches au joueur 2

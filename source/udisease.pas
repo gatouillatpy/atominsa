@@ -171,12 +171,12 @@ BEGIN
      until ( ( i <> uPlayer.BIndex ) and (uSecondPlayer.Alive) );  // on termine la boucle quand on a trouve un bomberman autre que celui du joueur qui a prit le bonus et qui n'est pas mort
 
      // Echange de coordonnees des deux joueurs
-     xtemp := uSecondPlayer.X;
-     ytemp := uSecondPlayer.Y;
-     uSecondPlayer.X := uPlayer.X;
-     uSecondPlayer.Y := uPlayer.Y;
-     uPlayer.X := xtemp;
-     uPlayer.Y := ytemp;
+     xtemp := uSecondPlayer.Position.X;
+     ytemp := uSecondPlayer.Position.Y;
+     uSecondPlayer.Position.X := uPlayer.Position.X;
+     uSecondPlayer.Position.Y := uPlayer.Position.Y;
+     uPlayer.Position.X := xtemp;
+     uPlayer.Position.Y := ytemp;
      
      Self.destroy();                    // on peut detruire le bonus
 END;
@@ -201,9 +201,13 @@ procedure CDisease.SmallFlame(); cdecl;
 begin
   if bDisease then
   begin
-    nOldValue:=uPlayer.FlameSize;
-    uPlayer.FlameSize:=2;
-    bDisease:=false;
+    if uPlayer.FlameSize<>2 then       //S'il n'a pas déjà la maladie
+    begin
+      nOldValue:=uPlayer.FlameSize;
+      uPlayer.FlameSize:=2;
+      bDisease:=false;
+    end
+    else Destroy
   end
   else
   begin

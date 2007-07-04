@@ -17,8 +17,11 @@ Type
 CBomb = Class(CBlock)
      Private
        bMoving,                                               // defini si la bombe est en cours de mouvement ou non
-       bJumping    : Boolean;                                 // definit si la bombe rebondit ou non ...
+       bJumping,                                              // definit si la bombe est en cours de saut ...
+       bMoveJump   : Boolean;                                 // definit si la bombe bouge en rebondissant ...
        uGrid       : CGrid;
+       nOriginX,
+       nOriginY,
        nIndex,                                                // definit le joueur qui a pose la bombe
        nMoveDir,                                              // direction de mouvement de la bombe
        nBombSize : integer;                                   // portee de la flamme de la bombe
@@ -31,13 +34,14 @@ CBomb = Class(CBlock)
        pIsBomberman : LPGetBomberman;                         // pointe sur la fonction pour savoir s'il y a un bomberman en telle position
 
        procedure Move(dt : single);                           // fonction interne de mouvement classique
+       procedure MoveJump(dt : Single);
+       procedure Jump(dt : Single);
 
      Public
        Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Overload;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
        Destructor Destroy();Override;
        function UpdateBomb():boolean;                         // check le temps + mouvement
        Procedure Explose();Override;                          // fait exploser la bombe
-       procedure Jump(dt : Single);
        procedure MoveRight(dt : Single);
        procedure MoveDown(dt : Single);
        procedure MoveLeft(dt : Single);
@@ -46,7 +50,7 @@ CBomb = Class(CBlock)
        property CanExplose : boolean Read bExplosive;
        property Position : Vector Read fPosition Write fPosition;
        property Time : Single Read fTimeCreated;
-
+       property JumpMovement : boolean Read bMoveJump Write bMoveJump;
        property BIndex : integer Read nIndex Write nIndex;
 
 end;
@@ -71,7 +75,7 @@ Type LPBombItem = ^BombItem;
 
 
 implementation
-uses UItem;
+uses UItem, uform;
 
 
 
@@ -356,7 +360,7 @@ end;
 
 
 {                                                                               }
-{                             CBomberman                                        }
+{                             CBomb                                             }
 {                                                                               }
 const NONE  = 0;
       UP    = 1;
@@ -493,28 +497,48 @@ procedure CBomb.MoveRight(dt : Single);
 begin
   bMoving := True;
   nMoveDir := RIGHT;
-  Move(dt);
+  if bMoveJump then
+  begin
+    bJumping:=true;
+    Jump(dt);
+  end
+  else Move(dt);
 end;
 
 procedure CBomb.MoveDown(dt : Single);
 begin
   bMoving := True;
   nMoveDir := DOWN;
-  Move(dt);
+  if bMoveJump then
+  begin
+    bJumping:=true;
+    Jump(dt);
+  end
+  else Move(dt);
 end;
 
 procedure CBomb.MoveLeft(dt : Single);
 begin
   bMoving := True;
   nMoveDir := LEFT;
-  Move(dt);
+  if bMoveJump then
+  begin
+    bJumping:=true;
+    Jump(dt);
+  end
+  else Move(dt);
 end;
 
 procedure CBomb.MoveUp(dt : Single);
 begin
   bMoving := True;
   nMoveDir := UP;
-  Move(dt);
+  if bMoveJump then
+  begin
+    bJumping:=true;
+    Jump(dt);
+  end
+  else Move(dt);
 end;
 
 
@@ -529,71 +553,91 @@ end;
 {*******************************************************************************}
 { Deplacement par saut des bombes                                               }
 {*******************************************************************************}
-procedure CBomb.Jump(dt : Single);
-var dX, dY : integer;
-    aX, aY : integer;
+procedure CBomb.MoveJump(dt : single);
+var r : integer;
 begin
-{  {On détermine d'abord la direction du mouvement}
-  dX:=0;
-  dY:=0;
-  case nMoveDir of
-    UP : dY:=-1;
-    DOWN : dY:=1;
-    RIGHT : dX:=1;
-    LEFT :  dX:=-1;
-  end;
-  if fPosition.z>=1.05 then
-  begin
-    fPosition.x:=fPosition.x+dX*BOMBMOVESPEED*dt;
-    fPosition.y:=fPosition.y+dY*BOMBMOVESPEED*dt;
-
-
-    aX:=Trunc(fPosition.x);
-    aY:=Trunc(fPosition.y);
-    if nMoveDir=RIGHT then aX:=aX+1
-    else if nMoveDir=DOWN then aY:=aY+1;
-
-    if Not(CheckCoordinates(aX,aY)) then
-    begin
-      case nMoveDir of
-        UP : fPosition.Y:=GRIDHEIGHT;
-        DOWN : fPosition.y:=1;
-        RIGHT : fPosition.x:=1;
-        LEFT :  fPosition.x:=GRIDWIDTH;
-      end;
-    end;
-    aX:=Trunc(fPosition.x);
-    aY:=Trunc(fPosition.y);
-    if nMoveDir=RIGHT then aX:=aX+1
-    else if nMoveDir=DOWN then aY:=aY+1;
-
-
-    if dX<>0 then fPosition.z:=1+Sin(PI*(fPosition.x-Trunc(fPosition.x)));
-    else if dY <>0 then fPosition.z:=1+Sin(PI*(fPosition.y-Trunc(fPosition.y)));
-  end;
-  
-  if fPosition.z<1.05 then
-  begin
-    if (uGrid.TestBlock(aX,aY)=nil) then
-    begin
-      //if fPosition.z<0.1 then
-      //begin
-        bJumping:=false;
-        fPosition.z:=0;
-      //end;
-    end
-    else
-    begin
-      nMoveDir:=Random(4)+1;
-      fPosition.z:=1.05;
-    end;
-  end; }
+   bJumping:=True;
+   //Repeat
+   r:=Random(4)+1;
+   //until r<>nMoveDir;
+   nMoveDir:=r;
+   Jump(dt);
 end;
 
 
+procedure CBomb.Jump(dt : Single);
+var dX, dY : integer;
+begin
+  dX := 0;
+  dY := 0;
+
+  case nMoveDir of
+    RIGHT : dX := 1;
+    LEFT  : dX := -1;
+    UP    : dY := -1;
+    DOWN  : dY := 1
+  end;
+
+  fPosition.x:=fPosition.x+dX*BOMBMOVESPEED*dt;
+  fPosition.y:=fPosition.y+dY*BOMBMOVESPEED*dt;
+
+  if Not(CheckCoordinates(Trunc(fPosition.x),Trunc(fPosition.y))) then
+  begin
+    case nMoveDir of
+      RIGHT : fPosition.x := 1;
+      LEFT  : fPosition.x := GRIDWIDTH;
+      UP    : fPosition.y := GRIDHEIGHT;
+      DOWN  : fPosition.y := 1;
+    end;
+  end;
+  
+  case nMoveDir of
+    RIGHT, LEFT : begin
+                    fPosition.z:=sin(PI*(fPosition.x-Trunc(fPosition.x)));
+                    if (((fPosition.x-Trunc(fPosition.x))<=0.1) and ( (nOriginX<>Trunc(fPosition.x)) or (nOriginY<>fPosition.y)) )then
+                    begin
+                      if (uGrid.GetBlock(Trunc(fPosition.x),Trunc(fPosition.y))=nil) then
+                      begin
+                        fPosition.z  := 0;
+                        nX           := Trunc(fPosition.x);
+                        nY           := Trunc(fPosition.y);
+                        nOriginX     := nX;
+                        nOriginY     := nY;
+                        fPosition.y  := nY;
+                        fPosition.x  := nX;
+                        uGrid.AddBlock(nX,nY,Self);
+                        bJumping     := false;
+                        bMoveJump    := false;
+                        bMoving      := false;
+                      end
+                      else bJumping:=false;
+                    end;
+                  end;
+    UP, DOWN    : begin
+                    fPosition.z:=sin(PI*(fPosition.y-Trunc(fPosition.y)));
+                      if (((fPosition.y-Trunc(fPosition.y))<=0.1) and ( (nOriginX<>Trunc(fPosition.x)) or (nOriginY<>fPosition.y)) )then
+                      begin
+                        if (uGrid.GetBlock(Trunc(fPosition.x),Trunc(fPosition.y))=nil) then
+                        begin
+                        fPosition.z  := 0;
+                        nX           := Trunc(fPosition.x);
+                        nY           := Trunc(fPosition.y);
+                        fPosition.y  := nY;
+                        fPosition.x  := nX;
+                        nOriginX     := nX;
+                        nOriginY     := nY;
+                        uGrid.AddBlock(nX,nY,Self);
+                        bJumping     := false;
+                        bMoveJump    := false;
+                        bMoving      := false;
+                        end
+                        else bJumping:=false;
+                      end;
+                  end;
+  end;
 
 
-
+end;
 
 
 
@@ -611,13 +655,16 @@ begin
    pIsBomberman    := IsBomberman;
    bExplosive      := true;                                                     //une bombe peut exploser
    bMoving         := False;
-   bJumping        := False;
+   bMoveJump       := False;
+   bJumping        := false;
    nMoveDir        := NONE;
    uGrid           := aGrid;
    nIndex          := aIndex;
    nBombSize       := aBombSize;                                                // la taille des flammes de la bombe est celle de la portee des flammes du joueur qui la cree
    nX              := Trunc(aX);                                                // abscisse de la bombe dans la grille
    nY              := Trunc(aY);                                                // ordonnee de la bombe dans la grille
+   nOriginX        := nX;
+   nOriginY        := nY;
    fPosition.x     := nX;                                                       //abscisse ordonnee reelles
    fPosition.y     := nY;
    fTimeCreated    := 0;
@@ -723,8 +770,17 @@ begin
   aLastTime:=GetTime();
   dt:=aLastTime - fLastTime;
   fLastTime:=aLastTime;
-  fTimeCreated += dt;
-  if bMoving then Move(dt);
+  if Not(bMoveJump) then fTimeCreated += dt;
+  
+  if bMoving then
+  begin
+    if bMoveJump then
+    begin
+      if bJumping then begin Jump(dt); end  else MoveJump(dt);
+    end
+    else Move(dt);
+  end;
+    
   result:=(fTimeCreated >= fExploseTime);
   if result then Explose;
 end;

@@ -20,10 +20,14 @@ type
     fLX, fLY : Single;       // dernières coordonnées
     fDanger : Single;        // pourcentage de risque aux coordonnées courantes
     
-    fXOrigin,                //Position lors de la creation du bomberman
-    fYOrigin,
-    fX,
-    fY,                      //Position Graphique bomberman
+
+
+    fPosition,
+    fOrigin   : Vector;
+    //fXOrigin,                //Position lors de la creation du bomberman
+    //fYOrigin,
+    //fX,
+    //fY,                      //Position Graphique bomberman
     fSpeed,                  //Vitesse du bomberman
     fBombTime : Single;      //Temps avant explosion des bombes
 
@@ -41,6 +45,7 @@ type
     nDirection  : integer;    //Derniere direction de mouvement du bomberman
 
 
+    bDropBomb,
     bEjectBomb,               //Si true = on oblige a lacher ses bombes
     bNoBomb  : Boolean;       //Permet de savoir si on peut poser une bombe ou pas indifferemment du nombre en stock (= maladie)
              //true = je suis malade => je peux pas poser
@@ -57,6 +62,7 @@ type
     procedure DoMove(afX, afY : Single);
     procedure TestCase(aX,aY : integer;var bBomb : boolean;var bResult : boolean);
     procedure MoveBomb(_X,_Y,aX,aY,dX,dY : integer; dt : Single);
+    procedure DropBomb(dt : Single);
     
     function TestBomb(aX,aY : integer):boolean;
     function TestBonus(aX,aY : integer):boolean;
@@ -68,6 +74,7 @@ type
     { public declarations }
   Constructor Create(aName : string; aTeam : integer; aIndex : Integer;
                            aGrid : CGrid; aX, aY : Single);
+  procedure SecondaryKey(dt : single);cdecl;
   procedure MoveUp(dt : Single);cdecl;
   procedure MoveDown(dt : Single);cdecl;
   procedure MoveLeft(dt : Single);cdecl;
@@ -83,8 +90,9 @@ type
 
   function CanBomb():boolean;
 
-  property X : single Read fX Write fX;
-  property Y : single Read fY Write fY;
+  property Position : Vector Read fPosition Write fPosition;
+//  property X : single Read fX Write fX;
+//  property Y : single Read fY Write fY;
   property Direction : integer Read nDirection;
 
   Property LX : Single Read fLX Write fLX;
@@ -138,7 +146,8 @@ type
 
 
 implementation
-uses uItem;        //Classe Item
+uses uItem,        //Classe Item
+     uForm;
 
 
 
@@ -334,13 +343,13 @@ result:=Nil;
 if ((pBombermanItem<>Nil) AND (CheckCoordinates(aX,aY))) then
 begin
  pTemp:=pBombermanItem;
- Find:=((Trunc(pTemp^.Bomberman.X+0.5)=aX) AND (Trunc(pTemp^.Bomberman.Y+0.5)=aY));
+ Find:=((Trunc(pTemp^.Bomberman.Position.X+0.5)=aX) AND (Trunc(pTemp^.Bomberman.Position.Y+0.5)=aY));
  Last:=(pTemp^.Next=Nil);
 
  While Not(Find or Last) do
  begin
   pTemp:=pTemp^.Next;
-  Find:=((Trunc(pTemp^.Bomberman.X+0.5)=aX) AND (Trunc(pTemp^.Bomberman.Y+0.5)=aY));
+  Find:=((Trunc(pTemp^.Bomberman.Position.X+0.5)=aX) AND (Trunc(pTemp^.Bomberman.Position.Y+0.5)=aY));
   Last:=(pTemp^.Next=Nil);
  end;
 
@@ -458,8 +467,8 @@ end;
 
 procedure CBomberman.DoMove(afX, afY : Single);
 begin
- fX:=afX;
- fY:=afY;
+ fPosition.x:=afX;
+ fPosition.y:=afY;
 end;
 
 
@@ -474,7 +483,7 @@ begin
 end
 else
 begin
-  bCanMove:=TestGrid(aX,aY) or Not(ChangeCase(aX,aY,fX,fY));
+  bCanMove:=TestGrid(aX,aY) or Not(ChangeCase(aX,aY,fPosition.x,fPosition.y));
   {Si on peut se deplacer on le fait sans chercher quoi que ce soit}
   if bCanMove then
   begin
@@ -518,8 +527,8 @@ begin
 
   {On repere d'abord dans quel case on est cence arriver}
   delta := 1;
-  _fX:=fX + dx*fSpeed*dt;
-  _fY:=fY + dy*fSpeed*dt;
+  _fX:=fPosition.x + dx*fSpeed*dt;
+  _fY:=fPosition.y + dy*fSpeed*dt;
   _X:=_fX;
   _Y:=_fY;
   if dY=1 then _Y:=_Y+delta;                                                    // mouvement vers le bas
@@ -535,8 +544,8 @@ begin
 
   if bExtrem1 and bExtrem2 then
   begin
-    if bBomb1 then MoveBomb(Trunc(fX+0.5),Trunc(fY+0.5),aX1,aY1,dX,dY,dt)
-    else if bBomb2 then MoveBomb(Trunc(fX+0.5),Trunc(fY+0.5),aX2,aY2,dX,dY,dt)
+    if bBomb1 then MoveBomb(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5),aX1,aY1,dX,dY,dt)
+    else if bBomb2 then MoveBomb(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5),aX2,aY2,dX,dY,dt)
     else
     begin
       DoMove(_fX,_fY);
@@ -548,14 +557,14 @@ begin
   begin
     if bExtrem1 then
     begin
-      if bBomb1 then MoveBomb(Trunc(fX+0.5),Trunc(fY+0.5),aX1,aY1,dX,dY,dt)
+      if bBomb1 then MoveBomb(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5),aX1,aY1,dX,dY,dt)
       else
       begin
         if dX<>0 then
         begin
           if lastDir.y<>1 then
           begin
-            DoMove(fX - abs(dy)*fSpeed*dt,fY - abs(dx)*fSpeed*dt);
+            DoMove(fPosition.x - abs(dy)*fSpeed*dt,fPosition.y - abs(dx)*fSpeed*dt);
             lastDir.x:=dX;
             lastDir.y:=dY;
           end
@@ -569,7 +578,7 @@ begin
         begin
           if lastDir.x<>1 then
           begin
-            DoMove(fX - abs(dy)*fSpeed*dt,fY - abs(dx)*fSpeed*dt);
+            DoMove(fPosition.x - abs(dy)*fSpeed*dt,fPosition.y - abs(dx)*fSpeed*dt);
             lastDir.x:=dX;
             lastDir.y:=dY;
           end
@@ -583,14 +592,14 @@ begin
     end
     else if bExtrem2 then
     begin
-      if bBomb2 then MoveBomb(Trunc(fX+0.5),Trunc(fY+0.5),aX2,aY2,dX,dY,dt)
+      if bBomb2 then MoveBomb(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5),aX2,aY2,dX,dY,dt)
       else
       begin
         if dX<>0 then
         begin
           if lastDir.y<>-1 then
           begin
-            DoMove(fX + abs(dy)*fSpeed*dt,fY + abs(dx)*fSpeed*dt);
+            DoMove(fPosition.x + abs(dy)*fSpeed*dt,fPosition.y + abs(dx)*fSpeed*dt);
             lastDir.x:=dX;
             lastDir.y:=dY;
           end
@@ -604,7 +613,7 @@ begin
         begin
           if lastDir.x<>-1 then
           begin
-            DoMove(fX + abs(dy)*fSpeed*dt,fY + abs(dx)*fSpeed*dt);
+            DoMove(fPosition.x + abs(dy)*fSpeed*dt,fPosition.y + abs(dx)*fSpeed*dt);
             lastDir.x:=dX;
             lastDir.y:=dY;
           end
@@ -624,8 +633,8 @@ begin
   end;
   if (((dX=1) or (dY=1)) AND (Not(bExtrem1 or bExtrem2))) then
   begin
-    if dX=1 then begin if (_fX-Trunc(_fX))<0.4 then DoMove(_fX,fY); end
-    else if (_fY-Trunc(_fY))<0.4 then DoMove(fX,_fY);
+    if dX=1 then begin if (_fX-Trunc(_fX))<0.4 then DoMove(_fX,Position.y); end
+    else if (_fY-Trunc(_fY))<0.4 then DoMove(Position.x,_fY);
   end;
 end;
 
@@ -702,8 +711,8 @@ if bAlive then
  begin
   bAlive:=False;
   Inc(nDeaths);
-  fX:=0;
-  fY:=0;
+  fPosition.x:=0;
+  fPosition.y:=0;
  end;
 end;
 
@@ -721,10 +730,14 @@ begin
  result := ((nBombCount<>0) And Not(NoBomb));
 end;
 
+
+
 procedure CBomberman.UpBombCount(); cdecl;
 begin
   nBombCount +=1;
 end;
+
+
 
 procedure CBomberman.CreateBomb(dt : Single); cdecl;
 begin
@@ -732,11 +745,13 @@ begin
   begin
     if CanBomb  then
     begin
-      if AddBomb(fX+0.5,fY+0.5,nIndex,nFlameSize,fBombTime,uGrid,@UpBombCount,@IsBombermanAtCoo) then
+      if AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,uGrid,@UpBombCount,@IsBombermanAtCoo) then
         Dec(nBombCount);
     end;
   end;
 end;
+
+
 
 procedure CBomberman.MoveBomb(_X,_Y,aX,aY,dX,dY : integer; dt : Single);
 var _Bomb : CBomb;
@@ -748,6 +763,49 @@ begin
    else if dX=-1 then _Bomb.MoveLeft(dt)
    else if dY=1 then _Bomb.MoveDown(dt)
    else if dY=-1 then _Bomb.MoveUp(dt);
+  end;
+end;
+
+
+
+procedure CBomberman.DropBomb(dt : Single);
+var aBomb : CBomb;
+    dX, dY : integer;
+    delta : single;
+begin
+  delta := 0.3;
+  dX := Trunc(fPosition.x);
+  dY := Trunc(fPosition.y);
+
+  case nDirection of
+    0    : begin  //bas
+             dY := Trunc(fPosition.y+delta)+1;;
+           end;
+    90   : begin  //gauche
+             dX := Trunc(fPosition.x-delta);
+           end;
+    -180 : begin  //haut
+             dY := Trunc(fPosition.y-delta);
+           end;
+    -90  : begin  //droite
+             dX := Trunc(fPosition.x+delta)+1;
+           end;
+  end;
+
+if CheckCoordinates(dX,dY) then
+  if ((uGrid.GetBlock(dX,dY)<>nil) AND (uGrid.GetBlock(dX,dY) is CBomb)) then
+  begin
+    AddLineToConsole('ya une bombe');
+    aBomb:=CBomb(uGrid.GetBlock(dX,dY));
+    uGrid.DelBlock(dX,dY);
+    aBomb.JumpMovement:=True;
+    case nDirection of
+      0    : aBomb.MoveDown(dt);
+      90   : aBomb.MoveLeft(dt);
+      -180 : aBomb.MoveUp(dt);
+      -90  : aBomb.MoveRight(dt);
+    end;
+
   end;
 end;
 
@@ -768,14 +826,15 @@ begin
   sName          := aName;
   nTeam          := aTeam;
   nIndex         := aIndex;
-  fX             := aX;
-  fY             := aY;
-  fXOrigin       := aX;
-  fYOrigin       := aY;
+  fPosition.x    := aX;
+  fPosition.y    := aY;
+  fPosition.z    := 0;
+  fOrigin        := fPosition;
   uGrid          := aGrid;
   nKills         := 0;
   nDeaths        := 0;
   nScore         := 0;
+  bDropBomb      := true;///////////////////////////////////////////////////////////////
   bEjectBomb     := false;
   bNoBomb        := False;
   bReverse       := False;
@@ -792,11 +851,13 @@ begin
 end;
 
 
+
+
 procedure CBomberman.Restore();
 begin
   bAlive        := True;
-  fX            := fXOrigin;
-  fY            := fYOrigin;
+  fPosition     := fOrigin;
+  bDropBomb     := True; ////////////////////////////////////////////////////////////
   bEjectBomb    := false;
   bNoBomb       := False;
   bReverse      := False;
@@ -838,11 +899,11 @@ end;
 procedure CBomberman.CheckBonus();
 var oldX, oldY : integer;
 begin
-  if Not(uGrid.getBlock(Trunc(fX+0.5),Trunc(fY+0.5))=Nil) then
-     if (uGrid.getBlock(Trunc(fX+0.5),Trunc(fY+0.5)) is CItem) then
+  if Not(uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil) then
+     if (uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5)) is CItem) then
       begin
-         oldX:=Trunc(fX+0.5);                                                   //a cause de la maladie SWITCH il faut se souvenir de ou il etait
-         oldY:=Trunc(fY+0.5);                                                   //avant de prendre le bonus
+         oldX:=Trunc(fPosition.x+0.5);                                                   //a cause de la maladie SWITCH il faut se souvenir de ou il etait
+         oldY:=Trunc(fPosition.y+0.5);                                                   //avant de prendre le bonus
          CItem(uGrid.getBlock(oldX,oldY)).Bonus(Self);
          uGrid.DelBlock(oldX,oldY);
       end;
@@ -852,5 +913,20 @@ procedure CBomberman.ChangeReverse();
 begin
   bReverse:=Not(bReverse);
 end;
+
+
+
+
+
+
+
+{*******************************************************************************}
+{ Gestion de la seconde touche d'action                                         }
+{*******************************************************************************}
+procedure CBomberman.SecondaryKey(dt: single); cdecl;
+begin
+ if bDropBomb then DropBomb(dt);
+end;
+
 
 end.

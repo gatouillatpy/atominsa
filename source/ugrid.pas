@@ -38,7 +38,7 @@ End;
 
 Implementation
 
-Uses UExtraBomb, UFlameUp, uFlame, UDisease, USpeedUp, UKick;
+Uses UExtraBomb, UFlameUp, uFlame, UDisease, USpeedUp, UKick, uForm;
 
 
 { CGrid }
@@ -131,6 +131,7 @@ end;
 Procedure CGrid.DelBlock ( x, y : Integer ) ;
 Begin
      aBlock[x,y] := Nil; //on vide la case (x,y) du tableau
+     AddLineToConsole('vire de '+inttostr(x)+' '+inttostr(y));
 End;
 
 
