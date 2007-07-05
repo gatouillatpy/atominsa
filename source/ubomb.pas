@@ -1,4 +1,3 @@
-//faire le mouvement par rebond
 Unit UBomb;
 
 {$mode objfpc}{$H+}
@@ -16,6 +15,7 @@ Type
 
 CBomb = Class(CBlock)
      Private
+       bUpdateTime,
        bMoving,                                               // defini si la bombe est en cours de mouvement ou non
        bJumping,                                              // definit si la bombe est en cours de saut ...
        bMoveJump   : Boolean;                                 // definit si la bombe bouge en rebondissant ...
@@ -41,6 +41,8 @@ CBomb = Class(CBlock)
        Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Overload;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
        Destructor Destroy();Override;
        function UpdateBomb():boolean;                         // check le temps + mouvement
+       procedure StartTime();
+       procedure StopTime();
        Procedure Explose();Override;                          // fait exploser la bombe
        procedure MoveRight(dt : Single);
        procedure MoveDown(dt : Single);
@@ -770,7 +772,7 @@ begin
   aLastTime:=GetTime();
   dt:=aLastTime - fLastTime;
   fLastTime:=aLastTime;
-  if Not(bMoveJump) then fTimeCreated += dt;
+  if (Not(bMoveJump) and bUpdateTime) then fTimeCreated += dt;
   
   if bMoving then
   begin
@@ -783,6 +785,16 @@ begin
     
   result:=(fTimeCreated >= fExploseTime);
   if result then Explose;
+end;
+
+procedure CBomb.StartTime();
+begin
+  bUpdateTime := true;
+end;
+
+procedure CBomb.StopTime();
+begin
+  bUpdateTime := false;
 end;
 
 

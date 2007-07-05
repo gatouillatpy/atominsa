@@ -107,10 +107,10 @@ Procedure LoadMap () ;
 Procedure SetCamera () ;
 Procedure SetLighting ( h : Single ; a0, a1, a2 : Single ) ;
 
-Procedure DrawBomberman ( w : Single ) ;
+Procedure DrawBomberman ( w : Single; bUpdate : boolean ) ;
 Procedure DrawGrid ( w : Single ) ;
-Procedure DrawBomb ( w : Single ) ;
-Procedure DrawFlame ( w : Single ) ;
+Procedure DrawBomb ( w : Single; bUpdate : boolean ) ;
+Procedure DrawFlame ( w : Single; bUpdate : boolean ) ;
 Procedure DrawPlane ( w : Single ) ;
 Procedure DrawTimer () ;
 Procedure DrawScore () ;
@@ -411,7 +411,7 @@ End;
 
 
 
-Procedure DrawBomberman ( w : Single ) ;
+Procedure DrawBomberman ( w : Single; bUpdate : boolean ) ;
 Var i : Integer;
 Begin
      EnableLighting();
@@ -427,7 +427,7 @@ Begin
                PushObjectMatrix( GetBombermanByCount(i).Position.X-0.15, GetBombermanByCount(i).Position.Z, GetBombermanByCount(i).Position.Y-0.15, 0.05, 0.05, 0.05, 0, GetBombermanByCount(i).Direction, 0 );
                DrawMesh( MESH_BOMBERMAN(GetBombermanByCount(i).BIndex), False );
                PopObjectMatrix();
-               GetBombermanByCount(i).Update(GetDelta());
+               if bUpdate then GetBombermanByCount(i).Update(GetDelta());
           End;
      End;
 End;
@@ -473,7 +473,7 @@ Begin
                     SetMaterial( w, w, 0, 1.0 );
                     SetTexture( 1, TEXTURE_NONE );
                     PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
-                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////Mette le mesh du Kick
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mette le mesh du Kick
                     PopObjectMatrix();
                  End Else If (pBlock Is CItem) Then Begin
                     SetMaterial( w, w, w, 1.0 );
@@ -502,7 +502,7 @@ End;
 
 
 
-Procedure DrawBomb ( w : Single ) ;
+Procedure DrawBomb ( w : Single; bUpdate : boolean ) ;
 Var i : Integer;
 Var r, g, b : Single;
 Begin
@@ -534,13 +534,17 @@ Begin
                             0, 0, 0 );
           DrawMesh( MESH_BOMB(GetBombByCount(i).BIndex), False );
           PopObjectMatrix();
-          If Not GetBombByCount(i).UpdateBomb() Then i += 1;
+          if bUpdate then
+          begin
+            If Not GetBombByCount(i).UpdateBomb() Then i += 1;
+          end
+          else i += 1;
     End;
 End;
 
 
 
-Procedure DrawFlame ( w : Single ) ;
+Procedure DrawFlame ( w : Single; bUpdate : boolean ) ;
 Var i : Integer;
 Var r, g, b : Single;
 Begin
@@ -622,7 +626,11 @@ Begin
           DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
           PopObjectMatrix();
           // mise à jour
-          If Not GetFlameByCount(i).Update() Then i += 1;
+          if bUpdate then
+          begin
+            If Not GetFlameByCount(i).Update() Then i += 1;
+          end
+          else i+=1;
      End;
 End;
 
@@ -962,10 +970,10 @@ Begin
      // rendu des reflets
      If bReflection Then Begin
         PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
-        DrawBomberman( 0.4 );
+        DrawBomberman( 0.4,false );
         DrawGrid( 0.4 );
-        DrawBomb( 0.4 );
-        DrawFlame( 0.4 );
+        DrawBomb( 0.4,false );
+        DrawFlame( 0.4,false );
         PopObjectMatrix();
         PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
         DrawSkybox( 0.4, 0.4, 0.4, 0.4, TEXTURE_MAP_SKYBOX(0) );
@@ -974,10 +982,10 @@ Begin
 
      // rendu global
      DrawPlane( 1.0 );
-     DrawBomberman( 1.0 );
+     DrawBomberman( 1.0,false );
      DrawGrid( 1.0 );
-     DrawBomb( 1.0 );
-     DrawFlame( 1.0 );
+     DrawBomb( 1.0,false );
+     DrawFlame( 1.0,false );
      DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
 
      // affichage du vainqueur
@@ -1153,10 +1161,10 @@ Begin
      // rendu des reflets
      If bReflection Then Begin
         PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
-        DrawBomberman( 0.4 );
+        DrawBomberman( 0.4,false );
         DrawGrid( 0.4 );
-        DrawBomb( 0.4 );
-        DrawFlame( 0.4 );
+        DrawBomb( 0.4,false );
+        DrawFlame( 0.4,false );
         PopObjectMatrix();
         PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
         DrawSkybox( 0.4, 0.4, 0.4, 0.4, TEXTURE_MAP_SKYBOX(0) );
@@ -1165,10 +1173,10 @@ Begin
 
      // rendu global
      DrawPlane( 1.0 );
-     DrawBomberman( 1.0 );
+     DrawBomberman( 1.0,true );
      DrawGrid( 1.0 );
-     DrawBomb( 1.0 );
-     DrawFlame( 1.0 );
+     DrawBomb( 1.0,true );
+     DrawFlame( 1.0,true );
      DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
      
      // affichage des scores
@@ -1661,7 +1669,7 @@ Begin
 
      // rendu du plateau
      DrawPlane( 0.3 );
-     DrawBomberman( 0.3 );
+     DrawBomberman( 0.3,false );
      DrawGrid( 0.3 );
      DrawSkybox( 0.3, 0.3, 0.3, 0.3, TEXTURE_MAP_SKYBOX(0) );
 

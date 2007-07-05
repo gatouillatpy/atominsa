@@ -21,9 +21,7 @@ Technique :
  - mode solo
 
 Gameplay :
- - BUG : LES SCORES RESTENT A ZERO !!! ON NE GAGNE PAS DE POINT EN REMPORTANT LE ROUND
- - finir la fonction jump des bombes
- - implémenter les bonus kick, grab, push, spooger, trigger, jelly, goldflame, baddisease
+ - implémenter les bonus grab, push, spooger, trigger, jelly, goldflame, baddisease
  - terminer l'implémentation des maladies 
  - rendre les maladies contagieuses
  - rendre certaines bombes défectueuses (leur minuterie est random)

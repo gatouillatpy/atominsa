@@ -46,7 +46,6 @@ type
 
 
     bSecondaryPressed,
-    bGrabBomb,                // porte t il une bombe ?
     bCanGrabBomb,             // Peut il porter une bombe ... (le bonus)
     bEjectBomb,               //Si true = on oblige a lacher ses bombes
     bNoBomb  : Boolean;       //Permet de savoir si on peut poser une bombe ou pas indifferemment du nombre en stock (= maladie)
@@ -802,6 +801,7 @@ begin
   begin
     uGrabbedBomb:=CBomb(uGrid.GetBlock(dX,dY));
     uGrid.DelBlock(dX,dY);
+    uGrabbedBomb.StopTime();
     uGrabbedBomb.Position.z:=1;
   end;
 end;
@@ -812,6 +812,8 @@ procedure CBomberman.DropBomb(dt : Single);
 begin
   if uGrabbedBomb<>nil then
   begin
+    uGrabbedBomb.StartTime();
+    uGrabbedBomb.Position.Z:=0;
     uGrabbedBomb.JumpMovement:=True;
     case nDirection of
       0    : uGrabbedBomb.MoveDown(dt);
@@ -905,7 +907,12 @@ procedure CBomberman.Update(dt : Single);
 begin
   CheckBonus;
   if bEjectBomb then CreateBomb(dt);
-  if (Not(bSecondaryPressed) and (uGrabbedBomb<>nil)) then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
+  if (uGrabbedBomb<>nil) then
+  begin
+    uGrabbedBomb.Position.x:=fPosition.x;
+    uGrabbedBomb.Position.y:=fPosition.y;
+    if Not(bSecondaryPressed) then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
+  end;
   bSecondaryPressed := false;
 end;
 

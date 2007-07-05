@@ -131,7 +131,6 @@ end;
 Procedure CGrid.DelBlock ( x, y : Integer ) ;
 Begin
      aBlock[x,y] := Nil; //on vide la case (x,y) du tableau
-     AddLineToConsole('vire de '+inttostr(x)+' '+inttostr(y));
 End;
 
 
