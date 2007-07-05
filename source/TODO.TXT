@@ -21,7 +21,7 @@ Technique :
  - mode solo
 
 Gameplay :
- - implémenter les bonus grab, push, spooger, trigger, jelly, goldflame, baddisease
+ - implémenter les bonus push, spooger, trigger, jelly, goldflame, baddisease
  - terminer l'implémentation des maladies 
  - rendre les maladies contagieuses
  - rendre certaines bombes défectueuses (leur minuterie est random)

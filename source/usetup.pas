@@ -822,7 +822,7 @@ Begin
      nDisplayRefreshrate := 60;
 
      nRoundCount := 3;
-     fRoundDuration := 180.0;
+     fRoundDuration := 180.0*2;
      
      pScheme := NIL;
      nScheme := -1;

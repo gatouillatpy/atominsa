@@ -11,7 +11,7 @@ Interface
 
 Uses Classes, SysUtils,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
-     USpeedUp, UExtraBomb, UFlameUp, UKick, UGrid, UFlame, UBomb, USetup, UForm,
+     USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UGrid, UFlame, UBomb, USetup, UForm,
      UCharacter, UComputer;
 
 
@@ -470,10 +470,16 @@ Begin
                     DrawMesh( MESH_FLAMEUP, True );
                     PopObjectMatrix();
                  End Else If (pBlock Is CKick) And (pBlock As CItem).IsExplosed() Then Begin
-                    SetMaterial( w, w, 0, 1.0 );
+                    SetMaterial( w, w, 1.0, 1.0 );
                     SetTexture( 1, TEXTURE_NONE );
                     PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
-                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mette le mesh du Kick
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du Kick
+                    PopObjectMatrix();
+                 End Else If (pBlock Is CGrab) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( w, w, 1.0, 0.5 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du GRAB
                     PopObjectMatrix();
                  End Else If (pBlock Is CItem) Then Begin
                     SetMaterial( w, w, w, 1.0 );
@@ -1072,13 +1078,13 @@ Begin
      End;
 
      // affectation des touches au joueur 2
-     If pPlayer1 <> NIL Then Begin
+     If pPlayer2 <> NIL Then Begin
         BindKeyObj( nKey2MoveUp, False, @pPlayer2.MoveUp );
         BindKeyObj( nKey2MoveDown, False, @pPlayer2.MoveDown );
         BindKeyObj( nKey2MoveLeft, False, @pPlayer2.MoveLeft );
         BindKeyObj( nKey2MoveRight, False, @pPlayer2.MoveRight );
         BindKeyObj( nKey2Primary, True, @pPlayer2.CreateBomb );
-        //BindKeyObj( nKey2Secondary, True, @pPlayer2.??? );
+        BindKeyObj( nKey2Secondary, True, @pPlayer2.SecondaryKey );
      End;
 
      // fin de partie si un joueur a gagné un certain nombre de rounds

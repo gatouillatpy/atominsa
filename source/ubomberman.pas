@@ -22,16 +22,12 @@ type
     
 
 
-    fPosition,
-    fOrigin   : Vector;
-    //fXOrigin,                //Position lors de la creation du bomberman
-    //fYOrigin,
-    //fX,
-    //fY,                      //Position Graphique bomberman
+    fPosition,               // position graphique du personnage
+    fOrigin   : Vector;      // position a la creation du personnage
     fSpeed,                  //Vitesse du bomberman
     fBombTime : Single;      //Temps avant explosion des bombes
 
-    lastDir   : vectorN;     // memorise la derniere direction du bomberman
+    lastDir   : vectorN;     // memorise la derniere direction de mouvement du bomberman
 
     sName     : string;       //nom du joueur
 
@@ -96,8 +92,6 @@ type
   function CanBomb():boolean;
 
   property Position : Vector Read fPosition Write fPosition;
-//  property X : single Read fX Write fX;
-//  property Y : single Read fY Write fY;
   property Direction : integer Read nDirection;
 
   Property LX : Single Read fLX Write fLX;
@@ -151,8 +145,8 @@ type
 
 
 implementation
-uses uItem,        //Classe Item
-     uForm;
+uses uItem;        //Classe Item
+
 
 
 
@@ -802,7 +796,7 @@ begin
     uGrabbedBomb:=CBomb(uGrid.GetBlock(dX,dY));
     uGrid.DelBlock(dX,dY);
     uGrabbedBomb.StopTime();
-    uGrabbedBomb.Position.z:=1;
+    uGrabbedBomb.Position.z:=0.75;
   end;
 end;
 
@@ -840,33 +834,17 @@ end;
 constructor CBomberman.Create(aName: string; aTeam: integer; aIndex : Integer;
                                aGrid : CGrid; aX, aY : Single);
 begin
-  sName           := aName;
-  nTeam           := aTeam;
-  nIndex          := aIndex;
-  fPosition.x     := aX;
-  fPosition.y     := aY;
-  fPosition.z     := 0;
-  fOrigin         := fPosition;
-  uGrid           := aGrid;
-  uGrabbedBomb    := nil;
-  nKills          := 0;
-  nDeaths         := 0;
-  nScore          := 0;
-  bSecondaryPressed := false;
-  bCanGrabBomb       := true;///////////////////////////////////////////////////////////////
-  bEjectBomb      := false;
-  bNoBomb         := False;
-  bReverse        := False;
-  bKick           := false;
-  bAlive          := True;
-  nBombCount      := DEFAULTBOMBCOUNT;
-  fBombTime       := BOMBTIME;
-  nFlameSize      := DEFAULTFLAMESIZE;
-  fSpeed          := DEFAULTSPEED;
-  nDirection      := 0;
-  lastDir.x       := 0;
-  lastDir.y       := 0;
-  lastDir.z       := 0;
+  sName              := aName;
+  nTeam              := aTeam;
+  nIndex             := aIndex;
+  fOrigin.x          := aX;
+  fOrigin.y          := aY;
+  fOrigin.z          := 0;
+  uGrid              := aGrid;
+  nKills             := 0;
+  nDeaths            := 0;
+  nScore             := 0;
+  lastDir.z          := 0;
 end;
 
 
@@ -874,22 +852,22 @@ end;
 
 procedure CBomberman.Restore();
 begin
-  bAlive          := True;
-  fPosition       := fOrigin;
-  bSecondaryPressed := false;
-  bCanGrabBomb       := True; ////////////////////////////////////////////////////////////
-  bEjectBomb      := false;
-  bNoBomb         := False;
-  bReverse        := False;
-  bKick           := false;
-  nBombCount      := DEFAULTBOMBCOUNT;
-  fBombTime       := BOMBTIME;
-  nFlameSize      := DEFAULTFLAMESIZE;
-  fSpeed          := DEFAULTSPEED;
-  nDirection      := 0;
-  lastDir.x       := 0;
-  lastDir.y       := 0;
-  uGrabbedBomb    := nil;
+  bAlive             := True;
+  fPosition          := fOrigin;
+  bSecondaryPressed  := false;
+  bCanGrabBomb       := false;
+  bEjectBomb         := false;
+  bNoBomb            := False;
+  bReverse           := False;
+  bKick              := false;
+  nBombCount         := DEFAULTBOMBCOUNT;
+  fBombTime          := BOMBTIME;
+  nFlameSize         := DEFAULTFLAMESIZE;
+  fSpeed             := DEFAULTSPEED;
+  nDirection         := 0;
+  lastDir.x          := 0;
+  lastDir.y          := 0;
+  uGrabbedBomb       := nil;
 end;
 
 

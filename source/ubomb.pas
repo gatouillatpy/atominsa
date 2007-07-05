@@ -77,7 +77,7 @@ Type LPBombItem = ^BombItem;
 
 
 implementation
-uses UItem, uform;
+uses UItem;
 
 
 
@@ -655,6 +655,7 @@ constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime 
 begin
    pUpCount        := UpCount;
    pIsBomberman    := IsBomberman;
+   bUpdateTime     := true;
    bExplosive      := true;                                                     //une bombe peut exploser
    bMoving         := False;
    bMoveJump       := False;
