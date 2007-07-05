@@ -91,7 +91,7 @@ var pBombItem : LPBombItem = NIL;
 
 
 
-Procedure UpdateCountList(i : integer);Forward;                                 // pour lui dire que la procedure existe plus loin
+Procedure UpdateCountList();Forward;                                 // pour lui dire que la procedure existe plus loin
 
 
 
@@ -158,7 +158,7 @@ begin
    pTemp^.Bomb.Free;
    Dec(BombCount);
    Dispose(pTemp);
-   UpdateCountList(i);
+   UpdateCountList();
   end;
 end;
 end;
@@ -169,7 +169,6 @@ end;
 procedure RemoveBombByGridCoo(aX,aY : integer);
 var pTemp,pPrev : LPBombItem;
     Find, Last : Boolean;
-    i : integer;
 begin
 pPrev:=Nil;
 if ((pBombItem<>Nil) AND CheckCoordinates(aX,aY)) then
@@ -191,10 +190,9 @@ begin
    if (pPrev<>Nil) then pPrev^.Next:=pTemp^.Next
    else pBombItem:=pTemp^.Next;
    pTemp^.Bomb.Free;
-   i:=pTemp^.Count;
    Dec(BombCount);
    Dispose(pTemp);
-   UpdateCountList(i);
+   UpdateCountList();
   end;
 end;
 end;
@@ -205,7 +203,6 @@ end;
 procedure RemoveThisBomb(bomb: CBomb);
 var Find : boolean;
     pTemp, pPrev : LPBombItem;
-    Count : integer;
 begin
 Find:=False;
 pPrev:=Nil;
@@ -222,10 +219,9 @@ pPrev:=Nil;
     end;
 
     if pPrev<>nil then pPrev^.Next:=pTemp^.Next else pBombItem:=pTemp^.Next;
-    Count:=pTemp^.Count;
     Dispose(pTemp);
     Dec(BombCount);
-    UpdateCountList(Count);
+    UpdateCountList();
   end;
 end;
 
@@ -327,18 +323,19 @@ end;
 {*******************************************************************************}
 { Fonctions Diverses                                                            }
 {*******************************************************************************}
-Procedure UpdateCountList(i : integer);
-var Count : integer;
+Procedure UpdateCountList();
+var i : integer;
     pTemp : LPBombItem;
 begin
- Count:=1;
+ if BombCount<>0 then
+ begin
   pTemp:=pBombItem;
-  While (Count<=BombCount) do
+  for i:=1 to BombCount do
   begin
-   if (Count>=i) then pTemp^.Count:=Count;
-   Inc(Count);
-   pTemp:=pTemp^.Next;
+    pTemp^.Count:=i;
+    pTemp:=pTemp^.Next;
   end;
+ end;
 end;
 
 
