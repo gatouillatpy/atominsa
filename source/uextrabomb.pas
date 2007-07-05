@@ -6,7 +6,7 @@ Unit UExtraBomb;
 
 Interface
 
-Uses Classes, SysUtils, UItem, UBomberman, UUtils;
+Uses Classes, SysUtils, UItem, UBomberman, UUtils, UCore;
 
 Type
 
@@ -27,10 +27,12 @@ Implementation
 
 Procedure CExtraBomb.Bonus( nPlayer : CBomberman );
 Begin
-     if nPlayer.BombCount<>MAXBOMBCOUNT then
-       nPlayer.BombCount := nPlayer.BombCount + 1; // augmente le nombre de bombes du joueur de 1
-       self.destroy();        // on peut detruire le bonus
+     SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up an extra bomb.', 0.0, 0.2, 5 );
 
+     If nPlayer.BombCount < MAXBOMBCOUNT Then
+        nPlayer.BombCount := nPlayer.BombCount + 1; // augmente le nombre de bombes du joueur d'une unité
+
+     Self.Destroy(); // on peut detruire le bonus
 End;
 
 

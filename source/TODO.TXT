@@ -1,5 +1,6 @@
 Technique :
  - mode réseau :
+   - QUESTION : comment gérer la synchronisation des ressources?
    - dès la connexion établie le serveur renvoie toutes les données sur les joueurs
    - à chaque frame le client s'occupe de ses joueurs uniquement (prévoir un boolean dans CBomberman)
    - le client renvoie les données concernant ses joueurs

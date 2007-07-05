@@ -6,7 +6,7 @@ Unit UKick;
 
 Interface
 
-Uses Classes, SysUtils, UItem, UBomberman;
+Uses Classes, SysUtils, UItem, UBomberman, UCore, UUtils;
 
 Type
 
@@ -27,8 +27,10 @@ Implementation
 
 Procedure CKick.Bonus( nPlayer : CBomberman ) ;
 Begin
-       nPlayer.ChangeKick();
-       self.destroy();
+     SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up the ability to kick bombs.', 0.0, 0.2, 5 );
+     
+     nPlayer.ChangeKick();
+     self.destroy();
 End;
 
 

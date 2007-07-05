@@ -53,7 +53,6 @@ Constructor CPowerUp.Create ( _nCode : Integer ;
                               _nGameQuantity : Integer ;
                               _bForbidden : Boolean ) ;
 Begin
-
      nCode := _nCode;
 
      nInitQuantity := _nInitQuantity;
@@ -62,12 +61,10 @@ Begin
      If _nGameQuantity > 0 Then nGameQuantity := _nGameQuantity Else nGameQuantity := Random(-_nGameQuantity+1);
      
      bForbidden := _bForbidden;
-
 End;
 
 Function CPowerUp.Name : String ;
 Begin
-
      Case nCode Of
           POWERUP_EXTRABOMB    : Result := 'an extra bomb';
           POWERUP_FLAMEUP      : Result := 'a flame upgrade';
@@ -83,12 +80,10 @@ Begin
           POWERUP_SUPERDISEASE : Result := 'a very bad disease';
           POWERUP_RANDOM       : Result := 'something';
      End;
-     
 End;
 
 Function CPowerUp.InitQuantity : Integer ;
 Begin
-
      If nInitQuantity > 0 Then
           Result := nInitQuantity
      Else Begin
@@ -108,12 +103,10 @@ Begin
                POWERUP_RANDOM       : Result := 0;
           End;
      End;
-
 End;
 
 Function CPowerUp.GameQuantity : Integer ;
 Begin
-
      If bGameOverride Then
           Result := nGameQuantity
      Else Begin
@@ -133,7 +126,7 @@ Begin
                POWERUP_RANDOM       : Result := 3;
           End;
      End;
-     
+
 End;
 
 

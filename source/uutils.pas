@@ -106,12 +106,14 @@ Const BLOCK_BLANK = 0;
 
 
 // constantes de définition des sons
-Const SOUND_MENU_MOVE    = 1;
-      SOUND_MENU_SELECT  = 2;
-      SOUND_MENU_BACK    = 3;
-      SOUND_MENU_CLICK   = 4;
+Const SOUND_MENU_MOVE    = 101;
+      SOUND_MENU_SELECT  = 102;
+      SOUND_MENU_BACK    = 103;
+      SOUND_MENU_CLICK   = 104;
 
-      SOUND_BOMB_NULL    = 10;
+      SOUND_MESSAGE      = 201;
+
+      SOUND_BOMB_NULL    = 300;
 
 Function SOUND_BOMB( k : Integer ) : Integer ;
 
@@ -200,9 +202,11 @@ Const STRING_SCORE_TABLE_NULL   =  0;
       STRING_MENU_MAIN          =  1;
       STRING_EDITOR_MENU_NULL   =  0;
       STRING_SETUP_MENU_NULL    =  0;
-      STRING_GAME_MENU_NULL =  0;
+      STRING_GAME_MENU_NULL     =  0;
       STRING_TIMER              = 10;
       STRING_SCREEN             = 11;
+      STRING_MESSAGE            = 12;
+      STRING_NOTIFICATION       = 13;
 
 Function STRING_SCORE_TABLE( k : Integer ) : Integer ;
 Function STRING_EDITOR_MENU( k : Integer ) : Integer ;

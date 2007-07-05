@@ -60,6 +60,11 @@ Var nPlayer  : Integer;
 
 
 
+Var bMessage : Boolean;
+    sMessage : String;
+
+
+
 Var bUp     : Boolean;
 Var bDown   : Boolean;
 Var bLeft   : Boolean;
@@ -101,6 +106,7 @@ Var pPlayer1 : CBomberman;
 
 
 
+Procedure LoadCharacter ( tPlayer : Integer ) ;
 Procedure LoadScheme () ;
 Procedure LoadMap () ;
 
@@ -171,6 +177,33 @@ Implementation
 ////////////////////////////////////////////////////////////////////////////////
 // CHARGEMENT                                                                 //
 ////////////////////////////////////////////////////////////////////////////////
+
+
+
+Procedure LoadCharacter ( tPlayer : Integer ) ;
+Begin
+     If nPlayerCharacter[tPlayer] = -1 Then Begin
+        pPlayerCharacter[tPlayer] := aCharacterList[Trunc(Random(nCharacterCount))];
+     End Else Begin
+        pPlayerCharacter[tPlayer] := aCharacterList[nPlayerCharacter[tPlayer]];
+     End;
+     DelMesh( MESH_BOMBERMAN(tPlayer) );
+     AddMesh( './characters/' + pPlayerCharacter[tPlayer].PlayerMesh, MESH_BOMBERMAN(tPlayer) );
+     DelMesh( MESH_BOMB(tPlayer) );
+     AddMesh( './characters/' + pPlayerCharacter[tPlayer].BombMesh, MESH_BOMB(tPlayer) );
+     DelTexture( TEXTURE_BOMBERMAN(tPlayer) );
+     AddTexture( './characters/' + pPlayerCharacter[tPlayer].PlayerSkin[tPlayer], TEXTURE_BOMBERMAN(tPlayer) );
+     DelTexture( TEXTURE_BOMB(tPlayer) );
+     AddTexture( './characters/' + pPlayerCharacter[tPlayer].BombSkin, TEXTURE_BOMB(tPlayer) );
+     DelTexture( TEXTURE_FLAME(tPlayer) );
+     AddTexture( './characters/' + pPlayerCharacter[tPlayer].FlameTexture, TEXTURE_FLAME(tPlayer) );
+     DelSound( SOUND_BOMB(10+tPlayer) );
+     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[1], SOUND_BOMB(10+tPlayer) );
+     DelSound( SOUND_BOMB(20+tPlayer) );
+     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[2], SOUND_BOMB(20+tPlayer) );
+     DelSound( SOUND_BOMB(30+tPlayer) );
+     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[3], SOUND_BOMB(30+tPlayer) );
+End;
 
 
 
@@ -411,7 +444,7 @@ End;
 
 
 
-Procedure DrawBomberman ( w : Single; bUpdate : boolean ) ;
+Procedure DrawBomberman ( w : Single ; bUpdate : Boolean ) ;
 Var i : Integer;
 Begin
      EnableLighting();
@@ -427,7 +460,7 @@ Begin
                PushObjectMatrix( GetBombermanByCount(i).Position.X-0.15, GetBombermanByCount(i).Position.Z, GetBombermanByCount(i).Position.Y-0.15, 0.05, 0.05, 0.05, 0, GetBombermanByCount(i).Direction, 0 );
                DrawMesh( MESH_BOMBERMAN(GetBombermanByCount(i).BIndex), False );
                PopObjectMatrix();
-               if bUpdate then GetBombermanByCount(i).Update(GetDelta());
+               If bUpdate Then GetBombermanByCount(i).Update(GetDelta());
           End;
      End;
 End;
@@ -508,7 +541,7 @@ End;
 
 
 
-Procedure DrawBomb ( w : Single; bUpdate : boolean ) ;
+Procedure DrawBomb ( w : Single ; bUpdate : Boolean ) ;
 Var i : Integer;
 Var r, g, b : Single;
 Begin
@@ -540,17 +573,17 @@ Begin
                             0, 0, 0 );
           DrawMesh( MESH_BOMB(GetBombByCount(i).BIndex), False );
           PopObjectMatrix();
-          if bUpdate then
-          begin
-            If Not GetBombByCount(i).UpdateBomb() Then i += 1;
-          end
-          else i += 1;
+          If bUpdate Then Begin
+              If Not GetBombByCount(i).UpdateBomb() Then i += 1;
+          End Else Begin
+              i += 1;
+          End;
     End;
 End;
 
 
 
-Procedure DrawFlame ( w : Single; bUpdate : boolean ) ;
+Procedure DrawFlame ( w : Single ; bUpdate : Boolean ) ;
 Var i : Integer;
 Var r, g, b : Single;
 Begin
@@ -632,11 +665,11 @@ Begin
           DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
           PopObjectMatrix();
           // mise à jour
-          if bUpdate then
-          begin
-            If Not GetFlameByCount(i).Update() Then i += 1;
-          end
-          else i+=1;
+          If bUpdate Then Begin
+              If Not GetFlameByCount(i).Update() Then i += 1;
+          End Else Begin
+              i += 1;
+          End;
      End;
 End;
 
@@ -710,7 +743,7 @@ End;
 
 Var fScreenTime : Single;
     sScreenMessage : String;
-    
+
 Procedure InitScreen () ;
 Begin
      fScreenTime := 0.0;
@@ -719,12 +752,12 @@ End;
 
 Procedure AddBlankToScreen () ;
 Begin
-     sScreenMessage := sScreenMessage + '                        ';
+     sScreenMessage := sScreenMessage + '************************';
 End;
 
 Procedure AddStringToScreen ( sMessage : String ) ;
 Begin
-     sScreenMessage := sScreenMessage + '   ' + sMessage + ' ';
+     sScreenMessage := sScreenMessage + '************************' + sMessage + '************************';
 End;
 
 Procedure DrawScreen () ;
@@ -735,12 +768,15 @@ Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
 
-     If GetTime > fScreenTime + 0.1 Then Begin
+     If Length(sScreenMessage) <= 24 Then Begin
+        sScreenMessage := '************************';
+     End Else If GetTime > fScreenTime + 0.1 Then Begin
         fScreenTime := GetTime;
         For k := 1 To Length(sScreenMessage) - 1 Do
             sScreenMessage[k] := sScreenMessage[k+1];
+        SetLength(sScreenMessage, Length(sScreenMessage) - 1);
      End;
-     
+
      DisableLighting();
 
      SetString( STRING_SCREEN, '************************', 0.0, 0.0, 0.0 );
@@ -776,6 +812,65 @@ Begin
      End Else Begin
         bScoreTable := False;
      End;
+End;
+
+
+
+Procedure DrawMessage () ;
+Var w, h : Single;
+Begin
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
+     If GetKey(KEY_SQUARE) Then Begin
+        If GetTime > fKey Then Begin
+           SetString( STRING_MESSAGE, 'say : ' + sMessage, 0.0, 0.02, 600 );
+           bMessage := Not bMessage;
+           fKey := GetTime + 0.5;
+           ClearInput();
+        End;
+     End;
+
+     If bMessage Then Begin
+         DrawString( STRING_MESSAGE, -w / h * 0.9, -0.75, -1, 0.018 * w / h, 0.024, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+
+         If GetKey( KEY_ENTER ) Then Begin
+            If Not bEnter Then Begin
+               PlaySound( SOUND_MESSAGE );
+               Send( nLocalIndex, HEADER_MESSAGE, sMessage );
+               bMessage := False;
+               sMessage := '';
+            End;
+            bEnter := True;
+         End Else Begin
+            bEnter := False;
+         End;
+
+         If Ord(CheckKey()) > 0 Then Begin
+            If GetTime > fKey Then Begin
+               If Ord(CheckKey()) = 8 Then Begin
+                   SetLength(sMessage, Length(sMessage) - 1);
+               End Else Begin
+                   sMessage := sMessage + CheckKey();
+               End;
+               SetString( STRING_MESSAGE, 'say : ' + sMessage, 0.0, 0.02, 600 );
+               fKey := GetTime + 0.1;
+            End;
+         End Else Begin
+            fKey := 0.0;
+         End;
+     End;
+End;
+
+
+
+Procedure DrawNotification () ;
+Var w, h : Single;
+Begin
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
+     DrawString( STRING_NOTIFICATION, -w / h * 0.9, -0.9, -1, 0.018 * w / h, 0.024, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 End;
 
 
@@ -1047,6 +1142,9 @@ Begin
      FreeBomb();
      FreeTimer();
 
+     // initialisation des informations
+     SetString( STRING_NOTIFICATION, 'fight!', 0.0, 0.2, 10 );
+
      // initialisation de la camera
      nCamera := CAMERA_OVERALL;
 
@@ -1105,6 +1203,10 @@ Begin
      // enregistrement des paramètres
      WriteSettings( 'atominsa.cfg' );
 
+     // initialisation de l'invite de messages
+     bMessage := False;
+     sMessage := '';
+     
      // suppression de tous les bomberman
      FreeBomberman();
      
@@ -1149,11 +1251,8 @@ Begin
      
      // initialisation du panneau d'affichage
      InitScreen();
-     AddBlankToScreen();
      AddStringToScreen( 'Welcome to Bomberman Returns!' ); // IL VA FALLOIR QU'ON TROUVE UN VRAI TITRE
-     AddBlankToScreen();
      AddStringToScreen( 'Good luck!   Have fun!' );
-     AddBlankToScreen();
 End;
 
 
@@ -1184,7 +1283,13 @@ Begin
      DrawBomb( 1.0,true );
      DrawFlame( 1.0,true );
      DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
+
+     // affichage de l'invite de messages
+     If bMulti Then DrawMessage();
      
+     // affichage des informations
+     DrawNotification();
+
      // affichage des scores
      DrawScore();
      
@@ -1436,36 +1541,18 @@ Begin
                      If nPlayerType[nPlayer] = PLAYER_KB1 Then nPlayerType[nPlayer] := PLAYER_NIL;
                      If nPlayerType[nPlayer] = PLAYER_KB2 Then nPlayerType[nPlayer] := PLAYER_KB1;
                      If nPlayerType[nPlayer] = PLAYER_COM Then nPlayerType[nPlayer] := PLAYER_KB2;
-                     //If nPlayerType[nPlayer] = PLAYER_NET Then nPlayerType[nPlayer] := PLAYER_COM;
                      SetString( STRING_GAME_MENU(63), 'type : ' + PlayerType, 0.0, 0.02, 600 );
                 End;
                 MENU_PLAYER_CHARACTER :
                 Begin
                      nPlayerCharacter[nPlayer] -= 1;
                      If nPlayerCharacter[nPlayer] < -1 Then nPlayerCharacter[nPlayer] := nCharacterCount - 1;
+                     LoadCharacter( nPlayer );
                      If nPlayerCharacter[nPlayer] = -1 Then Begin
-                        pPlayerCharacter[nPlayer] := aCharacterList[Trunc(Random(nCharacterCount))];
                         SetString( STRING_GAME_MENU(62), 'character : ' + 'random', 0.0, 0.02, 600 );
                      End Else Begin
-                        pPlayerCharacter[nPlayer] := aCharacterList[nPlayerCharacter[nPlayer]];
                         SetString( STRING_GAME_MENU(62), 'character : ' + pPlayerCharacter[nPlayer].Name, 0.0, 0.02, 600 );
                      End;
-                     DelMesh( MESH_BOMBERMAN(nPlayer) );
-                     AddMesh( './characters/' + pPlayerCharacter[nPlayer].PlayerMesh, MESH_BOMBERMAN(nPlayer) );
-                     DelMesh( MESH_BOMB(nPlayer) );
-                     AddMesh( './characters/' + pPlayerCharacter[nPlayer].BombMesh, MESH_BOMB(nPlayer) );
-                     DelTexture( TEXTURE_BOMBERMAN(nPlayer) );
-                     AddTexture( './characters/' + pPlayerCharacter[nPlayer].PlayerSkin[nPlayer], TEXTURE_BOMBERMAN(nPlayer) );
-                     DelTexture( TEXTURE_BOMB(nPlayer) );
-                     AddTexture( './characters/' + pPlayerCharacter[nPlayer].BombSkin, TEXTURE_BOMB(nPlayer) );
-                     DelTexture( TEXTURE_FLAME(nPlayer) );
-                     AddTexture( './characters/' + pPlayerCharacter[nPlayer].FlameTexture, TEXTURE_FLAME(nPlayer) );
-                     DelSound( SOUND_BOMB(10+nPlayer) );
-                     AddSound( './characters/' + pPlayerCharacter[nPlayer].BombSound[1], SOUND_BOMB(10+nPlayer) );
-                     DelSound( SOUND_BOMB(20+nPlayer) );
-                     AddSound( './characters/' + pPlayerCharacter[nPlayer].BombSound[2], SOUND_BOMB(20+nPlayer) );
-                     DelSound( SOUND_BOMB(30+nPlayer) );
-                     AddSound( './characters/' + pPlayerCharacter[nPlayer].BombSound[3], SOUND_BOMB(30+nPlayer) );
                 End;
            End;
         End;
@@ -1486,7 +1573,6 @@ Begin
                 End;
                 MENU_PLAYER_TYPE :
                 Begin
-                     //If nPlayerType[nPlayer] = PLAYER_COM Then nPlayerType[nPlayer] := PLAYER_NET;
                      If nPlayerType[nPlayer] = PLAYER_KB2 Then nPlayerType[nPlayer] := PLAYER_COM;
                      If nPlayerType[nPlayer] = PLAYER_KB1 Then nPlayerType[nPlayer] := PLAYER_KB2;
                      If nPlayerType[nPlayer] = PLAYER_NIL Then nPlayerType[nPlayer] := PLAYER_KB1;
@@ -1496,29 +1582,12 @@ Begin
                 Begin
                      nPlayerCharacter[nPlayer] += 1;
                      If nPlayerCharacter[nPlayer] = nCharacterCount Then nPlayerCharacter[nPlayer] := -1;
+                     LoadCharacter( nPlayer );
                      If nPlayerCharacter[nPlayer] = -1 Then Begin
-                        pPlayerCharacter[nPlayer] := aCharacterList[Trunc(Random(nCharacterCount))];
                         SetString( STRING_GAME_MENU(62), 'character : ' + 'random', 0.0, 0.02, 600 );
                      End Else Begin
-                        pPlayerCharacter[nPlayer] := aCharacterList[nPlayerCharacter[nPlayer]];
                         SetString( STRING_GAME_MENU(62), 'character : ' + pPlayerCharacter[nPlayer].Name, 0.0, 0.02, 600 );
                      End;
-                     DelMesh( MESH_BOMBERMAN(nPlayer) );
-                     AddMesh( './characters/' + pPlayerCharacter[nPlayer].PlayerMesh, MESH_BOMBERMAN(nPlayer) );
-                     DelMesh( MESH_BOMB(nPlayer) );
-                     AddMesh( './characters/' + pPlayerCharacter[nPlayer].BombMesh, MESH_BOMB(nPlayer) );
-                     DelTexture( TEXTURE_BOMBERMAN(nPlayer) );
-                     AddTexture( './characters/' + pPlayerCharacter[nPlayer].PlayerSkin[nPlayer], TEXTURE_BOMBERMAN(nPlayer) );
-                     DelTexture( TEXTURE_BOMB(nPlayer) );
-                     AddTexture( './characters/' + pPlayerCharacter[nPlayer].BombSkin, TEXTURE_BOMB(nPlayer) );
-                     DelTexture( TEXTURE_FLAME(nPlayer) );
-                     AddTexture( './characters/' + pPlayerCharacter[nPlayer].FlameTexture, TEXTURE_FLAME(nPlayer) );
-                     DelSound( SOUND_BOMB(10+nPlayer) );
-                     AddSound( './characters/' + pPlayerCharacter[nPlayer].BombSound[1], SOUND_BOMB(10+nPlayer) );
-                     DelSound( SOUND_BOMB(20+nPlayer) );
-                     AddSound( './characters/' + pPlayerCharacter[nPlayer].BombSound[2], SOUND_BOMB(20+nPlayer) );
-                     DelSound( SOUND_BOMB(30+nPlayer) );
-                     AddSound( './characters/' + pPlayerCharacter[nPlayer].BombSound[3], SOUND_BOMB(30+nPlayer) );
                 End;
            End;
         End;

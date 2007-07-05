@@ -6,7 +6,7 @@ Unit UGrab;
 
 Interface
 
-Uses Classes, SysUtils, UItem, UBomberman;
+Uses Classes, SysUtils, UItem, UBomberman, UCore, UUtils;
 
 Type
 
@@ -27,8 +27,10 @@ Implementation
 
 Procedure CGrab.Bonus( nPlayer : CBomberman ) ;
 Begin
-       nPlayer.ChangeGrab();
-       self.destroy();
+     SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up the ability to grab bombs.', 0.0, 0.2, 5 );
+
+     nPlayer.ChangeGrab();
+     self.destroy();
 End;
 
 

@@ -10,7 +10,13 @@ Interface
 
 
 Uses Classes, SysUtils,
-     UCore, UGame, UUtils, USetup;
+     UCore, UGame, UUtils, USetup, UForm;
+
+
+
+Var nClientCount : Integer;
+Var nClientIndex : Array [0..255] Of DWord;
+Var sClientName : Array [0..255] Of String;
 
 
 
@@ -24,10 +30,9 @@ Implementation
 
 
 Const MULTI_NONE       = 0;
-Const MULTI_BUSY       = 1;
-Const MULTI_SERVER     = 2;
-Const MULTI_CLIENT     = 3;
-Const MULTI_ERROR      = 4;
+Const MULTI_SERVER     = 1;
+Const MULTI_CLIENT     = 2;
+Const MULTI_ERROR      = 3;
 
 Var nMulti : Integer;
 
@@ -39,6 +44,7 @@ Const GAME_MENU_MULTI = 12;
 
 Const MENU_MULTI_NAME         = 81;
 Const MENU_MULTI_ADDRESS      = 82;
+Const MENU_MULTI_TYPE         = 83;
 
 Const MENU_MULTI_JOIN         = 91;
 Const MENU_MULTI_HOST         = 92;
@@ -86,14 +92,18 @@ Begin
      // ajout du menu
      SetString( STRING_GAME_MENU(81), 'name : ' + sLocalName, 0.2, 1.0, 600 );
      SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.2, 1.0, 600 );
-
+     Case nServerType Of
+          SERVER_UNKNOWN : SetString( STRING_GAME_MENU(83), 'type : unknown', 0.2, 1.0, 600 );
+          SERVER_STANDARD : SetString( STRING_GAME_MENU(83), 'type : standard', 0.2, 1.0, 600 );
+          SERVER_EXTENDED : SetString( STRING_GAME_MENU(83), 'type : extended', 0.2, 1.0, 600 );
+     End;
+     
      // ajout des boutons join et host
      SetString( STRING_GAME_MENU(91), 'join', 0.2, 0.5, 600 );
      SetString( STRING_GAME_MENU(92), 'host', 0.2, 0.5, 600 );
 
      // ajout des textes d'état
-     SetString( STRING_GAME_MENU(101), 'connecting...', 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(102), 'connection timeout.', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(101), 'connection error.', 0.2, 1.0, 600 );
 
      // modification de la machine d'état interne
      nGame := GAME_MENU_MULTI;
@@ -134,12 +144,12 @@ Begin
      t += 0.12;
      DrawString( STRING_GAME_MENU(82), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_MULTI_ADDRESS), IsActive(MENU_MULTI_ADDRESS), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
      t += 0.12;
-     DrawString( STRING_GAME_MENU(91), -w / h * 0.6, -0.2, -1, 0.024 * w / h, 0.036, 1.0, IsActive(MENU_MULTI_JOIN), IsActive(MENU_MULTI_JOIN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     DrawString( STRING_GAME_MENU(92), -w / h * 0.2, -0.2, -1, 0.024 * w / h, 0.036, 1.0, IsActive(MENU_MULTI_HOST), IsActive(MENU_MULTI_HOST), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-     If nMulti = MULTI_BUSY Then
-        DrawString( STRING_GAME_MENU(101), -w / h * 0.8, -0.6, -1, 0.018 * w / h, 0.024, 0.0, 0.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     DrawString( STRING_GAME_MENU(83), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_MULTI_TYPE), IsActive(MENU_MULTI_TYPE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     t += 0.12;
+     DrawString( STRING_GAME_MENU(91), -w / h * 0.6, -0.7, -1, 0.024 * w / h, 0.036, 1.0, IsActive(MENU_MULTI_JOIN), IsActive(MENU_MULTI_JOIN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     DrawString( STRING_GAME_MENU(92), -w / h * 0.2, -0.7, -1, 0.024 * w / h, 0.036, 1.0, IsActive(MENU_MULTI_HOST), IsActive(MENU_MULTI_HOST), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
      If nMulti = MULTI_ERROR Then
-        DrawString( STRING_GAME_MENU(102), -w / h * 0.8, -0.6, -1, 0.018 * w / h, 0.024, 0.0, 0.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+        DrawString( STRING_GAME_MENU(101), -w / h * 0.8, -0.9, -1, 0.018 * w / h, 0.024, 0.0, 0.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
@@ -151,7 +161,8 @@ Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
            If nMenu = MENU_MULTI_ADDRESS Then nMenu := MENU_MULTI_NAME Else
-           If nMenu = MENU_MULTI_JOIN Then nMenu := MENU_MULTI_ADDRESS Else
+           If nMenu = MENU_MULTI_TYPE Then nMenu := MENU_MULTI_ADDRESS Else
+           If nMenu = MENU_MULTI_JOIN Then nMenu := MENU_MULTI_TYPE Else
            If nMenu = MENU_MULTI_HOST Then nMenu := MENU_MULTI_JOIN Else
            If nMenu = MENU_MULTI_NAME Then nMenu := MENU_MULTI_HOST;
         End;
@@ -165,7 +176,8 @@ Begin
            PlaySound( SOUND_MENU_CLICK );
            If nMenu = MENU_MULTI_HOST Then nMenu := MENU_MULTI_NAME Else
            If nMenu = MENU_MULTI_NAME Then nMenu := MENU_MULTI_ADDRESS Else
-           If nMenu = MENU_MULTI_ADDRESS Then nMenu := MENU_MULTI_JOIN Else
+           If nMenu = MENU_MULTI_ADDRESS Then nMenu := MENU_MULTI_TYPE Else
+           If nMenu = MENU_MULTI_TYPE Then nMenu := MENU_MULTI_JOIN Else
            If nMenu = MENU_MULTI_JOIN Then nMenu := MENU_MULTI_HOST;
         End;
         bDown := True;
@@ -181,13 +193,27 @@ Begin
                 Begin
                      If ClientInit( sServerAddress, nServerPort ) Then Begin
                         nMulti := MULTI_CLIENT;
+                        For k := 1 To 8 Do Begin
+                            nPlayerType[k] := PLAYER_NIL;
+                            nPlayerClient[k] := -1;
+                        End;
                         InitMenu();
+                        Send( nLocalIndex, HEADER_CONNECT, sLocalName );
+                     End Else Begin
+                        nMulti := MULTI_ERROR;
                      End;
                 End;
                 MENU_MULTI_HOST :
                 Begin
                      If ServerInit( nServerPort ) Then Begin
                         nMulti := MULTI_SERVER;
+                        nClientCount := 1;
+                        nClientIndex[0] := nLocalIndex;
+                        sClientName[0] := sLocalName;
+                        For k := 1 To 8 Do Begin
+                            nPlayerType[k] := PLAYER_NIL;
+                            nPlayerClient[k] := -1;
+                        End;
                         InitMenu();
                      End;
                 End;
@@ -196,6 +222,60 @@ Begin
         bEnter := True;
      End Else Begin
         bEnter := False;
+     End;
+
+     If GetKeyS( KEY_LEFT ) Then Begin
+        If Not bLeft Then Begin
+           PlaySound( SOUND_MENU_CLICK );
+           Case nMenu Of
+                MENU_MULTI_TYPE :
+                Begin
+                     If nServerType = SERVER_EXTENDED Then nServerType := SERVER_STANDARD;
+                     Case nServerType Of
+                          SERVER_STANDARD : SetString( STRING_GAME_MENU(83), 'type : standard', 0.0, 0.02, 600 );
+                          SERVER_EXTENDED : SetString( STRING_GAME_MENU(83), 'type : extended', 0.0, 0.02, 600 );
+                     End;
+                End;
+                MENU_MULTI_JOIN :
+                Begin
+                     nMenu := MENU_MULTI_HOST;
+                End;
+                MENU_MULTI_HOST :
+                Begin
+                     nMenu := MENU_MULTI_JOIN;
+                End;
+           End;
+        End;
+        bLeft := True;
+     End Else Begin
+        bLeft := False;
+     End;
+
+     If GetKeyS( KEY_RIGHT ) Then Begin
+        If Not bRight Then Begin
+           PlaySound( SOUND_MENU_CLICK );
+           Case nMenu Of
+                MENU_MULTI_TYPE :
+                Begin
+                     If nServerType = SERVER_STANDARD Then nServerType := SERVER_EXTENDED;
+                     Case nServerType Of
+                          SERVER_STANDARD : SetString( STRING_GAME_MENU(83), 'type : standard', 0.0, 0.02, 600 );
+                          SERVER_EXTENDED : SetString( STRING_GAME_MENU(83), 'type : extended', 0.0, 0.02, 600 );
+                     End;
+                End;
+                MENU_MULTI_JOIN :
+                Begin
+                     nMenu := MENU_MULTI_HOST;
+                End;
+                MENU_MULTI_HOST :
+                Begin
+                     nMenu := MENU_MULTI_JOIN;
+                End;
+           End;
+        End;
+        bRight := True;
+     End Else Begin
+        bRight := False;
      End;
 
      If Ord(CheckKey()) > 0 Then Begin
@@ -258,6 +338,194 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// RESEAU                                                                     //
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+Function GetString ( sData : String ; nString : Integer ) : String ;
+Var i, j : Integer;
+    nCount : Integer;
+    sResult : String;
+Begin
+     nCount := 0;
+     sResult := 'NULL';
+
+     j := 1;
+     For i := 1 To Length(sData) Do Begin
+        If sData[i] = #31 Then Begin
+           nCount += 1;
+           If nCount = nString Then sResult := Copy( sData, j, i - j );
+           j := i + 1;
+        End Else If i = Length(sData) Then Begin
+           nCount += 1;
+           If nCount = nString Then sResult := Copy( sData, j, i - j + 1 );
+           j := i + 1;
+        End;
+        If sResult <> 'NULL' Then Break;
+     End;
+
+     GetString := sResult;
+End;
+
+
+
+Function ClientIndex( nIndex : DWord ) : Integer ;
+Var k : Integer;
+Begin
+     ClientIndex := -1;
+     For k := 0 To nClientCount - 1 Do
+         If nClientIndex[k] = nIndex Then ClientIndex := k;
+End;
+
+
+
+Procedure ProcessServer () ;
+Var nIndex : DWord;
+    nHeader : Integer;
+    sData : String;
+Var k : Integer;
+Begin
+     While GetPacket( nIndex, nHeader, sData ) Do Begin
+          Case nHeader Of
+               HEADER_CONNECT :
+               Begin
+                    // ajout du client à la liste
+                    If ClientIndex(nIndex) = -1 Then Begin
+                       nClientIndex[nClientCount] := nIndex;
+                       sClientName[nClientCount] := sData;
+                       nClientCount += 1;
+                       AddLineToConsole( sData + ' entered the game.' );
+                    End;
+                    // renvoi de la liste des clients
+                    nIndex := nLocalIndex;
+                    nHeader := HEADER_LIST_CLIENT;
+                    sData := IntToStr(nClientCount);
+                    For k := 0 To nClientCount - 1 Do
+                        sData := sData + #31 + IntToStr(nClientIndex[k]) + #31 + sClientName[k];
+                    Send( nIndex, nHeader, sData );
+                    // renvoi de la liste des joueurs
+                    nIndex := nLocalIndex;
+                    nHeader := HEADER_LIST_PLAYER;
+                    sData := '';
+                    For k := 1 To 8 Do Begin
+                        sData := sData + #31 + IntToStr(nPlayerClient[k]);
+                        sData := sData + #31 + sPlayerName[k];
+                        sData := sData + #31 + pPlayerCharacter[k].Name;
+                    End;
+                    Send( nIndex, nHeader, sData );
+               End;
+               HEADER_DISCONNECT :
+               Begin
+                    // suppression du client de la liste
+                    For k := ClientIndex(nIndex) To nClientCount - 2 Do
+                        nClientIndex[k] := nClientIndex[k+1];
+                    nClientCount -= 1;
+                    AddLineToConsole( sData + ' leaved the game.' );
+                    // supression des joueurs attribués s'il y en avait
+                    For k := 1 To 8 Do Begin
+                        If nPlayerClient[k] = nIndex Then Begin
+                           nPlayerClient[k] := -1;
+                           sPlayerName[k] := '';
+                        End;
+                    End;
+                    // renvoi de la liste des clients
+                    nIndex := nLocalIndex;
+                    nHeader := HEADER_LIST_CLIENT;
+                    sData := IntToStr(nClientCount);
+                    For k := 0 To nClientCount - 1 Do
+                        sData := sData + #31 + IntToStr(nClientIndex[k]) + #31 + sClientName[k];
+                    Send( nIndex, nHeader, sData );
+                    // renvoi de la liste des joueurs
+                    nIndex := nLocalIndex;
+                    nHeader := HEADER_LIST_PLAYER;
+                    sData := '';
+                    For k := 1 To 8 Do Begin
+                        sData := sData + #31 + IntToStr(nPlayerClient[k]);
+                        sData := sData + #31 + sPlayerName[k];
+                        sData := sData + #31 + pPlayerCharacter[k].Name;
+                    End;
+                    Send( nIndex, nHeader, sData );
+               End;
+               HEADER_MESSAGE :
+               Begin
+                    AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' says : ' + sData );
+                    AddStringToScreen( sClientName[ClientIndex(nIndex)] + ' says : ' + sData );
+                    Send( nIndex, nHeader, sData );
+               End;
+          End;
+     End;
+End;
+
+
+
+Procedure ProcessClient () ;
+Var nIndex : DWord;
+    nHeader : Integer;
+    sData : String;
+Var k, l, m : Integer;
+Begin
+     While GetPacket( nIndex, nHeader, sData ) Do Begin
+          Case nHeader Of
+               HEADER_MESSAGE :
+               Begin
+                    AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' says : ' + sData );
+                    AddStringToScreen( sClientName[ClientIndex(nIndex)] + ' says : ' + sData );
+               End;
+               HEADER_LIST_CLIENT :
+               Begin
+                    l := 1;
+                    nClientCount := StrToInt( GetString( sData, l ) ); l += 1;
+                    For k := 0 To nClientCount - 1 Do Begin
+                        nClientIndex[k] := StrToInt( GetString( sData, l ) ); l += 1;
+                        sClientName[k] := GetString( sData, l ); l += 1;
+                    End;
+               End;
+               HEADER_LIST_PLAYER :
+               Begin
+                    l := 1;
+                    For k := 1 To 8 Do Begin
+                        nPlayerClient[k] := StrToInt( GetString( sData, l ) ); l += 1;
+                        sPlayerName[k] := GetString( sData, l ); l += 1;
+                        nPlayerCharacter[k] := -1;
+                        For m := 0 To nCharacterCount - 1 Do
+                            If aCharacterList[m].Name = GetString( sData, l ) Then nPlayerCharacter[k] := m;
+                        LoadCharacter( k ); l += 1;
+                    End;
+               End;
+          End;
+     End;
+End;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // PHASE MULTI                                                                //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -272,6 +540,9 @@ Begin
      // activation du mode multi
      bMulti := True;
 
+     // initialisation du compteur de clients
+     nClientCount := 0;
+     
      // suppression de tous les joueurs externes
      For k := 1 To 8 Do
          If nPlayerType[k] = PLAYER_NET Then nPlayerType[k] := PLAYER_NIL;
@@ -298,8 +569,11 @@ Begin
      End;
 
      If nMulti = MULTI_SERVER Then Begin
+        ProcessServer();
         If nState = PHASE_MENU Then ServerTerminate() Else ServerLoop();
      End Else If nMulti = MULTI_CLIENT Then Begin
+        If nState = PHASE_MENU Then Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
+        ProcessClient();
         If nState = PHASE_MENU Then ClientTerminate() Else ClientLoop();
      End;
 End;

@@ -4,7 +4,7 @@ unit USpeedUp;
 
 Interface
 
-Uses Classes, SysUtils, UItem, UBomberman, UUtils;
+Uses Classes, SysUtils, UItem, UBomberman, UUtils, UCore;
 
 Type
 
@@ -25,11 +25,12 @@ Implementation
 
 Procedure CSpeedUp.Bonus( nPlayer : CBomberman );
 Begin
+     SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up a speed upgrade.', 0.0, 0.2, 5 );
 
-       nPlayer.Speed := nPlayer.Speed + SPEEDCHANGE; // augmente la vitesse du joueur
-       if nPlayer.Speed > SPEEDLIMIT then nPlayer.Speed := SPEEDLIMIT;    // limitation de la vitesse du bomberman
+     nPlayer.Speed := nPlayer.Speed + SPEEDCHANGE; // augmente la vitesse du joueur
+     if nPlayer.Speed > SPEEDLIMIT then nPlayer.Speed := SPEEDLIMIT;    // limitation de la vitesse du bomberman
 
-       self.destroy();     // on peut detruire le bonus
+     self.destroy();     // on peut detruire le bonus
 End;
 
 

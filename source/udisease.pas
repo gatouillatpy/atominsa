@@ -49,6 +49,8 @@ Implementation
 Procedure CDisease.Bonus( _uPlayer : CBomberman );
 Var i : integer;
 Begin
+     SetString( STRING_NOTIFICATION, _uPlayer.Name + ' has picked up a disease.', 0.0, 0.2, 5 );
+
      uPlayer := _uPlayer;
      bDisease := True;
 

@@ -137,6 +137,9 @@ Begin
      AddSound( './sounds/back.wav', SOUND_MENU_BACK );
      AddSound( './sounds/click.wav', SOUND_MENU_CLICK );
 
+     // chargement du son de l'invite de messages
+     AddSound( './sounds/message.wav', SOUND_MESSAGE );
+
      // chargement des bombermen
      For k := 1 To 8 Do Begin
          If nPlayerCharacter[k] = -1 Then Begin

@@ -203,7 +203,7 @@
       <Unit22>
         <Filename Value="ubomb.pas"/>
         <UnitName Value="UBomb"/>
-        <CursorPos X="11" Y="655"/>
+        <CursorPos X="40" Y="657"/>
         <TopLine Value="637"/>
         <EditorIndex Value="13"/>
         <UsageCount Value="100"/>
@@ -485,128 +485,7 @@
         <Loaded Value="True"/>
       </Unit59>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
-      <Position1>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1085" Column="16" TopLine="1067"/>
-      </Position1>
-      <Position2>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1086" Column="16" TopLine="1068"/>
-      </Position2>
-      <Position3>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1087" Column="16" TopLine="1069"/>
-      </Position3>
-      <Position4>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="130" Column="1" TopLine="94"/>
-      </Position4>
-      <Position5>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="99" Column="13" TopLine="81"/>
-      </Position5>
-      <Position6>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1071" Column="17" TopLine="1053"/>
-      </Position6>
-      <Position7>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1072" Column="50" TopLine="1054"/>
-      </Position7>
-      <Position8>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1073" Column="52" TopLine="1055"/>
-      </Position8>
-      <Position9>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1074" Column="52" TopLine="1056"/>
-      </Position9>
-      <Position10>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1075" Column="53" TopLine="1057"/>
-      </Position10>
-      <Position11>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1076" Column="50" TopLine="1058"/>
-      </Position11>
-      <Position12>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1077" Column="53" TopLine="1059"/>
-      </Position12>
-      <Position13>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1081" Column="17" TopLine="1098"/>
-      </Position13>
-      <Position14>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1148" Column="10" TopLine="1118"/>
-      </Position14>
-      <Position15>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1209" Column="65" TopLine="1184"/>
-      </Position15>
-      <Position16>
-        <Filename Value="usetup.pas"/>
-        <Caret Line="30" Column="19" TopLine="12"/>
-      </Position16>
-      <Position17>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="227" Column="12" TopLine="199"/>
-      </Position17>
-      <Position18>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="341" Column="6" TopLine="280"/>
-      </Position18>
-      <Position19>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
-      </Position19>
-      <Position20>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="18" Column="15" TopLine="1"/>
-      </Position20>
-      <Position21>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="43" Column="23" TopLine="25"/>
-      </Position21>
-      <Position22>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="94" Column="27" TopLine="76"/>
-      </Position22>
-      <Position23>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="161" Column="10" TopLine="143"/>
-      </Position23>
-      <Position24>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="171" Column="26" TopLine="163"/>
-      </Position24>
-      <Position25>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="116" Column="14" TopLine="101"/>
-      </Position25>
-      <Position26>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="161" Column="10" TopLine="131"/>
-      </Position26>
-      <Position27>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="195" Column="10" TopLine="165"/>
-      </Position27>
-      <Position28>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="205" Column="31" TopLine="199"/>
-      </Position28>
-      <Position29>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="224" Column="11" TopLine="206"/>
-      </Position29>
-      <Position30>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="326" Column="17" TopLine="308"/>
-      </Position30>
-    </JumpHistory>
+    <JumpHistory Count="0" HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>

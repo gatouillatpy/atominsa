@@ -13,6 +13,28 @@ Uses Classes, SysUtils, LazJPEG, Math, Graphics, IntfGraphics,
 
 
 
+Const HEADER_CONNECT           = 1001;
+Const HEADER_DISCONNECT        = 1002;
+
+Const HEADER_MESSAGE           = 1101;
+
+Const HEADER_LIST_CLIENT       = 1201;
+Const HEADER_LIST_PLAYER       = 1202;
+
+Const HEADER_RESERVE           = 1301;
+
+
+
+Type LPPacketItem = ^PacketItem;
+     PacketItem = RECORD
+                      index : DWord;
+                      header : Integer;
+                      data : String;
+                      next : LPPacketItem;
+                  END;
+
+
+
 Const KEY_UP = -GLUT_KEY_UP;
       KEY_DOWN = -GLUT_KEY_DOWN;
       KEY_LEFT = -GLUT_KEY_LEFT;
@@ -22,19 +44,28 @@ Const KEY_UP = -GLUT_KEY_UP;
 Const KEY_TAB = 9;
       KEY_ESC = 27;
       KEY_ENTER = 13;
+      KEY_SQUARE = 178;
       KEY_N = 110;
       KEY_Y = 121;
       
+
+
 Const EFFECT_NONE     = 0;
 Const EFFECT_TERMINAL = 1;
+
+
 
 Const FONT_NORMAL    = 1;
 Const FONT_BOLD      = 2;
 Const FONT_HELVETICA = 3;
 
+
+
 Const BUTTON_LEFT    = 1;
 Const BUTTON_RIGHT   = 2;
 Const BUTTON_MIDDLE  = 3;
+
+
 
 Type LPOGLPolygon = ^OGLPolygon;
      LPOGLVertex = ^OGLVertex;
@@ -57,6 +88,8 @@ Type LPOGLPolygon = ^OGLPolygon;
                        tv : Single;
                        id : LongInt;
                  END;
+
+
 
 Type GLVector = RECORD
                       x : GLFloat;
@@ -81,6 +114,8 @@ Type GLVector = RECORD
                      id2 : GLUInt;
                END;
                
+
+
 Type LPOGLMesh = ^OGLMesh;
      OGLMesh = RECORD
                       PolygonCount : LongInt;
@@ -111,6 +146,7 @@ Type GameCallback = Procedure () ; cdecl;
      KeyCallbackObj = Procedure ( fTime : Single ) Of Object ; cdecl;
      ButtonCallback = Procedure () ; cdecl;
      TimerCallback = Procedure () Of Object ; cdecl;
+
 
 
 Procedure InitDataStack () ;
@@ -236,6 +272,11 @@ Var BackBuffer : GLUInt;
 
 Var bConnected : Boolean;
 
+Procedure AddPacket ( nIndex : DWord ; nHeader : Integer ; sData : String ) ;
+Function GetPacket ( Var nIndex : DWord ; Var nHeader : Integer ; Var sData : String ) : Boolean ;
+
+Procedure Send ( nIndex : DWord ; nHeader : Integer ; sData : String );
+
 Function ServerInit ( Const nPort : Word ) : Boolean ;
 Procedure ServerTerminate () ;
 Procedure ServerLoop () ;
@@ -277,23 +318,22 @@ Implementation
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FONCTIONS DE GESTION DE LA PILE DE DONNEES                                 //
+// FONCTIONS DE GESTION DU RESEAU                                             //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 
+Var aSocket : Array [0..255] Of TLSocket;
+    nSocket : Integer;
+    
+    
+
 Type TLEvents = Class
      Public
-           // server
-           Procedure OnErrorServer ( Const msg : String ; aSocket : TLSocket );
-           Procedure OnConnectServer ( aSocket : TLSocket );
-           Procedure OnReceiveServer ( aSocket : TLSocket );
-           Procedure OnDisconnectServer ( aSocket : TLSocket );
-
-           //client
-           Procedure OnDisconnectClient( aSocket : TLSocket );
-           Procedure OnReceiveClient( aSocket : TLSocket );
-           Procedure OnErrorClient( Const msg : String ; aSocket : TLSocket );
+           Procedure OnError ( Const sError : String ; tSocket : TLSocket );
+           Procedure OnConnect ( tSocket : TLSocket );
+           Procedure OnReceive ( tSocket : TLSocket );
+           Procedure OnDisconnect( tSocket : TLSocket );
 End;
 
 Var pTCP : TLTcp;
@@ -301,28 +341,169 @@ Var pEvent: TLEvents;
 
 
 
-// client
+Var pPacketStack : LPPacketItem = NIL;
 
 
 
-Procedure TLEvents.OnDisconnectClient ( aSocket : TLSocket ) ;
+Procedure AddPacket ( nIndex : DWord ; nHeader : Integer ; sData : String ) ;
+Var pPacketItem : LPPacketItem ;
 Begin
+     pPacketItem := pPacketStack;
+     If pPacketStack = NIL Then Begin
+          New( pPacketStack );
+          pPacketStack^.index := nIndex;
+          pPacketStack^.header := nHeader;
+          pPacketStack^.data := sData;
+          pPacketStack^.next := NIL;
+     End Else Begin
+          pPacketItem := pPacketStack;
+          While (pPacketItem^.next <> NIL) Do
+               pPacketItem := pPacketItem^.next;
+          New( pPacketItem^.next );
+          pPacketItem := pPacketItem^.next;
+          pPacketItem^.index := nIndex;
+          pPacketItem^.header := nHeader;
+          pPacketItem^.data := sData;
+          pPacketItem^.next := NIL;
+     End;
+End;
+
+
+
+Function GetPacket ( Var nIndex : DWord ; Var nHeader : Integer ; Var sData : String ) : Boolean ;
+Begin
+     If pPacketStack = NIL Then Begin
+        GetPacket := False;
+     End Else Begin
+        nIndex := pPacketStack^.index;
+        nHeader := pPacketStack^.header;
+        sData := pPacketStack^.data;
+        pPacketStack := pPacketStack^.next;
+        GetPacket := True;
+     End;
+End;
+
+
+
+Procedure Send ( nIndex : DWord ; nHeader : Integer ; sData : String );
+Var k : Integer;
+Begin
+     If nSocket = -1 Then Begin
+        If pTCP.Connected Then pTCP.SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
+     End Else Begin
+        For k := 0 To nSocket Do
+            If aSocket[k].Connected Then aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
+     End;
+End;
+
+
+
+Function GetMessage ( sData : String ; nMessage : Integer ) : String ;
+Var i, j : Integer;
+    nCount : Integer;
+    sResult : String;
+Begin
+     nCount := 0;
+     sResult := 'NULL';
+
+     j := 1;
+     For i := 1 To Length(sData) Do Begin
+        If sData[i] = #4 Then Begin
+           nCount += 1;
+           If nCount = nMessage Then sResult := Copy( sData, j, i - j );
+           j := i + 1;
+        End;
+        If sResult <> 'NULL' Then Break;
+     End;
+
+     GetMessage := sResult;
+End;
+
+
+
+Function GetPart ( sData : String ; nPart : Integer ) : String ;
+Var i, j : Integer;
+    nCount : Integer;
+    sResult : String;
+Begin
+     nCount := 0;
+     sResult := 'NULL';
+
+     j := 1;
+     For i := 1 To Length(sData) Do Begin
+        If sData[i] = #30 Then Begin
+           nCount += 1;
+           If nCount = nPart Then sResult := Copy( sData, j, i - j );
+           j := i + 1;
+        End Else If i = Length(sData) Then Begin
+           nCount += 1;
+           If nCount = nPart Then sResult := Copy( sData, j, i - j + 1 );
+           j := i + 1;
+        End;
+        If sResult <> 'NULL' Then Break;
+     End;
+
+     GetPart := sResult;
+End;
+
+
+
+Procedure TLEvents.OnConnect ( tSocket : TLSocket ) ;
+Begin
+     nSocket += 1;
+     aSocket[nSocket] := tSocket;
+
+     If bDebug Then AddLineToConsole( tSocket.PeerAddress + ' connected.' );
+End;
+
+
+
+Procedure TLEvents.OnDisconnect ( tSocket : TLSocket ) ;
+Var p, q : Integer;
+Begin
+     If nSocket > -1 Then Begin
+        For p := 0 To nSocket Do
+            If aSocket[p] = tSocket Then q := p;
+        For p := q To nSocket - 1 Do
+            aSocket[p] := aSocket[p+1];
+        nSocket -= 1;
+     End;
      AddLineToConsole('Connection lost.');
 End;
 
 
 
-Procedure TLEvents.OnReceiveClient ( aSocket : TLSocket ) ;
-Var s : String;
+Procedure TLEvents.OnReceive ( tSocket : TLSocket ) ;
+Var sBuffer : String;
+Var sMessage : String;
+    nMessage : Integer;
+Var nIndex : DWord;
+    nHeader : Integer;
+    sData : String;
 Begin
-  //if aSocket.GetMessage(s) > 0 then
+     If tSocket.GetMessage( sBuffer ) > 0 Then Begin
+        nMessage := 1;
+        sMessage := GetMessage( sBuffer, nMessage );
+        While sMessage <> 'NULL' Do Begin
+           If bDebug Then AddLineToConsole( 'Reception :' );
+           nIndex := StrToInt( GetPart( sMessage, 1 ) );
+           If bDebug Then AddLineToConsole( '    Index : ' + IntToStr(nIndex) );
+           nHeader := StrToInt( GetPart( sMessage, 2 ) );
+           If bDebug Then AddLineToConsole( '    Header : ' + IntToStr(nHeader) );
+           sData := GetPart( sMessage, 3 );
+           If bDebug Then AddLineToConsole( '    Data : ' + sData );
+           AddPacket( nIndex, nHeader, sData );
+           nMessage += 1;
+           sMessage := GetMessage( sBuffer, nMessage );
+        End;
+     End;
 End;
 
 
 
-Procedure TLEvents.OnErrorClient ( Const msg : String ; aSocket : TLSocket ) ;
+Procedure TLEvents.OnError ( Const sError : String ; tSocket : TLSocket ) ;
 Begin
-     AddLineToConsole( 'Network error : ' + msg );
+     AddLineToConsole( 'Network error : ' + sError );
 End;
 
 
@@ -330,13 +511,15 @@ End;
 Function ClientInit ( Const sAddress : String ; Const nPort : Word ) : Boolean ;
 Var t : Single;
 Begin
+     nSocket := -1;
+
      bConnected := False;
 
      pEvent := TLEvents.Create;
      pTCP := TLTcp.Create( NIL );
-     pTCP.OnReceive := @pEvent.OnReceiveClient;
-     pTCP.OnDisconnect := @pEvent.OnDisconnectClient;
-     pTCP.OnError := @pEvent.OnErrorClient;
+     pTCP.OnReceive := @pEvent.OnReceive;
+     pTCP.OnDisconnect := @pEvent.OnDisconnect;
+     pTCP.OnError := @pEvent.OnError;
      If pTCP.Connect( sAddress, nPort ) Then Begin
         AddLineToConsole('Connecting...');
         t := GetTime;
@@ -373,52 +556,20 @@ End;
 Procedure ClientLoop () ;
 Begin
      pTCP.Callaction;
-     //Sleep(1);
-End;
-
-
-
-// server
-
-
-
-Procedure TLEvents.OnErrorServer ( Const msg : String ; aSocket : TLSocket ) ;
-Begin
-     AddLineToConsole( 'Network error : ' + msg );
-End;
-
-
-
-Procedure TLEvents.OnReceiveServer ( aSocket : TLSocket ) ;
-Var s : String;
-Begin
-     //if aSocket.GetMessage(s) > 0 then
-End;
-
-
-
-Procedure TLEvents.OnDisconnectServer ( aSocket : TLSocket ) ;
-Begin
-     AddLineToConsole('Connection lost.');
-End;
-
-
-
-Procedure TLEvents.OnConnectServer ( aSocket : TLSocket ) ;
-Begin
-     AddLineToConsole( aSocket.PeerAddress + ' connected.' );
 End;
 
 
 
 Function ServerInit ( Const nPort : Word ) : Boolean;
 Begin
+     nSocket := -1;
+     
      pEvent := TLEvents.Create;
      pTCP := TLTcp.Create( NIL );
-     pTCP.OnError := @pEvent.OnErrorServer;
-     pTCP.OnAccept := @pEvent.OnConnectServer;
-     pTCP.OnReceive := @pEvent.OnReceiveServer;
-     pTCP.OnDisconnect := @pEvent.OnDisconnectServer;
+     pTCP.OnError := @pEvent.OnError;
+     pTCP.OnAccept := @pEvent.OnConnect;
+     pTCP.OnReceive := @pEvent.OnReceive;
+     pTCP.OnDisconnect := @pEvent.OnDisconnect;
      If pTCP.Listen( nPort ) Then Begin
         AddLineToConsole('Server started.');
         ServerInit := True;
@@ -443,7 +594,6 @@ End;
 Procedure ServerLoop () ;
 Begin
      pTCP.Callaction;
-     //Sleep(1);
 End;
 
 

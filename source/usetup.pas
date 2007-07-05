@@ -14,20 +14,26 @@ Const PLAYER_KB2 = 2;
 Const PLAYER_COM = 3;
 Const PLAYER_NET = 4;
 
-Var sLocalName : String;
-Var sServerAddress : String;
-Var nServerPort : Word;
+Const SERVER_UNKNOWN = 0;
+Const SERVER_STANDARD = 1;
+Const SERVER_EXTENDED = 2;
+
+Var sLocalName : String; // a sauvegarder
+Var nLocalIndex : DWord;
+Var sServerAddress : String; // a sauvegarder
+Var nServerPort : Word; // a sauvegarder
+Var nServerType : Integer; // a sauvegarder
 
 Var nVersion : Integer;
 
 Var bDebug : Boolean;
 
-Var bColor : Boolean;
+Var bColor : Boolean; // a sauvegarder et afficher
 
 Var bIntro : Boolean;
 
 Var nRoundCount : Integer;
-Var fRoundDuration : Single;
+Var fRoundDuration : Single; // a sauvegarder et afficher
 
 Var nWindowLeft : Integer;
 Var nWindowTop : Integer;
@@ -62,6 +68,7 @@ Var nPlayerCharacter : Array [1..8] Of Integer;
 Var sPlayerName : Array [1..8] Of String;
 Var nPlayerType : Array [1..8] Of Integer;
 Var nPlayerSkill : Array [1..8] Of Integer;
+Var nPlayerClient : Array [1..8] Of DWord;
 
 Var nKey1Primary : Integer;
 Var nKey1Secondary : Integer;
@@ -218,7 +225,7 @@ Begin
                   End;
                   nSetup := SETUP_MENU;
                End;
-               If GetKeyS( k ) Then Begin
+               If GetKeyS( -k ) Then Begin
                   Case nMenu Of
                        MENU_P1MOVEUP : nKey1MoveUp := -k;
                        MENU_P1MOVEDOWN : nKey1MoveDown := -k;
@@ -797,8 +804,10 @@ Begin
      End;
 
      sLocalName := 'atominsa server';
+     nLocalIndex := Random(1073741824);
      sServerAddress := '127.0.0.1';
      nServerPort := 1212;
+     nServerType := SERVER_STANDARD;
      
      bIntro := True;
      
@@ -835,6 +844,7 @@ Begin
          nPlayerCharacter[k] := -1;
          nPlayerType[k] := PLAYER_COM;
          nPlayerSkill[k] := 2;
+         nPlayerClient[k] := -1;
      End;
      sPlayerName[1] := 'John Carmack';
      sPlayerName[2] := 'Shigeru Miyamoto';

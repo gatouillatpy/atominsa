@@ -6,7 +6,7 @@ Unit UFlameUp;
 
 Interface
 
-Uses Classes, SysUtils, UItem, UBomberman, UUtils;
+Uses Classes, SysUtils, UItem, UBomberman, UUtils, UCore;
 
 Type
 
@@ -27,9 +27,11 @@ Implementation
 
 Procedure CFlameUp.Bonus( nPlayer : CBomberman ) ;
 Begin
-       nPlayer.FlameSize := nPlayer.FlameSize + FLAMECHANGE; // augmente la portee de l'explosion des bombes du joueur de 1
-       if nPlayer.FlameSize > FLAMELIMIT then nPlayer.FlameSize := FLAMELIMIT; // les flammes ne doivent pas depasser la valeur limite
-       self.destroy();      // on change la valeur de la variable pour qu'a la prochaine utilissation de la methode, on annule son effet
+     SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up a flame upgrade.', 0.0, 0.2, 5 );
+
+     nPlayer.FlameSize := nPlayer.FlameSize + FLAMECHANGE; // augmente la portee de l'explosion des bombes du joueur de 1
+     if nPlayer.FlameSize > FLAMELIMIT then nPlayer.FlameSize := FLAMELIMIT; // les flammes ne doivent pas depasser la valeur limite
+     self.destroy();      // on change la valeur de la variable pour qu'a la prochaine utilissation de la methode, on annule son effet
 End;
 
 
