@@ -55,6 +55,7 @@ Begin
      bDisease := True;
 
      i := Random(DISEASECOUNT) + 1;                                // on tire un nombre aleatoire pour choisir la maladie
+     i:=5;
      Case i Of
           1 : Begin
 	      SpeedUp();                                // maladie qui augmente temporairement la vitesse du joueur
@@ -165,11 +166,11 @@ var i : Integer;                                  // variable qui va definir l'i
     uSecondPlayer : CBomberman;                    // variable qui va servir a recuperer les coordonnees d'un autre bomberman
     xtemp,ytemp : Single;                         // variable temporaire pour echanger les coordonnees des deux joueurs
 BEGIN
-     i := 0;                                       // initialisation de la variable
+     i := 1;                                       // initialisation de la variable
 
      Repeat                                        // boucle pour trouver un autre bomberman pour echanger de coordonnees
      i := random(GetBombermanCount())+1;             // on prend un joueur au hasard pour echanger ses coordonnees
-     uSecondPlayer := GetBombermanByIndex(i);
+     uSecondPlayer := GetBombermanByCount(i);
      until ( ( i <> uPlayer.BIndex ) and (uSecondPlayer.Alive) );  // on termine la boucle quand on a trouve un bomberman autre que celui du joueur qui a prit le bonus et qui n'est pas mort
 
      // Echange de coordonnees des deux joueurs

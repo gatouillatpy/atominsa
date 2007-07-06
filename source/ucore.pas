@@ -211,9 +211,9 @@ Procedure FreeTimer();
 
 
 
-Procedure BindKeyStd ( nKey : Integer ; bInstant : Boolean ; pCallback : KeyCallbackStd ) ;
-Procedure BindKeyObj ( nKey : Integer ; bInstant : Boolean ; pCallback : KeyCallbackObj ) ;
-Procedure ExecKey ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ) ;
+Procedure BindKeyStd ( nKey : Integer ; bDown : boolean; bInstant : Boolean ; pCallback : KeyCallbackStd ) ;
+Procedure BindKeyObj ( nKey : Integer ; bDown : boolean; bInstant : Boolean ; pCallback : KeyCallbackObj ) ;
+Procedure ExecKey ( nKey : Integer ; bDown : boolean; bInstant : Boolean ; bSpecial : Boolean ) ;
 
 Procedure BindButton ( nButton : Integer ; pCallback : ButtonCallback ) ;
 
@@ -2375,8 +2375,10 @@ Type LPKeyItem = ^KeyItem;
                       key : Integer;
                       instant : Boolean;
                       special : Boolean;
-                      callbackstd : KeyCallbackStd;
-                      callbackobj : KeyCallbackObj;
+                      callbackstddown : KeyCallbackStd;
+                      callbackstdup   : KeyCallbackStd;
+                      callbackobjdown : KeyCallbackObj;
+                      callbackobjup   : KeyCallbackObj;
                       next : LPKeyItem;
                 END;
 Var pKeyStack : LPKeyItem = NIL;
@@ -2464,18 +2466,26 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 // BindKey : Ajoute une callback à la pile de touches.                        //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure BindKeyStd ( nKey : Integer ; bInstant : Boolean ; pCallback : KeyCallbackStd ) ;
+Procedure BindKeyStd ( nKey : Integer; bDown : boolean ; bInstant : Boolean ; pCallback : KeyCallbackStd ) ;
 Var pKeyItem : LPKeyItem ;
 Begin
      pKeyItem := pKeyStack;
      While pKeyItem <> NIL Do
      Begin
           If (pKeyItem^.key = -nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = True) Then Begin
-             pKeyItem^.callbackstd := pCallback;
+             if bDown then
+             begin
+               pKeyItem^.callbackstddown := pCallback;
+             end
+             else pKeyItem^.callbackstdup := pCallback;
              Exit;
           End;
           If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = False) Then Begin
-             pKeyItem^.callbackstd := pCallback;
+             if bDown then
+             begin
+               pKeyItem^.callbackstddown := pCallback;
+             end
+             else pKeyItem^.callbackstdup := pCallback;
              Exit;
           End;
           pKeyItem := pKeyItem^.next;
@@ -2494,22 +2504,41 @@ Begin
      If nKey < 0 Then pKeyStack^.key := -nKey Else pKeyStack^.key := nKey;
      pKeyStack^.instant := bInstant;
      If nKey < 0 Then pKeyStack^.special := True Else pKeyStack^.special := False;
-     pKeyStack^.callbackstd := pCallback;
-     pKeyStack^.callbackobj := NIL;
+     if bDown then
+     begin
+       pKeyStack^.callbackstdDown := pCallback;
+       pKeyStack^.callbackstdUp := NIL;
+     end
+     else
+     begin
+       pKeyStack^.callbackstdDown := NIL;
+       pKeyStack^.callbackstdUp := pCallback;
+     end;
+     pKeyStack^.callbackobjDown := NIL;
+     pKeyStack^.callbackobjUp := NIL;
+     
 End;
 
-Procedure BindKeyObj ( nKey : Integer ; bInstant : Boolean ; pCallback : KeyCallbackObj ) ;
+Procedure BindKeyObj ( nKey : Integer; bDown : boolean ; bInstant : Boolean ; pCallback : KeyCallbackObj ) ;
 Var pKeyItem : LPKeyItem ;
 Begin
      pKeyItem := pKeyStack;
      While pKeyItem <> NIL Do
      Begin
           If (pKeyItem^.key = -nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = True) Then Begin
-             pKeyItem^.callbackobj := pCallback;
+             if bDown then
+             begin
+               pKeyItem^.callbackobjdown := pCallback;
+             end
+             else pKeyItem^.callbackobjup := pCallback;
              Exit;
           End;
           If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = False) Then Begin
-             pKeyItem^.callbackobj := pCallback;
+             if bDown then
+             begin
+               pKeyItem^.callbackobjDown := pCallback;
+             end
+             else pKeyItem^.callbackobjup := pCallback;
              Exit;
           End;
           pKeyItem := pKeyItem^.next;
@@ -2528,8 +2557,19 @@ Begin
      If nKey < 0 Then pKeyStack^.key := -nKey Else pKeyStack^.key := nKey;
      pKeyStack^.instant := bInstant;
      If nKey < 0 Then pKeyStack^.special := True Else pKeyStack^.special := False;
-     pKeyStack^.callbackstd := NIL;
-     pKeyStack^.callbackobj := pCallback;
+     if bDown then
+     begin
+       pKeyStack^.callbackobjDown := pCallback;
+       pKeyStack^.callbackobjUp := Nil;
+     end
+     else
+     begin
+       pKeyStack^.callbackobjDown := NIL;
+       pKeyStack^.callbackobjUp := pCallback;
+     end;
+     pKeyStack^.callbackstdup := NIL;
+     pKeyStack^.callbackstddown := NIL;
+
 End;
 
 
@@ -2537,19 +2577,35 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 // ExecKey : Execute la callback correspondante à la touche enfoncée.         //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure ExecKey ( nKey : Integer ; bInstant : Boolean ; bSpecial : Boolean ) ;
+Procedure ExecKey ( nKey : Integer ; bDown : boolean ;bInstant : Boolean ; bSpecial : Boolean ) ;
 Var pKeyItem : LPKeyItem ;
 Begin
-     // regarde si la touche enfoncée a été définie et appelle la callback correspondante
+   if bDown then
+   begin
+      // regarde si la touche enfoncée a été définie et appelle la callback correspondante
      pKeyItem := pKeyStack;
      While pKeyItem <> NIL Do
      Begin
           If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = bSpecial) Then Begin
-             If (pKeyItem^.callbackstd = NIL) And (pKeyItem^.callbackobj <> NIL) Then pKeyItem^.callbackobj( GetDelta() );
-             If (pKeyItem^.callbackobj = NIL) And (pKeyItem^.callbackstd <> NIL) Then pKeyItem^.callbackstd();
+            If (pKeyItem^.callbackstddown = NIL) And (pKeyItem^.callbackobjdown <> NIL) Then pKeyItem^.callbackobjdown( GetDelta() );
+            If (pKeyItem^.callbackobjdown = NIL) And (pKeyItem^.callbackstddown <> NIL) Then pKeyItem^.callbackstddown();
           End;
           pKeyItem := pKeyItem^.next;
      End;
+   end
+   else
+   begin
+     pKeyItem := pKeyStack;
+     While pKeyItem <> Nil do
+     begin
+       if (pKeyItem^.Key = nKey) AND (pKeyItem^.special = bSpecial) then
+       begin
+         If (pKeyItem^.callbackstdup = NIL) And (pKeyItem^.callbackobjup <> NIL) Then pKeyItem^.callbackobjup( GetDelta() );
+         If (pKeyItem^.callbackobjup = NIL) And (pKeyItem^.callbackstdup <> NIL) Then pKeyItem^.callbackstdup();
+       end;
+       pKeyItem := pKeyItem^.Next;
+     end;
+   end;
 End;
 
 
@@ -2644,7 +2700,7 @@ Var bReshape : Boolean;
 
 Procedure OGLKeyDown( k : Byte ; x, y : LongInt ); cdecl; overload;
 Begin
-     If bKey[k] = False Then ExecKey( k, True, False );
+     If bKey[k] = False Then ExecKey( k, True, True, False );
      bKey[k] := True;
 End;
 
@@ -2652,6 +2708,7 @@ End;
 
 Procedure OGLKeyUp( k : Byte ; x, y : LongInt ); cdecl; overload;
 Begin
+     If bKey[k] then ExecKey( k, False, True, False);
      bKey[k] := False;
 End;
 
@@ -2659,7 +2716,7 @@ End;
 
 Procedure OGLKeyDownS( k : LongInt ; x, y : LongInt ); cdecl; overload;
 Begin
-     If bKeyS[k] = False Then ExecKey( k, True, True );
+     If bKeyS[k] = False Then ExecKey( k, True, True, True );
      bKeyS[k] := True;
 End;
 
@@ -2667,6 +2724,7 @@ End;
 
 Procedure OGLKeyUpS( k : LongInt ; x, y : LongInt ); cdecl; overload;
 Begin
+     If bKey[k] then ExecKey( k, False, True, True);
      bKeyS[k] := False;
 End;
 
@@ -2739,8 +2797,8 @@ Begin
      glutSwapBuffers;
 
      For k := 0 To 255 Do Begin
-         If bKey[k] = True Then ExecKey( k, False, False );
-         If bKeyS[k] = True Then ExecKey( k, False, True );
+         If bKey[k] = True Then ExecKey( k, True, False, False );
+         If bKeyS[k] = True Then ExecKey( k, True, False, True );
      End;
      
      nFrame += 1;

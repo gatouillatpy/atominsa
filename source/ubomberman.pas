@@ -60,7 +60,7 @@ type
     procedure DoMove(afX, afY : Single);
     procedure TestCase(aX,aY : integer;var bBomb : boolean;var bResult : boolean);
     procedure MoveBomb(_X,_Y,aX,aY,dX,dY : integer; dt : Single);
-    procedure GrabBomb();
+    function GrabBomb():boolean;
     procedure DropBomb(dt : Single);
     
     function TestBomb(aX,aY : integer):boolean;
@@ -73,7 +73,10 @@ type
     { public declarations }
   Constructor Create(aName : string; aTeam : integer; aIndex : Integer;
                            aGrid : CGrid; aX, aY : Single);
-  procedure SecondaryKey(dt : single);cdecl;
+  procedure PrimaryKeyDown(dt : Single);cdecl;
+  procedure SecondaryKeyDown(dt : single);cdecl;
+  procedure PrimaryKeyUp(dt : Single);cdecl;
+  procedure SecondaryKeyUp(dt : Single);cdecl;
   procedure MoveUp(dt : Single);cdecl;
   procedure MoveDown(dt : Single);cdecl;
   procedure MoveLeft(dt : Single);cdecl;
@@ -767,7 +770,7 @@ end;
 
 
 
-procedure CBomberman.GrabBomb();
+function CBomberman.GrabBomb():boolean;
 var dX, dY : integer;
     delta : single;
 begin
@@ -798,6 +801,8 @@ begin
     uGrabbedBomb.StopTime();
     uGrabbedBomb.Position.z:=0.75;
   end;
+
+ result:=Not(uGrabbedBomb=Nil)
 end;
 
 
@@ -846,6 +851,8 @@ begin
   nScore             := 0;
   lastDir.z          := 0;
 end;
+
+
 
 
 
@@ -945,12 +952,27 @@ end;
 
 
 {*******************************************************************************}
-{ Gestion de la seconde touche d'action                                         }
+{ Gestion des touches d'actions                                                 }
 {*******************************************************************************}
-procedure CBomberman.SecondaryKey(dt: single); cdecl;
+procedure CBomberman.PrimaryKeyDown(dt: Single); cdecl;
+begin
+  if (uGrabbedBomb=Nil) then CreateBomb(dt);
+end;
+
+procedure CBomberman.SecondaryKeyDown(dt: single); cdecl;
 begin
  bSecondaryPressed := true;
  if (bCanGrabBomb and (uGrabbedBomb=nil)) then GrabBomb();
+end;
+
+procedure CBomberman.PrimaryKeyUp(dt: Single); cdecl;
+begin
+
+end;
+
+procedure CBomberman.SecondaryKeyUp(dt: Single); cdecl;
+begin
+
 end;
 
 

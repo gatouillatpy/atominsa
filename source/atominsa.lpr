@@ -173,7 +173,7 @@ Begin
      End;
 
      // définition de la touche pour le passage en plein écran
-     BindKeyStd( KEY_F11, True, @SwitchDisplay );
+     BindKeyStd( KEY_F11, True, True, @SwitchDisplay );
 
      ExecGlut();
 End.

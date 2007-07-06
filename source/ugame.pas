@@ -911,18 +911,23 @@ Procedure InitScore () ;
 Var i : Integer;
 Begin
      // suppression des touches des joueurs
-     BindKeyObj( nKey1MoveUp, False, NIL );
-     BindKeyObj( nKey1MoveDown, False, NIL );
-     BindKeyObj( nKey1MoveLeft, False, NIL );
-     BindKeyObj( nKey1MoveRight, False, NIL );
-     BindKeyObj( nKey1Primary, True, NIL );
-     BindKeyObj( nKey1Secondary, True, NIL );
-     BindKeyObj( nKey2MoveUp, False, NIL );
-     BindKeyObj( nKey2MoveDown, False, NIL );
-     BindKeyObj( nKey2MoveLeft, False, NIL );
-     BindKeyObj( nKey2MoveRight, False, NIL );
-     BindKeyObj( nKey2Primary, True, NIL );
-     BindKeyObj( nKey2Secondary, True, NIL );
+     BindKeyObj( nKey1MoveUp, True, False, NIL );
+     BindKeyObj( nKey1MoveDown, True, False, NIL );
+     BindKeyObj( nKey1MoveLeft, True, False, NIL );
+     BindKeyObj( nKey1MoveRight, True, False, NIL );
+     BindKeyObj( nKey1Primary, True, True, NIL );
+     BindKeyObj( nKey1Secondary, True, True, NIL );
+     BindKeyObj( nKey1Primary, False, True, NIL );
+     BindKeyObj( nKey1Secondary, False, True, NIL );
+     
+     BindKeyObj( nKey2MoveUp, True, False, NIL );
+     BindKeyObj( nKey2MoveDown, True, False, NIL );
+     BindKeyObj( nKey2MoveLeft, True, False, NIL );
+     BindKeyObj( nKey2MoveRight, True, False, NIL );
+     BindKeyObj( nKey2Primary, True, True, NIL );
+     BindKeyObj( nKey2Secondary, True, True, NIL );
+     BindKeyObj( nKey2Primary, False, True, NIL );
+     BindKeyObj( nKey2Secondary, False, True, NIL );
 
      // identification du vainqueur
      If GetBombermanCount() <> 0 Then
@@ -1026,18 +1031,23 @@ Begin
      fWaitTime := GetTime;
 
      // suppression des touches des joueurs
-     BindKeyObj( nKey1MoveUp, False, NIL );
-     BindKeyObj( nKey1MoveDown, False, NIL );
-     BindKeyObj( nKey1MoveLeft, False, NIL );
-     BindKeyObj( nKey1MoveRight, False, NIL );
-     BindKeyObj( nKey1Primary, True, NIL );
-     BindKeyObj( nKey1Secondary, True, NIL );
-     BindKeyObj( nKey2MoveUp, False, NIL );
-     BindKeyObj( nKey2MoveDown, False, NIL );
-     BindKeyObj( nKey2MoveLeft, False, NIL );
-     BindKeyObj( nKey2MoveRight, False, NIL );
-     BindKeyObj( nKey2Primary, True, NIL );
-     BindKeyObj( nKey2Secondary, True, NIL );
+     BindKeyObj( nKey1MoveUp, True, False, NIL );
+     BindKeyObj( nKey1MoveDown, True, False, NIL );
+     BindKeyObj( nKey1MoveLeft, True, False, NIL );
+     BindKeyObj( nKey1MoveRight, True, False, NIL );
+     BindKeyObj( nKey1Primary, True, True, NIL );
+     BindKeyObj( nKey1Secondary, True, True, NIL );
+     BindKeyObj( nKey1Primary, False, True, NIL );
+     BindKeyObj( nKey1Secondary, False, True, NIL );
+     
+     BindKeyObj( nKey2MoveUp, True, False, NIL );
+     BindKeyObj( nKey2MoveDown, True, False, NIL );
+     BindKeyObj( nKey2MoveLeft, True, False, NIL );
+     BindKeyObj( nKey2MoveRight, True, False, NIL );
+     BindKeyObj( nKey2Primary, True, True, NIL );
+     BindKeyObj( nKey2Secondary, True, True, NIL );
+     BindKeyObj( nKey2Primary, False, True, NIL );
+     BindKeyObj( nKey2Secondary, False, True, NIL );
 
      // affichage du vainqueur
      If CheckEndGame() <= 0 Then Begin
@@ -1167,22 +1177,26 @@ Begin
 
      // affectation des touches au joueur 1
      If pPlayer1 <> NIL Then Begin
-        BindKeyObj( nKey1MoveUp, False, @pPlayer1.MoveUp );
-        BindKeyObj( nKey1MoveDown, False, @pPlayer1.MoveDown );
-        BindKeyObj( nKey1MoveLeft, False, @pPlayer1.MoveLeft );
-        BindKeyObj( nKey1MoveRight, False, @pPlayer1.MoveRight );
-        BindKeyObj( nKey1Primary, True, @pPlayer1.CreateBomb );
-        BindKeyObj( nKey1Secondary, False, @pPlayer1.SecondaryKey );
+        BindKeyObj( nKey1MoveUp, True, False, @pPlayer1.MoveUp );
+        BindKeyObj( nKey1MoveDown, True, False, @pPlayer1.MoveDown );
+        BindKeyObj( nKey1MoveLeft, True, False, @pPlayer1.MoveLeft );
+        BindKeyObj( nKey1MoveRight, True, False, @pPlayer1.MoveRight );
+        BindKeyObj( nKey1Primary, True, False, @pPlayer1.PrimaryKeyDown );
+        BindKeyObj( nKey1Secondary, True, False, @pPlayer1.SecondaryKeyDown );
+        BindKeyObj( nKey1Primary, False, False, @pPlayer1.PrimaryKeyUp );
+        BindKeyObj( nKey1Secondary, False, False, @pPlayer1.SecondaryKeyUp );
      End;
 
      // affectation des touches au joueur 2
      If pPlayer2 <> NIL Then Begin
-        BindKeyObj( nKey2MoveUp, False, @pPlayer2.MoveUp );
-        BindKeyObj( nKey2MoveDown, False, @pPlayer2.MoveDown );
-        BindKeyObj( nKey2MoveLeft, False, @pPlayer2.MoveLeft );
-        BindKeyObj( nKey2MoveRight, False, @pPlayer2.MoveRight );
-        BindKeyObj( nKey2Primary, True, @pPlayer2.CreateBomb );
-        BindKeyObj( nKey2Secondary, True, @pPlayer2.SecondaryKey );
+        BindKeyObj( nKey2MoveUp, True, False, @pPlayer2.MoveUp );
+        BindKeyObj( nKey2MoveDown, True, False, @pPlayer2.MoveDown );
+        BindKeyObj( nKey2MoveLeft, True, False, @pPlayer2.MoveLeft );
+        BindKeyObj( nKey2MoveRight, True, False, @pPlayer2.MoveRight );
+        BindKeyObj( nKey2Primary, True, False, @pPlayer2.PrimaryKeyDown );
+        BindKeyObj( nKey2Secondary, True, False, @pPlayer2.SecondaryKeyDown );
+        BindKeyObj( nKey2Primary, False, False, @pPlayer2.PrimaryKeyUp );
+        BindKeyObj( nKey2Secondary, False, False, @pPlayer2.SecondaryKeyUp );
      End;
 
      // fin de partie si un joueur a gagné un certain nombre de rounds
