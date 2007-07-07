@@ -854,8 +854,9 @@ Begin
                    sMessage := sMessage + CheckKey();
                End;
                SetString( STRING_MESSAGE, 'say : ' + sMessage, 0.0, 0.02, 600 );
-               fKey := GetTime + 0.1;
             End;
+            fKey := GetTime + 0.2;
+            ClearInput();
          End Else Begin
             fKey := 0.0;
          End;
@@ -1641,8 +1642,9 @@ Begin
                      SetString( STRING_GAME_MENU(61), 'name : ' + sPlayerName[nPlayer], 0.0, 0.02, 600 );
                 End;
            End;
-           fKey := GetTime + 0.1;
         End;
+        fKey := GetTime + 0.2;
+        ClearInput();
      End Else Begin
         fKey := 0.0;
      End;

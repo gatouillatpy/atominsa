@@ -301,7 +301,8 @@ Begin
                      SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
                 End;
            End;
-           fKey := GetTime + 0.1;
+           fKey := GetTime + 0.2;
+           ClearInput();
         End;
      End Else Begin
         fKey := 0.0;

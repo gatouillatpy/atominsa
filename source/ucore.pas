@@ -2473,19 +2473,19 @@ Begin
      While pKeyItem <> NIL Do
      Begin
           If (pKeyItem^.key = -nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = True) Then Begin
-             if bDown then
-             begin
-               pKeyItem^.callbackstddown := pCallback;
-             end
-             else pKeyItem^.callbackstdup := pCallback;
+             If bDown Then Begin
+                 pKeyItem^.callbackstddown := pCallback;
+             End Else Begin
+                 pKeyItem^.callbackstdup := pCallback;
+             End;
              Exit;
           End;
           If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = False) Then Begin
-             if bDown then
-             begin
-               pKeyItem^.callbackstddown := pCallback;
-             end
-             else pKeyItem^.callbackstdup := pCallback;
+             If bDown Then Begin
+                 pKeyItem^.callbackstddown := pCallback;
+             End Else Begin
+                 pKeyItem^.callbackstdup := pCallback;
+             End;
              Exit;
           End;
           pKeyItem := pKeyItem^.next;
@@ -2504,19 +2504,15 @@ Begin
      If nKey < 0 Then pKeyStack^.key := -nKey Else pKeyStack^.key := nKey;
      pKeyStack^.instant := bInstant;
      If nKey < 0 Then pKeyStack^.special := True Else pKeyStack^.special := False;
-     if bDown then
-     begin
-       pKeyStack^.callbackstdDown := pCallback;
-       pKeyStack^.callbackstdUp := NIL;
-     end
-     else
-     begin
-       pKeyStack^.callbackstdDown := NIL;
-       pKeyStack^.callbackstdUp := pCallback;
-     end;
-     pKeyStack^.callbackobjDown := NIL;
-     pKeyStack^.callbackobjUp := NIL;
-     
+     If bDown Then Begin
+         pKeyStack^.callbackstddown := pCallback;
+         pKeyStack^.callbackstdup := NIL;
+     End Else Begin
+         pKeyStack^.callbackstddown := NIL;
+         pKeyStack^.callbackstdup := pCallback;
+     End;
+     pKeyStack^.callbackobjdown := NIL;
+     pKeyStack^.callbackobjup := NIL;
 End;
 
 Procedure BindKeyObj ( nKey : Integer; bDown : boolean ; bInstant : Boolean ; pCallback : KeyCallbackObj ) ;
@@ -2526,19 +2522,19 @@ Begin
      While pKeyItem <> NIL Do
      Begin
           If (pKeyItem^.key = -nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = True) Then Begin
-             if bDown then
-             begin
-               pKeyItem^.callbackobjdown := pCallback;
-             end
-             else pKeyItem^.callbackobjup := pCallback;
+             If bDown Then Begin
+                 pKeyItem^.callbackobjdown := pCallback;
+             End Else Begin
+                 pKeyItem^.callbackobjup := pCallback;
+             End;
              Exit;
           End;
           If (pKeyItem^.key = nKey) And (pKeyItem^.instant = bInstant) And (pKeyItem^.special = False) Then Begin
-             if bDown then
-             begin
-               pKeyItem^.callbackobjDown := pCallback;
-             end
-             else pKeyItem^.callbackobjup := pCallback;
+             If bDown Then Begin
+                 pKeyItem^.callbackobjdown := pCallback;
+             End Else Begin
+                 pKeyItem^.callbackobjup := pCallback;
+             End;
              Exit;
           End;
           pKeyItem := pKeyItem^.next;
@@ -2557,16 +2553,13 @@ Begin
      If nKey < 0 Then pKeyStack^.key := -nKey Else pKeyStack^.key := nKey;
      pKeyStack^.instant := bInstant;
      If nKey < 0 Then pKeyStack^.special := True Else pKeyStack^.special := False;
-     if bDown then
-     begin
-       pKeyStack^.callbackobjDown := pCallback;
-       pKeyStack^.callbackobjUp := Nil;
-     end
-     else
-     begin
-       pKeyStack^.callbackobjDown := NIL;
-       pKeyStack^.callbackobjUp := pCallback;
-     end;
+     If bDown Then Begin
+         pKeyStack^.callbackobjdown := pCallback;
+         pKeyStack^.callbackobjup := NIL;
+     End Else Begin
+         pKeyStack^.callbackobjdown := NIL;
+         pKeyStack^.callbackobjup := pCallback;
+     End;
      pKeyStack^.callbackstdup := NIL;
      pKeyStack^.callbackstddown := NIL;
 
