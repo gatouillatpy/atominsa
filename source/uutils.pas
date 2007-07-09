@@ -70,25 +70,35 @@ Var nState : Integer;
 
 
 // constantes du jeu
-Const GRIDWIDTH = 15;           // largeur de la grille
-      GRIDHEIGHT = 11;          // longueur de la grille
-      DEFAULTFLAMESIZE = 3;     // taille initiale de la portee des flames
-      DEFAULTBOMBCOUNT = 1;     // nombre initial de bombes
-      DEFAULTSPEED = 4;         // vitesse initiale des joueurs
-      SPAWNCOUNT = 256;         // nombre maximum de points d'apparitions
-      POWERUPCOUNT = 13;        // nombre de powerups différents
-      TIMEDISEASE = 10;         // duree d'action des maladies
-      SPEEDCHANGE = 1;          // valeur d'augmentation de la vitesse
-      SPEEDLIMIT = 7;           // vitesse maximale
-      FLAMECHANGE = 1;          // valeur d'augmentation de la portee des flammes
-      FLAMELIMIT = 10;          // portée des flammes maximale
-      FLAMETIME = 0.8;          // durée avant suppression d'une flamme
-      BOMBTIME = 3.0;           // durée avant explosion d'une bombe en situation normale
-      BOMBTIMEDISEASE = 0.75 ;    // duree avant explosion d'une bombe d'un malade =)
-      BOMBMOVESPEED = 6;        // vitesse de deplacement d'une bombe
-      MAXBOMBCOUNT = 10;        // nombre maximum de bombe par bomberman
+Const GRIDWIDTH         = 15;           // largeur de la grille
+      GRIDHEIGHT        = 11;          // longueur de la grille
+      DEFAULTFLAMESIZE  = 3;     // taille initiale de la portee des flames
+      DEFAULTBOMBCOUNT  = 1;     // nombre initial de bombes
+      DEFAULTSPEED      = 4;         // vitesse initiale des joueurs
+      SPAWNCOUNT        = 256;         // nombre maximum de points d'apparitions
+      POWERUPCOUNT      = 13;        // nombre de powerups différents
+      TIMEDISEASE       = 10;         // duree d'action des maladies
+      SPEEDCHANGE       = 0.5;          // valeur d'augmentation de la vitesse
+      SPEEDLIMIT        = 7;           // vitesse maximale
+      FLAMECHANGE       = 1;          // valeur d'augmentation de la portee des flammes
+      FLAMELIMIT        = 10;          // portée des flammes maximale
+      FLAMETIME         = 0.8;          // durée avant suppression d'une flamme
+      BOMBTIME          = 3.0;           // durée avant explosion d'une bombe en situation normale
+      BOMBTIMEDISEASE   = 0.75 ;    // duree avant explosion d'une bombe d'un malade =)
+      BOMBMOVESPEED     = 6;        // vitesse de deplacement d'une bombe
+      MAXBOMBCOUNT      = 10;        // nombre maximum de bombe par bomberman
 
 
+// constantes d'identification des maladies
+Const DISEASE_NONE       = 0;
+      DISEASE_SPEEDUP    = 1;
+      DISEASE_SPEEDDOWN  = 2;
+      DISEASE_NOBOMB     = 3;
+      DISEASE_CHANGEKEY  = 4;
+      DISEASE_SWITCH     = 5;
+      DISEASE_FASTBOMB   = 6;
+      DISEASE_SMALLFLAME = 7;
+      DISEASE_EJECTBOMB  = 8;
 
 
 // constantes de définition des chemins d'accès

@@ -31,16 +31,19 @@ type
 
     sName     : string;       //nom du joueur
 
+    nDisease : integer;
     nIndex,                   //numero du bomberman
     nTeam,                    //numero de team
     nKills,                   //nombre de bomberman tue
     nDeaths,                  //nombre de fois tue
-    nScore,                   //Score
+    nScore,                   // score
     nBombCount,               //Nombre de bombes dispo
     nFlameSize,               //Taille de la flamme
     nDirection  : integer;    //Derniere direction de mouvement du bomberman
 
 
+
+    bPrimaryPressed,
     bSecondaryPressed,
     bCanGrabBomb,             // Peut il porter une bombe ... (le bonus)
     bEjectBomb,               //Si true = on oblige a lacher ses bombes
@@ -62,6 +65,7 @@ type
     procedure MoveBomb(_X,_Y,aX,aY,dX,dY : integer; dt : Single);
     function GrabBomb():boolean;
     procedure DropBomb(dt : Single);
+    procedure ContaminateBomberman();
     
     function TestBomb(aX,aY : integer):boolean;
     function TestBonus(aX,aY : integer):boolean;
@@ -102,15 +106,17 @@ type
   Property CX : Single Read fCX Write fCX;
   Property CY : Single Read fCY Write fCY;
   Property Danger : Single Read fDanger Write fDanger;
+  property ExploseBombTime : Single Read fBombTime Write fBombTime;
 
+  property DiseaseNumber : integer Read nDisease Write nDisease;
   property BIndex : integer Read nIndex Write nIndex;
   property Name : string Read sName Write sName;
   property Team : integer Read nTeam Write nTeam;
   property Kills : integer Read nKills;
   property Deaths : integer Read nDeaths;
   property Score : integer Read nScore;
-  property ExploseBombTime : Single Read fBombTime Write fBombTime;
-  
+
+
   property BombCount : integer Read nBombCount Write nBombCount;
   property FlameSize : integer Read nFlameSize Write nFlameSize;
   property Speed : single Read fSpeed Write fSpeed;
@@ -121,6 +127,14 @@ type
 
   end;
   
+
+
+type ArrayIndex = record
+                   count : integer;
+                   Tab   : array[1..8] of integer;
+                  end;
+
+
 
 
 type
@@ -139,7 +153,7 @@ type
     Function GetBombermanCount():Integer;
     Function GetBombermanByCount(i : integer):Cbomberman;
     Function GetBombermanByIndex(i : integer):CBomberman;
-    function GetBombermanByCoo(aX, aY: integer): CBomberman;
+    function GetBombermanIndexByCoo(aX, aY: integer): ArrayIndex;
     function IsBombermanAtCoo(aX,aY : integer):boolean;cdecl;
     Function CheckEndGame() : Integer;
 
@@ -148,7 +162,7 @@ type
 
 
 implementation
-uses uItem;        //Classe Item
+uses uForm,uCore,uItem,uDisease;
 
 
 
@@ -337,27 +351,23 @@ end;
 if Find then result:=pTemp^.Bomberman;
 End;
 
-function GetBombermanByCoo(aX, aY: integer): CBomberman;
+function GetBombermanIndexByCoo(aX, aY: integer): ArrayIndex;
 var pTemp : LPBombermanItem;
-    Find, Last : Boolean;
 begin
-result:=Nil;
-if ((pBombermanItem<>Nil) AND (CheckCoordinates(aX,aY))) then
-begin
- pTemp:=pBombermanItem;
- Find:=((Trunc(pTemp^.Bomberman.Position.X+0.5)=aX) AND (Trunc(pTemp^.Bomberman.Position.Y+0.5)=aY));
- Last:=(pTemp^.Next=Nil);
-
- While Not(Find or Last) do
- begin
-  pTemp:=pTemp^.Next;
-  Find:=((Trunc(pTemp^.Bomberman.Position.X+0.5)=aX) AND (Trunc(pTemp^.Bomberman.Position.Y+0.5)=aY));
-  Last:=(pTemp^.Next=Nil);
- end;
-
- if Find then result:=pTemp^.Bomberman;
-
-end;
+  result.Count:=0;
+  if ((pBombermanItem<>Nil) AND (CheckCoordinates(aX,aY))) then
+  begin
+   pTemp:=pBombermanItem;
+   While Not(pTemp=Nil) do
+   begin
+     if ((Trunc(pTemp^.Bomberman.Position.X+0.5)=aX) AND (Trunc(pTemp^.Bomberman.Position.Y+0.5)=aY)) then
+     begin
+       inc(result.count);
+       result.tab[result.count]:=pTemp^.Bomberman.Bindex;
+     end;
+     pTemp:=pTemp^.Next
+   end;
+  end;
 end;
 
 Function GetBombermanCount():Integer;
@@ -398,7 +408,7 @@ end;
 function IsBombermanAtCoo(aX, aY: integer): boolean; cdecl;
 {True = il y a au moins un bomberman}
 begin
-result:=(GetBombermanByCoo(aX,aY)<>Nil)
+result:=(GetBombermanIndexByCoo(aX,aY).Count<>0)
 end;
 
 
@@ -421,6 +431,16 @@ Begin
      If c = 1 Then Result :=  k; // on renvoie l'index du joueur vainqueur
      If c = 0 Then Result := -1; // on renvoie -1 s'il y a égalité
 End;
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -689,12 +709,15 @@ end;
 
 
 
+
+
+
 {*******************************************************************************}
 { Gestion des Scores                                                            }
 {*******************************************************************************}
 procedure CBomberman.UpScore();
 begin
-Inc(nScore);
+  nScore := nScore + 1;
 end;
 
 procedure CBomberman.UpKills();
@@ -717,6 +740,12 @@ if bAlive then
   fPosition.y:=0;
  end;
 end;
+
+
+
+
+
+
 
 
 
@@ -833,6 +862,13 @@ end;
 
 
 
+
+
+
+
+
+
+
 {*******************************************************************************}
 { Creation et restauration                                                      }
 {*******************************************************************************}
@@ -846,6 +882,7 @@ begin
   fOrigin.y          := aY;
   fOrigin.z          := 0;
   uGrid              := aGrid;
+  nDisease           := DISEASE_NONE;
   nKills             := 0;
   nDeaths            := 0;
   nScore             := 0;
@@ -861,6 +898,7 @@ procedure CBomberman.Restore();
 begin
   bAlive             := True;
   fPosition          := fOrigin;
+  bPrimaryPressed    := false;
   bSecondaryPressed  := false;
   bCanGrabBomb       := false;
   bEjectBomb         := false;
@@ -885,21 +923,34 @@ end;
 
 
 
+
+
+
+
+
+
 {*******************************************************************************}
 { Update                                                                        }
 {*******************************************************************************}
 procedure CBomberman.Update(dt : Single);
 begin
   CheckBonus;
+  if nDisease<>0 then ContaminateBomberman();
   if bEjectBomb then CreateBomb(dt);
   if (uGrabbedBomb<>nil) then
   begin
     uGrabbedBomb.Position.x:=fPosition.x;
     uGrabbedBomb.Position.y:=fPosition.y;
-    if Not(bSecondaryPressed) then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
+    if Not(bPrimaryPressed) then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
   end;
-  bSecondaryPressed := false;
 end;
+
+
+
+
+
+
+
 
 
 
@@ -921,6 +972,33 @@ begin
          uGrid.DelBlock(oldX,oldY);
       end;
 end;
+
+
+
+
+
+procedure CBomberman.ContaminateBomberman();
+var aArrayVictim : ArrayIndex;
+    aVictim : CBomberman;
+    aDisease : CDisease;
+    index : integer;
+begin
+ aArrayVictim := GetBombermanIndexByCoo(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5));
+ if Not(aArrayVictim.Count<=1) then
+ for index:=Low(aArrayVictim.tab) to aArrayVictim.Count do
+ if aArrayVictim.tab[index]<>nIndex then
+ begin
+   aVictim:=GetBombermanByIndex(aArrayVictim.Tab[index]);
+   if (aVictim.DiseaseNumber=0) then
+   begin
+     SetString( STRING_NOTIFICATION, aVictim.Name + ' has contamined by ' + sName, 0.0, 0.2, 5 );
+     aDisease:=CDisease.Create(1,1);
+     aDisease.BonusForced(aVictim,nDisease);
+   end;
+ end;
+end;
+
+
 
 
 
@@ -951,28 +1029,48 @@ end;
 
 
 
+
+
+
+
+
+
+
 {*******************************************************************************}
 { Gestion des touches d'actions                                                 }
 {*******************************************************************************}
 procedure CBomberman.PrimaryKeyDown(dt: Single); cdecl;
 begin
-  if (uGrabbedBomb=Nil) then CreateBomb(dt);
+ if bAlive then
+ begin
+  if (bCanGrabBomb and (uGrabbedBomb=nil) and Not(bPrimaryPressed)) then GrabBomb();
+  if (uGrabbedBomb=Nil) and Not(bPrimaryPressed) then CreateBomb(dt);
+  bPrimaryPressed := true;
+ end;
 end;
 
 procedure CBomberman.SecondaryKeyDown(dt: single); cdecl;
 begin
- bSecondaryPressed := true;
- if (bCanGrabBomb and (uGrabbedBomb=nil)) then GrabBomb();
+  if bAlive then
+  begin
+    bSecondaryPressed := true;
+  end;
 end;
 
 procedure CBomberman.PrimaryKeyUp(dt: Single); cdecl;
 begin
-
+  if bAlive then
+  begin
+    bPrimaryPressed := false;
+  end;
 end;
 
 procedure CBomberman.SecondaryKeyUp(dt: Single); cdecl;
 begin
-
+  if bAlive then
+  begin
+    bSecondaryPressed := false;
+  end;
 end;
 
 

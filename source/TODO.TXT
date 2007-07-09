@@ -24,7 +24,6 @@ Technique :
 Gameplay :
  - implémenter les bonus push, spooger, trigger, jelly, goldflame, baddisease
  - terminer l'implémentation des maladies 
- - rendre les maladies contagieuses
  - rendre certaines bombes défectueuses (leur minuterie est random)
 
 Divers :

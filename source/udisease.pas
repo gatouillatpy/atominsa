@@ -38,7 +38,9 @@ CDisease = Class ( CItem )
                   Procedure EjectBomb () ; cdecl;          // maladie qui oblige temporairement la joueur a ejecter ses bombes
 
            Public
+                 Destructor Destroy();override;
                  Procedure Bonus ( _uPlayer : CBomberman ) ; override; // procédure appelée par le bomberman pour l'attribution d'un bonus
+                 Procedure BonusForced( _uPlayer : CBomberman; num : integer);
 
 End;
 
@@ -50,45 +52,54 @@ Procedure CDisease.Bonus( _uPlayer : CBomberman );
 Var i : integer;
 Begin
      SetString( STRING_NOTIFICATION, _uPlayer.Name + ' has picked up a disease.', 0.0, 0.2, 5 );
-
-     uPlayer := _uPlayer;
-     bDisease := True;
-
      i := Random(DISEASECOUNT) + 1;                                // on tire un nombre aleatoire pour choisir la maladie
-     i:=5;
-     Case i Of
-          1 : Begin
-	      SpeedUp();                                // maladie qui augmente temporairement la vitesse du joueur
-	      AddTimer( TIMEDISEASE, @SpeedUp );        // on utilise un timer pour annuler l'effet de la maladie après TIMEDISEASE secondes
-          End;
-          2 : Begin
-	      SpeedDown();                              // maladie qui diminue temporairement la vitesse du joueur
-	      AddTimer( TIMEDISEASE, @SpeedDown );
-          End;
-          3 : Begin
-	      NoBomb();                                 // maladie qui empeche temporairement le joueur de poser des bombes
-	      AddTimer( TIMEDISEASE, @NoBomb );
-          End;
-          4 : Begin
-	      ChangeKeys();                             // maladie qui change temporairement les touches de deplacement
-	      AddTimer( TIMEDISEASE, @ChangeKeys );
-          End;
-          5 :
-              SwitchBomberman();                        // maladie qui echange la position de deux joueurs
-          6 : Begin
-              FastBomb();                               // bombe explose apres BOMBTIMEDISEASE de temps (inferieur a la normale)
-              AddTimer( TIMEDISEASE, @FastBomb);
-          End;
-          7 : Begin
-              SmallFlame();                             // reduit la taille de la flame a une case aux alentours
-              AddTimer( TIMEDISEASE, @SmallFlame);
-          End;
-          8 : Begin
-	      EjectBomb();               // maladie qui oblige temporairement la joueur a ejecter ses bombes
-	      AddTimer( TIMEDISEASE, @EjectBomb); // on utilise un timer pour annuler l'effet de la maladie apres TIMEDISEASE
-          End;
-     End;
+     BonusForced(_uPlayer,i);
 End;
+
+procedure CDisease.BonusForced(_uPlayer: CBomberman; num: integer);
+begin
+  uPlayer := _uPlayer;
+  bDisease := True;
+  if (uPlayer.DiseaseNumber=0) or (num=DISEASE_SWITCH) then
+  begin
+    uPlayer.DiseaseNumber:=num;
+    
+    Case num Of
+            DISEASE_SPEEDUP : Begin
+                SpeedUp();                                // maladie qui augmente temporairement la vitesse du joueur
+  	      AddTimer( TIMEDISEASE, @SpeedUp );        // on utilise un timer pour annuler l'effet de la maladie après TIMEDISEASE secondes
+            End;
+            DISEASE_SPEEDDOWN : Begin
+  	      SpeedDown();                              // maladie qui diminue temporairement la vitesse du joueur
+  	      AddTimer( TIMEDISEASE, @SpeedDown );
+            End;
+            DISEASE_NOBOMB : Begin
+  	      NoBomb();                                 // maladie qui empeche temporairement le joueur de poser des bombes
+  	      AddTimer( TIMEDISEASE, @NoBomb );
+            End;
+            DISEASE_CHANGEKEY : Begin
+  	      ChangeKeys();                             // maladie qui change temporairement les touches de deplacement
+  	      AddTimer( TIMEDISEASE, @ChangeKeys );
+            End;
+            DISEASE_SWITCH :
+                SwitchBomberman();                        // maladie qui echange la position de deux joueurs
+            DISEASE_FASTBOMB : Begin
+                FastBomb();                               // bombe explose apres BOMBTIMEDISEASE de temps (inferieur a la normale)
+                AddTimer( TIMEDISEASE, @FastBomb);
+            End;
+            DISEASE_SMALLFLAME : Begin
+                SmallFlame();                             // reduit la taille de la flame a une case aux alentours
+                AddTimer( TIMEDISEASE, @SmallFlame);
+            End;
+            DISEASE_EJECTBOMB : Begin
+  	      EjectBomb();               // maladie qui oblige temporairement la joueur a ejecter ses bombes
+  	      AddTimer( TIMEDISEASE, @EjectBomb); // on utilise un timer pour annuler l'effet de la maladie apres TIMEDISEASE
+            End;
+       End;
+
+  end
+  else Destroy();
+end;
 
 
 Procedure CDisease.speedup (); cdecl;
@@ -147,6 +158,12 @@ BEGIN
                         end;
 END;
 
+destructor CDisease.Destroy();
+begin
+  uPlayer.DiseaseNumber:=DISEASE_NONE;
+  inherited Destroy();
+end;
+
 
 Procedure CDisease.changekeys (); cdecl;
 BEGIN
@@ -180,7 +197,7 @@ BEGIN
      uSecondPlayer.Position.Y := uPlayer.Position.Y;
      uPlayer.Position.X := xtemp;
      uPlayer.Position.Y := ytemp;
-     
+     uPlayer.DiseaseNumber := DISEASE_NONE;
      Self.destroy();                    // on peut detruire le bonus
 END;
 

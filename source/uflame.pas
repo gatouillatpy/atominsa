@@ -313,23 +313,24 @@ end;
 //Verifie si une bombe ou un bomberman se trouve sur la flame
 function CFlame.Update():boolean;
 var PlayerKilled : CBomberman;
+    aArrayIndex  : ArrayIndex;
+    index : integer;
 begin
   result:=False;
   if (GetBombByGridCoo(Self.X,Self.Y)<>nil) then                      //cherche les bombes en fait
    GetBombByGridCoo(Self.X,Self.Y).Explose();
    
    
-  PlayerKilled:=GetBombermanByCoo(Self.X,Self.Y);
-  While (PlayerKilled<>nil) do
-  //if (PlayerKilled<>nil) then                                     //cherche si y'a un bomberman dans le coin
+  aArrayIndex:=GetBombermanIndexByCoo(Self.X,Self.Y);
+  for index:=Low(aArrayIndex.Tab) to aArrayIndex.Count do                                        //cherche si y'a un bomberman dans le coin
   begin
-  if PlayerKilled.Alive then
-   begin
-   PlayerKilled.Dead();                                           //fait tomber de 1 le score ...
-   if (PlayerKilled<>bombPlayer) then bombPlayer.UpKills()         //on incremente le score du joueur qui a
-   else bombPlayer.DownKills();
-  end;                                                            //cree la flame que si il s'est pas tue tout seul
-  PlayerKilled:=GetBombermanByCoo(Self.X,Self.Y);
+    PlayerKilled:=GetBombermanByIndex(aArrayIndex.Tab[index]);
+    if PlayerKilled.Alive then
+     begin
+     PlayerKilled.Dead();                                           //fait tomber de 1 le score ...
+     if (PlayerKilled<>bombPlayer) then bombPlayer.UpKills()         //on incremente le score du joueur qui a
+     else bombPlayer.DownKills();
+    end;                                                            //cree la flame que si il s'est pas tue tout seul
   end;
 
 

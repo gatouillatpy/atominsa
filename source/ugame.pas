@@ -916,19 +916,19 @@ Begin
      BindKeyObj( nKey1MoveDown, True, False, NIL );
      BindKeyObj( nKey1MoveLeft, True, False, NIL );
      BindKeyObj( nKey1MoveRight, True, False, NIL );
-     BindKeyObj( nKey1Primary, True, True, NIL );
-     BindKeyObj( nKey1Secondary, True, True, NIL );
-     BindKeyObj( nKey1Primary, False, True, NIL );
-     BindKeyObj( nKey1Secondary, False, True, NIL );
+     BindKeyObj( nKey1Primary, True, False, NIL );
+     BindKeyObj( nKey1Secondary, True, False, NIL );
+     BindKeyObj( nKey1Primary, False, False, NIL );
+     BindKeyObj( nKey1Secondary, False, False, NIL );
      
      BindKeyObj( nKey2MoveUp, True, False, NIL );
      BindKeyObj( nKey2MoveDown, True, False, NIL );
      BindKeyObj( nKey2MoveLeft, True, False, NIL );
      BindKeyObj( nKey2MoveRight, True, False, NIL );
-     BindKeyObj( nKey2Primary, True, True, NIL );
-     BindKeyObj( nKey2Secondary, True, True, NIL );
-     BindKeyObj( nKey2Primary, False, True, NIL );
-     BindKeyObj( nKey2Secondary, False, True, NIL );
+     BindKeyObj( nKey2Primary, True, False, NIL );
+     BindKeyObj( nKey2Secondary, True, False, NIL );
+     BindKeyObj( nKey2Primary, False, False, NIL );
+     BindKeyObj( nKey2Secondary, False, False, NIL );
 
      // identification du vainqueur
      If GetBombermanCount() <> 0 Then
@@ -1036,26 +1036,26 @@ Begin
      BindKeyObj( nKey1MoveDown, True, False, NIL );
      BindKeyObj( nKey1MoveLeft, True, False, NIL );
      BindKeyObj( nKey1MoveRight, True, False, NIL );
-     BindKeyObj( nKey1Primary, True, True, NIL );
-     BindKeyObj( nKey1Secondary, True, True, NIL );
-     BindKeyObj( nKey1Primary, False, True, NIL );
-     BindKeyObj( nKey1Secondary, False, True, NIL );
+     BindKeyObj( nKey1Primary, True, False, NIL );
+     BindKeyObj( nKey1Secondary, True, False, NIL );
+     BindKeyObj( nKey1Primary, False, False, NIL );
+     BindKeyObj( nKey1Secondary, False, False, NIL );
      
      BindKeyObj( nKey2MoveUp, True, False, NIL );
      BindKeyObj( nKey2MoveDown, True, False, NIL );
      BindKeyObj( nKey2MoveLeft, True, False, NIL );
      BindKeyObj( nKey2MoveRight, True, False, NIL );
-     BindKeyObj( nKey2Primary, True, True, NIL );
-     BindKeyObj( nKey2Secondary, True, True, NIL );
-     BindKeyObj( nKey2Primary, False, True, NIL );
-     BindKeyObj( nKey2Secondary, False, True, NIL );
+     BindKeyObj( nKey2Primary, True, False, NIL );
+     BindKeyObj( nKey2Secondary, True, False, NIL );
+     BindKeyObj( nKey2Primary, False, False, NIL );
+     BindKeyObj( nKey2Secondary, False, False, NIL );
 
      // affichage du vainqueur
      If CheckEndGame() <= 0 Then Begin
         SetString( STRING_SCORE_TABLE(0), 'draw game!', 1.0, 0.5, 300.0 );
      End Else Begin
-        SetString( STRING_SCORE_TABLE(0), GetBombermanByCount(CheckEndGame()).Name + ' wins the round.', 1.0, 0.5, 300.0 );
-        GetBombermanByCount(CheckEndGame()).UpScore();
+        SetString( STRING_SCORE_TABLE(0), GetBombermanByIndex(CheckEndGame()).Name + ' wins the round.', 1.0, 0.5, 300.0 );
+        GetBombermanByIndex(CheckEndGame()).UpScore();
      End;
 
      // affichage des scores
