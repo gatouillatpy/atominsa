@@ -15,6 +15,7 @@ Type
 
 CBomb = Class(CBlock)
      Private
+       bJelly,                                                // rebondit conte les obstacles
        bUpdateTime,
        bMoving,                                               // defini si la bombe est en cours de mouvement ou non
        bJumping,                                              // definit si la bombe est en cours de saut ...
@@ -38,7 +39,7 @@ CBomb = Class(CBlock)
        procedure Jump(dt : Single);
 
      Public
-       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Overload;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
+       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Overload;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
        Destructor Destroy();Override;
        function UpdateBomb():boolean;                         // check le temps + mouvement
        procedure StartTime();
@@ -54,6 +55,7 @@ CBomb = Class(CBlock)
        property Time : Single Read fTimeCreated;
        property JumpMovement : boolean Read bMoveJump Write bMoveJump;
        property BIndex : integer Read nIndex Write nIndex;
+       property Jelly : boolean Read bJelly;
 
 end;
 
@@ -66,7 +68,7 @@ Type LPBombItem = ^BombItem;
               end;
 
     
-    function AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman):Boolean;
+    function AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman):Boolean;
     procedure RemoveBombByCount(i : integer);
     procedure RemoveBombByGridCoo(aX,aY : integer);
     procedure FreeBomb();overload;
@@ -99,7 +101,7 @@ Procedure UpdateCountList();Forward;                                 // pour lui
 { Ajout / Suppression                                                           }
 {*******************************************************************************}
 // ajout
-function AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman): boolean;
+function AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman): boolean;
 var pTemp : LPBombItem;
 begin
 result:=false;
@@ -110,7 +112,7 @@ begin
  begin
    New(pBombItem);
    pBombItem^.Next:=Nil;
-   pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
+   pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aJelly,aGrid,UpCount,IsBomberman);
    pBombItem^.Count:=BombCount;
    result:=true;
  end
@@ -123,7 +125,7 @@ begin
  pTemp:=pTemp^.Next;
  pTemp^.Count:=BombCount;
  pTemp^.Next:=Nil;
- pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
+ pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aJelly,aGrid,UpCount,IsBomberman);
  result:=true;
 end;
 end;
@@ -363,9 +365,9 @@ end;
 {                                                                               }
 const NONE  = 0;
       UP    = 1;
-      DOWN  = 2;
-      RIGHT = 3;
-      LEFT  = 4;
+      DOWN  = -1;
+      RIGHT = 2;
+      LEFT  = -2;
 
 
 {*******************************************************************************}
@@ -467,8 +469,9 @@ begin
    {Par contre meme remarque que tout a l'heure si mouvement a droite ou gauche}
     if TestBomberman(aX,aY) then
     begin
-      bMoving:=False;
+      //bMoving:=false;
       if ((nMoveDir=RIGHT) or (nMoveDir=DOWN)) then DoMove(_X,_Y,_X,_Y);
+      if bJelly then nMoveDir:=-nMoveDir else bMoving:=False;
     end
    {Sinon c'est que c'est un objet sur la grille qui nous bloque}
     else
@@ -483,8 +486,9 @@ begin
      {Deuxieme Cas : Bombe ou mur : on s'arrete}
       else
       begin
-        bMoving:=False;
+        //bMoving := false;
         if ((nMoveDir=RIGHT) or (nMoveDir=DOWN)) then DoMove(_X,_Y,_X,_Y);
+        if bJelly then nMoveDir:=-nMoveDir else bMoving:=False;
       end;
     end;
   end;
@@ -558,8 +562,12 @@ begin
    bJumping:=True;
    //Repeat
    r:=Random(4)+1;
-   //until r<>nMoveDir;
-   nMoveDir:=r;
+   case r of
+    1 : nMoveDir := UP;
+    2 : nMoveDir := DOWN;
+    3 : nMoveDir := RIGHT;
+    4 : nMoveDir := LEFT;
+   end;
    Jump(dt);
 end;
 
@@ -648,10 +656,16 @@ end;
 {*******************************************************************************}
 { Creation / destruction                                                        }
 {*******************************************************************************}
-constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aJelly : boolean ; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+var r : integer;
 begin
+   if (aBombTime=BOMBTIME) and ((random(100)+1)<=10)then
+      aBombtime := (random(200)+1)*BOMBTIME/100;
+   //play sound moisi !!!
+
    pUpCount        := UpCount;
    pIsBomberman    := IsBomberman;
+   bJelly          := aJelly;
    bUpdateTime     := true;
    bExplosive      := true;                                                     //une bombe peut exploser
    bMoving         := False;
@@ -770,6 +784,11 @@ begin
   aLastTime:=GetTime();
   dt:=aLastTime - fLastTime;
   fLastTime:=aLastTime;
+  if Not(bUpdateTime and bMoveJump) then
+  begin
+    nX:=Trunc(fPosition.x);
+    nY:=Trunc(fPosition.y);
+  end;
   if (Not(bMoveJump) and bUpdateTime) then fTimeCreated += dt;
   
   if bMoving then

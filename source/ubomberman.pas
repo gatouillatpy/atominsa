@@ -43,6 +43,7 @@ type
 
 
 
+    bJelly,
     bPrimaryPressed,
     bSecondaryPressed,
     bCanGrabBomb,             // Peut il porter une bombe ... (le bonus)
@@ -53,6 +54,8 @@ type
     bReverse  : Boolean;       //touche inverse
     bAlive    : Boolean;      //Personnage en vie ou non
     bKick     : Boolean;      //Shoot dans une bombe possible ou non
+
+
     uGrid     : CGrid;        //Pointe sur la grille de jeu
     uGrabbedBomb : CBomb;      // pointe sur la bombe qu'on porte
     
@@ -95,6 +98,7 @@ type
   procedure ChangeReverse();
   procedure ChangeKick();
   procedure ChangeGrab();
+  procedure ChangeJelly();
 
   function CanBomb():boolean;
 
@@ -776,7 +780,7 @@ begin
   begin
     if CanBomb  then
     begin
-      if AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,uGrid,@UpBombCount,@IsBombermanAtCoo) then
+      if AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,uGrid,@UpBombCount,@IsBombermanAtCoo) then
         Dec(nBombCount);
     end;
   end;
@@ -898,13 +902,14 @@ procedure CBomberman.Restore();
 begin
   bAlive             := True;
   fPosition          := fOrigin;
+  bJelly             := False;
   bPrimaryPressed    := false;
   bSecondaryPressed  := false;
-  bCanGrabBomb       := false;
+  bCanGrabBomb       := False;
   bEjectBomb         := false;
   bNoBomb            := False;
   bReverse           := False;
-  bKick              := false;
+  bKick              := False;
   nBombCount         := DEFAULTBOMBCOUNT;
   fBombTime          := BOMBTIME;
   nFlameSize         := DEFAULTFLAMESIZE;
@@ -941,7 +946,7 @@ begin
   begin
     uGrabbedBomb.Position.x:=fPosition.x;
     uGrabbedBomb.Position.y:=fPosition.y;
-    if Not(bPrimaryPressed) then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
+    if Not(bPrimaryPressed and bCanGrabBomb)then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
   end;
 end;
 
@@ -991,7 +996,7 @@ begin
    aVictim:=GetBombermanByIndex(aArrayVictim.Tab[index]);
    if (aVictim.DiseaseNumber=0) then
    begin
-     SetString( STRING_NOTIFICATION, aVictim.Name + ' has contamined by ' + sName, 0.0, 0.2, 5 );
+     SetString( STRING_NOTIFICATION, aVictim.Name + ' has contaminated by ' + sName, 0.0, 0.2, 5 );
      aDisease:=CDisease.Create(1,1);
      aDisease.BonusForced(aVictim,nDisease);
    end;
@@ -1011,16 +1016,21 @@ end;
 
 procedure CBomberman.ChangeKick();
 begin
-  bKick := Not(bKick);
+  bKick := true;
   //if bGrab reapparition de la caisse ?
   bCanGrabBomb := false;
 end;
 
 procedure CBomberman.ChangeGrab();
 begin
-  bCanGrabBomb := Not(bCanGrabBomb);
+  bCanGrabBomb := true;
   //if bKick reapparition de la caisse ?
   bKick := false;
+end;
+
+procedure CBomberman.ChangeJelly();
+begin
+  bJelly := true;
 end;
 
 

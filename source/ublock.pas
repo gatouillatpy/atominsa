@@ -23,8 +23,8 @@ CBlock = Class
            Procedure Explose () ; virtual;                                      // detruit le bloc si c'est possible (appele apres une explosion)
            Function IsExplosive():boolean;
            
-           Property XGrid : integer Read nX;
-           Property YGrid : integer Read nY;
+           Property XGrid : integer Read nX Write nX;
+           Property YGrid : integer Read nY Write nY;
                
 End;
 

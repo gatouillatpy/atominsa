@@ -11,7 +11,7 @@ Interface
 
 Uses Classes, SysUtils,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
-     USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UGrid, UFlame, UBomb, USetup, UForm,
+     USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UJelly, UGrid, UFlame, UBomb, USetup, UForm,
      UCharacter, UComputer;
 
 
@@ -417,28 +417,61 @@ End;
 
 Procedure SetLighting ( h : Single ; a0, a1, a2 : Single ) ;
 Var k : Integer;
+    aBomberman : CBomberman;
 Begin
      For k := 1 To 8 Do Begin
          SetLight( k - 1, 4999.999, 4999.999, 4999.999, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, False );
      End;
 
      If bLighting Then Begin
-        If nPlayerType[1] > 0 Then If GetBombermanByIndex(1).Alive Then
-           SetLight( 0, GetBombermanByIndex(1).Position.X, h, GetBombermanByIndex(1).Position.Y - 2, 1, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
-        If nPlayerType[2] > 0 Then If GetBombermanByIndex(2).Alive Then
-           SetLight( 1, GetBombermanByIndex(2).Position.X, h, GetBombermanByIndex(2).Position.Y - 2, 0, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
-        If nPlayerType[3] > 0 Then If GetBombermanByIndex(3).Alive Then
-           SetLight( 2, GetBombermanByIndex(3).Position.X, h, GetBombermanByIndex(3).Position.Y - 2, 0, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
-        If nPlayerType[4] > 0 Then If GetBombermanByIndex(4).Alive Then
-           SetLight( 3, GetBombermanByIndex(4).Position.X, h, GetBombermanByIndex(4).Position.Y - 2, 1, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
-        If nPlayerType[5] > 0 Then If GetBombermanByIndex(5).Alive Then
-           SetLight( 4, GetBombermanByIndex(5).Position.X, h, GetBombermanByIndex(5).Position.Y - 2, 0, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
-        If nPlayerType[6] > 0 Then If GetBombermanByIndex(6).Alive Then
-           SetLight( 5, GetBombermanByIndex(6).Position.X, h, GetBombermanByIndex(6).Position.Y - 2, 1, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
-        If nPlayerType[7] > 0 Then If GetBombermanByIndex(7).Alive Then
-           SetLight( 6, GetBombermanByIndex(7).Position.X, h, GetBombermanByIndex(7).Position.Y - 2, 1, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
-        If nPlayerType[8] > 0 Then If GetBombermanByIndex(8).Alive Then
-           SetLight( 7, GetBombermanByIndex(8).Position.X, h, GetBombermanByIndex(8).Position.Y - 2, 0, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        If nPlayerType[1] > 0 Then
+        begin
+           aBomberman:=GetBombermanByIndex(1);
+           if aBomberman.Alive then
+           SetLight( 0, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 1, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        end;
+        If nPlayerType[2] > 0 Then
+        begin
+           aBomberman:=GetBombermanByIndex(2);
+           if aBomberman.Alive then
+           SetLight( 1, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        end;
+        If nPlayerType[3] > 0 Then
+        begin
+           aBomberman:=GetBombermanByIndex(3);
+           if aBomberman.Alive then
+           SetLight( 2, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        end;
+        If nPlayerType[4] > 0 Then
+        begin
+           aBomberman:=GetBombermanByIndex(4);
+           if aBomberman.Alive then
+           SetLight( 3, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 1, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        end;
+        If nPlayerType[5] > 0 Then
+        begin
+           aBomberman:=GetBombermanByIndex(5);
+           if aBomberman.Alive then
+           SetLight( 4, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        end;
+        If nPlayerType[6] > 0 Then
+        begin
+           aBomberman:=GetBombermanByIndex(6);
+           if aBomberman.Alive then
+           SetLight( 5, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 1, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        end;
+        If nPlayerType[7] > 0 Then
+        begin
+           aBomberman:=GetBombermanByIndex(7);
+           if aBomberman.Alive then
+           SetLight( 6, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 1, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        end;
+        If nPlayerType[8] > 0 Then
+        begin
+           aBomberman:=GetBombermanByIndex(8);
+           if aBomberman.Alive then
+           SetLight( 7, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+        end;
      End;
 End;
 
@@ -446,6 +479,7 @@ End;
 
 Procedure DrawBomberman ( w : Single ; bUpdate : Boolean ) ;
 Var i : Integer;
+    aBomberman : CBomberman;
 Begin
      EnableLighting();
      SetLighting( 2.0, 1.0, 0.3, 0.6 );
@@ -454,13 +488,14 @@ Begin
 
      For i := 1 To GetBombermanCount() Do
      Begin
-          If GetBombermanByCount(i).Alive then
+          aBomberman:=GetBombermanByCount(i);
+          If aBomberman.Alive then
           Begin
                SetTexture( 1, TEXTURE_BOMBERMAN(i) );
-               PushObjectMatrix( GetBombermanByCount(i).Position.X-0.15, GetBombermanByCount(i).Position.Z, GetBombermanByCount(i).Position.Y-0.15, 0.05, 0.05, 0.05, 0, GetBombermanByCount(i).Direction, 0 );
-               DrawMesh( MESH_BOMBERMAN(GetBombermanByCount(i).BIndex), False );
+               PushObjectMatrix( aBomberman.Position.X-0.15, aBomberman.Position.Z, aBomberman.Position.Y-0.15, 0.05, 0.05, 0.05, 0, aBomberman.Direction, 0 );
+               DrawMesh( MESH_BOMBERMAN(aBomberman.BIndex), False );
                PopObjectMatrix();
-               If bUpdate Then GetBombermanByCount(i).Update(GetDelta());
+               If bUpdate Then aBomberman.Update(GetDelta());
           End;
      End;
 End;
@@ -514,6 +549,12 @@ Begin
                     PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
                     DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du GRAB
                     PopObjectMatrix();
+                 End Else If (pBlock Is CJelly) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( w, w, 0.8, 0.4 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du JELLY
+                    PopObjectMatrix();
                  End Else If (pBlock Is CItem) Then Begin
                     SetMaterial( w, w, w, 1.0 );
                     SetTexture( 1, TEXTURE_MAP_BRICK );
@@ -543,15 +584,17 @@ End;
 
 Procedure DrawBomb ( w : Single ; bUpdate : Boolean ) ;
 Var i : Integer;
-Var r, g, b : Single;
+    r, g, b : Single;
+    aBomb : CBomb;
 Begin
      EnableLighting();
      SetLighting( 5.0, 1.0, 1.8, 2.4 );
 
      i := 1;
      While ( i <= GetBombCount() ) Do Begin
+          aBomb := GetBombByCount(i);
           If bColor Then Begin
-             Case GetBombByCount(i).BIndex Of
+             Case aBomb.BIndex Of
                   1 : Begin r := 3.0; g := 0.0; b := 0.0; End;
                   2 : Begin r := 0.0; g := 0.0; b := 3.0; End;
                   3 : Begin r := 0.0; g := 3.0; b := 0.0; End;
@@ -565,16 +608,24 @@ Begin
              r := 1.0; g := 1.0; b := 1.0;
           End;
           SetMaterial( w * r, w * g, w * b, 1.0 );
-          SetTexture( 1, TEXTURE_BOMB(GetBombByCount(i).BIndex) );
-          PushObjectMatrix( GetBombByCount(i).Position.X, GetBombByCount(i).Position.Z, GetBombByCount(i).Position.Y,
-                            1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
-                            1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
-                            1/30*(0.7+Cos(4*GetBombByCount(i).Time)*Cos(4*GetBombByCount(i).Time)*0.5),
-                            0, 0, 0 );
-          DrawMesh( MESH_BOMB(GetBombByCount(i).BIndex), False );
+          SetTexture( 1, TEXTURE_BOMB(aBomb.BIndex) );
+          if Not(aBomb.Jelly) then
+          PushObjectMatrix( aBomb.Position.X, aBomb.Position.Z, aBomb.Position.Y,
+                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
+                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
+                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
+                            0, 0, 0 )
+          else
+          PushObjectMatrix( aBomb.Position.X, aBomb.Position.Z, aBomb.Position.Y,
+                            1/30*(0.7+Cos(6*aBomb.Time)*Cos(6*aBomb.Time)*0.5),
+                            1/30*(0.7+Cos(6*aBomb.Time)*Cos(6*aBomb.Time)*0.5),
+                            1/30*(0.7+Cos(6*aBomb.Time)*Cos(6*aBomb.Time)*0.5),
+                            0,0,0);
+                            
+          DrawMesh( MESH_BOMB(aBomb.BIndex), False );
           PopObjectMatrix();
           If bUpdate Then Begin
-              If Not GetBombByCount(i).UpdateBomb() Then i += 1;
+              If Not aBomb.UpdateBomb() Then i += 1;
           End Else Begin
               i += 1;
           End;
@@ -585,16 +636,18 @@ End;
 
 Procedure DrawFlame ( w : Single ; bUpdate : Boolean ) ;
 Var i : Integer;
-Var r, g, b : Single;
+    r, g, b : Single;
+    aFlame : CFlame;
 Begin
      DisableLighting();
 
      i := 1;
      While ( i <= GetFlameCount() ) Do Begin
-          SetTexture( 1, TEXTURE_FLAME(GetFlameByCount(i).Owner.BIndex) );
+          aFlame := GetFlameByCount(i);
+          SetTexture( 1, TEXTURE_FLAME(aFlame.Owner.BIndex) );
           // flamme intérieure
           If bColor Then Begin
-             Case GetFlameByCount(i).Owner.BIndex Of
+             Case aFlame.Owner.BIndex Of
                   1 : Begin r := 1.0; g := 0.6; b := 0.6; End;
                   2 : Begin r := 0.6; g := 0.6; b := 1.0; End;
                   3 : Begin r := 0.6; g := 1.0; b := 0.6; End;
@@ -607,12 +660,12 @@ Begin
           End Else Begin
              r := 1.0; g := 1.0; b := 1.0;
           End;
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.001, 0, GetFlameByCount(i).Y - 0.001 ); // on évite les cas particuliers (les angles à 90° bug)
-          DrawSprite( 1.0 + 2.0 * GetFlameByCount(i).Itensity, 1.0 + 2.0 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X - 0.001, 0, aFlame.Y - 0.001 ); // on évite les cas particuliers (les angles à 90° bug)
+          DrawSprite( 1.0 + 2.0 * aFlame.Itensity, 1.0 + 2.0 * aFlame.Itensity, r, g, b, aFlame.Itensity, True );
           PopObjectMatrix();
           // flammes centrales
           If bColor Then Begin
-             Case GetFlameByCount(i).Owner.BIndex Of
+             Case aFlame.Owner.BIndex Of
                   1 : Begin r := 0.8; g := 0.2; b := 0.2; End;
                   2 : Begin r := 0.2; g := 0.2; b := 0.8; End;
                   3 : Begin r := 0.2; g := 0.8; b := 0.2; End;
@@ -625,21 +678,21 @@ Begin
           End Else Begin
              r := 1.0; g := 0.5; b := 0.0;
           End;
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y );
-          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.8, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X - 0.301, 0, aFlame.Y );
+          DrawSprite( 0.6 + 1.7 * aFlame.Itensity, 0.6 + 1.7 * aFlame.Itensity, r, g, b, aFlame.Itensity * 0.8, True );
           PopObjectMatrix();
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y );
-          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.8, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X + 0.299, 0, aFlame.Y );
+          DrawSprite( 0.6 + 1.7 *aFlame.Itensity, 0.6 + 1.7 * aFlame.Itensity, r, g, b, aFlame.Itensity * 0.8, True );
           PopObjectMatrix();
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X, 0, GetFlameByCount(i).Y - 0.301 );
-          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.8, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X, 0, aFlame.Y - 0.301 );
+          DrawSprite( 0.6 + 1.7 * aFlame.Itensity, 0.6 + 1.7 * aFlame.Itensity, r, g, b, aFlame.Itensity * 0.8, True );
           PopObjectMatrix();
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X, 0, GetFlameByCount(i).Y + 0.299 );
-          DrawSprite( 0.6 + 1.7 * GetFlameByCount(i).Itensity, 0.6 + 1.7 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.8, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X, 0, aFlame.Y + 0.299 );
+          DrawSprite( 0.6 + 1.7 * aFlame.Itensity, 0.6 + 1.7 * aFlame.Itensity, r, g, b, aFlame.Itensity * 0.8, True );
           PopObjectMatrix();
           // flammes extérieures
           If bColor Then Begin
-             Case GetFlameByCount(i).Owner.BIndex Of
+             Case aFlame.Owner.BIndex Of
                   1 : Begin r := 0.4; g := 0.0; b := 0.0; End;
                   2 : Begin r := 0.0; g := 0.0; b := 0.4; End;
                   3 : Begin r := 0.0; g := 0.4; b := 0.0; End;
@@ -652,21 +705,21 @@ Begin
           End Else Begin
              r := 1.0; g := 0.0; b := 0.0;
           End;
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y - 0.301 );
-          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X - 0.301, 0, aFlame.Y - 0.301 );
+          DrawSprite( 0.2 + 1.4 * aFlame.Itensity, 0.2 + 1.4 * aFlame.Itensity, r, g, b, aFlame.Itensity * 0.4, True );
           PopObjectMatrix();
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X - 0.301, 0, GetFlameByCount(i).Y + 0.299 );
-          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X - 0.301, 0, aFlame.Y + 0.299 );
+          DrawSprite( 0.2 + 1.4 * aFlame.Itensity, 0.2 + 1.4 * aFlame.Itensity, r, g, b, aFlame.Itensity * 0.4, True );
           PopObjectMatrix();
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y - 0.301 );
-          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X + 0.299, 0, aFlame.Y - 0.301 );
+          DrawSprite( 0.2 + 1.4 * aFlame.Itensity, 0.2 + 1.4 * aFlame.Itensity, r, g, b, aFlame.Itensity * 0.4, True );
           PopObjectMatrix();
-          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, GetFlameByCount(i).X + 0.299, 0, GetFlameByCount(i).Y + 0.299 );
-          DrawSprite( 0.2 + 1.4 * GetFlameByCount(i).Itensity, 0.2 + 1.4 * GetFlameByCount(i).Itensity, r, g, b, GetFlameByCount(i).Itensity * 0.4, True );
+          PushBillboardMatrix( vCamera.x, vCamera.y, vCamera.z, aFlame.X + 0.299, 0, aFlame.Y + 0.299 );
+          DrawSprite( 0.2 + 1.4 * aFlame.Itensity, 0.2 + 1.4 * aFlame.Itensity, r, g, b, aFlame.Itensity * 0.4, True );
           PopObjectMatrix();
           // mise à jour
           If bUpdate Then Begin
-              If Not GetFlameByCount(i).Update() Then i += 1;
+              If Not aFlame.Update() Then i += 1;
           End Else Begin
               i += 1;
           End;
@@ -795,6 +848,7 @@ End;
 Procedure DrawScore () ;
 Var w, h : Single;
     i : Integer;
+    aBomberman : CBomberman;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -803,7 +857,10 @@ Begin
         If Not bScoreTable Then Begin
            If GetBombermanCount() <> 0 Then
               For i := 1 To GetBombermanCount() Do
-                  SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %2d ; %d kill(s), %d death(s).', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths]), Single(i) * 0.1 + 0.1, 1.0, 20 );
+              begin
+                  aBomberman := GetBombermanByCount(i);
+                  SetString( STRING_SCORE_TABLE(i), aBomberman.Name + Format(' : %2d ; %d kill(s), %d death(s).', [aBomberman.Score, aBomberman.Kills, aBomberman.Deaths]), Single(i) * 0.1 + 0.1, 1.0, 20 );
+              end;
         End;
         If GetBombermanCount() <> 0 Then
            For i := 1 To GetBombermanCount() Do
@@ -910,6 +967,7 @@ End;
 
 Procedure InitScore () ;
 Var i : Integer;
+    aBomberman : CBomberman;
 Begin
      // suppression des touches des joueurs
      BindKeyObj( nKey1MoveUp, True, False, NIL );
@@ -942,7 +1000,10 @@ Begin
      // affichage des scores
      If GetBombermanCount() <> 0 Then
         For i := 1 To GetBombermanCount() Do
-            SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %2d ; %d kill(s), %d death(s).', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths]), Single(i) * 0.1 + 0.5, 1.0, 300.0 );
+        begin
+            aBomberman := GetBombermanByCount(i);
+            SetString( STRING_SCORE_TABLE(i), aBomberman.Name + Format(' : %2d ; %d kill(s), %d death(s).', [aBomberman.Score, aBomberman.Kills, aBomberman.Deaths]), Single(i) * 0.1 + 0.5, 1.0, 300.0 );
+        end;
 
      // mise à jour de la machine d'état interne
      nGame := GAME_SCORE;

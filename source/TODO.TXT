@@ -22,9 +22,9 @@ Technique :
  - mode solo
 
 Gameplay :
- - implémenter les bonus push, spooger, trigger, jelly, goldflame, baddisease
+ - implémenter les bonus push, spooger, trigger, goldflame, baddisease
  - terminer l'implémentation des maladies 
- - rendre certaines bombes défectueuses (leur minuterie est random)
+
 
 Divers :
  - mettre la licence en entête de chaque fichier
@@ -41,13 +41,13 @@ Rappels :
  - voir ce site pour l'inspiration http://www.geocities.com/mheid.geo/about.html
 
  Liste des bonus :
-  - extrabomb    > ajoute la possibilité de poser une bombe supplémentaire    > fait
-  - flameup      > ajoute un degré d'expansion de flammes                     > fait
-  - disease      > maladie aléatoire                                          > à finir
-  - kick         > permet de shooter dans les bombes avec l'action 2          > à finir
-  - punch        > permet de pousser les bombes dans une direction au contact > à finir (manque le mesh)
+  - extrabomb    > ajoute la possibilité de poser une bombe supplémentaire    > terminé
+  - flameup      > ajoute un degré d'expansion de flammes                     > terminé
+  - disease      > maladie aléatoire                                          > à compléter
+  - punch         > permet de shooter dans les bombes avec l'action 2         > a faire
+  - kick        > permet de pousser les bombes dans une direction au contact  > fait manque le mesh
   - grab         > permet de prendre une bombe dans ses mains avec l'action 1 
-                   lorsqu'elle vient d'être posée                             > à faire
+                   lorsqu'elle vient d'être posée                             > fait manque le mesh
   - spooger      > permet d'aligner tout son stock de bombes dans une
                    direction avec l'action 1 lorsqu'une première bombe vient
                    d'être posée                                               > à faire
@@ -55,7 +55,7 @@ Rappels :
   - trigger      > transforme les trois bombes suivantes en pipe bombes
                    déclenchables à distance avec l'action 2                   > à faire
   - jelly        > transforme les bombes posées en bombes rebondissantes
-                   contre les murs lorsque quelqu'un les pousse avec le punch > à faire
+                   contre les murs lorsque quelqu'un les pousse avec le punch > fait manque le mesh
   - superdisease > 3 maladies aléatoires                                      > à faire
   - random       > bonus random                                               > à faire
 

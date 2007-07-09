@@ -38,6 +38,7 @@ CDisease = Class ( CItem )
                   Procedure EjectBomb () ; cdecl;          // maladie qui oblige temporairement la joueur a ejecter ses bombes
 
            Public
+                 Constructor Create (aX, aY : Integer);OverRide;
                  Destructor Destroy();override;
                  Procedure Bonus ( _uPlayer : CBomberman ) ; override; // procédure appelée par le bomberman pour l'attribution d'un bonus
                  Procedure BonusForced( _uPlayer : CBomberman; num : integer);
@@ -158,9 +159,15 @@ BEGIN
                         end;
 END;
 
+constructor CDisease.Create(aX, aY: Integer);
+begin
+  uPlayer:=nil;
+  inherited Create(aX, aY);
+end;
+
 destructor CDisease.Destroy();
 begin
-  uPlayer.DiseaseNumber:=DISEASE_NONE;
+  if Not(uPlayer=nil) then uPlayer.DiseaseNumber:=DISEASE_NONE;
   inherited Destroy();
 end;
 

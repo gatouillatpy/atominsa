@@ -18,7 +18,7 @@ CItem = Class (CBlock)
                bIsExplosed : Boolean;                                           // le bloc a deja explose (on voit le bonus) ou pas (on voit encore la caisse)
         
         Public
-              Constructor Create (aX, aY : Integer);OverLoad;                   // constructeur
+              Constructor Create (aX, aY : Integer);virtual;OverLoad;                   // constructeur
               Procedure Bonus ( nPlayer : CBomberman ) ; virtual; abstract;     // procedure abstraite qui definira l'action du bonus
               Procedure Explose () ; override;                                  // detruit le bloc si c'est possible (appele apres une explosion)
               Function IsExplosed () : Boolean ;                                // savoir si l'objet a deja explose une fois ou pas (caisse ou bonus)
