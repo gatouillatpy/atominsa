@@ -7,7 +7,7 @@ Unit UFlame;
 
 Interface
 
-Uses Classes, SysUtils, UBomberman, UUtils, UBomb, UCore;
+Uses Classes, SysUtils, UBomberman, UUtils, UListBomb, UBomb, UCore;
   
 Type
 

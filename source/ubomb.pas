@@ -14,13 +14,14 @@ Type
 { CBomb }
 
 CBomb = Class(CBlock)
-     Private
-       bJelly,                                                // rebondit conte les obstacles
+
+     Protected
        bUpdateTime,
        bMoving,                                               // defini si la bombe est en cours de mouvement ou non
        bJumping,                                              // definit si la bombe est en cours de saut ...
        bMoveJump   : Boolean;                                 // definit si la bombe bouge en rebondissant ...
        uGrid       : CGrid;
+       nPunch,                                                // nombre de cases restantes pour un mouvement dû à un punch
        nOriginX,
        nOriginY,
        nIndex,                                                // definit le joueur qui a pose la bombe
@@ -34,14 +35,14 @@ CBomb = Class(CBlock)
        pUpCount : LPUpcount;                                  // pointe sur la fonction du bomberman qui a pose la bombe pour lui augmenter son score
        pIsBomberman : LPGetBomberman;                         // pointe sur la fonction pour savoir s'il y a un bomberman en telle position
 
-       procedure Move(dt : single);                           // fonction interne de mouvement classique
+       procedure Move(dt : single);virtual;                           // fonction interne de mouvement classique
        procedure MoveJump(dt : Single);
        procedure Jump(dt : Single);
 
      Public
-       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Overload;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
+       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Overload;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
        Destructor Destroy();Override;
-       function UpdateBomb():boolean;                         // check le temps + mouvement
+       function UpdateBomb():boolean;virtual;                         // check le temps + mouvement
        procedure StartTime();
        procedure StopTime();
        Procedure Explose();Override;                          // fait exploser la bombe
@@ -49,313 +50,23 @@ CBomb = Class(CBlock)
        procedure MoveDown(dt : Single);
        procedure MoveLeft(dt : Single);
        procedure MoveUp(dt : Single);
+       procedure Punch(dir : integer; dt : Single);
 
        property CanExplose : boolean Read bExplosive;
        property Position : Vector Read fPosition Write fPosition;
        property Time : Single Read fTimeCreated;
        property JumpMovement : boolean Read bMoveJump Write bMoveJump;
        property BIndex : integer Read nIndex Write nIndex;
-       property Jelly : boolean Read bJelly;
+
 
 end;
 
 
-Type LPBombItem = ^BombItem;
-     BombItem = record
-              Count : integer;
-              Bomb : CBomb;
-              Next : LPBombItem;
-              end;
 
-    
-    function AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman):Boolean;
-    procedure RemoveBombByCount(i : integer);
-    procedure RemoveBombByGridCoo(aX,aY : integer);
-    procedure FreeBomb();overload;
-    procedure FreeBomb(pList : LPBombItem);overload;
-    function GetBombCount():integer;
-    function GetBombByCount(i : integer):CBomb;
-    function GetBombByGridCoo(aX,aY : integer):CBomb;
 
 
 implementation
-uses UItem;
-
-
-
-
-
-{                                                                               }
-{                           Liste Bombes                                        }
-{                                                                               }
-var pBombItem : LPBombItem = NIL;
-    BombCount : integer = 0;                                                    // Contient notre liste de bombes
-
-
-
-Procedure UpdateCountList();Forward;                                 // pour lui dire que la procedure existe plus loin
-
-
-
-{*******************************************************************************}
-{ Ajout / Suppression                                                           }
-{*******************************************************************************}
-// ajout
-function AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman): boolean;
-var pTemp : LPBombItem;
-begin
-result:=false;
-if (aGrid.GetBlock(Trunc(aX),Trunc(aY))=Nil) then
-begin
- Inc(BombCount);
- if (pBombItem=Nil) then
- begin
-   New(pBombItem);
-   pBombItem^.Next:=Nil;
-   pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aJelly,aGrid,UpCount,IsBomberman);
-   pBombItem^.Count:=BombCount;
-   result:=true;
- end
- else
- begin
- pTemp:=pBombItem;
- While (pTemp^.Next<>Nil) do
-   pTemp:=pTemp^.Next;
- New(pTemp^.Next);
- pTemp:=pTemp^.Next;
- pTemp^.Count:=BombCount;
- pTemp^.Next:=Nil;
- pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aJelly,aGrid,UpCount,IsBomberman);
- result:=true;
-end;
-end;
-end;
-
-
-
-// suppression par numero
-procedure RemoveBombByCount(i: integer);
-var pTemp,pPrev : LPBombItem;
-    Find, Last : Boolean;
-begin
-pPrev:=Nil;
-if ((i<=BombCount) AND (pBombItem<>Nil)) then
-begin
-  pTemp:=pBombItem;
-  Find:=(pTemp^.Count=i);
-  Last:=(pTemp^.Next=Nil);
-
-  While Not(Find or Last) do
-  begin
-   pPrev:=pTemp;
-   pTemp:=pTemp^.Next;
-   Last:=(pTemp^.Next=Nil);
-   Find:=(pTemp^.Count=i);
-  end;
-
-  if Find then
-  begin
-   if (pPrev<>Nil) then pPrev^.Next:=pTemp^.Next
-   else pBombItem:=pTemp^.Next;
-   pTemp^.Bomb.Free;
-   Dec(BombCount);
-   Dispose(pTemp);
-   UpdateCountList();
-  end;
-end;
-end;
-
-
-
-// suppression par coordonnees
-procedure RemoveBombByGridCoo(aX,aY : integer);
-var pTemp,pPrev : LPBombItem;
-    Find, Last : Boolean;
-begin
-pPrev:=Nil;
-if ((pBombItem<>Nil) AND CheckCoordinates(aX,aY)) then
-begin
-  pTemp:=pBombItem;
-  Find:=((pTemp^.Bomb.XGrid=aX) AND (pTemp^.Bomb.YGrid=aY));
-  Last:=(pTemp^.Next=Nil);
-
-  While Not(Find or Last) do
-  begin
-   pPrev:=pTemp;
-   pTemp:=pTemp^.Next;
-   Last:=(pTemp^.Next=Nil);
-   Find:=((pTemp^.Bomb.XGrid=aX) AND (pTemp^.Bomb.YGrid=aY));
-  end;
-
-  if Find then
-  begin
-   if (pPrev<>Nil) then pPrev^.Next:=pTemp^.Next
-   else pBombItem:=pTemp^.Next;
-   pTemp^.Bomb.Free;
-   Dec(BombCount);
-   Dispose(pTemp);
-   UpdateCountList();
-  end;
-end;
-end;
-
-
-
-// suppression par bombe
-procedure RemoveThisBomb(bomb: CBomb);
-var Find : boolean;
-    pTemp, pPrev : LPBombItem;
-begin
-Find:=False;
-pPrev:=Nil;
-  if pBombItem<>Nil then
-  begin
-    pTemp:=pBombItem;
-    Find:=(pTemp^.Bomb=Bomb);
-
-    While Not(Find) do
-    begin
-      pPrev:=pTemp;
-      pTemp:=pTemp^.Next;
-      Find:=(pTemp^.Bomb=Bomb);
-    end;
-
-    if pPrev<>nil then pPrev^.Next:=pTemp^.Next else pBombItem:=pTemp^.Next;
-    Dispose(pTemp);
-    Dec(BombCount);
-    UpdateCountList();
-  end;
-end;
-
-
-
-// vidage complet
-procedure FreeBomb();
-begin
- if pBombItem<>Nil then
- begin
-  FreeBomb(pBombItem^.Next);
-  pBombItem^.Bomb.Free;
-  Dispose(pBombItem);
-  pBombItem:=Nil;
- end;
- BombCount:=0;
-end;
-
-procedure FreeBomb(pList: LPBombItem);
-begin
- if (pList<>Nil) then
- begin
-  FreeBomb(pList^.Next);
-  pList^.Bomb.Free;
-  Dispose(pList);
-  pList:=Nil;
- end;
-end;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{*******************************************************************************}
-{ Fonctions Get                                                                 }
-{*******************************************************************************}
-function GetBombByCount(i : integer):CBomb;
-var pTemp : LPBombItem;
-begin
-result:=Nil;
-pTemp:=pBombItem;
-if ((i<=BombCount) AND (pBombItem<>Nil)) then
-begin
- While (pTemp^.Count<>i) do
-  pTemp:=pTemp^.Next;
-
- result:=pTemp^.Bomb;
-end;
-end;
-
-
-
-function GetBombByGridCoo(aX,aY : integer): CBomb;
-var pTemp : LPBombItem;
-    Find, Last : Boolean;
-begin
-result:=Nil;
-if ((pBombItem<>Nil) AND (CheckCoordinates(aX,aY))) then
-begin
- pTemp:=pBombItem;
- Find:=((pTemp^.Bomb.XGrid=aX) AND (pTemp^.Bomb.YGrid=aY));
- Last:=(pTemp^.Next=Nil);
-
- While Not(Find or Last) do
- begin
-  pTemp:=pTemp^.Next;
-  Find:=((pTemp^.Bomb.XGrid=aX) AND (pTemp^.Bomb.YGrid=aY));
-  Last:=(pTemp^.Next=Nil);
- end;
-
- if Find then result:=pTemp^.Bomb;
-
-end;
-end;
-
-
-
-function GetBombCount(): integer;
-begin
-  result:=BombCount;
-end;
-
-
-
-
-
-
-
-
-{*******************************************************************************}
-{ Fonctions Diverses                                                            }
-{*******************************************************************************}
-Procedure UpdateCountList();
-var i : integer;
-    pTemp : LPBombItem;
-begin
- if BombCount<>0 then
- begin
-  pTemp:=pBombItem;
-  for i:=1 to BombCount do
-  begin
-    pTemp^.Count:=i;
-    pTemp:=pTemp^.Next;
-  end;
- end;
-end;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+uses UItem, UListBomb;
 
 
 
@@ -363,12 +74,6 @@ end;
 {                                                                               }
 {                             CBomb                                             }
 {                                                                               }
-const NONE  = 0;
-      UP    = 1;
-      DOWN  = -1;
-      RIGHT = 2;
-      LEFT  = -2;
-
 
 {*******************************************************************************}
 { Deplacement normal des bombes                                                 }
@@ -404,6 +109,8 @@ procedure CBomb.Move(dt : single);
    procedure DoMove(afX, afY : Single;aX,aY : integer);
    begin
      uGrid.DelBlock(nX,nY);
+     if nPunch>0 then
+       if ((aX<>nX) or (aY<>nY)) then nPunch -= 1;
      nX:=aX;
      nY:=aY;
      fPosition.x:=afX;
@@ -471,7 +178,7 @@ begin
     begin
       //bMoving:=false;
       if ((nMoveDir=RIGHT) or (nMoveDir=DOWN)) then DoMove(_X,_Y,_X,_Y);
-      if bJelly then nMoveDir:=-nMoveDir else bMoving:=False;
+      bMoving:=False;
     end
    {Sinon c'est que c'est un objet sur la grille qui nous bloque}
     else
@@ -488,7 +195,7 @@ begin
       begin
         //bMoving := false;
         if ((nMoveDir=RIGHT) or (nMoveDir=DOWN)) then DoMove(_X,_Y,_X,_Y);
-        if bJelly then nMoveDir:=-nMoveDir else bMoving:=False;
+        bMoving:=False;
       end;
     end;
   end;
@@ -543,6 +250,8 @@ begin
   end
   else Move(dt);
 end;
+
+
 
 
 
@@ -653,10 +362,45 @@ end;
 
 
 
+
+
+
+
+
+
+{*******************************************************************************}
+{ Lancement d'une bombe par le punch                                            }
+{*******************************************************************************}
+procedure CBomb.Punch(dir: integer; dt: Single);
+begin
+ nMoveDir  := dir;
+ nPunch    := PUNCHNUMBERCASE;
+ bMoving := true;
+ Move(dt);
+end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {*******************************************************************************}
 { Creation / destruction                                                        }
 {*******************************************************************************}
-constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aJelly : boolean ; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
 var r : integer;
 begin
    if (aBombTime=BOMBTIME) and ((random(100)+1)<=10)then
@@ -665,7 +409,6 @@ begin
 
    pUpCount        := UpCount;
    pIsBomberman    := IsBomberman;
-   bJelly          := aJelly;
    bUpdateTime     := true;
    bExplosive      := true;                                                     //une bombe peut exploser
    bMoving         := False;
@@ -673,6 +416,7 @@ begin
    bJumping        := false;
    nMoveDir        := NONE;
    uGrid           := aGrid;
+   nPunch          := 0;
    nIndex          := aIndex;
    nBombSize       := aBombSize;                                                // la taille des flammes de la bombe est celle de la portee des flammes du joueur qui la cree
    nX              := Trunc(aX);                                                // abscisse de la bombe dans la grille
@@ -693,6 +437,16 @@ destructor CBomb.Destroy();
 begin
   inherited;
 end;
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -774,6 +528,16 @@ end;
 
 
 
+
+
+
+
+
+
+
+
+
+
 {*******************************************************************************}
 { Update                                                                        }
 {*******************************************************************************}
@@ -784,13 +548,12 @@ begin
   aLastTime:=GetTime();
   dt:=aLastTime - fLastTime;
   fLastTime:=aLastTime;
+  if (Not(bMoveJump) and bUpdateTime) then fTimeCreated += dt;
   if Not(bUpdateTime and bMoveJump) then
   begin
     nX:=Trunc(fPosition.x);
     nY:=Trunc(fPosition.y);
   end;
-  if (Not(bMoveJump) and bUpdateTime) then fTimeCreated += dt;
-  
   if bMoving then
   begin
     if bMoveJump then
@@ -799,7 +562,13 @@ begin
     end
     else Move(dt);
   end;
-    
+
+  if (nPunch=0) AND bMoving then
+  begin
+    bMoving := false;
+    nPunch  := -1;
+  end;
+  
   result:=(fTimeCreated >= fExploseTime);
   if result then Explose;
 end;

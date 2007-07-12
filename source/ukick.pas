@@ -29,7 +29,7 @@ Procedure CKick.Bonus( nPlayer : CBomberman ) ;
 Begin
      SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up the ability to kick bombs.', 0.0, 0.2, 5 );
      
-     nPlayer.ChangeKick();
+     nPlayer.ActiveKick();
      self.destroy();
 End;
 

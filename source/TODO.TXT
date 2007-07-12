@@ -22,8 +22,9 @@ Technique :
  - mode solo
 
 Gameplay :
- - implémenter les bonus push, spooger, trigger, goldflame, baddisease
- - terminer l'implémentation des maladies 
+ - implémenter les bonus spooger, trigger, goldflame, baddisease
+ - terminer l'implémentation des maladies
+ - modifier le moment d'explosion d'une bombe : elle n'explose que si elle est a peu pres centré sur la case ... 
 
 
 Divers :
@@ -36,15 +37,13 @@ Graphismes :
  - faire les animations une fois l'éditeur terminé
 
 Rappels :
- - de base l'action 1 permet de poser une bombe, l'action 2 n'a pas encore été implémentée ; voir pour
-   transformer la méthode CreateBomb en Primary pour l'action 1 et créer une méthode Secondary pour l'action 2
  - voir ce site pour l'inspiration http://www.geocities.com/mheid.geo/about.html
 
  Liste des bonus :
   - extrabomb    > ajoute la possibilité de poser une bombe supplémentaire    > terminé
   - flameup      > ajoute un degré d'expansion de flammes                     > terminé
   - disease      > maladie aléatoire                                          > à compléter
-  - punch         > permet de shooter dans les bombes avec l'action 2         > a faire
+  - punch         > permet de shooter dans les bombes avec l'action 2         > fait manque le mesh
   - kick        > permet de pousser les bombes dans une direction au contact  > fait manque le mesh
   - grab         > permet de prendre une bombe dans ses mains avec l'action 1 
                    lorsqu'elle vient d'être posée                             > fait manque le mesh
@@ -55,7 +54,7 @@ Rappels :
   - trigger      > transforme les trois bombes suivantes en pipe bombes
                    déclenchables à distance avec l'action 2                   > à faire
   - jelly        > transforme les bombes posées en bombes rebondissantes
-                   contre les murs lorsque quelqu'un les pousse avec le punch > fait manque le mesh
+                   contre les murs lorsque quelqu'un les pousse avec le kick > fait manque le mesh
   - superdisease > 3 maladies aléatoires                                      > à faire
   - random       > bonus random                                               > à faire
 

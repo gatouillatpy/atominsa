@@ -87,6 +87,7 @@ Const GRIDWIDTH         = 15;           // largeur de la grille
       BOMBTIMEDISEASE   = 0.75 ;    // duree avant explosion d'une bombe d'un malade =)
       BOMBMOVESPEED     = 6;        // vitesse de deplacement d'une bombe
       MAXBOMBCOUNT      = 10;        // nombre maximum de bombe par bomberman
+      PUNCHNUMBERCASE   = 3;         // nombre de cases de deplacement dû à un coup de punch
 
 
 // constantes d'identification des maladies

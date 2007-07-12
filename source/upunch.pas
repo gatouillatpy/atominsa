@@ -1,4 +1,4 @@
-Unit UJelly;
+Unit UPunch;
 
 {$mode objfpc}{$H+}
 
@@ -10,9 +10,9 @@ Uses UItem, UBomberman, UCore, UUtils;
 
 Type
 
-{ CJelly }
+{ CPunch }
 
-CJelly = Class ( CItem )
+CPunch = Class ( CItem )
 
            Public
                  Procedure Bonus ( nPlayer : CBomberman ) ; override;
@@ -23,13 +23,13 @@ End;
 
 Implementation
 
-{ CJelly }
+{ CPunch }
 
-Procedure CJelly.Bonus( nPlayer : CBomberman ) ;
+Procedure CPunch.Bonus( nPlayer : CBomberman ) ;
 Begin
-     SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up jelly bombs.', 0.0, 0.2, 5 );
+     SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up the capacity to Punch bombs.', 0.0, 0.2, 5 );
 
-     nPlayer.ActiveJelly();
+     nPlayer.ActivePunch();
      self.destroy();
 End;
 

@@ -38,7 +38,7 @@ End;
 
 Implementation
 
-Uses UExtraBomb, UFlameUp, uFlame, UDisease, USpeedUp, UKick,uGrab,uJelly;
+Uses UExtraBomb, UFlameUp, uFlame, UDisease, USpeedUp, UKick, uGrab, uJelly, UPunch;
 
 
 { CGrid }
@@ -84,6 +84,7 @@ Begin
                                          POWERUP_DISEASE         : aBlock[i,j] := CDisease.Create(i,j);
                                          POWERUP_KICK            : aBlock[i,j] := CKick.Create(i,j);
                                          POWERUP_SPEEDUP         : aBlock[i,j] := CSpeedUp.Create(i,j);
+                                         POWERUP_PUNCH           : aBlock[i,j] := CPunch.Create(i,j);
                                          POWERUP_GRAB            : aBlock[i,j] := CGrab.Create(i,j);
                                          POWERUP_JELLYBOMB       : aBlock[i,j] := CJelly.Create(i,j);
                                     End;

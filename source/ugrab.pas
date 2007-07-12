@@ -29,7 +29,7 @@ Procedure CGrab.Bonus( nPlayer : CBomberman ) ;
 Begin
      SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up the ability to grab bombs.', 0.0, 0.2, 5 );
 
-     nPlayer.ChangeGrab();
+     nPlayer.ActiveGrab();
      self.destroy();
 End;
 

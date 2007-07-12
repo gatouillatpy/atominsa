@@ -6,7 +6,8 @@ interface
 
 uses UUtils,       //Nos constantes
      UGrid,        //Grille de jeu
-     UBomb;        //Pour la creation de bombes
+     UListBomb,
+     UBomb;        //Pour les mouvements de bombes
 
      
 
@@ -43,6 +44,7 @@ type
 
 
 
+    bCanPunch,
     bJelly,
     bPrimaryPressed,
     bSecondaryPressed,
@@ -69,6 +71,7 @@ type
     function GrabBomb():boolean;
     procedure DropBomb(dt : Single);
     procedure ContaminateBomberman();
+    procedure PunchBomb(dt : Single);
     
     function TestBomb(aX,aY : integer):boolean;
     function TestBonus(aX,aY : integer):boolean;
@@ -96,9 +99,10 @@ type
   procedure UpScore();
   procedure Restore();
   procedure ChangeReverse();
-  procedure ChangeKick();
-  procedure ChangeGrab();
-  procedure ChangeJelly();
+  procedure ActiveKick();
+  procedure ActiveGrab();
+  procedure ActiveJelly();
+  procedure ActivePunch();
 
   function CanBomb():boolean;
 
@@ -458,8 +462,6 @@ End;
 {                                                                               }
 {                             CBomberman                                        }
 {                                                                               }
-
-
 {*******************************************************************************}
 { Toute la gestion du deplacement des bombermans                                }
 {*******************************************************************************}
@@ -860,6 +862,44 @@ end;
 
 
 
+procedure CBomberman.PunchBomb(dt: Single);
+var dX, dY : integer;
+    delta : single;
+begin
+  delta := 0.5;
+  dX := Trunc(fPosition.x);
+  dY := Trunc(fPosition.y);
+
+  case nDirection of
+    0    : begin  //bas
+             dY := Trunc(fPosition.y)+1;;
+           end;
+    90   : begin  //gauche
+             dX := Trunc(fPosition.x-delta);
+           end;
+    180 : begin  //haut
+             dY := Trunc(fPosition.y-delta);
+           end;
+    -90  : begin  //droite
+             dX := Trunc(fPosition.x)+1;
+           end;
+  end;
+
+ if CheckCoordinates(dX,dY) then
+  if ((uGrid.GetBlock(dX,dY)<>nil) AND (uGrid.GetBlock(dX,dY) is CBomb)) then
+  begin
+    case nDirection of
+      0    :  CBomb(uGrid.GetBlock(dX,dY)).Punch(DOWN,dt);
+      90   :  CBomb(uGrid.GetBlock(dX,dY)).Punch(LEFT,dt);
+      180  :  CBomb(uGrid.GetBlock(dX,dY)).Punch(UP,dt);
+      -90  :  CBomb(uGrid.GetBlock(dX,dY)).Punch(RIGHT,dt);
+    end;
+  end;
+end;
+
+
+
+
 
 
 
@@ -902,6 +942,7 @@ procedure CBomberman.Restore();
 begin
   bAlive             := True;
   fPosition          := fOrigin;
+  bCanPunch          := False;
   bJelly             := False;
   bPrimaryPressed    := false;
   bSecondaryPressed  := false;
@@ -1007,6 +1048,9 @@ end;
 
 
 
+
+
+
 procedure CBomberman.ChangeReverse();
 begin
   bReverse:=Not(bReverse);
@@ -1014,23 +1058,30 @@ end;
 
 
 
-procedure CBomberman.ChangeKick();
+procedure CBomberman.ActiveKick();
 begin
   bKick := true;
   //if bGrab reapparition de la caisse ?
   bCanGrabBomb := false;
+  bCanPunch       := false;
 end;
 
-procedure CBomberman.ChangeGrab();
+procedure CBomberman.ActiveGrab();
 begin
   bCanGrabBomb := true;
   //if bKick reapparition de la caisse ?
   bKick := false;
 end;
 
-procedure CBomberman.ChangeJelly();
+procedure CBomberman.ActiveJelly();
 begin
   bJelly := true;
+end;
+
+procedure CBomberman.ActivePunch();
+begin
+  bCanPunch := true;
+  bKick := false;
 end;
 
 
@@ -1053,7 +1104,7 @@ procedure CBomberman.PrimaryKeyDown(dt: Single); cdecl;
 begin
  if bAlive then
  begin
-  if (bCanGrabBomb and (uGrabbedBomb=nil) and Not(bPrimaryPressed)) then GrabBomb();
+  if (bCanGrabBomb and (uGrabbedBomb=nil)) then GrabBomb();
   if (uGrabbedBomb=Nil) and Not(bPrimaryPressed) then CreateBomb(dt);
   bPrimaryPressed := true;
  end;
@@ -1063,6 +1114,7 @@ procedure CBomberman.SecondaryKeyDown(dt: single); cdecl;
 begin
   if bAlive then
   begin
+    if bCanPunch and Not(bSecondaryPressed) then PunchBomb(dt);
     bSecondaryPressed := true;
   end;
 end;

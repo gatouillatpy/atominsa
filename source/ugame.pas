@@ -11,8 +11,8 @@ Interface
 
 Uses Classes, SysUtils,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
-     USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UJelly, UGrid, UFlame, UBomb, USetup, UForm,
-     UCharacter, UComputer;
+     USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UJelly, UGrid, UFlame, UListBomb, UBomb, USetup, UForm,
+     UJellyBomb, UPunch, UCharacter, UComputer;
 
 
 
@@ -555,6 +555,12 @@ Begin
                     PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
                     DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du JELLY
                     PopObjectMatrix();
+                 End Else If (pBlock Is CPunch) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( w, w, 0.2, 0.6 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du PUNCH
+                    PopObjectMatrix();
                  End Else If (pBlock Is CItem) Then Begin
                     SetMaterial( w, w, w, 1.0 );
                     SetTexture( 1, TEXTURE_MAP_BRICK );
@@ -609,7 +615,7 @@ Begin
           End;
           SetMaterial( w * r, w * g, w * b, 1.0 );
           SetTexture( 1, TEXTURE_BOMB(aBomb.BIndex) );
-          if Not(aBomb.Jelly) then
+          if Not(aBomb is CJellyBomb) then
           PushObjectMatrix( aBomb.Position.X, aBomb.Position.Z, aBomb.Position.Y,
                             1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
                             1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),

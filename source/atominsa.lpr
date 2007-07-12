@@ -5,7 +5,8 @@ Program atominsa;
 Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
-     UPractice, UMenu, UIntro, UEditor, UMulti, UGrab, uJelly;
+     UPractice, UMenu, UIntro, UEditor, UMulti, UGrab, uJelly, UJellyBomb,
+     UListBomb, UPunch;
 
 
 
