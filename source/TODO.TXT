@@ -22,8 +22,7 @@ Technique :
  - mode solo
 
 Gameplay :
- - implémenter les bonus trigger, goldflame, baddisease
- - terminer l'implémentation des maladies
+ - facultatif : creer des Jelly Trigger bombes .....
 
 
 
@@ -50,22 +49,22 @@ Rappels :
   - spooger      > permet d'aligner tout son stock de bombes dans une
                    direction avec l'action 1 lorsqu'une première bombe vient
                    d'être posée                                               > fait manque le mesh
-  - goldflame    > met le degré d'expansion de flammes au maximum             > à faire
+  - goldflame    > met le degré d'expansion de flammes au maximum             > fait manque le mesh
   - trigger      > transforme les trois bombes suivantes en pipe bombes
-                   déclenchables à distance avec l'action 2                   > à faire
+                   déclenchables à distance avec l'action 2                   > fait manque le mesh
   - jelly        > transforme les bombes posées en bombes rebondissantes
                    contre les murs lorsque quelqu'un les pousse avec le kick > fait manque le mesh
-  - superdisease > 3 maladies aléatoires                                      > à faire
-  - random       > bonus random                                               > à faire
+  - superdisease > 3 maladies aléatoires                                      > fait manque le mesh
+  - random       > bonus random                                               > fait manque le mesh
 
  Liste des maladies :
-  - joueur ralenti (vitesse minimum)
-  - joueur accéléré (vitesse maximum
-  - joueur ne peut plus poser de bombes
-  - joueur téléporté à la place d'un autre
-  - joueur chie des bombes et est plus rapide
-  - joueur chie des bombes et les kick automatiquement
-  - joueur a les touches inversées
-  - taille des flammes au max
-  - taille des flammes au min
-  - les bombes explosent trois fois plus vite 
+  - joueur ralenti (vitesse minimum)					> terminé
+  - joueur accéléré (vitesse maximum					> terminé
+  - joueur ne peut plus poser de bombes					> terminé
+  - joueur téléporté à la place d'un autre				> terminé
+  - joueur chie des bombes et est plus rapide 				> terminé
+  - joueur chie des bombes et les kick automatiquement			> terminé
+  - joueur a les touches inversées					> terminé
+  - taille des flammes au max						> terminé
+  - taille des flammes au min						> terminé
+  - les bombes explosent trois fois plus vite 				> terminé

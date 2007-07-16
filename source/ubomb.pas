@@ -40,7 +40,7 @@ CBomb = Class(CBlock)
        procedure Jump(dt : Single);
 
      Public
-       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Overload;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
+       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Virtual;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
        Destructor Destroy();Override;
        function UpdateBomb():boolean;virtual;                         // check le temps + mouvement
        procedure StartTime();
@@ -180,6 +180,7 @@ begin
       //bMoving:=false;
       if ((nMoveDir=RIGHT) or (nMoveDir=DOWN)) then DoMove(_X,_Y,_X,_Y);
       bMoving:=False;
+      nMoveDir:=NONE;
     end
    {Sinon c'est que c'est un objet sur la grille qui nous bloque}
     else
@@ -376,7 +377,7 @@ procedure CBomb.Punch(dir: integer; dt: Single);
 begin
  nMoveDir  := dir;
  nPunch    := PUNCHNUMBERCASE;
- bMoving := true;
+ bMoving   := true;
  Move(dt);
 end;
 
@@ -508,7 +509,7 @@ Procedure CBomb.Explose();
            
 var k : integer;
 begin
-  k := Trunc(Random(3) + 1.0) * 10;
+  k := (Random(3) + 1) * 10;
   PlaySound( SOUND_BOMB(k + nIndex) );
   RemoveThisBomb(Self);                                                         //On supprime la bombe de la liste
   bExplosive:=False;                                                            //elle pete elle peut plus exploser ... pour eviter qu'une bombe fasse sauter une bombe et celle ci fasse resaute la meme qu au debut ...

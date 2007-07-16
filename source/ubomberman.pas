@@ -7,7 +7,8 @@ interface
 uses UUtils,       //Nos constantes
      UGrid,        //Grille de jeu
      UListBomb,
-     UBomb;        //Pour les mouvements de bombes
+     UBomb,        //Pour les mouvements de bombes
+     UTriggerBomb;
 
      
 
@@ -17,30 +18,31 @@ type
 
   CBomberman = class
   private
-    fCX, fCY : Single;       // coordonnées ciblées par l'intelligence artificielle
-    fLX, fLY : Single;       // dernières coordonnées
-    fDanger : Single;        // pourcentage de risque aux coordonnées courantes
+    fCX, fCY : Single;           // coordonnées ciblées par l'intelligence artificielle
+    fLX, fLY : Single;           // dernières coordonnées
+    fDanger : Single;            // pourcentage de risque aux coordonnées courantes
     
 
 
-    fPosition,               // position graphique du personnage
-    fOrigin   : Vector;      // position a la creation du personnage
-    fSpeed,                  //Vitesse du bomberman
-    fBombTime : Single;      //Temps avant explosion des bombes
+    fPosition,                   // position graphique du personnage
+    fOrigin   : Vector;          // position a la creation du personnage
+    fSpeed,                      // vitesse du bomberman
+    fBombTime : Single;          // temps avant explosion des bombes
 
-    lastDir   : vectorN;     // memorise la derniere direction de mouvement du bomberman
+    lastDir   : vectorN;         // memorise la derniere direction de mouvement du bomberman
 
-    sName     : string;       //nom du joueur
+    sName     : string;          // nom du joueur
 
-    nDisease,                 // stock le numero d'identification de la maladie
-    nIndex,                   //numero du bomberman
-    nTeam,                    //numero de team
-    nKills,                   //nombre de bomberman tue
-    nDeaths,                  //nombre de fois tue
-    nScore,                   // score
-    nBombCount,               //Nombre de bombes dispo
-    nFlameSize,               //Taille de la flamme
-    nDirection  : integer;    //Derniere direction de mouvement du bomberman
+    nTriggerBomb,                // stock le nombre de bombe TRIGGER qu'il peut encore poser
+    nDisease,                    // stock le numero d'identification de la maladie
+    nIndex,                      // numero du bomberman
+    nTeam,                       // numero de team
+    nKills,                      // nombre de bomberman tue
+    nDeaths,                     // nombre de fois tue
+    nScore,                      // score
+    nBombCount,                  // nombre de bombes dispo
+    nFlameSize,                  // taille de la flamme
+    nDirection  : integer;       // derniere direction de mouvement du bomberman
 
 
 
@@ -49,19 +51,20 @@ type
     bJelly,
     bPrimaryPressed,
     bSecondaryPressed,
-    bCanGrabBomb,             // Peut il porter une bombe ... (le bonus)
-    bEjectBomb,               //Si true = on oblige a lacher ses bombes
-    bNoBomb,                  //Permet de savoir si on peut poser une bombe ou pas indifferemment du nombre en stock (= maladie)
-             //true = je suis malade => je peux pas poser
-             //false = je suis pas malade => je peux poser si j'en ai assez en stock
-    bReverse ,                // touche inverse
-    bAlive,                   // Personnage en vie ou non
-    bcanKick     : Boolean;      //Shoot dans une bombe possible ou non
+    bCanGrabBomb,                // peut il porter une bombe ... (le bonus)
+    bEjectBomb,                  // si true = on oblige a lacher ses bombes
+    bNoBomb,                     // permet de savoir si on peut poser une bombe ou pas indifferemment du nombre en stock (= maladie)
+                                           //  true = je suis malade => je peux pas poser
+                                           //  false = je suis pas malade => je peux poser si j'en ai assez en stock
+    bReverse ,                   // touche inverse
+    bAlive,                      // personnage en vie ou non
+    bcanKick     : Boolean;      // shoot dans une bombe possible ou non
 
 
-    uGrid     : CGrid;        //Pointe sur la grille de jeu
-    uGrabbedBomb : CBomb;      // pointe sur la bombe qu'on porte
-    
+    uTriggerBomb : LPBombItem;   // pointe sur les bombes a declenchement manuel
+    uGrid        : CGrid;        // pointe sur la grille de jeu
+    uGrabbedBomb : CBomb;        // pointe sur la bombe qu'on porte
+
 
     procedure Move(dx, dy : integer; dt : single);
     procedure UpBombCount(); cdecl;
@@ -73,11 +76,17 @@ type
     procedure DropBomb(dt : Single);
     procedure ContaminateBomberman();
     procedure PunchBomb(dt : Single);
+    procedure AddTriggerBomb();
+    procedure DelTriggerBomb();
+    procedure DoIgnition();
+
     
     function TestBomb(aX,aY : integer):boolean;
     function TestBonus(aX,aY : integer):boolean;
     function TestGrid(aX,aY : integer):boolean;
     function ChangeCase(aX,aY : integer;afX, afY : Single):boolean;
+    function GetTargetTriggerBomb():CTriggerBomb;
+    
   protected
     { protected declarations }
   public
@@ -101,10 +110,12 @@ type
   procedure Restore();
   procedure ChangeReverse();
   procedure ActiveKick();
+  procedure DisableKick();
   procedure ActiveGrab();
   procedure ActiveJelly();
   procedure ActivePunch();
   procedure ActiveSpoog();
+  procedure ActiveTrigger();
 
   function CanBomb():boolean;
 
@@ -495,6 +506,8 @@ begin
  result:= Not((aX=Trunc(afX+0.5)) AND (aY=Trunc(afY+0.5)));
 end;
 
+
+
 procedure CBomberman.DoMove(afX, afY : Single);
 begin
  fPosition.x:=afX;
@@ -764,6 +777,57 @@ end;
 {*******************************************************************************}
 { Liens avec les bombes                                                         }
 {*******************************************************************************}
+procedure CBomberman.AddTriggerBomb();
+var pPrev, pTemp : LPBombItem;
+begin
+  pPrev := nil;
+  pTemp := uTriggerBomb;
+  while pTemp<>nil do
+  begin
+    pPrev := pTemp;
+    pTemp := pTemp^.Next;
+  end;
+
+  New(pTemp);
+  if pPrev<>Nil then pPrev^.Next:=pTemp else uTriggerBomb := pTemp;
+  pTemp^.Bomb:=GetBombByCount(GetBombCount());
+  pTemp^.Count:=nIndex;
+  pTemp^.Next:=Nil;
+end;
+
+
+
+
+
+procedure CBomberman.DelTriggerBomb();
+var pTemp : LPBombItem;
+begin
+  pTemp:=uTriggerBomb;
+  uTriggerBomb:=uTriggerBomb^.Next;
+  Dispose(pTemp);
+end;
+
+
+
+
+
+function CBomberman.GetTargetTriggerBomb(): CTriggerBomb;
+begin
+  result:=(uTriggerBomb^.Bomb as CTriggerBomb);
+end;
+
+
+
+procedure CBomberman.DoIgnition();
+begin
+  GetTargetTriggerBomb.Ignition();
+  DelTriggerBomb();
+end;
+
+
+
+
+
 function CBomberman.CanBomb():boolean;
 begin
  result := ((nBombCount<>0) And Not(NoBomb));
@@ -784,7 +848,7 @@ end;
 
 procedure CBomberman.CreateBomb(dt : Single); cdecl;
 var aX, aY, dX, dY : integer;
-    Stop : boolean;
+    bTrigger, Stop : boolean;
 begin
   if bAlive then
   begin
@@ -792,8 +856,14 @@ begin
     begin
       if uGrid.GetBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil then
       begin
-        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,uGrid,@UpBombCount,@IsBombermanAtCoo);
+        bTrigger := nTriggerBomb<>0;
+        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo);
         Dec(nBombCount);
+        if bTrigger then
+        begin
+          AddTriggerBomb();
+          Dec(nTriggerBomb);
+        end;
       end
       else if bCanSpoog then
       begin
@@ -833,8 +903,14 @@ begin
               end
               else
               begin
-                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,uGrid,@UpBombCount,@IsBombermanAtCoo);
+                bTrigger := nTriggerBomb<>0;
+                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo);
                 Dec(nBombCount);
+                if bTrigger then
+                begin
+                  AddTriggerBomb();
+                  Dec(nTriggerBomb);
+                end;
               end;
             end;
           end;
@@ -976,6 +1052,8 @@ end;
 
 
 
+
+
 {*******************************************************************************}
 { Creation et restauration                                                      }
 {*******************************************************************************}
@@ -1015,6 +1093,7 @@ begin
   bEjectBomb         := False;
   bNoBomb            := False;
   bReverse           := False;
+  nTriggerBomb       := 0;
   nBombCount         := DEFAULTBOMBCOUNT;
   fBombTime          := BOMBTIME;
   nFlameSize         := DEFAULTFLAMESIZE;
@@ -1022,6 +1101,7 @@ begin
   nDirection         := 0;
   lastDir.x          := 0;
   lastDir.y          := 0;
+  uTriggerBomb       := nil;
   uGrabbedBomb       := nil;
 end;
 
@@ -1128,6 +1208,11 @@ begin
   bCanPunch       := false;
 end;
 
+procedure CBomberman.DisableKick();
+begin
+  bCanKick := false;
+end;
+
 procedure CBomberman.ActiveGrab();
 begin
   bCanGrabBomb := true;
@@ -1138,6 +1223,7 @@ end;
 procedure CBomberman.ActiveJelly();
 begin
   bJelly := true;
+  nTriggerBomb := 0;
 end;
 
 procedure CBomberman.ActivePunch();
@@ -1151,6 +1237,13 @@ begin
   bCanSpoog := true;
   if Not(uGrabbedBomb=nil) then DropBomb(0);
   bCanGrabBomb := false;
+end;
+
+procedure CBomberman.ActiveTrigger();
+begin
+  bJelly := false;
+  bCanPunch := false;
+  nTriggerBomb += 3;
 end;
 
 
@@ -1187,7 +1280,11 @@ procedure CBomberman.SecondaryKeyDown(dt: single); cdecl;
 begin
   if bAlive then
   begin
-    if bCanPunch and Not(bSecondaryPressed) then PunchBomb(dt);
+    if Not(bSecondaryPressed) then
+    begin
+      if bCanPunch then PunchBomb(dt);
+      if uTriggerBomb<>nil then DoIgnition();
+    end;
     bSecondaryPressed := true;
   end;
 end;

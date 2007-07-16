@@ -2,11 +2,6 @@ Unit UDisease;
 
 {$mode objfpc}{$H+}
 
-////////////////////////////////////////////////////////////////////////////////
-// UDisease : ?                                                               //
-////////////////////////////////////////////////////////////////////////////////
-
-
 
 Interface
 
@@ -14,7 +9,7 @@ Interface
 Uses Classes, SysUtils, UItem, UBomberman, UCore, UUtils;
 
 
-Const DISEASECOUNT = 8;
+Const DISEASECOUNT = 9;
 
 Type
 
@@ -25,6 +20,7 @@ CDisease = Class ( CItem )
                   uPlayer : CBomberman     ;               // stock le bomberman qui prend la maladie
                   nOldValue : integer;                     // garde en memoire les anciennes valeurs si necessaire
                   fOldValue : Single;
+                  bOldValue : boolean;
                   bDisease : Boolean       ;               // définit si on applique la maladie ou si on la retire
 
                   // méthodes des differentes maladies
@@ -35,8 +31,8 @@ CDisease = Class ( CItem )
                   Procedure SwitchBomberman (); cdecl;     // maladie qui echange la position de deux joueurs
                   procedure FastBomb();cdecl;
                   procedure SmallFlame();cdecl;
-                  Procedure EjectBomb () ; cdecl;          // maladie qui oblige temporairement la joueur a ejecter ses bombes
-
+                  Procedure EjectBombFast () ; cdecl;          // maladie qui oblige temporairement la joueur a ejecter ses bombes + vitesse max
+                  Procedure EjectBombKick () ; cdecl;          // idem sauf que kick au lieu de vitesse max
            Public
                  Constructor Create (aX, aY : Integer);OverRide;
                  Destructor Destroy();override;
@@ -53,16 +49,14 @@ Procedure CDisease.Bonus( _uPlayer : CBomberman );
 Var i : integer;
 Begin
      SetString( STRING_NOTIFICATION, _uPlayer.Name + ' has picked up a disease.', 0.0, 0.2, 5 );
-     i := Random(DISEASECOUNT) + 1;                                // on tire un nombre aleatoire pour choisir la maladie
-     BonusForced(_uPlayer,i);
+     i := Random(DISEASECOUNT) + 1;                                                                            // on tire un nombre aleatoire pour choisir la maladie
+     if (_uPlayer.DiseaseNumber=0) or (i=DISEASE_SWITCH) then BonusForced(_uPlayer,i) else Destroy();         // s'il est deja malade il peut pas etre encore malade
 End;
 
 procedure CDisease.BonusForced(_uPlayer: CBomberman; num: integer);
 begin
   uPlayer := _uPlayer;
   bDisease := True;
-  if (uPlayer.DiseaseNumber=0) or (num=DISEASE_SWITCH) then
-  begin
     uPlayer.DiseaseNumber:=num;
     
     Case num Of
@@ -92,14 +86,15 @@ begin
                 SmallFlame();                             // reduit la taille de la flame a une case aux alentours
                 AddTimer( TIMEDISEASE, @SmallFlame);
             End;
-            DISEASE_EJECTBOMB : Begin
-  	      EjectBomb();               // maladie qui oblige temporairement la joueur a ejecter ses bombes
-  	      AddTimer( TIMEDISEASE, @EjectBomb); // on utilise un timer pour annuler l'effet de la maladie apres TIMEDISEASE
+            DISEASE_EJECTBOMBFAST : Begin
+  	      EjectBombFast();               // maladie qui oblige temporairement la joueur a ejecter ses bombes
+  	      AddTimer( TIMEDISEASE, @EjectBombFast); // on utilise un timer pour annuler l'effet de la maladie apres TIMEDISEASE
+            End;
+            DISEASE_EJECTBOMBKICK : Begin
+  	      EjectBombKick();               // maladie qui oblige temporairement la joueur a ejecter ses bombes
+  	      AddTimer( TIMEDISEASE, @EjectBombKick); // on utilise un timer pour annuler l'effet de la maladie apres TIMEDISEASE
             End;
        End;
-
-  end
-  else Destroy();
 end;
 
 
@@ -147,14 +142,32 @@ BEGIN
 END;
 
 
-Procedure CDisease.ejectbomb (); cdecl;
+Procedure CDisease.ejectbombfast (); cdecl;
 BEGIN
      If ( bDisease = true ) then begin                       // si on doit appliquer la maladie
                              uPlayer.EjectBomb := true;     // oblige le joueur a ejecter ses bombes
+                             foldValue := uPlayer.Speed;
+                             uPlayer.Speed := SPEEDLIMIT;
                              bDisease := false;               // on change la valeur de la variable pour qu'a la prochaine utilissation de la methode, on annule son effet
                              end
                         else begin                  // pour annuler l'effet de la maladie
                              uPlayer.EjectBomb := false;  // annule l'effet
+                             uPlayer.Speed := fOldValue;
+                             Self.destroy();      // on peut detruire le bonus
+                        end;
+END;
+
+Procedure CDisease.ejectbombkick (); cdecl;
+BEGIN
+     If ( bDisease = true ) then begin                       // si on doit appliquer la maladie
+                             uPlayer.EjectBomb := true;     // oblige le joueur a ejecter ses bombes
+                             boldValue := uPlayer.Kick;
+                             uPlayer.ActiveKick;
+                             bDisease := false;               // on change la valeur de la variable pour qu'a la prochaine utilissation de la methode, on annule son effet
+                             end
+                        else begin                  // pour annuler l'effet de la maladie
+                             uPlayer.EjectBomb := false;  // annule l'effet
+                             if Not(bOldValue) then uPlayer.DisableKick();
                              Self.destroy();      // on peut detruire le bonus
                         end;
 END;
@@ -228,13 +241,9 @@ procedure CDisease.SmallFlame(); cdecl;
 begin
   if bDisease then
   begin
-    if uPlayer.FlameSize<>2 then       //S'il n'a pas déjà la maladie
-    begin
       nOldValue:=uPlayer.FlameSize;
       uPlayer.FlameSize:=2;
       bDisease:=false;
-    end
-    else Destroy
   end
   else
   begin

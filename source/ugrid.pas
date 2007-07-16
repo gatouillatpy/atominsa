@@ -38,7 +38,8 @@ End;
 
 Implementation
 
-Uses UExtraBomb, UFlameUp, uFlame, UDisease, USpeedUp, UKick, uGrab, uJelly, UPunch, USpoog;
+Uses UExtraBomb, UFlameUp, uFlame, UDisease, USpeedUp, UKick, uGrab, uJelly,
+     UPunch, USpoog, UGoldFLame, UTrigger, USuperDisease, URandomBonus;
 
 
 { CGrid }
@@ -76,7 +77,7 @@ Begin
                         Begin
                              r := Random( POWERUPCOUNT + 1 ) - 1; // on choisit un nombre aléatoire parmi les codes de bonus
                              If (r = POWERUP_NONE) And (m > n) Then aBlock[i,j] := CBlock.Create(i,j,b); // si aucun bonus n'est choisi et qu'il reste assez d'emplacements vides alors on en fait une brique standard
-                             For k := 1 To POWERUPCOUNT Do Begin // on regarde à quoi cela correspond dans le tableau
+                              For k := 1 To POWERUPCOUNT Do Begin // on regarde à quoi cela correspond dans le tableau
                                  If (uScheme.PowerUp(k).Code = r) And (qt[k] > 0) Then Begin // ainsi que la quantité restante à placer
                                     Case r Of
                                          POWERUP_EXTRABOMB       : aBlock[i,j] := CExtraBomb.Create(i,j);
@@ -87,7 +88,11 @@ Begin
                                          POWERUP_PUNCH           : aBlock[i,j] := CPunch.Create(i,j);
                                          POWERUP_GRAB            : aBlock[i,j] := CGrab.Create(i,j);
                                          POWERUP_SPOOGER         : aBlock[i,j] := CSpoog.Create(i,j);
+                                         POWERUP_GOLDFLAME       : aBlock[i,j] := CGoldFlame.Create(i,j);
+                                         POWERUP_TRIGGERBOMB     : aBlock[i,j] := CTrigger.Create(i,j);
                                          POWERUP_JELLYBOMB       : aBlock[i,j] := CJelly.Create(i,j);
+                                         POWERUP_SUPERDISEASE    : aBlock[i,j] := CSuperDisease.Create(i,j);
+                                         POWERUP_RANDOM          : aBlock[i,j] := CRandomBonus.Create(i,j);
                                     End;
                                     qt[k] -= 1;
                                     n -= 1;

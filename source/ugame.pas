@@ -12,7 +12,8 @@ Interface
 Uses Classes, SysUtils,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UJelly, UGrid, UFlame, UListBomb, UBomb, USetup, UForm,
-     UJellyBomb, UPunch, USpoog, UCharacter, UComputer;
+     UJellyBomb, UPunch, USpoog, UGoldFLame, UTrigger, UTriggerBomb, USuperDisease, URandomBonus,
+     UCharacter, UComputer;
 
 
 
@@ -567,9 +568,33 @@ Begin
                     PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
                     DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du SPOOG
                     PopObjectMatrix();
+                 End Else If (pBlock Is CGoldFlame) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( w, 0.4, 0.5, 0.6 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du GOLDFLAME
+                    PopObjectMatrix();
+                 End Else If (pBlock Is CTrigger) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( w, 0.2, 0.5, 0.9 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du TRIGGER
+                    PopObjectMatrix();
+                 End Else If (pBlock Is CSuperDisease) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( 0.8, 0.2, 0.2, 0.9 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du SUPERDISEASE
+                    PopObjectMatrix();
+                 End Else If (pBlock Is CRandomBonus) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( w, 1, 1, 0.8 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du RANDOM
+                    PopObjectMatrix();
                  End Else If (pBlock Is CItem) Then Begin
-                    SetMaterial( w, w, w, 1.0 );
-                    SetTexture( 1, TEXTURE_MAP_BRICK );
+                    SetMaterial( w, w, w, 1.0 );                                        //////////////////// sert a rien lui si ???????
+                    SetTexture( 1, TEXTURE_MAP_BRICK );                                 //////////////////
                     PushObjectMatrix( i, 0, j, 0.012, 0.012, 0.012, 0, 0, 0 );
                     DrawMesh( MESH_BLOCK_BRICK, False );
                     PopObjectMatrix();
@@ -621,18 +646,23 @@ Begin
           End;
           SetMaterial( w * r, w * g, w * b, 1.0 );
           SetTexture( 1, TEXTURE_BOMB(aBomb.BIndex) );
-          if Not(aBomb is CJellyBomb) then
+
+          if (aBomb is CJellyBomb) then
           PushObjectMatrix( aBomb.Position.X, aBomb.Position.Z, aBomb.Position.Y,
-                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
-                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
-                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
-                            0, 0, 0 )
+                            1/30*(0.7+Cos(7*aBomb.Time)*Cos(7*aBomb.Time)*0.5),
+                            1/30*(0.7+Cos(7*aBomb.Time)*Cos(7*aBomb.Time)*0.5),
+                            1/30*(0.7+Cos(7*aBomb.Time)*Cos(7*aBomb.Time)*0.5),
+                            0,0,0)
+          else if (aBomb is CTriggerBomb) then
+          PushObjectMatrix( aBomb.Position.X, aBomb.Position.Z, aBomb.Position.Y,
+                            0.04, 0.04, 0.04,
+                            0,0,0)
           else
           PushObjectMatrix( aBomb.Position.X, aBomb.Position.Z, aBomb.Position.Y,
-                            1/30*(0.7+Cos(6*aBomb.Time)*Cos(6*aBomb.Time)*0.5),
-                            1/30*(0.7+Cos(6*aBomb.Time)*Cos(6*aBomb.Time)*0.5),
-                            1/30*(0.7+Cos(6*aBomb.Time)*Cos(6*aBomb.Time)*0.5),
-                            0,0,0);
+                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
+                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
+                            1/30*(0.7+Cos(4*aBomb.Time)*Cos(4*aBomb.Time)*0.5),
+                            0, 0, 0 );
                             
           DrawMesh( MESH_BOMB(aBomb.BIndex), False );
           PopObjectMatrix();

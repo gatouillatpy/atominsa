@@ -91,15 +91,16 @@ Const GRIDWIDTH         = 15;           // largeur de la grille
 
 
 // constantes d'identification des maladies
-Const DISEASE_NONE       = 0;
-      DISEASE_SPEEDUP    = 1;
-      DISEASE_SPEEDDOWN  = 2;
-      DISEASE_NOBOMB     = 3;
-      DISEASE_CHANGEKEY  = 4;
-      DISEASE_SWITCH     = 5;
-      DISEASE_FASTBOMB   = 6;
-      DISEASE_SMALLFLAME = 7;
-      DISEASE_EJECTBOMB  = 8;
+Const DISEASE_NONE           = 0;
+      DISEASE_SPEEDUP        = 1;
+      DISEASE_SPEEDDOWN      = 2;
+      DISEASE_NOBOMB         = 3;
+      DISEASE_CHANGEKEY      = 4;
+      DISEASE_SWITCH         = 5;
+      DISEASE_FASTBOMB       = 6;
+      DISEASE_SMALLFLAME     = 7;
+      DISEASE_EJECTBOMBFAST  = 8;
+      DISEASE_EJECTBOMBKick  = 9;
 
 
 // constantes de définition des chemins d'accès

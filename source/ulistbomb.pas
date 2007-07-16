@@ -4,7 +4,7 @@ unit UListBomb;
 
 interface
 
-uses UGrid, UBomb, UJellyBomb,UUtils;
+uses UGrid, UBomb, UJellyBomb, UTriggerBomb, UUtils;
 
 const NONE  = 0;
       UP    = 1;
@@ -20,7 +20,7 @@ Type LPBombItem = ^BombItem;
               end;
 
 
-    procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+    procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
     procedure RemoveBombByCount(i : integer);
     procedure RemoveBombByGridCoo(aX,aY : integer);
     procedure RemoveThisBomb(bomb: CBomb);
@@ -48,7 +48,7 @@ Procedure UpdateCountList();Forward;                                 // pour lui
 { Ajout / Suppression                                                           }
 {*******************************************************************************}
 // ajout
-procedure AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+procedure AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aTrigger : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
 var pTemp : LPBombItem;
 begin
  Inc(BombCount);
@@ -57,6 +57,7 @@ begin
    New(pBombItem);
    pBombItem^.Next:=Nil;
    if aJelly then pBombItem^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
+   else if aTrigger then pBombItem^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
    else pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
    pBombItem^.Count:=BombCount;
  end
@@ -69,7 +70,9 @@ begin
    pTemp:=pTemp^.Next;
    pTemp^.Count:=BombCount;
    pTemp^.Next:=Nil;
-   pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
+   if aJelly then pTemp^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
+   else if aTrigger then pTemp^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
+   else pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
  end;
 end;
 

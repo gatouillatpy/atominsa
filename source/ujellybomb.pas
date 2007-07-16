@@ -25,7 +25,7 @@ uses UListBomb;
 procedure CJellyBomb.Move(dt: single);
 begin
   inherited Move(dt);
-  if Not(bMoving) then
+  if Not(bMoving) and (nMoveDir<>NONE) then
   begin
     bMoving:=True;
     nMoveDir:=-nMoveDir;
