@@ -20,7 +20,7 @@ Type LPBombItem = ^BombItem;
               end;
 
 
-    function AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman):Boolean;
+    procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
     procedure RemoveBombByCount(i : integer);
     procedure RemoveBombByGridCoo(aX,aY : integer);
     procedure RemoveThisBomb(bomb: CBomb);
@@ -48,11 +48,8 @@ Procedure UpdateCountList();Forward;                                 // pour lui
 { Ajout / Suppression                                                           }
 {*******************************************************************************}
 // ajout
-function AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman): boolean;
+procedure AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
 var pTemp : LPBombItem;
-begin
-result:=false;
-if (aGrid.GetBlock(Trunc(aX),Trunc(aY))=Nil) then
 begin
  Inc(BombCount);
  if (pBombItem=Nil) then
@@ -62,21 +59,18 @@ begin
    if aJelly then pBombItem^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
    else pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
    pBombItem^.Count:=BombCount;
-   result:=true;
  end
  else
  begin
- pTemp:=pBombItem;
- While (pTemp^.Next<>Nil) do
+   pTemp:=pBombItem;
+   While (pTemp^.Next<>Nil) do
+     pTemp:=pTemp^.Next;
+   New(pTemp^.Next);
    pTemp:=pTemp^.Next;
- New(pTemp^.Next);
- pTemp:=pTemp^.Next;
- pTemp^.Count:=BombCount;
- pTemp^.Next:=Nil;
- pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
- result:=true;
-end;
-end;
+   pTemp^.Count:=BombCount;
+   pTemp^.Next:=Nil;
+   pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
+ end;
 end;
 
 

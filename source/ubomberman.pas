@@ -32,7 +32,7 @@ type
 
     sName     : string;       //nom du joueur
 
-    nDisease : integer;
+    nDisease,                 // stock le numero d'identification de la maladie
     nIndex,                   //numero du bomberman
     nTeam,                    //numero de team
     nKills,                   //nombre de bomberman tue
@@ -44,18 +44,19 @@ type
 
 
 
+    bCanSpoog,
     bCanPunch,
     bJelly,
     bPrimaryPressed,
     bSecondaryPressed,
     bCanGrabBomb,             // Peut il porter une bombe ... (le bonus)
     bEjectBomb,               //Si true = on oblige a lacher ses bombes
-    bNoBomb  : Boolean;       //Permet de savoir si on peut poser une bombe ou pas indifferemment du nombre en stock (= maladie)
+    bNoBomb,                  //Permet de savoir si on peut poser une bombe ou pas indifferemment du nombre en stock (= maladie)
              //true = je suis malade => je peux pas poser
              //false = je suis pas malade => je peux poser si j'en ai assez en stock
-    bReverse  : Boolean;       //touche inverse
-    bAlive    : Boolean;      //Personnage en vie ou non
-    bKick     : Boolean;      //Shoot dans une bombe possible ou non
+    bReverse ,                // touche inverse
+    bAlive,                   // Personnage en vie ou non
+    bcanKick     : Boolean;      //Shoot dans une bombe possible ou non
 
 
     uGrid     : CGrid;        //Pointe sur la grille de jeu
@@ -103,6 +104,7 @@ type
   procedure ActiveGrab();
   procedure ActiveJelly();
   procedure ActivePunch();
+  procedure ActiveSpoog();
 
   function CanBomb():boolean;
 
@@ -130,7 +132,7 @@ type
   property Speed : single Read fSpeed Write fSpeed;
   property Alive : boolean Read bAlive;
   property NoBomb : Boolean Read bNoBomb Write bNoBomb;
-  property Kick : boolean Read bKick;
+  property Kick : boolean Read bCanKick;
   property EjectBomb : boolean Read bEjectBomb Write bEjectBomb;
 
   end;
@@ -530,7 +532,7 @@ begin
     {Sinon c'est que c'est soit un mur / caisse soit une bombe}
     else
     {Si c'est une bombe on regarde si on peut la shooter}
-    if (TestBomb(aX,aY) AND bKick) then
+    if (TestBomb(aX,aY) AND bCanKick) then
     begin
       bBomb:=True;
       bResult:=True;
@@ -776,17 +778,74 @@ end;
 
 
 
+
+
+
+
 procedure CBomberman.CreateBomb(dt : Single); cdecl;
+var aX, aY, dX, dY : integer;
+    Stop : boolean;
 begin
   if bAlive then
   begin
     if CanBomb  then
     begin
-      if AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,uGrid,@UpBombCount,@IsBombermanAtCoo) then
+      if uGrid.GetBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil then
+      begin
+        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,uGrid,@UpBombCount,@IsBombermanAtCoo);
         Dec(nBombCount);
+      end
+      else if bCanSpoog then
+      begin
+          //creation en ligne de bombes
+          dX := 0;
+          dY := 0;
+          aX := Trunc(fPosition.x+0.5);
+          aY := Trunc(fPosition.y+0.5);
+          Stop := false;
+          case nDirection of
+              0    : begin  //bas
+                       dY := 1;
+                     end;
+              90   : begin  //gauche
+                       dX := -1;
+                     end;
+              180 : begin  //haut
+                       dY := -1;
+                     end;
+              -90  : begin  //droite
+                       dX := 1;
+                     end;
+          end;
+          While (nBombCount<>0) and Not(Stop) do
+          begin
+            aX := aX + dX;
+            aY := aY + dY;
+            if Not(CheckCoordinates(aX,aY)) then
+            begin
+              Stop := True;
+            end
+            else
+            begin
+              if Not(uGrid.GetBlock(aX,aY)=nil) or IsBombermanAtCoo(aX,aY) then
+              begin
+                stop := true;
+              end
+              else
+              begin
+                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,uGrid,@UpBombCount,@IsBombermanAtCoo);
+                Dec(nBombCount);
+              end;
+            end;
+          end;
+      end;
     end;
   end;
 end;
+
+
+
+
 
 
 
@@ -805,29 +864,18 @@ end;
 
 
 
+
+
+
+
+
+
+
 function CBomberman.GrabBomb():boolean;
 var dX, dY : integer;
-    delta : single;
 begin
-  delta := 0.5;
-  dX := Trunc(fPosition.x);
-  dY := Trunc(fPosition.y);
-
-  case nDirection of
-    0    : begin  //bas
-             dY := Trunc(fPosition.y)+1;;
-           end;
-    90   : begin  //gauche
-             dX := Trunc(fPosition.x-delta);
-           end;
-    180 : begin  //haut
-             dY := Trunc(fPosition.y-delta);
-           end;
-    -90  : begin  //droite
-             dX := Trunc(fPosition.x)+1;
-           end;
-  end;
-
+  dX := Trunc(fPosition.x+0.5);
+  dY := Trunc(fPosition.y+0.5);
  if CheckCoordinates(dX,dY) then
   if ((uGrid.GetBlock(dX,dY)<>nil) AND (uGrid.GetBlock(dX,dY) is CBomb)) then
   begin
@@ -842,10 +890,18 @@ end;
 
 
 
+
+
+
+
+
+
 procedure CBomberman.DropBomb(dt : Single);
 begin
   if uGrabbedBomb<>nil then
   begin
+    uGrabbedBomb.Position.x:=fPosition.x;
+    uGrabbedBomb.Position.y:=fPosition.y;
     uGrabbedBomb.StartTime();
     uGrabbedBomb.Position.Z:=0;
     uGrabbedBomb.JumpMovement:=True;
@@ -858,6 +914,11 @@ begin
     uGrabbedBomb:=nil;
   end;
 end;
+
+
+
+
+
 
 
 
@@ -913,6 +974,8 @@ end;
 
 
 
+
+
 {*******************************************************************************}
 { Creation et restauration                                                      }
 {*******************************************************************************}
@@ -942,15 +1005,16 @@ procedure CBomberman.Restore();
 begin
   bAlive             := True;
   fPosition          := fOrigin;
+  bCanSpoog          := False;
   bCanPunch          := False;
   bJelly             := False;
-  bPrimaryPressed    := false;
-  bSecondaryPressed  := false;
   bCanGrabBomb       := False;
-  bEjectBomb         := false;
+  bCanKick           := False;
+  bPrimaryPressed    := False;
+  bSecondaryPressed  := False;
+  bEjectBomb         := False;
   bNoBomb            := False;
   bReverse           := False;
-  bKick              := False;
   nBombCount         := DEFAULTBOMBCOUNT;
   fBombTime          := BOMBTIME;
   nFlameSize         := DEFAULTFLAMESIZE;
@@ -987,7 +1051,6 @@ begin
   begin
     uGrabbedBomb.Position.x:=fPosition.x;
     uGrabbedBomb.Position.y:=fPosition.y;
-    if Not(bPrimaryPressed and bCanGrabBomb)then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
   end;
 end;
 
@@ -1060,17 +1123,16 @@ end;
 
 procedure CBomberman.ActiveKick();
 begin
-  bKick := true;
-  //if bGrab reapparition de la caisse ?
-  bCanGrabBomb := false;
+  bCanKick := true;
+  //if bCanPunch reapparition de la caisse ?
   bCanPunch       := false;
 end;
 
 procedure CBomberman.ActiveGrab();
 begin
   bCanGrabBomb := true;
-  //if bKick reapparition de la caisse ?
-  bKick := false;
+  //if bCanSpoog reapparition de la caisse ?
+  bCanSpoog := false;
 end;
 
 procedure CBomberman.ActiveJelly();
@@ -1081,7 +1143,14 @@ end;
 procedure CBomberman.ActivePunch();
 begin
   bCanPunch := true;
-  bKick := false;
+  bCanKick := false;
+end;
+
+procedure CBomberman.ActiveSpoog();
+begin
+  bCanSpoog := true;
+  if Not(uGrabbedBomb=nil) then DropBomb(0);
+  bCanGrabBomb := false;
 end;
 
 
@@ -1104,8 +1173,12 @@ procedure CBomberman.PrimaryKeyDown(dt: Single); cdecl;
 begin
  if bAlive then
  begin
-  if (bCanGrabBomb and (uGrabbedBomb=nil)) then GrabBomb();
-  if (uGrabbedBomb=Nil) and Not(bPrimaryPressed) then CreateBomb(dt);
+  if ((uGrabbedBomb=Nil) and Not(bPrimaryPressed)) then
+  begin
+    if bCanGrabBomb then GrabBomb();
+    if (uGrabbedBomb=nil) then CreateBomb(dt);
+  end;
+  
   bPrimaryPressed := true;
  end;
 end;
@@ -1124,6 +1197,7 @@ begin
   if bAlive then
   begin
     bPrimaryPressed := false;
+    if (uGrabbedBomb<>Nil) then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
   end;
 end;
 

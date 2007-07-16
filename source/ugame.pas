@@ -12,7 +12,7 @@ Interface
 Uses Classes, SysUtils,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UJelly, UGrid, UFlame, UListBomb, UBomb, USetup, UForm,
-     UJellyBomb, UPunch, UCharacter, UComputer;
+     UJellyBomb, UPunch, USpoog, UCharacter, UComputer;
 
 
 
@@ -560,6 +560,12 @@ Begin
                     SetTexture( 1, TEXTURE_NONE );
                     PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
                     DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du PUNCH
+                    PopObjectMatrix();
+                 End Else If (pBlock Is CSpoog) And (pBlock As CItem).IsExplosed() Then Begin
+                    SetMaterial( w, w, 0.5, 0.5 );
+                    SetTexture( 1, TEXTURE_NONE );
+                    PushObjectMatrix( i, 0, j, 0.05, 0.05, 0.05, 0, 0, 0 );
+                    DrawMesh( MESH_FLAMEUP, True );                /////////////////////////////////////////////Mettre le mesh du SPOOG
                     PopObjectMatrix();
                  End Else If (pBlock Is CItem) Then Begin
                     SetMaterial( w, w, w, 1.0 );

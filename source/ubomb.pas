@@ -110,7 +110,8 @@ procedure CBomb.Move(dt : single);
    begin
      uGrid.DelBlock(nX,nY);
      if nPunch>0 then
-       if ((aX<>nX) or (aY<>nY)) then nPunch -= 1;
+       if ((aX<>nX) or (aY<>nY)) then
+         if (abs(afX-aX)<0.1) and (abs(afY-aY)<0.1) then nPunch -= 1;
      nX:=aX;
      nY:=aY;
      fPosition.x:=afX;
@@ -416,7 +417,7 @@ begin
    bJumping        := false;
    nMoveDir        := NONE;
    uGrid           := aGrid;
-   nPunch          := 0;
+   nPunch          := -1;
    nIndex          := aIndex;
    nBombSize       := aBombSize;                                                // la taille des flammes de la bombe est celle de la portee des flammes du joueur qui la cree
    nX              := Trunc(aX);                                                // abscisse de la bombe dans la grille
@@ -568,8 +569,9 @@ begin
     bMoving := false;
     nPunch  := -1;
   end;
-  
-  result:=(fTimeCreated >= fExploseTime);
+  result := (fPosition.x-Trunc(fPosition.x))<0.2;
+  result := result and ((fPosition.y-Trunc(fPosition.y))<0.2);
+  result := result and (fTimeCreated >= fExploseTime);
   if result then Explose;
 end;
 

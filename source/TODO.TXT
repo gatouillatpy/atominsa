@@ -22,9 +22,9 @@ Technique :
  - mode solo
 
 Gameplay :
- - implémenter les bonus spooger, trigger, goldflame, baddisease
+ - implémenter les bonus trigger, goldflame, baddisease
  - terminer l'implémentation des maladies
- - modifier le moment d'explosion d'une bombe : elle n'explose que si elle est a peu pres centré sur la case ... 
+
 
 
 Divers :
@@ -49,7 +49,7 @@ Rappels :
                    lorsqu'elle vient d'être posée                             > fait manque le mesh
   - spooger      > permet d'aligner tout son stock de bombes dans une
                    direction avec l'action 1 lorsqu'une première bombe vient
-                   d'être posée                                               > à faire
+                   d'être posée                                               > fait manque le mesh
   - goldflame    > met le degré d'expansion de flammes au maximum             > à faire
   - trigger      > transforme les trois bombes suivantes en pipe bombes
                    déclenchables à distance avec l'action 2                   > à faire
