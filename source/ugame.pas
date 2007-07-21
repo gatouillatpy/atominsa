@@ -219,7 +219,7 @@ Begin
      pGrid := CGrid.Create( pScheme );
      FreeBomberman();
      For k := 1 To 8 Do
-         AddBomberman( 'temp', pScheme.Spawn(k).Team, pScheme.Spawn(k).Color, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+         AddBomberman( 'temp', pScheme.Spawn(k).Team, pScheme.Spawn(k).Color, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
 End;
 
 
@@ -1350,13 +1350,13 @@ Begin
      For k := 1 To 8 Do Begin // pour des random spawn on crééra une liste 1..8 de chiffres random parmi 1..8 sans remise
          Case nPlayerType[k] Of
               PLAYER_KB1 :
-                   pPlayer1 := AddBomberman( sPlayerName[k], k, k, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                   pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
               PLAYER_KB2 :
-                   pPlayer2 := AddBomberman( sPlayerName[k], k, k, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                   pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
               PLAYER_COM : // AddComputer() ?
-                   AddBomberman( sPlayerName[k], k, k, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                   AddBomberman( sPlayerName[k], k, k, nPlayerSkill[k], pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
               PLAYER_NET : // AddNetwork() ?
-                   AddBomberman( sPlayerName[k], k, k, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                   AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
          End;
      End;
 
@@ -1509,10 +1509,12 @@ End;
 Function PlayerSkill() : String ;
 Begin
      Case nPlayerSkill[nPlayer] Of
-          1 : PlayerSkill := 'novice';
-          2 : PlayerSkill := 'average';
-          3 : PlayerSkill := 'masterful';
-          4 : PlayerSkill := 'godlike';
+        //  SKILL_PLAYER    : PlayerSkill := 'player';
+          SKILL_NOVICE    : PlayerSkill := 'novice';
+          SKILL_AVERAGE   : PlayerSkill := 'average';
+          SKILL_MASTERFUL : PlayerSkill := 'masterful';
+          SKILL_GODLIKE   : PlayerSkill := 'godlike'
+          else PlayerSkill := 'player';
      End;
 End;
 

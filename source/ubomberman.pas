@@ -33,6 +33,7 @@ type
 
     sName     : string;          // nom du joueur
 
+    nAISkill,
     nTriggerBomb,                // stock le nombre de bombe TRIGGER qu'il peut encore poser
     nDisease,                    // stock le numero d'identification de la maladie
     nIndex,                      // numero du bomberman
@@ -79,6 +80,7 @@ type
     procedure AddTriggerBomb();
     procedure DelTriggerBomb();
     procedure DoIgnition();
+    procedure TriggerToNormalBomb();
 
     
     function TestBomb(aX,aY : integer):boolean;
@@ -92,7 +94,7 @@ type
   public
     { public declarations }
   Constructor Create(aName : string; aTeam : integer; aIndex : Integer;
-                           aGrid : CGrid; aX, aY : Single);
+                           aAISkill : integer; aGrid : CGrid; aX, aY : Single);
   procedure PrimaryKeyDown(dt : Single);cdecl;
   procedure SecondaryKeyDown(dt : single);cdecl;
   procedure PrimaryKeyUp(dt : Single);cdecl;
@@ -136,6 +138,7 @@ type
   property Kills : integer Read nKills;
   property Deaths : integer Read nDeaths;
   property Score : integer Read nScore;
+  property AISkill : integer Read nAISkill;
 
 
   property BombCount : integer Read nBombCount Write nBombCount;
@@ -166,7 +169,7 @@ type
                    Next : LPBombermanItem;
                  end;
     Function AddBomberman(aName : string; aTeam : integer; aIndex : Integer;
-                           aGrid : CGrid; aX, aY : Single):CBomberman;
+                           aAISkill : integer; aGrid : CGrid; aX, aY : Single):CBomberman;
     Function RemoveBombermanByIndex(i : Integer):Boolean;
     Function RemoveBombermanByCount(i : Integer):Boolean;
     Procedure FreeBomberman();overload;
@@ -204,7 +207,7 @@ Procedure UpdateCountList(i : integer);Forward;
 { Ajout / Suppression                                                           }
 {*******************************************************************************}
 Function AddBomberman(aName : string; aTeam : integer; aIndex : Integer;
-                           aGrid : CGrid; aX, aY : Single):CBomberman;
+                           aAISkill : integer; aGrid : CGrid; aX, aY : Single):CBomberman;
 var pTemp : LPBombermanItem;
 begin
 Inc(BombermanCount);
@@ -212,7 +215,7 @@ if pBombermanItem=NIL then
  begin
     New(pBombermanItem);
     pBombermanItem^.Count:=1;
-    pBombermanItem^.Bomberman:=CBomberman.Create(aName,aTeam,aIndex,aGrid,aX,aY);
+    pBombermanItem^.Bomberman:=CBomberman.Create(aName,aTeam,aIndex,aAISkill,aGrid,aX,aY);
     pBombermanItem^.Next:=NIL;
     result:=pBombermanItem^.Bomberman;
  end
@@ -224,7 +227,7 @@ if pBombermanItem=NIL then
     New(pTemp^.Next);
     pTemp:=pTemp^.Next;
     pTemp^.Count:=BombermanCount;
-    pTemp^.Bomberman:=CBomberman.Create(aName,aTeam,aIndex,aGrid,aX,aY);
+    pTemp^.Bomberman:=CBomberman.Create(aName,aTeam,aIndex,aAISkill,aGrid,aX,aY);
     pTemp^.Next:=NIL;
     result:=pTemp^.Bomberman;
  end;
@@ -824,6 +827,24 @@ begin
   DelTriggerBomb();
 end;
 
+procedure CBomberman.TriggerToNormalBomb();
+var aX, aY : integer;
+begin
+  if uTriggerBomb<>nil then
+  begin
+    while uTriggerBomb<>nil do
+    begin
+      aX := uTriggerBomb^.Bomb.XGrid;
+      aY := uTriggerBomb^.Bomb.YGrid;
+      uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
+      RemoveThisBomb(uTriggerBomb^.Bomb);
+      uTriggerBomb^.Bomb.Destroy();
+      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo);
+      DelTriggerBomb();
+    end;//while
+  end;//if uTriggerBomb
+end;
+
 
 
 
@@ -1058,16 +1079,16 @@ end;
 { Creation et restauration                                                      }
 {*******************************************************************************}
 constructor CBomberman.Create(aName: string; aTeam: integer; aIndex : Integer;
-                               aGrid : CGrid; aX, aY : Single);
+                               aAISkill : integer; aGrid : CGrid; aX, aY : Single);
 begin
   sName              := aName;
+  nAISkill           := aAISkill;
   nTeam              := aTeam;
   nIndex             := aIndex;
   fOrigin.x          := aX;
   fOrigin.y          := aY;
   fOrigin.z          := 0;
   uGrid              := aGrid;
-  nDisease           := DISEASE_NONE;
   nKills             := 0;
   nDeaths            := 0;
   nScore             := 0;
@@ -1093,6 +1114,7 @@ begin
   bEjectBomb         := False;
   bNoBomb            := False;
   bReverse           := False;
+  nDisease           := DISEASE_NONE;
   nTriggerBomb       := 0;
   nBombCount         := DEFAULTBOMBCOUNT;
   fBombTime          := BOMBTIME;
@@ -1224,12 +1246,14 @@ procedure CBomberman.ActiveJelly();
 begin
   bJelly := true;
   nTriggerBomb := 0;
+  TriggerToNormalBomb();
 end;
 
 procedure CBomberman.ActivePunch();
 begin
   bCanPunch := true;
   bCanKick := false;
+  TriggerToNormalBomb();
 end;
 
 procedure CBomberman.ActiveSpoog();

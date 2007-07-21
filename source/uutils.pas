@@ -103,6 +103,15 @@ Const DISEASE_NONE           = 0;
       DISEASE_EJECTBOMBKick  = 9;
 
 
+
+// constatntes pour l'intelligence artificielle
+const SKILL_PLAYER    = 0;
+      SKILL_NOVICE    = 1;
+      SKILL_AVERAGE   = 2;
+      SKILL_MASTERFUL = 3;
+      SKILL_GODLIKE   = 4;
+      
+      
 // constantes de définition des chemins d'accès
 Const PATH_MAP            = './maps/';
       PATH_SCHEME         = './schemes/';
