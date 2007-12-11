@@ -55,6 +55,7 @@ CBomb = Class(CBlock)
        property CanExplose : boolean Read bExplosive;
        property Position : Vector Read fPosition Write fPosition;
        property Time : Single Read fTimeCreated;
+       property ExploseTime : Single Read fExploseTime;
        property JumpMovement : boolean Read bMoveJump Write bMoveJump;
        property BIndex : integer Read nIndex Write nIndex;
 
