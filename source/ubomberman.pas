@@ -21,6 +21,10 @@ type
     fCX, fCY : Single;           // coordonnées ciblées par l'intelligence artificielle
     fLX, fLY : Single;           // dernières coordonnées
     fDanger : Single;            // pourcentage de risque aux coordonnées courantes
+    fDangerLeft : Single;        // danger aux coordonnées de la case à gauche du personnage
+    fDangerRight : Single;       // danger à droite du personnage
+    fDangerUp : Single;          // danger au-dessus du personnage
+    fDangerDown : Single;        // danger au-dessous du personnage
     
 
 
@@ -1093,6 +1097,8 @@ begin
   nDeaths            := 0;
   nScore             := 0;
   lastDir.z          := 0;
+  fCX                := aX;
+  fCY                := aY;
 end;
 
 

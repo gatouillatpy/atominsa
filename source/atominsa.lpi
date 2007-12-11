@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="6"/>
+      <ActiveEditorIndexAtStart Value="10"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -149,8 +149,8 @@
       <Unit15>
         <Filename Value="ubomberman.pas"/>
         <UnitName Value="UBomberman"/>
-        <CursorPos X="69" Y="230"/>
-        <TopLine Value="113"/>
+        <CursorPos X="28" Y="27"/>
+        <TopLine Value="11"/>
         <EditorIndex Value="10"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -352,10 +352,10 @@
       <Unit44>
         <Filename Value="ucomputer.pas"/>
         <UnitName Value="UComputer"/>
-        <CursorPos X="13" Y="147"/>
-        <TopLine Value="125"/>
+        <CursorPos X="6" Y="36"/>
+        <TopLine Value="16"/>
         <EditorIndex Value="6"/>
-        <UsageCount Value="53"/>
+        <UsageCount Value="54"/>
         <Loaded Value="True"/>
       </Unit44>
       <Unit45>
@@ -370,7 +370,7 @@
         <CursorPos X="68" Y="1359"/>
         <TopLine Value="1334"/>
         <EditorIndex Value="2"/>
-        <UsageCount Value="56"/>
+        <UsageCount Value="57"/>
         <Loaded Value="True"/>
       </Unit46>
       <Unit47>
@@ -386,7 +386,7 @@
         <CursorPos X="1" Y="403"/>
         <TopLine Value="375"/>
         <EditorIndex Value="8"/>
-        <UsageCount Value="47"/>
+        <UsageCount Value="48"/>
         <Loaded Value="True"/>
       </Unit48>
       <Unit49>
@@ -435,7 +435,7 @@
         <UnitName Value="UGrab"/>
         <CursorPos X="1" Y="39"/>
         <TopLine Value="2"/>
-        <UsageCount Value="94"/>
+        <UsageCount Value="96"/>
       </Unit55>
       <Unit56>
         <Filename Value="uitem.pas"/>
@@ -450,7 +450,7 @@
         <UnitName Value="UJelly"/>
         <CursorPos X="32" Y="8"/>
         <TopLine Value="2"/>
-        <UsageCount Value="61"/>
+        <UsageCount Value="63"/>
       </Unit57>
       <Unit58>
         <Filename Value="ujellybomb.pas"/>
@@ -458,7 +458,7 @@
         <UnitName Value="UJellyBomb"/>
         <CursorPos X="24" Y="28"/>
         <TopLine Value="1"/>
-        <UsageCount Value="58"/>
+        <UsageCount Value="60"/>
       </Unit58>
       <Unit59>
         <Filename Value="ulistbomb.pas"/>
@@ -466,7 +466,7 @@
         <UnitName Value="UListBomb"/>
         <CursorPos X="46" Y="7"/>
         <TopLine Value="49"/>
-        <UsageCount Value="39"/>
+        <UsageCount Value="41"/>
       </Unit59>
       <Unit60>
         <Filename Value="upunch.pas"/>
@@ -474,7 +474,7 @@
         <UnitName Value="UPunch"/>
         <CursorPos X="1" Y="39"/>
         <TopLine Value="2"/>
-        <UsageCount Value="38"/>
+        <UsageCount Value="40"/>
       </Unit60>
       <Unit61>
         <Filename Value="uspoil.pas"/>
@@ -482,7 +482,7 @@
         <UnitName Value="USpoil"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
-        <UsageCount Value="34"/>
+        <UsageCount Value="36"/>
       </Unit61>
       <Unit62>
         <Filename Value="uspoog.pas"/>
@@ -490,7 +490,7 @@
         <UnitName Value="USpoog"/>
         <CursorPos X="76" Y="12"/>
         <TopLine Value="2"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="35"/>
       </Unit62>
       <Unit63>
         <Filename Value="ugoldflame.pas"/>
@@ -498,7 +498,7 @@
         <UnitName Value="UGoldFlame"/>
         <CursorPos X="36" Y="32"/>
         <TopLine Value="1"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="35"/>
       </Unit63>
       <Unit64>
         <Filename Value="utriggerbomb.pas"/>
@@ -506,7 +506,7 @@
         <UnitName Value="UTriggerBomb"/>
         <CursorPos X="23" Y="34"/>
         <TopLine Value="12"/>
-        <UsageCount Value="32"/>
+        <UsageCount Value="34"/>
       </Unit64>
       <Unit65>
         <Filename Value="utrigger.pas"/>
@@ -514,7 +514,7 @@
         <UnitName Value="UTrigger"/>
         <CursorPos X="19" Y="28"/>
         <TopLine Value="2"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="33"/>
       </Unit65>
       <Unit66>
         <Filename Value="F:\lazarus\fpc\2.0.4\source\rtl\inc\systemh.inc"/>
@@ -528,7 +528,7 @@
         <UnitName Value="USuperDisease"/>
         <CursorPos X="52" Y="23"/>
         <TopLine Value="13"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="32"/>
       </Unit67>
       <Unit68>
         <Filename Value="urandomdisease.pas"/>
@@ -536,7 +536,7 @@
         <UnitName Value="URandomDisease"/>
         <CursorPos X="1" Y="57"/>
         <TopLine Value="20"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="30"/>
       </Unit68>
       <Unit69>
         <Filename Value="urandombonus.pas"/>
@@ -544,7 +544,7 @@
         <UnitName Value="URandomBonus"/>
         <CursorPos X="23" Y="30"/>
         <TopLine Value="1"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="29"/>
       </Unit69>
       <Unit70>
         <Filename Value="..\..\..\Users\Stephane\Desktop\Nouveau dossier\outils_unit.pas"/>
@@ -566,11 +566,40 @@
         <CursorPos X="21" Y="95"/>
         <TopLine Value="1"/>
         <EditorIndex Value="5"/>
-        <UsageCount Value="26"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit72>
     </Units>
-    <JumpHistory Count="0" HistoryIndex="-1"/>
+    <JumpHistory Count="7" HistoryIndex="6">
+      <Position1>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="45" Column="121" TopLine="30"/>
+      </Position1>
+      <Position2>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="22" Column="26" TopLine="6"/>
+      </Position2>
+      <Position3>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="21" Column="22" TopLine="51"/>
+      </Position3>
+      <Position4>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="129" Column="42" TopLine="31"/>
+      </Position4>
+      <Position5>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="218" Column="49" TopLine="197"/>
+      </Position5>
+      <Position6>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="230" Column="40" TopLine="209"/>
+      </Position6>
+      <Position7>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="870" Column="28" TopLine="864"/>
+      </Position7>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>

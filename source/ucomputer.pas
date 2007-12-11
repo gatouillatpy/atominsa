@@ -34,6 +34,7 @@ Function lm : Single; Begin If Random < 0.5 Then lm := -1.0 Else lm := 1.0 End;
 Var t : Single;
     k : Integer;
 Begin
+
     { Case nSkill Of
           SKILL_NOVICE :
           Begin
