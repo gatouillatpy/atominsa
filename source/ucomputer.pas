@@ -34,7 +34,7 @@ Function lm : Single; Begin If Random < 0.5 Then lm := -1.0 Else lm := 1.0 End;
 Var t : Single;
     k : Integer;
 Begin
-     Case nSkill Of
+    { Case nSkill Of
           SKILL_NOVICE :
           Begin
                // si les coordonnées ciblées sont toutes deux différentes aux coordonnées courantes alors
@@ -144,7 +144,7 @@ Begin
                // à chaque mise à jour on a 3% de chances de poser une bombe.
                If Random < 0.5 * GetDelta Then pBomberman.CreateBomb( GetDelta );
           End;
-     End;
+     End;  }
 End;
 
 
