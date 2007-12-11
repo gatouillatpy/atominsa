@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="7"/>
+      <ActiveEditorIndexAtStart Value="6"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -172,8 +172,8 @@
       <Unit18>
         <Filename Value="ubomb.pas"/>
         <UnitName Value="UBomb"/>
-        <CursorPos X="55" Y="58"/>
-        <TopLine Value="24"/>
+        <CursorPos X="6" Y="91"/>
+        <TopLine Value="78"/>
         <EditorIndex Value="7"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -233,58 +233,58 @@
         <UsageCount Value="100"/>
       </Unit26>
       <Unit27>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\datih.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\datih.inc"/>
         <CursorPos X="12" Y="111"/>
         <TopLine Value="92"/>
         <UsageCount Value="1"/>
       </Unit27>
       <Unit28>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\dati.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\dati.inc"/>
         <CursorPos X="11" Y="248"/>
         <TopLine Value="244"/>
         <UsageCount Value="1"/>
       </Unit28>
       <Unit29>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\inc\systemh.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\inc\systemh.inc"/>
         <CursorPos X="14" Y="539"/>
         <TopLine Value="520"/>
         <UsageCount Value="3"/>
       </Unit29>
       <Unit30>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\wininc\struct.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\wininc\struct.inc"/>
         <CursorPos X="14" Y="3824"/>
         <TopLine Value="3805"/>
         <UsageCount Value="1"/>
       </Unit30>
       <Unit31>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\sysutils.pp"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\sysutils.pp"/>
         <UnitName Value="sysutils"/>
         <CursorPos X="3" Y="36"/>
         <TopLine Value="121"/>
         <UsageCount Value="1"/>
       </Unit31>
       <Unit32>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\windows.pp"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\windows.pp"/>
         <UnitName Value="windows"/>
         <CursorPos X="6" Y="15"/>
         <TopLine Value="25"/>
         <UsageCount Value="1"/>
       </Unit32>
       <Unit33>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\wininc\redef.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\wininc\redef.inc"/>
         <CursorPos X="1" Y="492"/>
         <TopLine Value="473"/>
         <UsageCount Value="1"/>
       </Unit33>
       <Unit34>
-        <Filename Value="..\..\..\..\atominsa\current\atominsa.lpr"/>
+        <Filename Value="..\..\..\atominsa\current\atominsa.lpr"/>
         <UnitName Value="atominsa"/>
         <CursorPos X="1" Y="548"/>
         <TopLine Value="533"/>
         <UsageCount Value="1"/>
       </Unit34>
       <Unit35>
-        <Filename Value="..\..\..\..\atominsa\current\uutils.pas"/>
+        <Filename Value="..\..\..\atominsa\current\uutils.pas"/>
         <UnitName Value="UUtils"/>
         <CursorPos X="22" Y="55"/>
         <TopLine Value="38"/>
@@ -317,7 +317,7 @@
         <UsageCount Value="212"/>
       </Unit38>
       <Unit39>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\inc\file.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\inc\file.inc"/>
         <CursorPos X="3" Y="83"/>
         <TopLine Value="78"/>
         <UsageCount Value="3"/>
@@ -331,13 +331,13 @@
         <UsageCount Value="200"/>
       </Unit40>
       <Unit41>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\filutilh.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\filutilh.inc"/>
         <CursorPos X="12" Y="53"/>
         <TopLine Value="30"/>
         <UsageCount Value="1"/>
       </Unit41>
       <Unit42>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysutilh.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysutilh.inc"/>
         <CursorPos X="4" Y="33"/>
         <TopLine Value="12"/>
         <UsageCount Value="1"/>
@@ -352,14 +352,14 @@
       <Unit44>
         <Filename Value="ucomputer.pas"/>
         <UnitName Value="UComputer"/>
-        <CursorPos X="84" Y="134"/>
-        <TopLine Value="98"/>
+        <CursorPos X="13" Y="147"/>
+        <TopLine Value="125"/>
         <EditorIndex Value="6"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit44>
       <Unit45>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\inc\mathh.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\inc\mathh.inc"/>
         <CursorPos X="14" Y="50"/>
         <TopLine Value="9"/>
         <UsageCount Value="3"/>
@@ -397,19 +397,19 @@
         <UsageCount Value="7"/>
       </Unit49>
       <Unit50>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\osutilsh.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\osutilsh.inc"/>
         <CursorPos X="11" Y="25"/>
         <TopLine Value="18"/>
         <UsageCount Value="4"/>
       </Unit50>
       <Unit51>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\inc\socketsh.inc"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\inc\socketsh.inc"/>
         <CursorPos X="13" Y="182"/>
         <TopLine Value="163"/>
         <UsageCount Value="4"/>
       </Unit51>
       <Unit52>
-        <Filename Value="..\..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\winsock2.pp"/>
+        <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\win32\winsock2.pp"/>
         <UnitName Value="WinSock2"/>
         <CursorPos X="13" Y="1109"/>
         <TopLine Value="1090"/>
@@ -547,7 +547,7 @@
         <UsageCount Value="27"/>
       </Unit69>
       <Unit70>
-        <Filename Value="..\..\..\..\..\..\Users\Stephane\Desktop\Nouveau dossier\outils_unit.pas"/>
+        <Filename Value="..\..\..\Users\Stephane\Desktop\Nouveau dossier\outils_unit.pas"/>
         <UnitName Value="outils_unit"/>
         <CursorPos X="1" Y="1"/>
         <TopLine Value="1"/>
@@ -570,52 +570,7 @@
         <Loaded Value="True"/>
       </Unit72>
     </Units>
-    <JumpHistory Count="11" HistoryIndex="10">
-      <Position1>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="31" Column="20" TopLine="1"/>
-      </Position1>
-      <Position2>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="433" Column="16" TopLine="406"/>
-      </Position2>
-      <Position3>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="575" Column="53" TopLine="454"/>
-      </Position3>
-      <Position4>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="432" Column="13" TopLine="406"/>
-      </Position4>
-      <Position5>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="420" Column="27" TopLine="402"/>
-      </Position5>
-      <Position6>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="430" Column="16" TopLine="418"/>
-      </Position6>
-      <Position7>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="57" Column="36" TopLine="38"/>
-      </Position7>
-      <Position8>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="34" Column="8" TopLine="15"/>
-      </Position8>
-      <Position9>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="57" Column="48" TopLine="38"/>
-      </Position9>
-      <Position10>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="430" Column="16" TopLine="411"/>
-      </Position10>
-      <Position11>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="553" Column="56" TopLine="534"/>
-      </Position11>
-    </JumpHistory>
+    <JumpHistory Count="0" HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>
