@@ -20,11 +20,11 @@ type
   private
     fCX, fCY : Single;           // coordonnées ciblées par l'intelligence artificielle
     fLX, fLY : Single;           // dernières coordonnées
-    fDanger : Single;            // pourcentage de risque aux coordonnées courantes
-    fDangerLeft : Single;        // danger aux coordonnées de la case à gauche du personnage
-    fDangerRight : Single;       // danger à droite du personnage
-    fDangerUp : Single;          // danger au-dessus du personnage
-    fDangerDown : Single;        // danger au-dessous du personnage
+    fDanger : Integer;           // danger aux coordonnées courantes
+    fDangerLeft : Integer;       // danger aux coordonnées de la case à gauche du personnage
+    fDangerRight : Integer;      // danger à droite du personnage
+    fDangerUp : Integer;         // danger au-dessus du personnage
+    fDangerDown : Integer;       // danger au-dessous du personnage
     
 
 
@@ -32,6 +32,8 @@ type
     fOrigin   : Vector;          // position a la creation du personnage
     fSpeed,                      // vitesse du bomberman
     fBombTime : Single;          // temps avant explosion des bombes
+    
+    sumGetDelta : Single;        // somme des GetDelta depuis le dernier changement de cible
 
     lastDir   : vectorN;         // memorise la derniere direction de mouvement du bomberman
 
@@ -132,7 +134,7 @@ type
   Property LY : Single Read fLY Write fLY;
   Property CX : Single Read fCX Write fCX;
   Property CY : Single Read fCY Write fCY;
-  Property Danger : Single Read fDanger Write fDanger;
+//  Property Danger : Single Read fDanger Write fDanger;
   property ExploseBombTime : Single Read fBombTime Write fBombTime;
 
   property DiseaseNumber : integer Read nDisease Write nDisease;

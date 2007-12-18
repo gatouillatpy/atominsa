@@ -15,6 +15,7 @@ Uses Classes, SysUtils,
 
 
 Procedure ProcessComputer ( pBomberman : CBomberman ; nSkill : Integer ) ;
+Function CalculateDanger ( x : integer ; y : integer ) : integer ;
 
 
 
@@ -32,8 +33,67 @@ Const SKILL_GODLIKE        = 4;
 Procedure ProcessComputer ( pBomberman : CBomberman ; nSkill : Integer ) ;
 Function lm : Single; Begin If Random < 0.5 Then lm := -1.0 Else lm := 1.0 End;
 Var t : Single;
-    k : Integer;
+    i, j, k : Integer;
+    dangerMin : Integer;                                      // Le danger minimal connu pour l'instant
+    pX, pY, cX, cY, lX, lY : Integer;                         // Renommage des coordonnées pour améliorer la lecture du code.
+    aState : Array [1..GRIDWIDTH,1..GRIDHEIGHT] Of integer ;  // tableau du contenu de chaque case, 0 pour vide, 1 pour flamme, 2 pour bombe et 4 pour autre bomberman.
 Begin
+
+// Initialisation des variables.
+   pX := Trunc(pBomberman.Position.X + 0.5);
+   pY := Trunc(pBomberman.Position.Y + 0.5);
+   cX := Trunc(pBomberman.CX + 0.5);
+   cY := Trunc(pBomberman.CY + 0.5);
+   lX := Trunc(pBomberman.LX + 0.5);
+   lY := Trunc(pBomberman.LY + 0.5);
+   dangerMin := 10000;
+   
+
+// Mise à jour du tableau.
+     
+     // On met tous les données à 0.
+     For i := 1 To GRIDWIDTH Do Begin
+         For j := 1 To GRIDHEIGHT Do Begin
+             aState[i,j] := 0;
+         End;
+     End;
+
+     // On ajoute 1 à chaque case qui contient une flamme.
+     For k := 1 To GetFlameCount() Do Begin
+         aState[GetFlameByCount(k).X, GetFlameByCount(k).Y ] += 1;
+     End;
+
+     // On ajoute 2 à chaque case qui contient une bombe.
+     For k := 1 To GetBombCount() Do Begin
+         aState[Trunc(GetBombByCount(k).Position.X + 0.5), Trunc(GetBombByCount(k).Position.Y + 0.5)] += 2;
+     End;
+     
+     // On ajoute 4 à chaque case qui contient un personnage autre que l'IA
+     For k := 1 To GetBombermanCount() Do Begin
+         If (GetBombermanByCount(k) <> pBomberman) Then              // Comparaison à vérifier.
+            aState[Trunc(GetBombermanByCount(k).Position.X + 0.5), Trunc(GetBombermanByCount(k).Position.Y + 0.5)] += 4;
+     End;
+
+// Niveau Novice
+
+     Case nSkill Of
+          SKILL_NOVICE :
+          Begin
+               // si les coordonnées ciblées sont atteintes, alors on calcule de nouvelles coordonnées cibles.
+               If (cX = pX) And (cY = pY) Then Begin
+                  For i := pX - 2 To pX + 2 Do Begin
+                      For j := pY - 2 To pY + 2 Do Begin
+                          If CalculateDanger(i,j) <= dangerMin Then Begin
+                             cX := i;
+                             cY := j;                                // cX et cY à remettre dans pBomberman plus tard.
+                          End;
+                      End;
+                  End;
+               End;
+          End;
+     End;
+
+
 
     { Case nSkill Of
           SKILL_NOVICE :
@@ -146,6 +206,14 @@ Begin
                If Random < 0.5 * GetDelta Then pBomberman.CreateBomb( GetDelta );
           End;
      End;  }
+End;
+
+Function CalculateDanger ( x : integer ; y : integer ) : integer ;   // A faire
+Var
+   result1 : integer;
+Begin
+     result1 := 1;
+CalculateDanger := result1;
 End;
 
 
