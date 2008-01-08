@@ -134,7 +134,11 @@ type
   Property LY : Single Read fLY Write fLY;
   Property CX : Single Read fCX Write fCX;
   Property CY : Single Read fCY Write fCY;
-//  Property Danger : Single Read fDanger Write fDanger;
+  Property Danger : Integer Read fDanger Write fDanger;
+  Property DangerLeft : Integer Read fDangerLeft Write fDangerLeft;
+  Property DangerRight : Integer Read fDangerRight Write fDangerRight;
+  Property DangerUp : Integer Read fDangerUp Write fDangerUp;
+  Property DangerDown : Integer Read fDangerDown Write fDangerDown;
   property ExploseBombTime : Single Read fBombTime Write fBombTime;
 
   property DiseaseNumber : integer Read nDisease Write nDisease;
