@@ -18,12 +18,12 @@ type
 
   CBomberman = class
   private
-    fCX, fCY : Single;           // coordonnées ciblées par l'intelligence artificielle
+    fCX, fCY,                    // coordonnées ciblées par l'intelligence artificielle
     fLX, fLY : Single;           // dernières coordonnées
-    fDanger : Integer;           // danger aux coordonnées courantes
-    fDangerLeft : Integer;       // danger aux coordonnées de la case à gauche du personnage
-    fDangerRight : Integer;      // danger à droite du personnage
-    fDangerUp : Integer;         // danger au-dessus du personnage
+    fDanger,                     // danger aux coordonnées courantes
+    fDangerLeft,                 // danger aux coordonnées de la case à gauche du personnage
+    fDangerRight,                // danger à droite du personnage
+    fDangerUp,                   // danger au-dessus du personnage
     fDangerDown : Integer;       // danger au-dessous du personnage
     
 
@@ -33,7 +33,7 @@ type
     fSpeed,                      // vitesse du bomberman
     fBombTime : Single;          // temps avant explosion des bombes
     
-    sumGetDelta : Single;        // somme des GetDelta depuis le dernier changement de cible
+    fSumGetDelta : Single;       // somme des GetDelta depuis le dernier changement de cible
 
     lastDir   : vectorN;         // memorise la derniere direction de mouvement du bomberman
 
@@ -139,6 +139,7 @@ type
   Property DangerRight : Integer Read fDangerRight Write fDangerRight;
   Property DangerUp : Integer Read fDangerUp Write fDangerUp;
   Property DangerDown : Integer Read fDangerDown Write fDangerDown;
+  Property SumGetDelta : Single Read fSumGetDelta Write fSumGetDelta;
   property ExploseBombTime : Single Read fBombTime Write fBombTime;
 
   property DiseaseNumber : integer Read nDisease Write nDisease;
