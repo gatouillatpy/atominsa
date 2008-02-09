@@ -33,7 +33,7 @@ Const SKILL_GODLIKE        = 4;
 
 Procedure ProcessComputer ( pBomberman : CBomberman ; nSkill : Integer ) ;
 Function lm : Single; Begin If Random < 0.5 Then lm := -1.0 Else lm := 1.0 End;
-Var t : Single;
+Var t, rand : Single;
     i, j, k : Integer;
     bLeft, bDown, bUp, bRight : Integer;                             // Limites pour les calculs dans le tableau
     dangerMin : Integer;                                             // Le danger minimal connu pour l'instant
@@ -54,7 +54,7 @@ Begin
 
 // Mise à jour du tableau.
      
-     // On met tous les données à 0.
+     // On met toutes les données à 0.
      For i := 1 To GRIDWIDTH Do Begin
          For j := 1 To GRIDHEIGHT Do Begin
              aState[i,j] := 0;
@@ -63,7 +63,7 @@ Begin
 
      // On ajoute 1 à chaque case qui contient une flamme.
      For k := 1 To GetFlameCount() Do Begin
-         aState[GetFlameByCount(k).X, GetFlameByCount(k).Y ] += 1;
+         aState[GetFlameByCount(k).X, GetFlameByCount(k).Y] += 1;
      End;
 
      // On ajoute 2 à chaque case qui contient une bombe.
@@ -73,29 +73,35 @@ Begin
      
      // On ajoute 4 à chaque case qui contient un personnage autre que l'IA
      For k := 1 To GetBombermanCount() Do Begin
-         If (GetBombermanByCount(k) <> pBomberman) Then              // Comparaison à vérifier.
+         If ( ( Trunc(GetBombermanByCount(k).Position.X + 0.5) <> pX )
+         Or ( Trunc(GetBombermanByCount(k).Position.Y + 0.5) <> pY ) ) Then
             aState[Trunc(GetBombermanByCount(k).Position.X + 0.5), Trunc(GetBombermanByCount(k).Position.Y + 0.5)] += 4;
      End;
      
-// Mise à jour des dangers.
-   pBomberman.Danger := CalculateSlowDanger(pX, pY, aState);
-   pBomberman.DangerLeft := CalculateSlowDanger(pX - 1, pY, aState);
-   pBomberman.DangerRight := CalculateSlowDanger(pX + 1, pY, aState);
-   pBomberman.DangerUp := CalculateSlowDanger(pX, pY - 1, aState);
-   pBomberman.DangerDown := CalculateSlowDanger(pX, pY + 1, aState);
+// Mise à jour des dangers s'il ne vient pas de bouger
+   If ( pBomberman.CanCalculate = true ) Or ( pX <> lX ) Or ( pY <> lY )Then Begin
+      pBomberman.Danger := CalculateSlowDanger(pX, pY, aState);
+      pBomberman.DangerLeft := CalculateSlowDanger(pX - 1, pY, aState);
+      pBomberman.DangerRight := CalculateSlowDanger(pX + 1, pY, aState);
+      pBomberman.DangerUp := CalculateSlowDanger(pX, pY - 1, aState);
+      pBomberman.DangerDown := CalculateSlowDanger(pX, pY + 1, aState);
+   End;
 
 // Niveau Novice
 
      Case nSkill Of
           SKILL_NOVICE :
           Begin
+          {
                // Si les coordonnées ciblées sont atteintes ou obsolètes, alors on calcule de nouvelles coordonnées cibles.
-               If ( pX - 2 < 0 ) Then bLeft := 0 Else bLeft := pX - 2;
-               If ( pX + 2 > GRIDWIDTH ) Then bRight := GRIDWIDTH Else bRight := pX + 2;
-               If ( pY - 2 < 0 ) Then bUp := 0 Else bUp := pY - 2;
-               If ( pY + 2 > 0 ) Then bDown := GRIDHEIGHT Else bDown := pY + 2;
-               
                If ( ( cX = pX ) And ( cY = pY ) ) Or ( pBomberman.SumGetDelta >= 8 ) Then Begin
+                  // On fixe les limites du rectangle dans lequel on va calculer les dangers.
+                  If ( pX - 2 < 1 ) Then bLeft := 1 Else bLeft := pX - 2;
+                  If ( pX + 2 > GRIDWIDTH ) Then bRight := GRIDWIDTH Else bRight := pX + 2;
+                  If ( pY - 2 < 1 ) Then bUp := 1 Else bUp := pY - 2;
+                  If ( pY + 2 > 1 ) Then bDown := GRIDHEIGHT Else bDown := pY + 2;
+                  
+                  // Puis on calcule les dangers et sélectionne le minimum.
                   For i := bLeft To bRight Do Begin
                       For j := bUp To bDown Do Begin
                           If CalculateFastDanger( i, j, aState ) <= dangerMin Then Begin
@@ -108,54 +114,125 @@ Begin
                   pBomberman.SumGetDelta := 0;
                End;
                
-               // Si les dernières coordonnées ne sont pas les mêmes que les nouvelles, alors déterminer pX et pY.
-               // dangerMin := 10000;
+
+               // Prise en compte de la cible dans les dangers.
+               If ( abs( pX - cX ) + abs( pY - cY ) <> 0 ) Then
+                  pBomberman.Danger := pBomberman.Danger - 128 div ( abs( pX - cX ) + abs( pY - cY ) )
+               Else
+                  pBomberman.Danger := pBomberman.Danger - 256;
+               If ( abs( pX - 1 - cX ) + abs( pY - cY ) <> 0 ) Then
+                  pBomberman.DangerLeft := pBomberman.DangerLeft - 128 div ( abs( pX - 1 - cX ) + abs( pY - cY ) )
+               Else
+                  pBomberman.DangerLeft := pBomberman.DangerLeft - 256;
+               If ( abs( pX + 1 - cX ) + abs( pY - cY ) <> 0 ) Then
+                  pBomberman.DangerRight := pBomberman.DangerRight - 128 div ( abs( pX + 1 - cX ) + abs( pY - cY ) )
+               Else
+                  pBomberman.DangerRight := pBomberman.DangerRight - 256;
+               If ( abs( pX - cX ) + abs( pY - 1 - cY ) <> 0 ) Then
+                  pBomberMan.DangerUp := pBomberman.DangerUp - 128 div ( abs( pX - cX ) + abs( pY - 1 - cY ) )
+               Else
+                  pBomberman.DangerUp := pBomberman.DangerRight - 256;
+               If ( abs( pX - cX ) + abs( pY + 1 - cY ) <> 0 )Then
+                  pBomberman.DangerDown := pBomberman.DangerDown - 128 div ( abs( pX - cX ) + abs( pY + 1 - cY ) )
+               Else
+                  pBomberman.DangerDown := pBomberman.DangerDown - 256;
+                }
+                
+
+               // Si les dernières coordonnées ne sont pas les mêmes que les actuelles, alors déterminer pX et pY.
                If ( pX <> lX ) Or ( pY <> lY ) Then Begin
-                  // Prise en compte de la cible dans les dangers.
-                  If ( abs( pX - cX ) + abs( pY - cY ) <> 0 ) Then
-                     pBomberman.Danger := pBomberman.Danger - 256 div ( abs( pX - cX ) + abs( pY - cY ) )
-                  Else
-                     pBomberman.Danger := pBomberman.Danger - 512;
-                  If ( abs( pX - 1 - cX ) + abs( pY - cY ) <> 0 ) Then
-                     pBomberman.DangerLeft := pBomberman.DangerLeft - 256 div ( abs( pX - 1 - cX ) + abs( pY - cY ) )
-                  Else
-                      pBomberman.DangerLeft := pBomberman.DangerLeft - 512;
-                  If ( abs( pX + 1 - cX ) + abs( pY - cY ) <> 0 ) Then
-                     pBomberman.DangerRight := pBomberman.DangerRight - 256 div ( abs( pX + 1 - cX ) + abs( pY - cY ) )
-                  Else
-                      pBomberman.DangerRight := pBomberman.DangerRight - 512;
-                  If ( abs( pX - cX ) + abs( pY - 1 - cY ) <> 0 ) Then
-                     pBomberMan.DangerUp := pBomberman.DangerUp - 256 div ( abs( pX - cX ) + abs( pY - 1 - cY ) )
-                  Else
-                      pBomberman.DangerUp := pBomberman.DangerRight - 512;
-                  If ( abs( pX - cX ) + abs( pY + 1 - cY ) <> 0 )Then
-                     pBomberman.DangerDown := pBomberman.DangerDown - 256 div ( abs( pX - cX ) + abs( pY + 1 - cY ) )
-                  Else
-                      pBomberman.DangerDown := pBomberman.DangerDown - 512;
-
                   // Comparaison des dangers.
-                  If ( pBomberman.DangerLeft < pBomberman.Danger ) And ( pBomberman.DangerLeft < pBomberman.DangerRight )
-                  And ( pBomberman.DangerLeft < pBomberman.DangerUp ) And ( pBomberman.DangerLeft < pBomberman.DangerDown ) Then
-                     pX := pX - 1
-                  Else If ( pBomberman.DangerRight < pBomberman.Danger ) And ( pBomberman.DangerRight < pBomberman.DangerUp )
-                  And ( pBomberman.DangerRight < pBomberman.DangerDown ) Then
-                     pX := pX + 1
-                  Else If ( pBomberman.DangerUp < pBomberman.Danger ) And ( pBomberman.DangerUp < pBomberman.DangerDown ) Then
-                       pY := pY - 1
-                  Else If ( pBomberman.DangerDown < pBomberman.Danger ) Then
-                       pY := pY + 1;
+                  If ( pBomberman.DangerLeft <= pBomberman.Danger ) And ( pBomberman.DangerLeft <= pBomberman.DangerRight )
+                  And ( pBomberman.DangerLeft <= pBomberman.DangerUp ) And ( pBomberman.DangerLeft <= pBomberman.DangerDown ) Then Begin
+                     pBomberman.MoveLeft( GetDelta );
+                     pBomberman.CanCalculate := false;
+                  End
+                  Else If ( pBomberman.DangerRight <= pBomberman.Danger ) And ( pBomberman.DangerRight <= pBomberman.DangerUp )
+                  And ( pBomberman.DangerRight <= pBomberman.DangerDown ) Then Begin
+                     pBomberman.MoveRight( GetDelta );
+                     pBomberman.CanCalculate := false;
+                  End
+                  Else If ( pBomberman.DangerUp <= pBomberman.Danger ) And ( pBomberman.DangerUp <= pBomberman.DangerDown ) Then Begin
+                       pBomberman.MoveUp( GetDelta );
+                       pBomberman.CanCalculate := false;
+                  End
+                  Else If ( pBomberman.DangerDown <= pBomberman.Danger ) Then Begin
+                       pBomberman.MoveDown( GetDelta );
+                       pBomberman.CanCalculate := false;
+                  End
+                  Else
+                      pBomberman.CanCalculate := true;
+
+                  // Le bomberman se déplace donc on initialise les possibilités de déplacement.
+                  pBomberman.CanGoToTheLeft := true;
+                  pBomberman.CanGoToTheRight := true;
+                  pBomberman.CanGoToTheUp := true;
+                  pBomberman.CanGoToTheDown := true;
+               End
+               
+               // Si les dernières coordonnées sont les mêmes que les actuelles alors prendre le plus bas danger possible.
+               Else Begin
+                  // Si le bomberman ne bouge pas, alors tout recommence.
+                  If  ( ( pBomberman.Danger <= pBomberman.DangerLeft ) Or ( pBomberman.CanGoToTheLeft = false ) )
+                  And ( ( pBomberman.Danger <= pBomberman.DangerRight ) Or ( pBomberman.CanGoToTheRight = false ) )
+                  And ( ( pBomberman.Danger <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
+                  And ( ( pBomberman.Danger <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) ) Then Begin
+                      pBomberman.CanGoToTheLeft := true;
+                      pBomberman.CanGoToTheRight := true;
+                      pBomberman.CanGoToTheDown := true;
+                      pBomberman.CanGoToTheUp := true;
+                      pBomberman.CanCalculate := true;
+                  End
+                  Else Begin
+                  // Sinon, la situation est a décoincée sans recalculer les dangers.
+                       pBomberman.CanCalculate := false;
+                       
+                       If ( ( pBomberman.DangerLeft <= pBomberman.DangerRight ) Or ( pBomberman.CanGoToTheRight = false ) )
+                       And ( ( pBomberman.DangerLeft <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
+                       And ( ( pBomberman.DangerLeft <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
+                       And ( pBomberman.CanGoToTheLeft = true ) Then Begin
+                           pBomberman.MoveLeft( GetDelta );
+                           pBomberman.CanGoToTheLeft := false;
+                       End
+                       Else If ( ( pBomberman.DangerRight <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
+                       And ( ( pBomberman.DangerRight <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
+                       And ( pBomberman.CanGoToTheRight = true ) Then Begin
+                           pBomberman.MoveRight( GetDelta );
+                           pBomberman.CanGoToTheRight := false;
+                       End
+                       Else If ( ( pBomberman.DangerUp <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
+                       And ( pBomberman.CanGoToTheUp = true ) Then Begin
+                           pBomberman.MoveUp( GetDelta );
+                           pBomberman.CanGoToTheUp := false;
+                       End
+                       Else Begin
+                            pBomberman.MoveDown( GetDelta );
+                            pBomberman.CanGoToTheDown := false;
+                       End;
+                  End;
+                  
+                  // Si le bomberman n'a plus le droit de bouger, alors toutes les coordonnées redeviennent possibles.
+                  // Cela sert notamment quand la fonction ProcessComputer est lancée avant que les déplacements soient autorisées.
+                  If ( pBomberman.CanGoToTheRight = false ) And ( pBomberman.CanGoToTheLeft = false )
+                  And ( pBomberman.CanGoToTheDown = false ) And ( pBomberman.CanGoToTheUp = false ) Then Begin
+                      pBomberman.CanGoToTheRight := true;
+                      pBomberman.CanGoToTheLeft := true;
+                      pBomberman.CanGoToTheUp := true;
+                      pBomberman.CanGoToTheDown := true;
+                  End;
                End;
-               
 
+          End; // Fin de Novice
+     End; // Fin du Case Of
+     
+     // Entrées des variables locales dans les variables du bomberman.
+     pBomberman.CX := cX;
+     pBomberman.CY := cY;
+     pBomberman.LX := pX;
+     pBomberman.LY := pY;
+     
 
-
-
-                      
-
-               
-
-          End;
-     End;
+     
 
 
 
@@ -280,9 +357,9 @@ Var
 Begin
 // Initialisation des variables
    result1 := 0;                                 // Le minimum est 0, le maximum est autour de 10000.
-   If ( x - 3 < 0 ) Then cLeft := 0 Else cLeft := x - 3;
+   If ( x - 3 < 1 ) Then cLeft := 1 Else cLeft := x - 3;
    If ( x + 3 > GRIDWIDTH ) Then cRight := GRIDWIDTH Else cRight := x + 3;
-   If ( y - 3 < 0 ) Then cUp := 0 Else cUp := y - 3;
+   If ( y - 3 < 1 ) Then cUp := 1 Else cUp := y - 3;
    If ( y + 3 > GRIDHEIGHT ) Then cDown := GRIDHEIGHT Else cDown := y + 3;
 
 // Traitement des flammes et des bombes.
@@ -291,10 +368,16 @@ Begin
            If (i <> x) Or ( j <> y )Then Begin   // Pour Ariane V...
            // Traitement des flammes
               If ( pState[i, j] mod 2 = 1 ) Then
-                 result1 := result1 + 1024 div ( abs(x - i) + abs(y - j) );
+                 result1 := result1 + 2048 div ( abs(x - i) + abs(y - j) );
            // Traitement des bombes
-              If ( pState[i, j] mod 4 >= 2 ) Then
-                 result1 := result1 + 512 div ( abs(x - i) + abs(y - j) );
+              If ( pState[i, j] mod 4 >= 2 ) Then Begin
+                 // Si le bomberman est dans le champ de tir de la bombe, alors le danger est très grand.
+                 If ( x = i ) Or ( y = j ) Then
+                    result1 := result1 + 1024 div( abs(x - i) + abs(y - j) )
+                 // Sinon le danger est relativement faible.
+                 Else
+                     result1 := result1 + 128 div ( abs(x - i) + abs(y - j) );
+              End;
            End;
        End;
    End;
@@ -311,19 +394,27 @@ Begin
    result2 := 0;                                 // Le minimum est 0, le maximum est autour de 10000.
 
 // Traitement des flammes et des bombes.
-   For i :=  0 To GRIDWIDTH Do Begin
-       For j := 0 To GRIDHEIGHT Do Begin
+   For i := 1 To GRIDWIDTH Do Begin
+       For j := 1 To GRIDHEIGHT Do Begin
            If (i <> x) Or ( j <> y )Then Begin   // Pour Ariane V...
            // Traitement des flammes
               If ( pState[i, j] mod 2 = 1 ) Then
-                 result2 := result2 + 1024 div ( abs(x - i) + abs(y - j) );
+                 result2 := result2 + 2048 div ( abs(x - i) + abs(y - j) );
            // Traitement des bombes
-              If ( pState[i, j] mod 4 >= 2 ) Then
-                 result2 := result2 + 512 div ( abs(x - i) + abs(y - j) );
+              If ( pState[i, j] mod 4 >= 2 ) Then Begin
+              // Si le bomberman est dans le champ de tir de la bombe, alors le danger est très grand.
+                 If ( x = i ) Or ( y = j ) Then
+                    result2 := result2 + 1024 div ( abs(x - i) + abs(y - j) )
+              // Sinon le danger est relativement faible.
+                 Else
+                     result2 := result2 + 256 div ( abs(x - i) + abs(y - j) );
+              End;
            // Traitement des bombermans ( pas trop prêt ni trop loin )
-              If ( pState[i, j] div 4 = 1 ) Then Begin
-                 If ( abs(x - i) + abs(y - j) <= 2 ) Or ( abs(x - i) + abs(y - j) >= 8 ) Then
+              If ( pState[i, j] >= 4 ) Then Begin
+                 If ( ( abs(x - i) + abs(y - j) ) <= 2 ) Then
                     result2 := result2 + 64 div ( abs(x - i) + abs(y - j) );
+                 If ( ( abs(x - i) + abs(y - j) ) >= 8 ) Then
+                    result2 := result2 - 64 div ( abs(x - i) + abs(y - j) );
               End;
            End;
        End;

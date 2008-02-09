@@ -67,6 +67,12 @@ type
     bAlive,                      // personnage en vie ou non
     bcanKick     : Boolean;      // shoot dans une bombe possible ou non
 
+    bCanCalculate,               // les dangers doivent-ils être recalculés?
+    bCanGoToTheRight,
+    bCanGoToTheLeft,
+    bCanGoToTheUp,
+    bCanGoToTheDown : Boolean;   // peut-il aller dans la direction indiquée
+
 
     uTriggerBomb : LPBombItem;   // pointe sur les bombes a declenchement manuel
     uGrid        : CGrid;        // pointe sur la grille de jeu
@@ -159,6 +165,12 @@ type
   property NoBomb : Boolean Read bNoBomb Write bNoBomb;
   property Kick : boolean Read bCanKick;
   property EjectBomb : boolean Read bEjectBomb Write bEjectBomb;
+
+  property CanCalculate : Boolean Read bCanCalculate Write bCanCalculate;
+  property CanGoToTheRight : Boolean Read bCanGoToTheRight Write bCanGoToTheRight;
+  property CanGoToTheLeft : Boolean Read bCanGoToTheLeft Write bCanGoToTheLeft;
+  property CanGoToTheUp : Boolean Read bCanGoToTheUp Write bCanGoToTheUp;
+  property CanGoToTheDown : Boolean Read bCanGoToTheDown Write bCanGoToTheDown;
 
   end;
   
