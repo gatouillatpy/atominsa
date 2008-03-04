@@ -34,18 +34,18 @@ Begin
      SetString( STRING_NOTIFICATION, nPlayer.Name + ' has picked up a random bonus.', 0.0, 0.2, 5 );
      r := random(POWERUPCOUNT);
      case r of
-         POWERUP_EXTRABOMB       : aBonus := CExtraBomb.Create(0,0);
-         POWERUP_FLAMEUP         : aBonus := CFlameUp.Create(0,0);
-         POWERUP_DISEASE         : aBonus := CDisease.Create(0,0);
-         POWERUP_KICK            : aBonus := CKick.Create(0,0);
-         POWERUP_SPEEDUP         : aBonus := CSpeedUp.Create(0,0);
-         POWERUP_PUNCH           : aBonus := CPunch.Create(0,0);
-         POWERUP_GRAB            : aBonus := CGrab.Create(0,0);
-         POWERUP_SPOOGER         : aBonus := CSpoog.Create(0,0);
-         POWERUP_GOLDFLAME       : aBonus := CGoldFlame.Create(0,0);
-         POWERUP_TRIGGERBOMB     : aBonus := CTrigger.Create(0,0);
-         POWERUP_JELLYBOMB       : aBonus := CJelly.Create(0,0);
-         POWERUP_SUPERDISEASE    : aBonus := CSuperDisease.Create(0,0);
+         POWERUP_EXTRABOMB       : aBonus := CExtraBomb.Create(0,0);           // plus de bombes
+         POWERUP_FLAMEUP         : aBonus := CFlameUp.Create(0,0);             // flammes plus longues
+         POWERUP_DISEASE         : aBonus := CDisease.Create(0,0);             // maladies
+         POWERUP_KICK            : aBonus := CKick.Create(0,0);                // pousse avec rebonds
+         POWERUP_SPEEDUP         : aBonus := CSpeedUp.Create(0,0);             // plus de vitesse
+         POWERUP_PUNCH           : aBonus := CPunch.Create(0,0);               // pousse sans rebonds
+         POWERUP_GRAB            : aBonus := CGrab.Create(0,0);                // bombe par dessus les boîtes?
+         POWERUP_SPOOGER         : aBonus := CSpoog.Create(0,0);               // porte les bombes?
+         POWERUP_GOLDFLAME       : aBonus := CGoldFlame.Create(0,0);           // flammes infinies
+         POWERUP_TRIGGERBOMB     : aBonus := CTrigger.Create(0,0);             // bombes à retardement
+         POWERUP_JELLYBOMB       : aBonus := CJelly.Create(0,0);               // bombes spéciales
+         POWERUP_SUPERDISEASE    : aBonus := CSuperDisease.Create(0,0);        // 3 maladies
     end;
     aBonus.Bonus(nPlayer);
     Destroy();

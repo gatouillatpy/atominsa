@@ -17,6 +17,8 @@ type
   { CBomberman }
 
   CBomberman = class
+  public
+     procedure DoIgnition();
   private
     fCX, fCY,                    // coordonnées ciblées par l'intelligence artificielle
     fLX, fLY : Single;           // dernières coordonnées
@@ -85,13 +87,12 @@ type
     procedure DoMove(afX, afY : Single);
     procedure TestCase(aX,aY : integer;var bBomb : boolean;var bResult : boolean);
     procedure MoveBomb(_X,_Y,aX,aY,dX,dY : integer; dt : Single);
-    function GrabBomb():boolean;
+    function  GrabBomb():boolean;
     procedure DropBomb(dt : Single);
     procedure ContaminateBomberman();
     procedure PunchBomb(dt : Single);
     procedure AddTriggerBomb();
     procedure DelTriggerBomb();
-    procedure DoIgnition();
     procedure TriggerToNormalBomb();
 
     
@@ -140,6 +141,7 @@ type
   Property LY : Single Read fLY Write fLY;
   Property CX : Single Read fCX Write fCX;
   Property CY : Single Read fCY Write fCY;
+  
   Property Danger : Integer Read fDanger Write fDanger;
   Property DangerLeft : Integer Read fDangerLeft Write fDangerLeft;
   Property DangerRight : Integer Read fDangerRight Write fDangerRight;
@@ -164,13 +166,17 @@ type
   property Alive : boolean Read bAlive;
   property NoBomb : Boolean Read bNoBomb Write bNoBomb;
   property Kick : boolean Read bCanKick;
+  property Punch : Boolean Read bCanPunch;
   property EjectBomb : boolean Read bEjectBomb Write bEjectBomb;
+  property Reverse : Boolean Read bReverse Write bReverse;
 
   property CanCalculate : Boolean Read bCanCalculate Write bCanCalculate;
   property CanGoToTheRight : Boolean Read bCanGoToTheRight Write bCanGoToTheRight;
   property CanGoToTheLeft : Boolean Read bCanGoToTheLeft Write bCanGoToTheLeft;
   property CanGoToTheUp : Boolean Read bCanGoToTheUp Write bCanGoToTheUp;
   property CanGoToTheDown : Boolean Read bCanGoToTheDown Write bCanGoToTheDown;
+  
+  property TriggerBomb : LPBombItem Read uTriggerBomb;
 
   end;
   
@@ -1200,7 +1206,7 @@ procedure CBomberman.CheckBonus();
 var oldX, oldY : integer;
 begin
   if Not(uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil) then
-     if (uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5)) is CItem) then
+    if (uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5)) is CItem) then    // PLANTE REGULIEREMENT ICI!!!!
       begin
          oldX:=Trunc(fPosition.x+0.5);                                                   //a cause de la maladie SWITCH il faut se souvenir de ou il etait
          oldY:=Trunc(fPosition.y+0.5);                                                   //avant de prendre le bonus
@@ -1245,6 +1251,7 @@ procedure CBomberman.ChangeReverse();
 begin
   bReverse:=Not(bReverse);
 end;
+
 
 
 
