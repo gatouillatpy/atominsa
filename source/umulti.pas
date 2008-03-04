@@ -413,6 +413,7 @@ Begin
                         sData := sData + IntToStr(nPlayerClient[k]) + #31;
                         sData := sData + sPlayerName[k] + #31;
                         sData := sData + pPlayerCharacter[k].Name + #31;
+                        sData := sData + IntToStr(nPlayerType[k]) + #31;
                     End;
                     Send( nIndex, nHeader, sData );
                End;
@@ -445,6 +446,7 @@ Begin
                         sData := sData + IntToStr(nPlayerClient[k]) + #31;
                         sData := sData + sPlayerName[k] + #31;
                         sData := sData + pPlayerCharacter[k].Name + #31;
+                        sData := sData + IntToStr(nPlayerType[k]) + #31;
                     End;
                     Send( nIndex, nHeader, sData );
                End;
@@ -493,6 +495,7 @@ Begin
                         For m := 0 To nCharacterCount - 1 Do
                             If aCharacterList[m].Name = GetString( sData, l ) Then nPlayerCharacter[k] := m;
                         LoadCharacter( k ); l += 1;
+                        nPlayerType[k] := StrToInt( GetString( sData, l ) ); l += 1;
                     End;
                End;
           End;
