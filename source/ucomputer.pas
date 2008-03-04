@@ -172,6 +172,12 @@ Randomize;
       Else
           pBomberman.DangerDown := pBomberman.DangerDown - 32;
    End;
+   
+
+
+// Prise en compte de SumFixGetDelta pour pas que le bomberman reste fixe.
+   If ( pBomberman.SumFixGetDelta >= 8 ) Then
+      pBomberman.Danger := pBomberman.Danger + 64;
 
 
 
@@ -292,9 +298,13 @@ Randomize;
 // Si les dernières coordonnées ne sont pas les mêmes que les actuelles, alors déterminer pX et pY.
    If ( pBomberman.Position.X <> pBomberman.LX )
    Or ( pBomberman.Position.Y <> pBomberman.LY ) Then Begin
-      // Mise à jour de lX et lY
+      // Mise à jour de lX et lY et de SumFixGetDelta;
       pBomberman.LX := pBomberman.Position.X;
       pBomberman.LY := pBomberman.Position.Y;
+      If ( pBomberman.SumFixGetDelta - GetDelta >= 0 ) Then
+         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta - GetDelta
+      Else
+          pBomberman.SumFixGetDelta := 0;
 
       // Comparaison des dangers.
       If ( pBomberman.DangerLeft < pBomberman.Danger ) And ( pBomberman.DangerLeft <= pBomberman.DangerRight )
@@ -329,9 +339,13 @@ Randomize;
 
 // Si les dernières coordonnées sont les mêmes que les actuelles alors prendre le plus bas danger possible.
    Else Begin
-      // Mise à jour de lX et lY
+      // Mise à jour de lX et lY et de SumFixGetDelta;
       pBomberman.LX := pBomberman.Position.X;
       pBomberman.LY := pBomberman.Position.Y;
+      If ( pBomberman.SumFixGetDelta <= 8 ) And ( pBomberman.SumFixGetDelta + GetDelta >= 8 ) Then
+         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + GetDelta + 4
+      Else
+          pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + GetDelta;
 
       // Si le bomberman ne bouge pas, alors tout recommence.
       // Sinon, il y a des problèmes...

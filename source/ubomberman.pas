@@ -36,6 +36,7 @@ type
     fBombTime : Single;          // temps avant explosion des bombes
     
     fSumGetDelta : Single;       // somme des GetDelta depuis le dernier changement de cible
+    fSumFixGetDelta : Single;    // temps depuis lequel le bomberman est fixe.
 
     lastDir   : vectorN;         // memorise la derniere direction de mouvement du bomberman
 
@@ -148,6 +149,7 @@ type
   Property DangerUp : Integer Read fDangerUp Write fDangerUp;
   Property DangerDown : Integer Read fDangerDown Write fDangerDown;
   Property SumGetDelta : Single Read fSumGetDelta Write fSumGetDelta;
+  Property SumFixGetDelta : Single Read fSumFixGetDelta Write fSumFixGetDelta;
   property ExploseBombTime : Single Read fBombTime Write fBombTime;
 
   property DiseaseNumber : integer Read nDisease Write nDisease;
@@ -1124,6 +1126,8 @@ begin
   lastDir.z          := 0;
   fCX                := aX;
   fCY                := aY;
+  fSumGetDelta       := 0;
+  fSumFixGetDelta    := 0;
 end;
 
 
