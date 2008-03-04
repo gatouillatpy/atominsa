@@ -15,7 +15,7 @@ Uses Classes, SysUtils,
 
 
 Var nClientCount : Integer;
-Var nClientIndex : Array [0..255] Of DWord;
+Var nClientIndex : Array [0..255] Of Integer;
 Var sClientName : Array [0..255] Of String;
 
 
@@ -410,9 +410,9 @@ Begin
                     nHeader := HEADER_LIST_PLAYER;
                     sData := '';
                     For k := 1 To 8 Do Begin
-                        sData := sData + #31 + IntToStr(nPlayerClient[k]);
-                        sData := sData + #31 + sPlayerName[k];
-                        sData := sData + #31 + pPlayerCharacter[k].Name;
+                        sData := sData + IntToStr(nPlayerClient[k]) + #31;
+                        sData := sData + sPlayerName[k] + #31;
+                        sData := sData + pPlayerCharacter[k].Name + #31;
                     End;
                     Send( nIndex, nHeader, sData );
                End;
@@ -442,9 +442,9 @@ Begin
                     nHeader := HEADER_LIST_PLAYER;
                     sData := '';
                     For k := 1 To 8 Do Begin
-                        sData := sData + #31 + IntToStr(nPlayerClient[k]);
-                        sData := sData + #31 + sPlayerName[k];
-                        sData := sData + #31 + pPlayerCharacter[k].Name;
+                        sData := sData + IntToStr(nPlayerClient[k]) + #31;
+                        sData := sData + sPlayerName[k] + #31;
+                        sData := sData + pPlayerCharacter[k].Name + #31;
                     End;
                     Send( nIndex, nHeader, sData );
                End;
@@ -464,6 +464,7 @@ Procedure ProcessClient () ;
 Var nIndex : DWord;
     nHeader : Integer;
     sData : String;
+    sBuffer : String;
 Var k, l, m : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin

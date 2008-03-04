@@ -68,7 +68,7 @@ Var nPlayerCharacter : Array [1..8] Of Integer;
 Var sPlayerName : Array [1..8] Of String;
 Var nPlayerType : Array [1..8] Of Integer;
 Var nPlayerSkill : Array [1..8] Of Integer;
-Var nPlayerClient : Array [1..8] Of DWord;
+Var nPlayerClient : Array [1..8] Of Integer;
 
 Var nKey1Primary : Integer;
 Var nKey1Secondary : Integer;
@@ -805,7 +805,7 @@ Begin
 
      sLocalName := 'atominsa server';
      nLocalIndex := Random(1073741824);
-     sServerAddress := '127.0.0.1';
+     sServerAddress := '192.168.0.2';
      nServerPort := 1212;
      nServerType := SERVER_STANDARD;
      
