@@ -473,6 +473,16 @@ Begin
                     Send( nIndex, nHeader, sData );
                     UpdateMenu();
                End;
+               HEADER_UPDATE :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    nPlayerType[k] := StrToInt( GetString( sData, 2 ) );
+                    nPlayerSkill[k] := StrToInt( GetString( sData, 3 ) );
+                    nPlayerCharacter[k] := StrToInt( GetString( sData, 4 ) );
+                    sPlayerName[k] := GetString( sData, 5 );
+                    Send( nIndex, nHeader, sData );
+                    UpdateMenu();
+               End;
           End;
      End;
 End;
@@ -527,6 +537,15 @@ Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     nPlayerClient[k] := -1;
                     nPlayerType[k] := PLAYER_NIL;
+                    UpdateMenu();
+               End;
+               HEADER_UPDATE :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    nPlayerType[k] := StrToInt( GetString( sData, 2 ) );
+                    nPlayerSkill[k] := StrToInt( GetString( sData, 3 ) );
+                    nPlayerCharacter[k] := StrToInt( GetString( sData, 4 ) );
+                    sPlayerName[k] := GetString( sData, 5 );
                     UpdateMenu();
                End;
           End;

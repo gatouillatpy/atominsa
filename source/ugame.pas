@@ -1767,8 +1767,14 @@ Begin
 
                            sData := IntToStr(nPlayer) + #31;
                            Send( nLocalIndex, HEADER_UNLOCK, sData );
+                        End Else Begin
+                            sData := IntToStr(nPlayer) + #31;
+                            sData := sData + IntToStr(nPlayerType[nPlayer]) + #31;
+                            sData := sData + IntToStr(nPlayerSkill[nPlayer]) + #31;
+                            sData := sData + IntToStr(nPlayerCharacter[nPlayer]) + #31;
+                            sData := sData + sPlayerName[nPlayer] + #31;
+                            Send( nLocalIndex, HEADER_UPDATE, sData );
                         End;
-                        // TODO : Envoyer un paquet donnant les infos concernant la modif du joueur
                      End;
                 End;
            End;

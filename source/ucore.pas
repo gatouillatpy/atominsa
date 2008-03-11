@@ -23,6 +23,7 @@ Const HEADER_LIST_PLAYER       = 1202;
 
 Const HEADER_LOCK              = 1301;
 Const HEADER_UNLOCK            = 1302;
+Const HEADER_UPDATE            = 1303;
 
 
 
