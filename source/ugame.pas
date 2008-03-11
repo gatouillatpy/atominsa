@@ -1577,6 +1577,7 @@ Procedure ProcessMenuPlayer () ;
 Var w, h : Single;
     t : Single;
     k : Integer;
+    sData : String;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -1737,7 +1738,7 @@ Begin
                         If nPlayerType[nPlayer] = PLAYER_NIL Then Begin
                            nPlayerClient[nPlayer] := -1;
 
-                           sData := IntToStr(n) + #31;
+                           sData := IntToStr(nPlayer) + #31;
                            Send( nLocalIndex, HEADER_UNLOCK, sData );
                         End;
                      End;

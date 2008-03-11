@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="0"/>
+      <ActiveEditorIndexAtStart Value="4"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -40,7 +40,7 @@
       <Unit1>
         <Filename Value="ucore.pas"/>
         <UnitName Value="UCore"/>
-        <CursorPos X="41" Y="21"/>
+        <CursorPos X="41" Y="4"/>
         <TopLine Value="1"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="102"/>
@@ -367,8 +367,8 @@
       <Unit46>
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="23" Y="1737"/>
-        <TopLine Value="1723"/>
+        <CursorPos X="53" Y="1741"/>
+        <TopLine Value="1720"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -604,7 +604,7 @@
         <UsageCount Value="10"/>
       </Unit76>
     </Units>
-    <JumpHistory Count="22" HistoryIndex="21">
+    <JumpHistory Count="24" HistoryIndex="23">
       <Position1>
         <Filename Value="ugame.pas"/>
         <Caret Line="1406" Column="28" TopLine="1372"/>
@@ -693,6 +693,14 @@
         <Filename Value="ugame.pas"/>
         <Caret Line="939" Column="20" TopLine="918"/>
       </Position22>
+      <Position23>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="1737" Column="23" TopLine="1723"/>
+      </Position23>
+      <Position24>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="1580" Column="20" TopLine="1559"/>
+      </Position24>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
