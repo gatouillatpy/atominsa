@@ -456,6 +456,12 @@ Begin
                     AddStringToScreen( sClientName[ClientIndex(nIndex)] + ' says : ' + sData );
                     Send( nIndex, nHeader, sData );
                End;
+               HEADER_LOCK :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    nPlayerClient[k] := nIndex;
+                    Send( nIndex, nHeader, sData );
+               End;
           End;
      End;
 End;
@@ -497,6 +503,11 @@ Begin
                         LoadCharacter( k ); l += 1;
                         nPlayerType[k] := StrToInt( GetString( sData, l ) ); l += 1;
                     End;
+               End;
+               HEADER_LOCK :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    nPlayerClient[k] := nIndex;
                End;
           End;
      End;

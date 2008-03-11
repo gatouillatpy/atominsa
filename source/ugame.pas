@@ -1521,12 +1521,14 @@ End;
 
 
 Procedure InitMenuPlayer ( n : Integer ) ;
-Var k : Integer;
+Var k : Integer; sData : String;
 Begin
      If bMulti = True Then Begin
         If (nPlayerClient[n] <> -1) And (nPlayerClient[n] <> nLocalIndex) Then Exit;
         nPlayerClient[n] := nLocalIndex;
-        //TODO: Envoyer un paquet à tout le monde pour signaler qu'on a vérouillé ce joueur.
+        
+        sData := IntToStr(n) + #31;
+        Send( nLocalIndex, HEADER_LOCK, sData );
      End;
      
      // identification du joueur modifié
@@ -1942,84 +1944,86 @@ Begin
         bDown := False;
      End;
 
-     If GetKeyS( KEY_LEFT ) Then Begin
-        If Not bLeft Then Begin
-           PlaySound( SOUND_MENU_CLICK );
-           Case nMenu Of
-                MENU_SCHEME :
-                Begin
-                     nScheme -= 1;
-                     If nScheme < -1 Then nScheme := nSchemeCount - 1;
-                     LoadScheme();
-                     If nScheme = -1 Then Begin
-                        SetString( STRING_GAME_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
-                     End Else Begin
-                        SetString( STRING_GAME_MENU(21), 'scheme : ' + pScheme.Name, 0.0, 0.02, 600 );
-                     End;
-                End;
-                MENU_MAP :
-                Begin
-                     nMap -= 1;
-                     If nMap < -1 Then nMap := nMapCount - 1;
-                     LoadMap();
-                     If nMap = -1 Then Begin
-                        SetString( STRING_GAME_MENU(31), 'map : ' + 'random', 0.0, 0.02, 600 );
-                     End Else Begin
-                        SetString( STRING_GAME_MENU(31), 'map : ' + pMap.Name, 0.0, 0.02, 600 );
-                     End;
-                End;
-                MENU_ROUNDCOUNT :
-                Begin
-                     nRoundCount -= 1;
-                     If nRoundCount < 1 Then nRoundCount := 1;
-                     SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
-                End;
-           End;
-        End;
-        bLeft := True;
-     End Else Begin
-        bLeft := False;
-     End;
+     If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Or (bMulti = False) Then Begin
+       If GetKeyS( KEY_LEFT ) Then Begin
+          If Not bLeft Then Begin
+             PlaySound( SOUND_MENU_CLICK );
+             Case nMenu Of
+                  MENU_SCHEME :
+                  Begin
+                       nScheme -= 1;
+                       If nScheme < -1 Then nScheme := nSchemeCount - 1;
+                       LoadScheme();
+                       If nScheme = -1 Then Begin
+                          SetString( STRING_GAME_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
+                       End Else Begin
+                          SetString( STRING_GAME_MENU(21), 'scheme : ' + pScheme.Name, 0.0, 0.02, 600 );
+                       End;
+                  End;
+                  MENU_MAP :
+                  Begin
+                       nMap -= 1;
+                       If nMap < -1 Then nMap := nMapCount - 1;
+                       LoadMap();
+                       If nMap = -1 Then Begin
+                          SetString( STRING_GAME_MENU(31), 'map : ' + 'random', 0.0, 0.02, 600 );
+                       End Else Begin
+                          SetString( STRING_GAME_MENU(31), 'map : ' + pMap.Name, 0.0, 0.02, 600 );
+                       End;
+                  End;
+                  MENU_ROUNDCOUNT :
+                  Begin
+                       nRoundCount -= 1;
+                       If nRoundCount < 1 Then nRoundCount := 1;
+                       SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
+                  End;
+             End;
+          End;
+          bLeft := True;
+       End Else Begin
+          bLeft := False;
+       End;
 
-     If GetKeyS( KEY_RIGHT ) Then Begin
-        If Not bRight Then Begin
-           PlaySound( SOUND_MENU_CLICK );
-           Case nMenu Of
-                MENU_SCHEME :
-                Begin
-                     nScheme += 1;
-                     If nScheme = nSchemeCount Then nScheme := -1;
-                     LoadScheme();
-                     If nScheme = -1 Then Begin
-                        SetString( STRING_GAME_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
-                     End Else Begin
-                        SetString( STRING_GAME_MENU(21), 'scheme : ' + pScheme.Name, 0.0, 0.02, 600 );
-                     End;
-                End;
-                MENU_MAP :
-                Begin
-                     nMap += 1;
-                     If nMap = nMapCount Then nMap := -1;
-                     LoadMap();
-                     If nMap = -1 Then Begin
-                        SetString( STRING_GAME_MENU(31), 'map : ' + 'random', 0.0, 0.02, 600 );
-                     End Else Begin
-                        SetString( STRING_GAME_MENU(31), 'map : ' + pMap.Name, 0.0, 0.02, 600 );
-                     End;
-                End;
-                MENU_ROUNDCOUNT :
-                Begin
-                     nRoundCount += 1;
-                     If nRoundCount > 99 Then nRoundCount := 1;
-                     SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
-                End;
-           End;
-        End;
-        bRight := True;
-     End Else Begin
-        bRight := False;
+       If GetKeyS( KEY_RIGHT ) Then Begin
+          If Not bRight Then Begin
+             PlaySound( SOUND_MENU_CLICK );
+             Case nMenu Of
+                  MENU_SCHEME :
+                  Begin
+                       nScheme += 1;
+                       If nScheme = nSchemeCount Then nScheme := -1;
+                       LoadScheme();
+                       If nScheme = -1 Then Begin
+                          SetString( STRING_GAME_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
+                       End Else Begin
+                          SetString( STRING_GAME_MENU(21), 'scheme : ' + pScheme.Name, 0.0, 0.02, 600 );
+                       End;
+                  End;
+                  MENU_MAP :
+                  Begin
+                       nMap += 1;
+                       If nMap = nMapCount Then nMap := -1;
+                       LoadMap();
+                       If nMap = -1 Then Begin
+                          SetString( STRING_GAME_MENU(31), 'map : ' + 'random', 0.0, 0.02, 600 );
+                       End Else Begin
+                          SetString( STRING_GAME_MENU(31), 'map : ' + pMap.Name, 0.0, 0.02, 600 );
+                       End;
+                  End;
+                  MENU_ROUNDCOUNT :
+                  Begin
+                       nRoundCount += 1;
+                       If nRoundCount > 99 Then nRoundCount := 1;
+                       SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
+                  End;
+             End;
+          End;
+          bRight := True;
+       End Else Begin
+          bRight := False;
+       End;
      End;
-
+     
      If GetKey( KEY_ENTER ) Then Begin
         If Not bEnter Then Begin
            PlaySound( SOUND_MENU_CLICK );

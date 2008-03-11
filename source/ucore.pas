@@ -21,7 +21,7 @@ Const HEADER_MESSAGE           = 1101;
 Const HEADER_LIST_CLIENT       = 1201;
 Const HEADER_LIST_PLAYER       = 1202;
 
-Const HEADER_RESERVE           = 1301;
+Const HEADER_LOCK              = 1301;
 
 
 
