@@ -1525,6 +1525,8 @@ Var k : Integer;
 Begin
      If bMulti = True Then Begin
         If (nPlayerClient[n] <> -1) And (nPlayerClient[n] <> nLocalIndex) Then Exit;
+        nPlayerClient[n] := nLocalIndex;
+        //TODO: Envoyer un paquet à tout le monde pour signaler qu'on a vérouillé ce joueur.
      End;
      
      // identification du joueur modifié

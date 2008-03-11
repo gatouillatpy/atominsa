@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="2"/>
+      <ActiveEditorIndexAtStart Value="4"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -84,7 +84,7 @@
         <UnitName Value="USetup"/>
         <CursorPos X="46" Y="803"/>
         <TopLine Value="786"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="2"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit6>
@@ -354,8 +354,8 @@
         <UnitName Value="UComputer"/>
         <CursorPos X="58" Y="791"/>
         <TopLine Value="98"/>
-        <EditorIndex Value="4"/>
-        <UsageCount Value="96"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="97"/>
         <Loaded Value="True"/>
       </Unit44>
       <Unit45>
@@ -367,10 +367,10 @@
       <Unit46>
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="38" Y="2039"/>
-        <TopLine Value="2019"/>
-        <EditorIndex Value="2"/>
-        <UsageCount Value="99"/>
+        <CursorPos X="17" Y="1550"/>
+        <TopLine Value="1507"/>
+        <EditorIndex Value="4"/>
+        <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit46>
       <Unit47>
@@ -386,7 +386,7 @@
         <CursorPos X="28" Y="379"/>
         <TopLine Value="348"/>
         <EditorIndex Value="10"/>
-        <UsageCount Value="90"/>
+        <UsageCount Value="91"/>
         <Loaded Value="True"/>
       </Unit48>
       <Unit49>
@@ -443,7 +443,7 @@
         <CursorPos X="82" Y="7"/>
         <TopLine Value="7"/>
         <EditorIndex Value="5"/>
-        <UsageCount Value="47"/>
+        <UsageCount Value="48"/>
         <Loaded Value="True"/>
       </Unit56>
       <Unit57>
@@ -604,7 +604,7 @@
         <UsageCount Value="10"/>
       </Unit76>
     </Units>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="17" HistoryIndex="16">
       <Position1>
         <Filename Value="ugame.pas"/>
         <Caret Line="1406" Column="28" TopLine="1372"/>
@@ -665,6 +665,14 @@
         <Filename Value="ugame.pas"/>
         <Caret Line="1529" Column="54" TopLine="1510"/>
       </Position15>
+      <Position16>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="2029" Column="45" TopLine="2016"/>
+      </Position16>
+      <Position17>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="2026" Column="32" TopLine="2001"/>
+      </Position17>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
