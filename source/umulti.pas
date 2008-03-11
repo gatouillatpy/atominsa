@@ -416,6 +416,7 @@ Begin
                         sData := sData + IntToStr(nPlayerType[k]) + #31;
                     End;
                     Send( nIndex, nHeader, sData );
+                    UpdateMenu();
                End;
                HEADER_DISCONNECT :
                Begin
@@ -449,6 +450,7 @@ Begin
                         sData := sData + IntToStr(nPlayerType[k]) + #31;
                     End;
                     Send( nIndex, nHeader, sData );
+                    UpdateMenu();
                End;
                HEADER_MESSAGE :
                Begin
@@ -460,13 +462,17 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     nPlayerClient[k] := nIndex;
+                    nPlayerType[k] := PLAYER_NET;
                     Send( nIndex, nHeader, sData );
+                    UpdateMenu();
                End;
                HEADER_UNLOCK :
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     nPlayerClient[k] := -1;
+                    nPlayerType[k] := PLAYER_NIL;
                     Send( nIndex, nHeader, sData );
+                    UpdateMenu();
                End;
           End;
      End;
@@ -509,16 +515,21 @@ Begin
                         LoadCharacter( k ); l += 1;
                         nPlayerType[k] := StrToInt( GetString( sData, l ) ); l += 1;
                     End;
+                    UpdateMenu();
                End;
                HEADER_LOCK :
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     nPlayerClient[k] := nIndex;
+                    nPlayerType[k] := PLAYER_NET;
+                    UpdateMenu();
                End;
                HEADER_UNLOCK :
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     nPlayerClient[k] := -1;
+                    nPlayerType[k] := PLAYER_NIL;
+                    UpdateMenu();
                End;
           End;
      End;

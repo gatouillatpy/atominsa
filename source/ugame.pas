@@ -138,6 +138,7 @@ Procedure InitGame () ;
 Procedure ProcessGame () ;
 
 Procedure InitMenu () ;
+Procedure UpdateMenu () ;
 Procedure ProcessMenu () ;
 
 Procedure InitMenuPlayer ( n : Integer ) ;
@@ -1804,6 +1805,47 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 // MENU PRINCIPAL                                                             //
 ////////////////////////////////////////////////////////////////////////////////
+
+
+
+Procedure UpdateMenu () ;
+Var k : Integer;
+Begin
+     // ajout du titre
+     SetString( STRING_GAME_MENU(1), 'practice', 0.0, 0.02, 600 );
+
+     // ajout de la liste de joueurs
+     SetString( STRING_GAME_MENU(11), PlayerInfo(1), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(12), PlayerInfo(2), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(13), PlayerInfo(3), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(14), PlayerInfo(4), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(15), PlayerInfo(5), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(16), PlayerInfo(6), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(17), PlayerInfo(7), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(18), PlayerInfo(8), 0.0, 0.02, 600 );
+
+     // chargement et ajout du scheme
+     LoadScheme();
+     If nScheme = -1 Then Begin
+        SetString( STRING_GAME_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
+     End Else Begin
+        SetString( STRING_GAME_MENU(21), 'scheme : ' + pScheme.Name, 0.0, 0.02, 600 );
+     End;
+
+     // chargement et ajout de la map
+     LoadMap();
+     If nMap = -1 Then Begin
+        SetString( STRING_GAME_MENU(31), 'map : ' + 'random', 0.0, 0.02, 600 );
+     End Else Begin
+        SetString( STRING_GAME_MENU(31), 'map : ' + pMap.Name, 0.0, 0.02, 600 );
+     End;
+
+     // ajout du compteur de rounds
+     SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
+
+     // ajout du bouton fight
+     SetString( STRING_GAME_MENU(51), 'fight!', 0.0, 0.02, 600 );
+End;
 
 
 
