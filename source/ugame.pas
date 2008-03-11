@@ -147,7 +147,7 @@ Procedure ProcessMenuPlayer () ;
 
 Implementation
 
-
+Uses UMulti;
 
 
 
@@ -1523,6 +1523,10 @@ End;
 Procedure InitMenuPlayer ( n : Integer ) ;
 Var k : Integer;
 Begin
+     If bMulti = True Then Begin
+        If (nPlayerClient[n] <> -1) And (nPlayerClient[n] <> nLocalIndex) Then Exit;
+     End;
+     
      // identification du joueur modifié
      nPlayer := n;
      
@@ -2035,10 +2039,20 @@ Begin
                 MENU_PLAYER8 :
                      InitMenuPlayer(8);
                 MENU_FIGHT :
-                     nGame := GAME_INIT;
+                Begin
+                     If bMulti = True Then Begin
+                        If nLocalIndex = nClientIndex[0] Then Begin
+                           nGame := GAME_INIT;
+                           //TODO : Envoyer un paquet aux client signalant le début du match
+                        End;
+                     End Else Begin
+                         nGame := GAME_INIT;
+                     End;
+                End;
            End;
-        End;
-        bEnter := True;
+       End Else Begin
+           bEnter := True;
+       End;
      End Else Begin
         bEnter := False;
      End;
