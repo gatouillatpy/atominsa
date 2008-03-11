@@ -462,6 +462,12 @@ Begin
                     nPlayerClient[k] := nIndex;
                     Send( nIndex, nHeader, sData );
                End;
+               HEADER_UNLOCK :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    nPlayerClient[k] := -1;
+                    Send( nIndex, nHeader, sData );
+               End;
           End;
      End;
 End;
@@ -508,6 +514,11 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     nPlayerClient[k] := nIndex;
+               End;
+               HEADER_UNLOCK :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    nPlayerClient[k] := -1;
                End;
           End;
      End;

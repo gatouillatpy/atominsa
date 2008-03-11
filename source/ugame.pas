@@ -1733,6 +1733,14 @@ Begin
                      nGame := GAME_MENU;
                      SetString( STRING_GAME_MENU(10 + nPlayer), PlayerInfo(nPlayer), 0.0, 0.02, 600 );
                      nMenu := MENU_PLAYER1 + nPlayer - 1;
+                     If bMulti = True Then Begin
+                        If nPlayerType[nPlayer] = PLAYER_NIL Then Begin
+                           nPlayerClient[nPlayer] := -1;
+
+                           sData := IntToStr(n) + #31;
+                           Send( nLocalIndex, HEADER_UNLOCK, sData );
+                        End;
+                     End;
                 End;
            End;
         End;
