@@ -1356,8 +1356,9 @@ Begin
                    pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
               PLAYER_COM : // AddComputer() ?
                    AddBomberman( sPlayerName[k], k, k, nPlayerSkill[k], pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-              PLAYER_NET : // AddNetwork() ?
-                   AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+              // TODO : Ajouter proprement le bomberman
+              //PLAYER_NET : // AddNetwork() ?
+              //     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
          End;
      End;
 
@@ -1469,41 +1470,66 @@ End;
 
 Function PlayerInfo( nConst : Integer ) : String ;
 Begin
-     Case nPlayerType[nConst] Of
-          PLAYER_NIL :
-          Begin
-               PlayerInfo := 'none';
-          End;
-          PLAYER_KB1 :
-          Begin
-               PlayerInfo := 'keyboard 1           : ' + sPlayerName[nConst];
-          End;
-          PLAYER_KB2 :
-          Begin
-               PlayerInfo := 'keyboard 2           : ' + sPlayerName[nConst];
-          End;
-          PLAYER_COM :
-          Begin
-               If nPlayerSkill[nConst] = 1 Then PlayerInfo := 'computer (novice)    : ' + sPlayerName[nConst];
-               If nPlayerSkill[nConst] = 2 Then PlayerInfo := 'computer (average)   : ' + sPlayerName[nConst];
-               If nPlayerSkill[nConst] = 3 Then PlayerInfo := 'computer (masterful) : ' + sPlayerName[nConst];
-               If nPlayerSkill[nConst] = 4 Then PlayerInfo := 'computer (godlike)   : ' + sPlayerName[nConst];
-          End;
-          PLAYER_NET :
-          Begin
-               PlayerInfo := 'network              : ' + sPlayerName[nConst];
-          End;
+     If (bMulti = True) And (nPlayerClient[nConst] <> nLocalIndex) Then Begin
+       Case nPlayerType[nConst] Of
+            PLAYER_NIL :
+            Begin
+                 PlayerInfo := 'none';
+            End;
+            PLAYER_KB1 :
+            Begin
+                 PlayerInfo := 'network              : ' + sPlayerName[nConst];
+            End;
+            PLAYER_KB2 :
+            Begin
+                 PlayerInfo := 'network              : ' + sPlayerName[nConst];
+            End;
+            PLAYER_COM :
+            Begin
+                 PlayerInfo := 'network              : ' + sPlayerName[nConst];
+            End;
+       End;
+     End Else Begin
+       Case nPlayerType[nConst] Of
+            PLAYER_NIL :
+            Begin
+                 PlayerInfo := 'none';
+            End;
+            PLAYER_KB1 :
+            Begin
+                 PlayerInfo := 'keyboard 1           : ' + sPlayerName[nConst];
+            End;
+            PLAYER_KB2 :
+            Begin
+                 PlayerInfo := 'keyboard 2           : ' + sPlayerName[nConst];
+            End;
+            PLAYER_COM :
+            Begin
+                 If nPlayerSkill[nConst] = 1 Then PlayerInfo := 'computer (novice)    : ' + sPlayerName[nConst];
+                 If nPlayerSkill[nConst] = 2 Then PlayerInfo := 'computer (average)   : ' + sPlayerName[nConst];
+                 If nPlayerSkill[nConst] = 3 Then PlayerInfo := 'computer (masterful) : ' + sPlayerName[nConst];
+                 If nPlayerSkill[nConst] = 4 Then PlayerInfo := 'computer (godlike)   : ' + sPlayerName[nConst];
+            End;
+       End;
      End;
 End;
 
 Function PlayerType() : String ;
 Begin
-     Case nPlayerType[nPlayer] Of
-          PLAYER_NIL : PlayerType := 'none';
-          PLAYER_KB1 : PlayerType := 'keyboard 1';
-          PLAYER_KB2 : PlayerType := 'keyboard 2';
-          PLAYER_COM : PlayerType := 'computer';
-          PLAYER_NET : PlayerType := 'network';
+     If (bMulti = True) And (nPlayerClient[nPlayer] <> nLocalIndex) Then Begin
+       Case nPlayerType[nPlayer] Of
+            PLAYER_NIL : PlayerType := 'none';
+            PLAYER_KB1 : PlayerType := 'network';
+            PLAYER_KB2 : PlayerType := 'network';
+            PLAYER_COM : PlayerType := 'network';
+       End;
+     End Else Begin
+       Case nPlayerType[nPlayer] Of
+            PLAYER_NIL : PlayerType := 'none';
+            PLAYER_KB1 : PlayerType := 'keyboard 1';
+            PLAYER_KB2 : PlayerType := 'keyboard 2';
+            PLAYER_COM : PlayerType := 'computer';
+       End;
      End;
 End;
 
@@ -1742,6 +1768,7 @@ Begin
                            sData := IntToStr(nPlayer) + #31;
                            Send( nLocalIndex, HEADER_UNLOCK, sData );
                         End;
+                        // TODO : Envoyer un paquet donnant les infos concernant la modif du joueur
                      End;
                 End;
            End;

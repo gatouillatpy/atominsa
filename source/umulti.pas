@@ -462,7 +462,6 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     nPlayerClient[k] := nIndex;
-                    nPlayerType[k] := PLAYER_NET;
                     Send( nIndex, nHeader, sData );
                     UpdateMenu();
                End;
@@ -521,7 +520,6 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     nPlayerClient[k] := nIndex;
-                    nPlayerType[k] := PLAYER_NET;
                     UpdateMenu();
                End;
                HEADER_UNLOCK :
@@ -581,10 +579,6 @@ Begin
      // initialisation du compteur de clients
      nClientCount := 0;
      
-     // suppression de tous les joueurs externes
-     For k := 1 To 8 Do
-         If nPlayerType[k] = PLAYER_NET Then nPlayerType[k] := PLAYER_NIL;
-
      // initialisation du menu
      InitMenuMulti();
 

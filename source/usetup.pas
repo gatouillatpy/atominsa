@@ -12,7 +12,6 @@ Const PLAYER_NIL = 0;
 Const PLAYER_KB1 = 1;
 Const PLAYER_KB2 = 2;
 Const PLAYER_COM = 3;
-Const PLAYER_NET = 4;
 
 Const SERVER_UNKNOWN = 0;
 Const SERVER_STANDARD = 1;
@@ -902,7 +901,6 @@ Begin
                     If nPlayerType[k] = PLAYER_KB1 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Keyboard 1' );
                     If nPlayerType[k] = PLAYER_KB2 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Keyboard 2' );
                     If nPlayerType[k] = PLAYER_COM Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Computer' );
-                    If nPlayerType[k] = PLAYER_NET Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Network' );
                     nPlayerSkill[k] := GetInteger(sLine, 5);
                     If nPlayerSkill[k] = 1 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' skill : Novice' );
                     If nPlayerSkill[k] = 2 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' skill : Average' );

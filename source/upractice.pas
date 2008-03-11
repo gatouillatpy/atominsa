@@ -32,10 +32,6 @@ Begin
      // désactivation du mode multi
      bMulti := False;
 
-     // suppression de tous les joueurs externes
-     For k := 1 To 8 Do
-         If nPlayerType[k] = PLAYER_NET Then nPlayerType[k] := PLAYER_NIL;
-         
      // initialisation du menu
      InitMenu();
 
