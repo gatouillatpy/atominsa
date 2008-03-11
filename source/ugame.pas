@@ -2052,9 +2052,8 @@ Begin
                      End;
                 End;
            End;
-       End Else Begin
-           bEnter := True;
        End;
+       bEnter := True;
      End Else Begin
         bEnter := False;
      End;
