@@ -27,6 +27,8 @@ Procedure ProcessMulti () ;
 
 Implementation
 
+Uses UBomberman;
+
 
 
 Const MULTI_NONE       = 0;
@@ -385,6 +387,8 @@ Procedure ProcessServer () ;
 Var nIndex : DWord;
     nHeader : Integer;
     sData : String;
+    pBomberman : CBomberman;
+    fX, fY : Single;
 Var k : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -482,6 +486,46 @@ Begin
                     sPlayerName[k] := GetString( sData, 5 );
                     Send( nIndex, nHeader, sData );
                     UpdateMenu();
+               End;
+               HEADER_MOVEUP :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    pBomberman.Position.x := StrToFloat( GetString( sData, 2 ) );
+                    pBomberman.Position.y := StrToFloat( GetString( sData, 3 ) );
+                    pBomberman.Direction := 180;
+                    pBomberman.LastDirN.x := 0;
+                    pBomberman.LastDirN.y := -1;
+               End;
+               HEADER_MOVEDOWN :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    pBomberman.Position.x := StrToFloat( GetString( sData, 2 ) );
+                    pBomberman.Position.y := StrToFloat( GetString( sData, 3 ) );
+                    pBomberman.Direction := 0;
+                    pBomberman.LastDirN.x := 0;
+                    pBomberman.LastDirN.y := 1;
+               End;
+               HEADER_MOVELEFT :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    pBomberman.Position.x := StrToFloat( GetString( sData, 2 ) );
+                    pBomberman.Position.y := StrToFloat( GetString( sData, 3 ) );
+                    pBomberman.Direction := 90;
+                    pBomberman.LastDirN.x := -1;
+                    pBomberman.LastDirN.y := 0;
+               End;
+               HEADER_MOVERIGHT :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    pBomberman.Position.x := StrToFloat( GetString( sData, 2 ) );
+                    pBomberman.Position.y := StrToFloat( GetString( sData, 3 ) );
+                    pBomberman.Direction := -90;
+                    pBomberman.LastDirN.x := 1;
+                    pBomberman.LastDirN.y := 0;
                End;
           End;
      End;

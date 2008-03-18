@@ -136,7 +136,8 @@ type
   function CanBomb():boolean;
 
   property Position : Vector Read fPosition Write fPosition;
-  property Direction : integer Read nDirection;
+  property Direction : integer Read nDirection Write nDirection;
+  property LastDirN : VectorN Read lastDir Write lastDir;
 
   Property LX : Single Read fLX Write fLX;
   Property LY : Single Read fLY Write fLY;
@@ -217,7 +218,7 @@ type
 
 
 implementation
-uses uForm,uCore,uItem,uDisease;
+uses uForm,uCore,uItem,uDisease,UGame,Classes,SysUtils,USetup;
 
 
 
@@ -598,6 +599,7 @@ procedure CBomberman.Move(dx, dy : integer; dt : single);
 var  aX1, aX2, aY1, aY2 : integer;
      _X, _Y,_fX, _fY, delta : Single;
      bExtrem1, bExtrem2, bBomb1, bBomb2 : boolean;
+     sData : String;
 begin
   {On modifie l'orientation du bomberman}
   nDirection:=-dX*90+90*dY*(dY-1);
@@ -713,6 +715,21 @@ begin
     if dX=1 then begin if (_fX-Trunc(_fX))<0.4 then DoMove(_fX,Position.y); end
     else if (_fY-Trunc(_fY))<0.4 then DoMove(Position.x,_fY);
   end;
+
+  If bMulti = True Then Begin
+     sData := IntToStr(nIndex) + #31;
+     sData := sData + FloatToStr(fPosition.x) + #31;
+     sData := sData + FloatToStr(fPosition.y) + #31;
+     If dy = -1 Then Begin
+        Send( nLocalIndex, HEADER_MOVEUP, sData );
+     End Else If dy = 1 Then Begin
+        Send( nLocalIndex, HEADER_MOVEDOWN, sData );
+     End Else If dx = -1 Then Begin
+        Send( nLocalIndex, HEADER_MOVELEFT, sData );
+     End Else If dx = 1 Then Begin
+        Send( nLocalIndex, HEADER_MOVERIGHT, sData );
+     End;
+  End;
 end;
 
 procedure CBomberman.MoveUp(dt : Single);cdecl;

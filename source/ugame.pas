@@ -1965,10 +1965,10 @@ Begin
      SetCamera();
 
      // rendu du plateau
-     DrawPlane( 0.3 );
-     DrawBomberman( 0.3,false );
-     DrawGrid( 0.3 );
-     DrawSkybox( 0.3, 0.3, 0.3, 0.3, TEXTURE_MAP_SKYBOX(0) );
+     DrawPlane( 0.9 );
+     DrawBomberman( 0.9, false );
+     DrawGrid( 0.9 );
+     DrawSkybox( 0.9, 0.9, 0.9, 0.9, TEXTURE_MAP_SKYBOX(0) );
 
      // affichage du menu
      DrawString( STRING_GAME_MENU(1), -w / h * 0.4,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );

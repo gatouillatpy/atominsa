@@ -27,6 +27,15 @@ Const HEADER_UPDATE            = 1303;
 Const HEADER_SETUP             = 1304;
 Const HEADER_FIGHT             = 1305;
 
+Const HEADER_MOVEUP            = 1401;
+Const HEADER_MOVEDOWN          = 1402;
+Const HEADER_MOVELEFT          = 1403;
+Const HEADER_MOVERIGHT         = 1404;
+Const HEADER_ACTION0           = 1405;
+Const HEADER_ACTION1           = 1406;
+
+Const HEADER_BOMBERMAN         = 1501;
+
 
 
 Type LPPacketItem = ^PacketItem;
