@@ -718,8 +718,8 @@ begin
 
   If bMulti = True Then Begin
      sData := IntToStr(nIndex) + #31;
-     sData := sData + FloatToStr(fPosition.x) + #31;
-     sData := sData + FloatToStr(fPosition.y) + #31;
+     sData := sData + FormatFloat('0.000',fPosition.x) + #31;
+     sData := sData + FormatFloat('0.000',fPosition.y) + #31;
      If dy = -1 Then Begin
         Send( nLocalIndex, HEADER_MOVEUP, sData );
      End Else If dy = 1 Then Begin
