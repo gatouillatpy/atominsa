@@ -1945,6 +1945,7 @@ Procedure ProcessMenu () ;
 Var w, h : Single;
     t : Single;
     k : Integer;
+    sData : String;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
