@@ -2063,7 +2063,7 @@ Begin
                        SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
                   End;
              End;
-             If bMulti = True Then Begin
+             If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
                 sData := IntToStr(nScheme) + #31;
                 sData := sData + IntToStr(nMap) + #31;
                 sData := sData + IntToStr(nRoundCount) + #31;
@@ -2107,6 +2107,12 @@ Begin
                        If nRoundCount > 99 Then nRoundCount := 1;
                        SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
                   End;
+             End;
+             If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+                sData := IntToStr(nScheme) + #31;
+                sData := sData + IntToStr(nMap) + #31;
+                sData := sData + IntToStr(nRoundCount) + #31;
+                Send( nLocalIndex, HEADER_SETUP, sData );
              End;
           End;
           bRight := True;
