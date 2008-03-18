@@ -347,7 +347,7 @@ End;
 
 
 Function GetString ( sData : String ; nString : Integer ) : String ;
-Var i, j : Integer;
+Var i, j, k : Integer;
     nCount : Integer;
     sResult : String;
 Begin
@@ -368,6 +368,10 @@ Begin
         If sResult <> 'NULL' Then Break;
      End;
 
+     For k := 1 To Length(sResult) Do Begin
+        If sData[k] = ',' Then sData[k] = '.';
+     End;
+     
      GetString := sResult;
 End;
 
@@ -491,8 +495,10 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
-                    pBomberman.Position.x := StrToFloat( GetString( sData, 2 ) );
-                    pBomberman.Position.y := StrToFloat( GetString( sData, 3 ) );
+                    fX := StrToFloat( GetString( sData, 2 ) );
+                    fY := StrToFloat( GetString( sData, 3 ) );
+                    pBomberman.Position.x := fX;
+                    pBomberman.Position.y := fY;
                     pBomberman.Direction := 180;
                     pBomberman.LastDirN.x := 0;
                     pBomberman.LastDirN.y := -1;
@@ -501,8 +507,10 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
-                    pBomberman.Position.x := StrToFloat( GetString( sData, 2 ) );
-                    pBomberman.Position.y := StrToFloat( GetString( sData, 3 ) );
+                    fX := StrToFloat( GetString( sData, 2 ) );
+                    fY := StrToFloat( GetString( sData, 3 ) );
+                    pBomberman.Position.x := fX;
+                    pBomberman.Position.y := fY;
                     pBomberman.Direction := 0;
                     pBomberman.LastDirN.x := 0;
                     pBomberman.LastDirN.y := 1;
@@ -511,8 +519,10 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
-                    pBomberman.Position.x := StrToFloat( GetString( sData, 2 ) );
-                    pBomberman.Position.y := StrToFloat( GetString( sData, 3 ) );
+                    fX := StrToFloat( GetString( sData, 2 ) );
+                    fY := StrToFloat( GetString( sData, 3 ) );
+                    pBomberman.Position.x := fX;
+                    pBomberman.Position.y := fY;
                     pBomberman.Direction := 90;
                     pBomberman.LastDirN.x := -1;
                     pBomberman.LastDirN.y := 0;
@@ -521,8 +531,10 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
-                    pBomberman.Position.x := StrToFloat( GetString( sData, 2 ) );
-                    pBomberman.Position.y := StrToFloat( GetString( sData, 3 ) );
+                    fX := StrToFloat( GetString( sData, 2 ) );
+                    fY := StrToFloat( GetString( sData, 3 ) );
+                    pBomberman.Position.x := fX;
+                    pBomberman.Position.y := fY;
                     pBomberman.Direction := -90;
                     pBomberman.LastDirN.x := 1;
                     pBomberman.LastDirN.y := 0;

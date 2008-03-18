@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="13"/>
+      <ActiveEditorIndexAtStart Value="11"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -27,12 +27,12 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="77">
+    <Units Count="78">
       <Unit0>
         <Filename Value="atominsa.lpr"/>
         <UnitName Value="atominsa"/>
-        <CursorPos X="1" Y="74"/>
-        <TopLine Value="58"/>
+        <CursorPos X="34" Y="64"/>
+        <TopLine Value="55"/>
         <EditorIndex Value="1"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
@@ -40,8 +40,8 @@
       <Unit1>
         <Filename Value="ucore.pas"/>
         <UnitName Value="UCore"/>
-        <CursorPos X="45" Y="405"/>
-        <TopLine Value="380"/>
+        <CursorPos X="27" Y="168"/>
+        <TopLine Value="156"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
@@ -82,8 +82,8 @@
       <Unit6>
         <Filename Value="usetup.pas"/>
         <UnitName Value="USetup"/>
-        <CursorPos X="1" Y="904"/>
-        <TopLine Value="1"/>
+        <CursorPos X="32" Y="149"/>
+        <TopLine Value="140"/>
         <EditorIndex Value="2"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -147,9 +147,9 @@
       <Unit15>
         <Filename Value="ubomberman.pas"/>
         <UnitName Value="UBomberman"/>
-        <CursorPos X="41" Y="722"/>
-        <TopLine Value="710"/>
-        <EditorIndex Value="13"/>
+        <CursorPos X="33" Y="1225"/>
+        <TopLine Value="1209"/>
+        <EditorIndex Value="15"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit15>
@@ -172,7 +172,7 @@
         <UnitName Value="UBomb"/>
         <CursorPos X="20" Y="43"/>
         <TopLine Value="16"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="17"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit18>
@@ -327,8 +327,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UEditor"/>
         <CursorPos X="40" Y="8"/>
-        <TopLine Value="176"/>
-        <EditorIndex Value="12"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit40>
@@ -354,10 +354,10 @@
       <Unit44>
         <Filename Value="ucomputer.pas"/>
         <UnitName Value="UComputer"/>
-        <CursorPos X="46" Y="74"/>
+        <CursorPos X="44" Y="80"/>
         <TopLine Value="63"/>
         <EditorIndex Value="3"/>
-        <UsageCount Value="99"/>
+        <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit44>
       <Unit45>
@@ -369,8 +369,8 @@
       <Unit46>
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="27" Y="142"/>
-        <TopLine Value="126"/>
+        <CursorPos X="63" Y="1299"/>
+        <TopLine Value="1278"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -385,18 +385,18 @@
       <Unit48>
         <Filename Value="umulti.pas"/>
         <UnitName Value="UMulti"/>
-        <CursorPos X="40" Y="339"/>
-        <TopLine Value="397"/>
+        <CursorPos X="34" Y="355"/>
+        <TopLine Value="342"/>
         <EditorIndex Value="11"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="94"/>
         <Loaded Value="True"/>
       </Unit48>
       <Unit49>
         <Filename Value="lnet.pas"/>
         <UnitName Value="lNet"/>
-        <CursorPos X="14" Y="277"/>
-        <TopLine Value="256"/>
-        <UsageCount Value="10"/>
+        <CursorPos X="1" Y="675"/>
+        <TopLine Value="657"/>
+        <UsageCount Value="6"/>
       </Unit49>
       <Unit50>
         <Filename Value="..\..\..\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\osutilsh.inc"/>
@@ -445,7 +445,7 @@
         <CursorPos X="82" Y="7"/>
         <TopLine Value="7"/>
         <EditorIndex Value="6"/>
-        <UsageCount Value="50"/>
+        <UsageCount Value="51"/>
         <Loaded Value="True"/>
       </Unit56>
       <Unit57>
@@ -470,7 +470,7 @@
         <UnitName Value="UListBomb"/>
         <CursorPos X="15" Y="23"/>
         <TopLine Value="9"/>
-        <EditorIndex Value="16"/>
+        <EditorIndex Value="18"/>
         <UsageCount Value="131"/>
         <Loaded Value="True"/>
       </Unit59>
@@ -512,7 +512,7 @@
         <UnitName Value="UTriggerBomb"/>
         <CursorPos X="18" Y="22"/>
         <TopLine Value="2"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="16"/>
         <UsageCount Value="124"/>
         <Loaded Value="True"/>
       </Unit64>
@@ -595,9 +595,11 @@
       </Unit74>
       <Unit75>
         <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
-        <CursorPos X="45" Y="143"/>
-        <TopLine Value="110"/>
+        <CursorPos X="21" Y="166"/>
+        <TopLine Value="155"/>
+        <EditorIndex Value="12"/>
         <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit75>
       <Unit76>
         <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\inc\systemh.inc"/>
@@ -605,19 +607,27 @@
         <TopLine Value="261"/>
         <UsageCount Value="10"/>
       </Unit76>
+      <Unit77>
+        <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstr.inc"/>
+        <CursorPos X="13" Y="1923"/>
+        <TopLine Value="1907"/>
+        <EditorIndex Value="13"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit77>
     </Units>
     <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
-        <Filename Value="ubomberman.pas"/>
-        <Caret Line="720" Column="1" TopLine="707"/>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="506" Column="35" TopLine="492"/>
       </Position1>
       <Position2>
-        <Filename Value="ubomberman.pas"/>
-        <Caret Line="721" Column="1" TopLine="708"/>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="518" Column="32" TopLine="497"/>
       </Position2>
       <Position3>
-        <Filename Value="ubomberman.pas"/>
-        <Caret Line="722" Column="1" TopLine="709"/>
+        <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <Caret Line="166" Column="21" TopLine="155"/>
       </Position3>
     </JumpHistory>
   </ProjectOptions>
@@ -643,10 +653,13 @@
     </Other>
   </CompilerOptions>
   <Debugging>
-    <Watches Count="1">
+    <Watches Count="2">
       <Item1>
         <Expression Value="sData"/>
       </Item1>
+      <Item2>
+        <Expression Value="fPosition.x"/>
+      </Item2>
     </Watches>
   </Debugging>
 </CONFIG>
