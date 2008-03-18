@@ -2062,6 +2062,12 @@ Begin
                        SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
                   End;
              End;
+             If bMulti = True Then Begin
+                sData := IntToStr(nScheme) + #31;
+                sData := sData + IntToStr(nMap) + #31;
+                sData := sData + IntToStr(nRoundCount) + #31;
+                Send( nLocalIndex, HEADER_SETUP, sData );
+             End;
           End;
           bLeft := True;
        End Else Begin
@@ -2133,7 +2139,8 @@ Begin
                      If bMulti = True Then Begin
                         If nLocalIndex = nClientIndex[0] Then Begin
                            nGame := GAME_INIT;
-                           //TODO : Envoyer un paquet aux client signalant le début du match
+                           sData := #31;
+                           Send( nLocalIndex, HEADER_FIGHT, sData );
                         End;
                      End Else Begin
                          nGame := GAME_INIT;

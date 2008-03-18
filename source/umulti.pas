@@ -548,6 +548,17 @@ Begin
                     sPlayerName[k] := GetString( sData, 5 );
                     UpdateMenu();
                End;
+               HEADER_SETUP :
+               Begin
+                    nScheme := StrToInt( GetString( sData, 1 ) );
+                    nMap := StrToInt( GetString( sData, 2 ) );
+                    nRoundCount := StrToInt( GetString( sData, 3 ) );
+                    UpdateMenu();
+               End;
+               HEADER_FIGHT :
+               Begin
+                    nGame := GAME_INIT;
+               End;
           End;
      End;
 End;
