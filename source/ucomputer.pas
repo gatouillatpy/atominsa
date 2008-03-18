@@ -15,9 +15,9 @@ Uses Classes, SysUtils,
 Type Table = Array [1..GRIDWIDTH,1..GRIDHEIGHT] Of Integer;
 
 Procedure ProcessComputer ( pBomberman : CBomberman ; nSkill : Integer ) ;
-Function CalculateFastDanger ( x : Integer ; y : Integer ; pState : Table ; iSkill : Integer ) : Integer ;
+Function CalculateFastDanger ( x : Integer ; y : Integer ; pState : Table ; iSkill : Integer ; isAfraid : Boolean ) : Integer ;
 Function CalculateDanger ( x : Integer ; y : Integer ; xMin : Integer ; xMax : Integer ; yMin : Integer ;
-                         yMax : Integer ; wState : Table ; wSkill : Integer ; canPush : Boolean ) : Integer ;
+                         yMax : Integer ; wState : Table ; wSkill : Integer ; canPush : Boolean ; isAfraid : Boolean ) : Integer ;
 Function PutBomb( x : Integer ; y : Integer ; pState : Table; wSkill : Integer ) : Boolean ;
 
 
@@ -41,6 +41,7 @@ Var
     isBombermanFound,                                                // Le bomberman a-t-il déjà été comptabilisé dans le tableau
     continue,                                                        // La boucle while doit-elle être continuée
     canPush,                                                         // Le bomberman peut pousser la bombe (donc n'est pas sur la bombe)
+    afraid,                                                          // Le bomberman a-t-il peur des autres bombermans
     doExplosion : Boolean;                                           // Le bomberman doit-il faire exploser sa Trigger Bombe
     bLeft, bDown, bUp, bRight : Integer;                             // Limites pour les calculs dans le tableau
     dangerMin : Integer;                                             // Le danger minimal connu pour l'instant
@@ -61,6 +62,11 @@ Randomize;
    dangerMin := 10000;
    isBombermanFound := false;
    pBomberman.SumGetDelta := pBomberman.SumGetDelta + GetDelta;
+   
+   If ( pBomberman.SumFixGetDelta >= 8 ) Then
+      afraid := true
+   Else
+       afraid := false;
    
 
 // Mise à jour du tableau.
@@ -109,15 +115,33 @@ Randomize;
 // Mise à jour des dangers s'il ne vient pas de bouger
    If ( pBomberman.CanCalculate = true ) Or ( pBomberman.Position.X <> pBomberman.LX )
    Or ( pBomberman.Position.Y <> pBomberman.LY )Then Begin
+      // Mise à jour de canPush
       If ( pBomberman.Kick = true ) Or ( pBomberman.Punch = true ) Then
          canPush := true
       Else
           canPush := false;
-      pBomberman.Danger := CalculateDanger(pX, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false);
-      pBomberman.DangerLeft := CalculateDanger(pX - 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush);
-      pBomberman.DangerRight := CalculateDanger(pX + 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush);
-      pBomberman.DangerUp := CalculateDanger(pX, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush);
-      pBomberman.DangerDown := CalculateDanger(pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush);
+      // Case du bomberman : pas de poussée de bombes possible
+      pBomberman.Danger := CalculateDanger(pX, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      // Gauche : poussée possible s'il y a une bombe à gauche et rien après
+      If ( pX >= 3 ) And ( aState[pX - 1, pY] mod 4 >= 2 ) And ( aState[pX - 2, pY] mod 16 = 0 ) Then
+         pBomberman.DangerLeft := CalculateDanger(pX - 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+      Else
+          pBomberman.DangerLeft := CalculateDanger(pX - 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      // Droite
+      If ( pX <= GRIDWIDTH - 2 ) And ( aState[pX + 1, pY] mod 4 >= 2 ) And ( aState[pX + 2, pY] mod 16 = 0 ) Then
+         pBomberman.DangerRight := CalculateDanger(pX + 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+      Else
+          pBomberman.DangerRight := CalculateDanger(pX + 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      // Haut
+      If ( pY >= 3 ) And ( aState[pX, pY - 1] mod 4 >= 2 ) And ( aState[pX, pY - 2] mod 16 = 0 ) Then
+         pBomberman.DangerUp := CalculateDanger(pX, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+      Else
+          pBomberman.DangerUp := CalculateDanger(pX, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      // Bas
+      If ( pY <= GRIDHEIGHT - 2 ) And ( aState[pX, pY + 1] mod 4 >= 2 ) And ( aState[pX, pY + 2] mod 16 = 0 ) Then
+         pBomberman.DangerDown := CalculateDanger(pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+      Else
+          pBomberman.DangerDown := CalculateDanger(pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
    End;
 
 
@@ -137,12 +161,12 @@ Randomize;
       // Puis on calcule les dangers et sélectionne le minimum.
          For i := bLeft To bRight Do Begin
              For j := bUp To bDown Do Begin
-                  If ( CalculateFastDanger( i, j, aState, nSkill ) < dangerMin )
-                  Or ( ( CalculateFastDanger( i, j, aState, nSkill ) = dangerMin )
-                  And ( Random < 0.5 ) ) Then Begin
+                  sum := CalculateFastDanger( i, j, aState, nSkill, afraid);
+                  If ( sum < dangerMin )
+                  Or ( ( sum = dangerMin ) And ( Random < 0.5 ) ) Then Begin
                       cX := i;
                       cY := j;
-                      dangerMin := CalculateFastDanger(i, j, aState, nSkill);
+                      dangerMin := sum;
                   End;
              End;
          End;
@@ -172,12 +196,6 @@ Randomize;
       Else
           pBomberman.DangerDown := pBomberman.DangerDown - 32;
    End;
-   
-
-
-// Prise en compte de SumFixGetDelta pour pas que le bomberman reste fixe.
-   If ( pBomberman.SumFixGetDelta >= 8 ) Then
-      pBomberman.Danger := pBomberman.Danger + 64;
 
 
 
@@ -194,7 +212,7 @@ Randomize;
 
 
 // Explosion des bombes pour le niveau godlike
-   If ( nSkill = SKILL_GODLIKE ) And ( pBomberman.TriggerBomb <> nil ) Then Begin
+   If ( nSkill = SKILL_GODLIKE ) And ( pBomberman.TriggerBomb <> Nil ) Then Begin
       // Initialisation des données
       doExplosion := false;
       bX := Trunc(pBomberman.TriggerBomb^.Bomb.Position.X + 0.5);
@@ -294,6 +312,12 @@ Randomize;
    End;
 
 
+
+// Si le bomberman ne bouge pas depuis trop longtemps, alors il a plus de chances de bouger.
+   If ( pBomberman.SumFixGetDelta >= 8 ) Then
+      pBomberman.Danger := pBomberman.Danger + 32;
+      
+      
 
 // Si les dernières coordonnées ne sont pas les mêmes que les actuelles, alors déterminer pX et pY.
    If ( pBomberman.Position.X <> pBomberman.LX )
@@ -430,7 +454,7 @@ End;
 
 
 
-Function CalculateFastDanger ( x : Integer ; y : Integer ; pState : Table ; iSkill : Integer ) : Integer ;
+Function CalculateFastDanger ( x : Integer ; y : Integer ; pState : Table ; iSkill : Integer ; isAfraid : Boolean ) : Integer ;
 Var
    result1 : Integer;                            // résultat renvoyé
    cLeft, cRight, cUp, cDown : Integer;          // limites pour les calculs du tableau.
@@ -443,7 +467,7 @@ Begin
    If ( y + 3 > GRIDHEIGHT ) Then cDown := GRIDHEIGHT Else cDown := y + 3;
 
 // Traitement des flammes, des bombes et des bombermans.
-   result1 := CalculateDanger( x, y, cLeft, cRight, cUp, cDown, pState, iSkill, false );
+   result1 := CalculateDanger( x, y, cLeft, cRight, cUp, cDown, pState, iSkill, false, isAfraid );
 // Pour que les coins ne soient pas favorisés.
    result1 := result1 * 49 div ( ( cRight - cLeft + 1 ) *  ( cDown - cUp + 1 ) );
 
@@ -454,7 +478,7 @@ End;
 
 
 Function CalculateDanger ( x : Integer ; y : Integer ; xMin : Integer ; xMax : Integer ; yMin : Integer ;
-                         yMax : Integer ; wState : Table ; wSkill : Integer ; canPush : Boolean ) : Integer ;
+                         yMax : Integer ; wState : Table ; wSkill : Integer ; canPush : Boolean ; isAfraid : Boolean ) : Integer ;
 Var
    iBomb,                                        // Position de la bombe
    iExit,                                        // Position de la sortie
@@ -510,10 +534,12 @@ Begin
               End;
            // Traitement des bombermans si le bomberman n'est pas sur la même case.
               If ( wState[i, j] mod 8 >= 4 ) Then Begin
-                 If ( ( abs(x - i) + abs(y - j) ) <= 4 ) Then
-                    result2 := result2 + 32;
-                 If ( ( abs(x - i) + abs(y - j) ) >= 6 ) Then
-                    result2 := result2 - 16;
+                 If ( ( abs(x - i) + abs(y - j) ) <= 4 ) And ( isAfraid = true ) Then
+                    result2 := result2 + 32 - 2 * ( abs(x - i) + abs(y - j) );
+                 If ( ( abs(x - i) + abs(y - j) ) >= 6 ) And ( isAfraid = true ) Then
+                    result2 := result2 - 16 + 1 * ( abs(x - i) + abs(y - j) );
+                 If ( ( abs(x - i) + abs(y - j) ) <= 16 ) And ( isAfraid = false ) Then
+                    result2 := result2 - 32 + 2 * ( abs(x - i) + abs(y - j) );
               End;
            // Traitement des bonus pour le niveau godlike.
               If ( wSkill = SKILL_GODLIKE ) And ( wState[i, j] >= 16 ) Then Begin
@@ -533,11 +559,15 @@ Begin
                  result2 := result2 + 4096;
            // Traitement des bombes.
               // Si le niveau est godlike est que le bomberman peut pousser la bombe, alors elle ne représente pas un danger.
-              If ( wState[i, j] mod 4 >= 2 ) And ( ( wSkill <> SKILL_GODLIKE ) Or ( canPush = false ) ) Then
-                 result2 := result2 + 2048;
+              If ( wState[i, j] mod 4 >= 2 ) Then Begin
+                 If ( wSkill = SKILL_GODLIKE ) And ( canPush = true ) Then
+                    result2 := result2 - 1024
+                 Else
+                     result2 := result2 + 2048;
+              End;
            // Traitement des bombermans situés sur le même case.
               If ( wState[i, j] mod 8 >= 4 ) Then
-                 result2 := result2 + 64;
+                 result2 := result2 + 32;
            // Traitement des blocks.
               If ( wState[i, j] mod 16 >= 8 ) Then
                  result2 := result2 + 8192;
