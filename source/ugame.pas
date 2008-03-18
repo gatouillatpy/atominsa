@@ -1349,17 +1349,25 @@ Begin
      pPlayer1 := NIL;
      pPlayer2 := NIL;
      For k := 1 To 8 Do Begin // pour des random spawn on crééra une liste 1..8 de chiffres random parmi 1..8 sans remise
-         Case nPlayerType[k] Of
-              PLAYER_KB1 :
-                   pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-              PLAYER_KB2 :
-                   pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-              PLAYER_COM : // AddComputer() ?
-                   AddBomberman( sPlayerName[k], k, k, nPlayerSkill[k], pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-              // TODO : Ajouter proprement le bomberman
-              //PLAYER_NET : // AddNetwork() ?
-              //     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-         End;
+       If ((bMulti = True) And (nLocalIndex = nPlayerClient[k])) Or (bMulti = False) Then Begin
+           Case nPlayerType[k] Of
+                PLAYER_KB1 :
+                     pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                PLAYER_KB2 :
+                     pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                PLAYER_COM :
+                     AddBomberman( sPlayerName[k], k, k, nPlayerSkill[k], pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+           End;
+       End Else Begin
+           Case nPlayerType[k] Of
+                PLAYER_KB1 :
+                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                PLAYER_KB2 :
+                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                PLAYER_COM :
+                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+           End;
+       End;
      End;
 
      // mise à zéro de la minuterie du jeu
