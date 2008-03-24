@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="11"/>
+      <ActiveEditorIndexAtStart Value="3"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -354,8 +354,8 @@
       <Unit44>
         <Filename Value="ucomputer.pas"/>
         <UnitName Value="UComputer"/>
-        <CursorPos X="44" Y="80"/>
-        <TopLine Value="63"/>
+        <CursorPos X="65" Y="374"/>
+        <TopLine Value="151"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -616,19 +616,59 @@
         <Loaded Value="True"/>
       </Unit77>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="13" HistoryIndex="12">
       <Position1>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="506" Column="35" TopLine="492"/>
-      </Position1>
-      <Position2>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="518" Column="32" TopLine="497"/>
-      </Position2>
-      <Position3>
         <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
         <Caret Line="166" Column="21" TopLine="155"/>
+      </Position1>
+      <Position2>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="68" Column="42" TopLine="57"/>
+      </Position2>
+      <Position3>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="317" Column="34" TopLine="304"/>
       </Position3>
+      <Position4>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="325" Column="54" TopLine="312"/>
+      </Position4>
+      <Position5>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="328" Column="76" TopLine="315"/>
+      </Position5>
+      <Position6>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="329" Column="64" TopLine="316"/>
+      </Position6>
+      <Position7>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="330" Column="37" TopLine="317"/>
+      </Position7>
+      <Position8>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="331" Column="64" TopLine="318"/>
+      </Position8>
+      <Position9>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="333" Column="36" TopLine="320"/>
+      </Position9>
+      <Position10>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="368" Column="54" TopLine="355"/>
+      </Position10>
+      <Position11>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="371" Column="76" TopLine="358"/>
+      </Position11>
+      <Position12>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="372" Column="64" TopLine="359"/>
+      </Position12>
+      <Position13>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="374" Column="36" TopLine="361"/>
+      </Position13>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

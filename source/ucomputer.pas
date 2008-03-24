@@ -64,9 +64,9 @@ Randomize;
    pBomberman.SumGetDelta := pBomberman.SumGetDelta + GetDelta;
    
    If ( pBomberman.SumFixGetDelta >= 8 ) Then
-      afraid := true
+      afraid := false
    Else
-       afraid := false;
+       afraid := true;
    
 
 // Mise à jour du tableau.
@@ -151,7 +151,7 @@ Randomize;
    Or ( pBomberman.Position.Y <> pBomberman.LY )Then Begin
                
    // Si les coordonnées ciblées sont atteintes ou obsolètes, alors on calcule de nouvelles coordonnées cibles.
-      If ( ( cX = pX ) And ( cY = pY ) ) Or ( pBomberman.SumGetDelta >= 4 ) Then Begin
+      If ( ( cX = pX ) And ( cY = pY ) ) Or ( pBomberman.SumGetDelta >= 2 ) Then Begin
       // On fixe les limites du rectangle dans lequel on va calculer les dangers.
          If ( pX - 2 < 1 ) Then bLeft := 1 Else bLeft := pX - 2;
          If ( pX + 2 > GRIDWIDTH ) Then bRight := GRIDWIDTH Else bRight := pX + 2;
@@ -325,6 +325,8 @@ Randomize;
       // Mise à jour de lX et lY et de SumFixGetDelta;
       pBomberman.LX := pBomberman.Position.X;
       pBomberman.LY := pBomberman.Position.Y;
+      If ( pBomberman.SumFixGetDelta >= 8 ) And ( pBomberman.SumFixGetDelta - GetDelta <= 8 ) Then
+         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta - 4;
       If ( pBomberman.SumFixGetDelta - GetDelta >= 0 ) Then
          pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta - GetDelta
       Else
