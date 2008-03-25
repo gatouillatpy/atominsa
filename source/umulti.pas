@@ -559,10 +559,12 @@ Begin
         sData := '';
         For k := 1 To 8 Do Begin
             pBomberman := GetBombermanByIndex( k );
-            sData := sData + FloatToStr(pBomberman.Position.x) + #31;
-            sData := sData + FloatToStr(pBomberman.Position.y) + #31;
-            sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
-            sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
+            If pBomberman <> Nil Then Begin
+               sData := sData + FloatToStr(pBomberman.Position.x) + #31;
+               sData := sData + FloatToStr(pBomberman.Position.y) + #31;
+               sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
+               sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
+            End;
         End;
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
      End;
@@ -648,18 +650,20 @@ Begin
                     l := 1;
                     For k := 1 To 8 Do Begin
                         pBomberman := GetBombermanByIndex( k );
-                        fX := StrToFloat( GetString( sData, l ) ); l += 1;
-                        fY := StrToFloat( GetString( sData, l ) ); l += 1;
-                        pBomberman.Position.x := fX;
-                        pBomberman.Position.y := fY;
-                        nX := StrToInt( GetString( sData, l ) ); l += 1;
-                        nY := StrToInt( GetString( sData, l ) ); l += 1;
-                        If nX = 1 Then pBomberman.Direction := -90
-                        Else If nX = -1 Then pBomberman.Direction := 90
-                        Else If nY = 1 Then pBomberman.Direction := 0
-                        Else If nY = -1 Then pBomberman.Direction := 180;
-                        pBomberman.LastDirN.x := nX;
-                        pBomberman.LastDirN.y := nY;
+                        If pBomberman <> Nil Then Begin
+                          fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                          fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                          pBomberman.Position.x := fX;
+                          pBomberman.Position.y := fY;
+                          nX := StrToInt( GetString( sData, l ) ); l += 1;
+                          nY := StrToInt( GetString( sData, l ) ); l += 1;
+                          If nX = 1 Then pBomberman.Direction := -90
+                          Else If nX = -1 Then pBomberman.Direction := 90
+                          Else If nY = 1 Then pBomberman.Direction := 0
+                          Else If nY = -1 Then pBomberman.Direction := 180;
+                          pBomberman.LastDirN.x := nX;
+                          pBomberman.LastDirN.y := nY;
+                        End;
                     End;
                End;
           End;
