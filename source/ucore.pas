@@ -290,6 +290,7 @@ Procedure AddPacket ( nIndex : DWord ; nHeader : Integer ; sData : String ) ;
 Function GetPacket ( Var nIndex : DWord ; Var nHeader : Integer ; Var sData : String ) : Boolean ;
 
 Procedure Send ( nIndex : DWord ; nHeader : Integer ; sData : String );
+Procedure SendEx ( nIndex : DWord ; nHeader : Integer ; sData : String );
 
 Function ServerInit ( Const nPort : Word ) : Boolean ;
 Procedure ServerTerminate () ;
@@ -303,7 +304,7 @@ Procedure ClientLoop () ;
 
 Implementation
 
-
+Uses UMulti;
 
 
 
@@ -407,6 +408,17 @@ Begin
      End Else Begin
         For k := 0 To nSocket Do
             If aSocket[k].Connected Then aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
+     End;
+End;
+
+Procedure SendEx ( nIndex : DWord ; nHeader : Integer ; sData : String );
+Var k : Integer;
+Begin
+     If nSocket = -1 Then Begin
+        If pTCP.Connected Then pTCP.SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
+     End Else Begin
+        For k := 0 To nSocket Do
+            If aSocket[k].Connected And (nIndex <> nClientIndex[k]) Then aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
      End;
 End;
 
