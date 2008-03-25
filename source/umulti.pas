@@ -683,7 +683,7 @@ Begin
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, 2 ) );
                     fY := StrToFloat( GetString( sData, 3 ) );
-                    If ( GetBombByGridCoo(Trunc(fX + 0.5), Trunc(fY + 0.5)) = Nil ) Then Begin
+                    If ( pBomberman.uGrid.aBlock[Trunc(fX + 0.5), Trunc(fY + 0.5)] = Nil ) Then Begin
                        AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,
                        pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
                     End;
@@ -692,12 +692,13 @@ Begin
                Begin
                     l := 1;
                     For k := 1 To GetBombCount() Do Begin
-                        If pBomb <> Nil Then Begin
+
                            pBomb := GetBombByCount( k );
-                           fX := StrToFloat( GetString( sData, l ) ); l += 1;
-                           fY := StrToFloat( GetString( sData, l ) ); l += 1;
-                           pBomb.Position.x := fX;
-                           pBomb.Position.y := fY;
+                        If pBomb <> Nil Then Begin
+                        //   fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                        //   fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                        //   pBomb.Position.x := fX;
+                        //   pBomb.Position.y := fY;
                         End;
                     End;
                End;

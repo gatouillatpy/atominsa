@@ -13,7 +13,7 @@ Type
 
 CGrid = Class
 
-        Private
+        Public
 
                aBlock        : Array [1..GRIDWIDTH,1..GRIDHEIGHT] Of CBlock   ; // tableau stockant les items
 
@@ -21,7 +21,6 @@ CGrid = Class
 
                
 
-        Public
 
               Constructor Create ( _uScheme : CScheme );                       // creer grille a partir d'un scheme
               Destructor Destroy () ;
