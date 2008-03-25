@@ -568,13 +568,15 @@ Begin
         End;
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
 
-        sData := '';
-        For k := 1 To GetBombCount() Do Begin
-            pBomb := GetBombByCount( k );
-            sData := sData + FloatToStr(pBomb.Position.x) + #31;
-            sData := sData + FloatToStr(pBomb.Position.y) + #31;
+        If GetBombCount() > 0 Then Begin
+           sData := '';
+           For k := 1 To GetBombCount() Do Begin
+               pBomb := GetBombByCount( k );
+               sData := sData + FloatToStr(pBomb.Position.x) + #31;
+               sData := sData + FloatToStr(pBomb.Position.y) + #31;
+           End;
+           Send( nLocalIndex, HEADER_BOMB, sData );
         End;
-        Send( nLocalIndex, HEADER_BOMB, sData );
     End;
 End;
 
