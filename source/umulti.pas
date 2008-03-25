@@ -690,11 +690,13 @@ Begin
                Begin
                     l := 1;
                     For k := 1 To GetBombCount() Do Begin
-                        pBomb := GetBombByCount( k );
-                        fX := StrToFloat( GetString( sData, l ) ); l += 1;
-                        fY := StrToFloat( GetString( sData, l ) ); l += 1;
-                        pBomb.Position.x := fX;
-                        pBomb.Position.y := fY;
+                        If pBomb <> Nil Then Begin
+                           pBomb := GetBombByCount( k );
+                           fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                           fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                           pBomb.Position.x := fX;
+                           pBomb.Position.y := fY;
+                        End;
                     End;
                End;
           End;
