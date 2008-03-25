@@ -35,6 +35,7 @@ Const HEADER_ACTION0           = 1405;
 Const HEADER_ACTION1           = 1406;
 
 Const HEADER_BOMBERMAN         = 1501;
+Const HEADER_BOMB              = 1502;
 
 
 

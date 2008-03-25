@@ -27,7 +27,7 @@ Procedure ProcessMulti () ;
 
 Implementation
 
-Uses UBomberman, UListBomb;
+Uses UBomberman, UListBomb, UBomb;
 
 
 
@@ -392,6 +392,7 @@ Var nIndex : DWord;
     nHeader : Integer;
     sData : String;
     pBomberman : CBomberman;
+    pBomb : CBomb;
     fX, fY : Single;
 Var k : Integer;
 Begin
@@ -545,12 +546,11 @@ Begin
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, 2 ) );
                     fY := StrToFloat( GetString( sData, 3 ) );
-                    // TODO : Mettre à jour les bombes.
-                    // aBombSize : integer; aBombTime : Single; aJelly : boolean; aTrigger : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
                     If ( GetBombByGridCoo(Trunc(fX + 0.5), Trunc(fY + 0.5)) = Nil ) Then Begin
                        AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,
                        pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
                     End;
+                    Send( nIndex, nHeader, sData );
                End;
           End;
      End;
@@ -567,7 +567,15 @@ Begin
             End;
         End;
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
-     End;
+
+        sData := '';
+        For k := 1 To GetBombCount() Do Begin
+            pBomb := GetBombByCount( k );
+            sData := sData + FloatToStr(pBomb.Position.x) + #31;
+            sData := sData + FloatToStr(pBomb.Position.y) + #31;
+        End;
+        Send( nLocalIndex, HEADER_BOMB, sData );
+    End;
 End;
 
 
@@ -578,6 +586,7 @@ Var nIndex : DWord;
     sData : String;
     sBuffer : String;
     pBomberman : CBomberman;
+    pBomb : CBomb;
     fX, fY : Single;
     nX, nY : Integer;
 Var k, l, m : Integer;
@@ -650,7 +659,7 @@ Begin
                     l := 1;
                     For k := 1 To 8 Do Begin
                         pBomberman := GetBombermanByIndex( k );
-                        If pBomberman <> Nil Then Begin
+                        If (pBomberman <> Nil) And (nPlayerClient[k] <> nLocalIndex) Then Begin
                           fX := StrToFloat( GetString( sData, l ) ); l += 1;
                           fY := StrToFloat( GetString( sData, l ) ); l += 1;
                           pBomberman.Position.x := fX;
@@ -664,6 +673,28 @@ Begin
                           pBomberman.LastDirN.x := nX;
                           pBomberman.LastDirN.y := nY;
                         End;
+                    End;
+               End;
+               HEADER_ACTION0 :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    fX := StrToFloat( GetString( sData, 2 ) );
+                    fY := StrToFloat( GetString( sData, 3 ) );
+                    If ( GetBombByGridCoo(Trunc(fX + 0.5), Trunc(fY + 0.5)) = Nil ) Then Begin
+                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,
+                       pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
+                    End;
+               End;
+               HEADER_BOMB :
+               Begin
+                    l := 1;
+                    For k := 1 To GetBombCount() Do Begin
+                        pBomb := GetBombByCount( k );
+                        fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                        fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                        pBomb.Position.x := fX;
+                        pBomb.Position.y := fY;
                     End;
                End;
           End;
