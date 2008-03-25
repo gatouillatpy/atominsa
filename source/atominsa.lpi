@@ -385,8 +385,8 @@
       <Unit48>
         <Filename Value="umulti.pas"/>
         <UnitName Value="UMulti"/>
-        <CursorPos X="38" Y="641"/>
-        <TopLine Value="623"/>
+        <CursorPos X="33" Y="648"/>
+        <TopLine Value="644"/>
         <EditorIndex Value="11"/>
         <UsageCount Value="95"/>
         <Loaded Value="True"/>
@@ -616,43 +616,11 @@
         <Loaded Value="True"/>
       </Unit77>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="1" HistoryIndex="0">
       <Position1>
         <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
         <Caret Line="166" Column="21" TopLine="155"/>
       </Position1>
-      <Position2>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1253" Column="21" TopLine="1933"/>
-      </Position2>
-      <Position3>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1388" Column="22" TopLine="1365"/>
-      </Position3>
-      <Position4>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="138" Column="22" TopLine="115"/>
-      </Position4>
-      <Position5>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="363" Column="35" TopLine="523"/>
-      </Position5>
-      <Position6>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="538" Column="35" TopLine="348"/>
-      </Position6>
-      <Position7>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="563" Column="20" TopLine="550"/>
-      </Position7>
-      <Position8>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="640" Column="70" TopLine="623"/>
-      </Position8>
-      <Position9>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="549" Column="43" TopLine="526"/>
-      </Position9>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

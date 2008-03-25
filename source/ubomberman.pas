@@ -18,8 +18,7 @@ type
 
   CBomberman = class
   public
-     procedure DoIgnition();
-  private
+    procedure DoIgnition();
     fCX, fCY,                    // coordonnées ciblées par l'intelligence artificielle
     fLX, fLY : Single;           // dernières coordonnées
     fDanger,                     // danger aux coordonnées courantes

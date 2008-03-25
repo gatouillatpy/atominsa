@@ -32,6 +32,8 @@ Type LPBombItem = ^BombItem;
 
 implementation
 
+Uses UGame, UCore, USetup, SysUtils;
+
 {                                                                               }
 {                           Liste Bombes                                        }
 {                                                                               }
@@ -50,6 +52,7 @@ Procedure UpdateCountList();Forward;                                 // pour lui
 // ajout
 procedure AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aTrigger : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
 var pTemp : LPBombItem;
+    sData : String;
 begin
  Inc(BombCount);
  if (pBombItem=Nil) then
@@ -74,6 +77,13 @@ begin
    else if aTrigger then pTemp^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
    else pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
  end;
+ 
+ If ( bMulti = true ) Then Begin
+    sData := IntToStr(aIndex) + #31;
+    sData := sData + FormatFloat('0.000',aX) + #31;
+    sData := sData + FormatFloat('0.000',aY) + #31;
+    Send( nLocalIndex, HEADER_ACTION0, sData );
+ End;
 end;
 
 

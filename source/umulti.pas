@@ -27,7 +27,7 @@ Procedure ProcessMulti () ;
 
 Implementation
 
-Uses UBomberman;
+Uses UBomberman, UListBomb;
 
 
 
@@ -538,6 +538,19 @@ Begin
                     pBomberman.Direction := -90;
                     pBomberman.LastDirN.x := 1;
                     pBomberman.LastDirN.y := 0;
+               End;
+               HEADER_ACTION0 :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    fX := StrToFloat( GetString( sData, 2 ) );
+                    fY := StrToFloat( GetString( sData, 3 ) );
+                    // TODO : Mettre à jour les bombes.
+                    // aBombSize : integer; aBombTime : Single; aJelly : boolean; aTrigger : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+                    If ( GetBombByGridCoo(Trunc(fX + 0.5), Trunc(fY + 0.5)) = Nil ) Then Begin
+                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,
+                       pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
+                    End;
                End;
           End;
      End;
