@@ -1384,6 +1384,91 @@ Begin
      InitScreen();
      AddStringToScreen( 'Welcome to Bomberman Returns!' ); // IL VA FALLOIR QU'ON TROUVE UN VRAI TITRE
      AddStringToScreen( 'Good luck!   Have fun!' );
+     
+     If bMulti = True Then Begin
+        If nLocalIndex = nClientIndex[0] Then Begin
+           For i := 1 To GRIDWIDTH Do Begin
+               For j := 1 To GRIDHEIGHT Do Begin
+                   nDisease[i, j] := -1;
+               End;
+           End;
+           sData := '';
+           For i := 1 To GRIDWIDTH Do Begin
+               For j := 1 To GRIDHEIGHT Do Begin
+                   If ( pGrid.GetBlock(i, j) Is CItem ) Then Begin
+                      If ( pGrid.GetBlock(i, j) Is CExtraBomb ) Then Begin
+                         sData := sData + IntToStr( POWERUP_EXTRABOMB );
+                         sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CFlameUp ) Then Begin
+                           sData := sData + IntToStr( POWERUP_FLAMEUP );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CDisease ) Then Begin // Attention : Plusieurs types de maladies.
+                           sData := sData + IntToStr( POWERUP_DISEASE );
+                           sData := sData + #31;
+                           nDisease[i, j] := Random(DISEASECOUNT) + 1;
+                           sData := sData + IntToStr( nDisease[i, j] );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CKick ) Then Begin
+                           sData := sData + IntToStr( POWERUP_KICK );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CSpeedUp ) Then Begin
+                           sData := sData + IntToStr( POWERUP_SPEEDUP );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CPunch ) Then Begin
+                           sData := sData + IntToStr( POWERUP_PUNCH );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CGrab ) Then Begin
+                           sData := sData + IntToStr( POWERUP_GRAB );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CSpoog ) Then Begin
+                           sData := sData + IntToStr( POWERUP_SPOOGER );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CGoldFlame ) Then Begin
+                           sData := sData + IntToStr( POWERUP_GOLDFLAME );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CTrigger ) Then Begin
+                           sData := sData + IntToStr( POWERUP_TRIGGERBOMB );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CJelly ) Then Begin
+                           sData := sData + IntToStr( POWERUP_JELLYBOMB );
+                           sData := sData + #31;
+                      End
+                      Else If ( pGrid.GetBlock(i, j) Is CSuperDisease ) Then Begin  // Plusieurs types de maladies.
+                           sData := sData + IntToStr( POWERUP_SUPERDISEASE );
+                           sData := sData + #31;
+                           Repeat
+                                 k := Random(DISEASECOUNT)+1;
+                           Until ( k <> DISEASE_SWITCH );
+                           Repeat
+                                 l := Random(DISEASECOUNT)+1;
+                           Until ( l <> k ) And ( l <> DISEASE_SWITCH );
+                           Repeat
+                                 m := Random(DISEASECOUNT)+1;
+                           Until ( m <> k ) And ( m <> l ) And ( m <> DISEASE_SWITCH );
+                           sData := sData + IntToStr( k + 100 * l + 10000 * i );
+                           sData := sData + #31;
+                      End
+                      Else Begin                  // Cela ne devrait jamais arriver...
+                           sData := sData + IntToStr( POWERUP_RANDOM );
+                           sData := sData + #31;
+                      End;
+                   End;
+               End;
+           End;
+           If ( sData = '' ) Then sData := #31;
+           Send( nLocalIndex, HEADER_FIGHT, sData );
+        End;
+     End;
 End;
 
 
@@ -2153,95 +2238,7 @@ Begin
                 MENU_PLAYER8 :
                      InitMenuPlayer(8);
                 MENU_FIGHT :
-                Begin
-                     If bMulti = True Then Begin
-                        If nLocalIndex = nClientIndex[0] Then Begin
-                           For i := 1 To GRIDWIDTH Do Begin
-                               For j := 1 To GRIDHEIGHT Do Begin
-                                   nDisease[i, j] := -1;
-                               End;
-                           End;
-                           nGame := GAME_INIT;
-                           sData := '';
-                           For i := 1 To GRIDWIDTH Do Begin
-                               For j := 1 To GRIDHEIGHT Do Begin
-                                   If ( pGrid.GetBlock(i, j) Is CItem ) Then Begin
-                                      If ( pGrid.GetBlock(i, j) Is CExtraBomb ) Then Begin
-                                         sData := sData + IntToStr( POWERUP_EXTRABOMB );
-                                         sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CFlameUp ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_FLAMEUP );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CDisease ) Then Begin // Attention : Plusieurs types de maladies.
-                                           sData := sData + IntToStr( POWERUP_DISEASE );
-                                           sData := sData + #31;
-                                           nDisease[i, j] := Random(DISEASECOUNT) + 1;
-                                           sData := sData + IntToStr( nDisease[i, j] );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CKick ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_KICK );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CSpeedUp ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_SPEEDUP );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CPunch ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_PUNCH );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CGrab ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_GRAB );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CSpoog ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_SPOOGER );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CGoldFlame ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_GOLDFLAME );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CTrigger ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_TRIGGERBOMB );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CJelly ) Then Begin
-                                           sData := sData + IntToStr( POWERUP_JELLYBOMB );
-                                           sData := sData + #31;
-                                      End
-                                      Else If ( pGrid.GetBlock(i, j) Is CSuperDisease ) Then Begin  // Plusieurs types de maladies.
-                                           sData := sData + IntToStr( POWERUP_SUPERDISEASE );
-                                           sData := sData + #31;
-                                           Repeat
-                                                 k := Random(DISEASECOUNT)+1;
-                                           Until ( k <> DISEASE_SWITCH );
-                                           Repeat
-                                                 l := Random(DISEASECOUNT)+1;
-                                           Until ( l <> k ) And ( l <> DISEASE_SWITCH );
-                                           Repeat
-                                                 m := Random(DISEASECOUNT)+1;
-                                           Until ( m <> k ) And ( m <> l ) And ( m <> DISEASE_SWITCH );
-                                           sData := sData + IntToStr( k + 100 * l + 10000 * i );
-                                           sData := sData + #31;
-                                      End
-                                      Else Begin                  // Cela ne devrait jamais arriver...
-                                           sData := sData + IntToStr( POWERUP_RANDOM );
-                                           sData := sData + #31;
-                                      End;
-                                   End;
-                               End;
-                           End;
-                           If ( sData = '' ) Then sData := #31;
-                           Send( nLocalIndex, HEADER_FIGHT, sData );
-                        End;
-                     End Else Begin
-                         nGame := GAME_INIT;
-                     End;
-                End;
+                     nGame := GAME_INIT;
            End;
        End;
        bEnter := True;
