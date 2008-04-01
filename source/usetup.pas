@@ -149,7 +149,6 @@ Var bEnter  : Boolean;
 Var bEscape : Boolean;
 
 
-
 Procedure InitMenu () ;
 Begin
      SetString( STRING_SETUP_MENU(1), 'setup', 0.2, 1.0, 600 );

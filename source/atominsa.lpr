@@ -178,5 +178,6 @@ Begin
      BindKeyStd( KEY_F11, True, True, @SwitchDisplay );
 
      ExecGlut();
+
 End.
 

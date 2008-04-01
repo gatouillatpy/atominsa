@@ -27,7 +27,7 @@ Procedure ProcessMulti () ;
 
 Implementation
 
-Uses UBomberman, UListBomb, UBomb;
+Uses UBomberman, UListBomb, UBomb, UBlock, UItem;
 
 
 
@@ -546,9 +546,8 @@ Begin
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, 2 ) );
                     fY := StrToFloat( GetString( sData, 3 ) );
-                    If ( GetBombByGridCoo(Trunc(fX + 0.5), Trunc(fY + 0.5)) = Nil ) Then Begin
-                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,
-                       pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
+                    If Not ( pGrid.GetBlock( Trunc( fX ),Trunc( fY ) ) Is CBomb ) Then Begin
+                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
                     End;
                     SendEx( nIndex, nHeader, sData );
                End;
@@ -591,6 +590,8 @@ Var nIndex : DWord;
     pBomb : CBomb;
     fX, fY : Single;
     nX, nY : Integer;
+    isBomb : Boolean;
+    nBonus : Integer;
 Var k, l, m : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -655,6 +656,44 @@ Begin
                HEADER_FIGHT :
                Begin
                     nGame := GAME_INIT;
+                    For k := 1 To GRIDWIDTH Do Begin
+                        For l := 1 To GRIDHEIGHT Do Begin
+                            nDisease[k, l] := -1;
+                        End;
+                    End;
+                    m := 1;
+                    For k := 1 To GRIDWIDTH Do Begin
+                        For l := 1 To GRIDHEIGHT Do Begin
+                            If ( pGrid.GetBlock(k, l) Is CItem ) Then Begin
+                               nBonus := StrToInt( GetString( sData, m ) );
+                               m := m + 1;
+                               Case nBonus Of
+                                    POWERUP_EXTRABOMB       : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                 //  CExtraBomb.Create(k,l);
+                                                              End;
+                               End;{
+         POWERUP_FLAMEUP         : aBonus := CFlameUp.Create(0,0);             // flammes plus longues
+         POWERUP_DISEASE         : Begin                                       // maladies
+                                        If ( bMulti = false ) Then
+                                           aBonus := CDisease.Create(0,0);
+                                   End;
+         POWERUP_KICK            : aBonus := CKick.Create(0,0);                // pousse avec rebonds
+         POWERUP_SPEEDUP         : aBonus := CSpeedUp.Create(0,0);             // plus de vitesse
+         POWERUP_PUNCH           : aBonus := CPunch.Create(0,0);               // pousse sans rebonds
+         POWERUP_GRAB            : aBonus := CGrab.Create(0,0);                // bombe par dessus les boîtes?
+         POWERUP_SPOOGER         : aBonus := CSpoog.Create(0,0);               // porte les bombes?
+         POWERUP_GOLDFLAME       : aBonus := CGoldFlame.Create(0,0);           // flammes infinies
+         POWERUP_TRIGGERBOMB     : aBonus := CTrigger.Create(0,0);             // bombes à retardement
+         POWERUP_JELLYBOMB       : aBonus := CJelly.Create(0,0);               // bombes spéciales
+         POWERUP_SUPERDISEASE    : aBonus := CSuperDisease.Create(0,0);        // 3 maladies
+                               }
+                            End;
+                        End;
+                    End;
+
+                               
+
                End;
                HEADER_BOMBERMAN :
                Begin
@@ -683,22 +722,20 @@ Begin
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, 2 ) );
                     fY := StrToFloat( GetString( sData, 3 ) );
-                    If ( GetBombByGridCoo(Trunc(fX + 0.5), Trunc(fY + 0.5)) = Nil ) Then Begin
-                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,
-                       pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
+                    If Not ( pGrid.GetBlock( Trunc( fX ),Trunc( fY ) ) Is CBomb ) Then Begin
+                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
                     End;
                End;
                HEADER_BOMB :
                Begin
                     l := 1;
                     For k := 1 To GetBombCount() Do Begin
-
-                           pBomb := GetBombByCount( k );
+                        pBomb := GetBombByCount( k );
                         If pBomb <> Nil Then Begin
-                        //   fX := StrToFloat( GetString( sData, l ) ); l += 1;
-                        //   fY := StrToFloat( GetString( sData, l ) ); l += 1;
-                        //   pBomb.Position.x := fX;
-                        //   pBomb.Position.y := fY;
+                           fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                           fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                           pBomb.Position.x := fX;
+                           pBomb.Position.y := fY;
                         End;
                     End;
                End;

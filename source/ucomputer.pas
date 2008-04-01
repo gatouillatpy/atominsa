@@ -24,7 +24,7 @@ Function PutBomb( x : Integer ; y : Integer ; pState : Table; wSkill : Integer )
 
 Implementation
 
-Uses UGame, UBlock, UItem, UTriggerBomb, UDisease, USuperDisease;
+Uses UGame, UBlock, UItem, UTriggerBomb, UDisease, USuperDisease, UBomb;
 
 
 Const SKILL_NOVICE         = 1;
@@ -153,15 +153,15 @@ Randomize;
    // Si les coordonnées ciblées sont atteintes ou obsolètes, alors on calcule de nouvelles coordonnées cibles.
       If ( ( cX = pX ) And ( cY = pY ) ) Or ( pBomberman.SumGetDelta >= 2 ) Then Begin
       // On fixe les limites du rectangle dans lequel on va calculer les dangers.
-         If ( pX - 2 < 1 ) Then bLeft := 1 Else bLeft := pX - 2;
-         If ( pX + 2 > GRIDWIDTH ) Then bRight := GRIDWIDTH Else bRight := pX + 2;
-         If ( pY - 2 < 1 ) Then bUp := 1 Else bUp := pY - 2;
-         If ( pY + 2 > GRIDHEIGHT ) Then bDown := GRIDHEIGHT Else bDown := pY + 2;
+         If ( pX - 3 < 1 ) Then bLeft := 1 Else bLeft := pX - 3;
+         If ( pX + 3 > GRIDWIDTH ) Then bRight := GRIDWIDTH Else bRight := pX + 3;
+         If ( pY - 3 < 1 ) Then bUp := 1 Else bUp := pY - 3;
+         If ( pY + 3 > GRIDHEIGHT ) Then bDown := GRIDHEIGHT Else bDown := pY + 3;
                   
       // Puis on calcule les dangers et sélectionne le minimum.
          For i := bLeft To bRight Do Begin
              For j := bUp To bDown Do Begin
-                  sum := CalculateFastDanger( i, j, aState, nSkill, afraid);
+                  sum := CalculateFastDanger( i, j, aState, nSkill, afraid );
                   If ( sum < dangerMin )
                   Or ( ( sum = dangerMin ) And ( Random < 0.5 ) ) Then Begin
                       cX := i;
@@ -443,7 +443,7 @@ Randomize;
    And ( PutBomb( Trunc( pBomberman.Position.X + 0.5), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill ) = true ) Then
        pBomberman.CreateBomb( GetDelta );
 
-
+     
      
 // Entrées des variables locales dans les variables du bomberman.
      pBomberman.CX := cX;
