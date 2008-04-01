@@ -1473,11 +1473,6 @@ Begin
      InitScreen();
      AddStringToScreen( 'Welcome to Bomberman Returns!' ); // IL VA FALLOIR QU'ON TROUVE UN VRAI TITRE
      AddStringToScreen( 'Good luck!   Have fun!' );
-     
-     If bMulti = True Then
-        If nLocalIndex = nClientIndex[0] Then
-            Send( nLocalIndex, HEADER_FIGHT, sData );
-
 End;
 
 
@@ -2247,7 +2242,10 @@ Begin
                 MENU_PLAYER8 :
                      InitMenuPlayer(8);
                 MENU_FIGHT :
-                     nGame := GAME_INIT;
+                If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+                    nGame := GAME_INIT;
+                    Send( nLocalIndex, HEADER_FIGHT, sData );
+                End;
            End;
        End;
        bEnter := True;
