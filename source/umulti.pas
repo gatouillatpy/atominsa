@@ -27,7 +27,7 @@ Procedure ProcessMulti () ;
 
 Implementation
 
-Uses UBomberman, UListBomb, UBomb, UBlock, UItem;
+Uses UBomberman, UListBomb, UBomb, UBlock, UItem, UGrid;
 
 
 
@@ -656,12 +656,14 @@ Begin
                HEADER_FIGHT :
                Begin
                     nGame := GAME_INIT;
+               End;
+               HEADER_ROUND :
+               Begin
                     For k := 1 To GRIDWIDTH Do Begin
                         For l := 1 To GRIDHEIGHT Do Begin
                             nDisease[k, l] := -1;
                         End;
                     End;
-                    pGrid := CGrid.Create( pScheme );
                     m := 1;
                     For k := 1 To GRIDWIDTH Do Begin
                         For l := 1 To GRIDHEIGHT Do Begin
@@ -725,9 +727,6 @@ Begin
                             End;
                         End;
                     End;
-
-                               
-
                End;
                HEADER_BOMBERMAN :
                Begin

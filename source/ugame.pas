@@ -1253,7 +1253,8 @@ End;
 
 
 Procedure InitRound () ;
-Var i : Integer;
+Var i, j, l, k, m : Integer;
+    sData : String;
 Begin
      // supression des différents éléments du jeu
      FreeFlame();
@@ -1313,84 +1314,9 @@ Begin
             If GetBombermanByCount(i).Score = nRoundCount Then
                InitScore();
 
-     // initialisation de la minuterie du round
-     fRoundTime := GetTime;
-End;
-
-
-
-Procedure InitGame () ;
-Var i, j, k, l, m: Integer;
-    sData : String;
-Begin
-     // enregistrement des paramètres
-     WriteSettings( 'atominsa.cfg' );
-
-     // initialisation de l'invite de messages
-     bMessage := False;
-     sMessage := '';
-     
-     // suppression de tous les bomberman
-     FreeBomberman();
-     
-     // supression des différents éléments du jeu
-     FreeFlame();
-     FreeBomb();
-     FreeTimer();
-
-     // initialisation de la camera
-     nCamera := CAMERA_OVERALL;
-
-     // chargement du scheme
-     If nScheme = -1 Then Begin
-        pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
-     End Else Begin
-        pScheme := aSchemeList[nScheme];
-     End;
-     
-     // création de la grille en fonction du scheme
-     If ((bMulti = True) And (nLocalIndex = nPlayerClient[0])) Or (bMulti = False) Then pGrid := CGrid.Create( pScheme );
-
-     // création des bombermen
-     pPlayer1 := NIL;
-     pPlayer2 := NIL;
-     For k := 1 To 8 Do Begin // pour des random spawn on crééra une liste 1..8 de chiffres random parmi 1..8 sans remise
-       If ((bMulti = True) And (nLocalIndex = nPlayerClient[k])) Or (bMulti = False) Then Begin
-           Case nPlayerType[k] Of
-                PLAYER_KB1 :
-                     pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-                PLAYER_KB2 :
-                     pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-                PLAYER_COM :
-                     AddBomberman( sPlayerName[k], k, k, nPlayerSkill[k], pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-           End;
-       End Else Begin
-           Case nPlayerType[k] Of
-                PLAYER_KB1 :
-                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-                PLAYER_KB2 :
-                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-                PLAYER_COM :
-                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
-           End;
-       End;
-     End;
-
-     // mise à zéro de la minuterie du jeu
-     fGameTime := GetTime();
-
-     // initialisation du premier round
-     nRound := 0;
-     InitRound();
-     
-     // initialisation du panneau d'affichage
-     InitScreen();
-     AddStringToScreen( 'Welcome to Bomberman Returns!' ); // IL VA FALLOIR QU'ON TROUVE UN VRAI TITRE
-     AddStringToScreen( 'Good luck!   Have fun!' );
-     
      If bMulti = True Then Begin
         If nLocalIndex = nClientIndex[0] Then Begin
-           For i := 1 To GRIDWIDTH Do Begin
+          For i := 1 To GRIDWIDTH Do Begin
                For j := 1 To GRIDHEIGHT Do Begin
                    nDisease[i, j] := -1;
                End;
@@ -1469,9 +1395,89 @@ Begin
                End;
            End;
            If ( sData = '' ) Then sData := #31;
-           Send( nLocalIndex, HEADER_FIGHT, sData );
+           Send( nLocalIndex, HEADER_ROUND, sData );
         End;
      End;
+
+     // initialisation de la minuterie du round
+     fRoundTime := GetTime;
+End;
+
+
+
+Procedure InitGame () ;
+Var i, j, k, l, m: Integer;
+    sData : String;
+Begin
+     // enregistrement des paramètres
+     WriteSettings( 'atominsa.cfg' );
+
+     // initialisation de l'invite de messages
+     bMessage := False;
+     sMessage := '';
+     
+     // suppression de tous les bomberman
+     FreeBomberman();
+     
+     // supression des différents éléments du jeu
+     FreeFlame();
+     FreeBomb();
+     FreeTimer();
+
+     // initialisation de la camera
+     nCamera := CAMERA_OVERALL;
+
+     // chargement du scheme
+     If nScheme = -1 Then Begin
+        pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
+     End Else Begin
+        pScheme := aSchemeList[nScheme];
+     End;
+     
+     // création de la grille en fonction du scheme
+     If ((bMulti = True) And (nLocalIndex = nPlayerClient[0])) Or (bMulti = False) Then pGrid := CGrid.Create( pScheme );
+
+     // création des bombermen
+     pPlayer1 := NIL;
+     pPlayer2 := NIL;
+     For k := 1 To 8 Do Begin // pour des random spawn on crééra une liste 1..8 de chiffres random parmi 1..8 sans remise
+       If ((bMulti = True) And (nLocalIndex = nPlayerClient[k])) Or (bMulti = False) Then Begin
+           Case nPlayerType[k] Of
+                PLAYER_KB1 :
+                     pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                PLAYER_KB2 :
+                     pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                PLAYER_COM :
+                     AddBomberman( sPlayerName[k], k, k, nPlayerSkill[k], pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+           End;
+       End Else Begin
+           Case nPlayerType[k] Of
+                PLAYER_KB1 :
+                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                PLAYER_KB2 :
+                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                PLAYER_COM :
+                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+           End;
+       End;
+     End;
+
+     // mise à zéro de la minuterie du jeu
+     fGameTime := GetTime();
+
+     // initialisation du premier round
+     nRound := 0;
+     InitRound();
+     
+     // initialisation du panneau d'affichage
+     InitScreen();
+     AddStringToScreen( 'Welcome to Bomberman Returns!' ); // IL VA FALLOIR QU'ON TROUVE UN VRAI TITRE
+     AddStringToScreen( 'Good luck!   Have fun!' );
+     
+     If bMulti = True Then
+        If nLocalIndex = nClientIndex[0] Then
+            Send( nLocalIndex, HEADER_FIGHT, sData );
+
 End;
 
 

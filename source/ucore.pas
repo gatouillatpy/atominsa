@@ -26,6 +26,7 @@ Const HEADER_UNLOCK            = 1302;
 Const HEADER_UPDATE            = 1303;
 Const HEADER_SETUP             = 1304;
 Const HEADER_FIGHT             = 1305;
+Const HEADER_ROUND             = 1306;
 
 Const HEADER_MOVEUP            = 1401;
 Const HEADER_MOVEDOWN          = 1402;
