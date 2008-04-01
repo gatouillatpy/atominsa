@@ -1320,7 +1320,8 @@ End;
 
 
 Procedure InitGame () ;
-Var k : Integer;
+Var i, j, k, l, m: Integer;
+    sData : String;
 Begin
      // enregistrement des paramètres
      WriteSettings( 'atominsa.cfg' );
@@ -1392,6 +1393,7 @@ Begin
                    nDisease[i, j] := -1;
                End;
            End;
+           pGrid := CGrid.Create( pScheme );
            sData := '';
            For i := 1 To GRIDWIDTH Do Begin
                For j := 1 To GRIDHEIGHT Do Begin

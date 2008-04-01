@@ -9,8 +9,8 @@ Interface
 
 
 
-Uses Classes, SysUtils,
-     UCore, UGame, UUtils, USetup, UForm;
+Uses Classes, SysUtils, UJellyBomb, UPunch, USpoog, UGoldFLame, UTrigger, UTriggerBomb, USuperDisease,
+     UCore, UGame, UUtils, USetup, UForm, UExtraBomb, UFlameUp, UKick, UGrab, UJelly, UDisease, USpeedUp;
 
 
 
@@ -670,24 +670,57 @@ Begin
                                Case nBonus Of
                                     POWERUP_EXTRABOMB       : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
-                                                                 //  CExtraBomb.Create(k,l);
+                                                                   pGrid.aBlock[k,l] := CExtraBomb.Create(k,l);
                                                               End;
-                               End;{
-         POWERUP_FLAMEUP         : aBonus := CFlameUp.Create(0,0);             // flammes plus longues
-         POWERUP_DISEASE         : Begin                                       // maladies
-                                        If ( bMulti = false ) Then
-                                           aBonus := CDisease.Create(0,0);
-                                   End;
-         POWERUP_KICK            : aBonus := CKick.Create(0,0);                // pousse avec rebonds
-         POWERUP_SPEEDUP         : aBonus := CSpeedUp.Create(0,0);             // plus de vitesse
-         POWERUP_PUNCH           : aBonus := CPunch.Create(0,0);               // pousse sans rebonds
-         POWERUP_GRAB            : aBonus := CGrab.Create(0,0);                // bombe par dessus les boîtes?
-         POWERUP_SPOOGER         : aBonus := CSpoog.Create(0,0);               // porte les bombes?
-         POWERUP_GOLDFLAME       : aBonus := CGoldFlame.Create(0,0);           // flammes infinies
-         POWERUP_TRIGGERBOMB     : aBonus := CTrigger.Create(0,0);             // bombes à retardement
-         POWERUP_JELLYBOMB       : aBonus := CJelly.Create(0,0);               // bombes spéciales
-         POWERUP_SUPERDISEASE    : aBonus := CSuperDisease.Create(0,0);        // 3 maladies
-                               }
+                                    POWERUP_FLAMEUP         : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CFlameUp.Create(k,l);
+                                                              End;
+                                    POWERUP_DISEASE         : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CFlameUp.Create(k,l);
+                                                                   nDisease[k,l] := StrToInt( GetString( sData, m ) );
+                                                                   m += 1;
+                                                              End;
+                                    POWERUP_KICK            : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CKick.Create(k,l);
+                                                              End;
+                                    POWERUP_SPEEDUP         : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CSpeedUp.Create(k,l);
+                                                              End;
+                                    POWERUP_PUNCH           : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CFlameUp.Create(k,l);
+                                                              End;
+                                    POWERUP_GRAB            : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CGrab.Create(k,l);
+                                                              End;
+                                    POWERUP_SPOOGER         : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CSpoog.Create(k,l);
+                                                              End;
+                                    POWERUP_GOLDFLAME       : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CGoldFlame.Create(k,l);
+                                                              End;
+                                    POWERUP_TRIGGERBOMB     : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CTrigger.Create(k,l);
+                                                              End;
+                                    POWERUP_JELLYBOMB       : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CJelly.Create(k,l);
+                                                              End;
+                                    POWERUP_SUPERDISEASE    : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CSuperDisease.Create(k,l);
+                                                                   nDisease[k,l] := StrToInt( GetString( sData, m ) );
+                                                                   m += 1;
+                                                              End;
+                               End;
                             End;
                         End;
                     End;
