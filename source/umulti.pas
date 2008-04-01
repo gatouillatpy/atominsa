@@ -661,6 +661,7 @@ Begin
                             nDisease[k, l] := -1;
                         End;
                     End;
+                    pGrid := CGrid.Create( pScheme );
                     m := 1;
                     For k := 1 To GRIDWIDTH Do Begin
                         For l := 1 To GRIDHEIGHT Do Begin

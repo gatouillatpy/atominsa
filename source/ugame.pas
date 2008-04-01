@@ -1395,7 +1395,6 @@ Begin
                    nDisease[i, j] := -1;
                End;
            End;
-           pGrid := CGrid.Create( pScheme );
            sData := '';
            For i := 1 To GRIDWIDTH Do Begin
                For j := 1 To GRIDHEIGHT Do Begin
