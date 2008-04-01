@@ -1435,7 +1435,7 @@ Begin
      End;
      
      // création de la grille en fonction du scheme
-     If ((bMulti = True) And (nLocalIndex = nPlayerClient[0])) Or (bMulti = False) Then pGrid := CGrid.Create( pScheme );
+     pGrid := CGrid.Create( pScheme );
 
      // création des bombermen
      pPlayer1 := NIL;
