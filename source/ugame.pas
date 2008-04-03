@@ -1404,7 +1404,7 @@ Begin
      End;
 
      // initialisation de la minuterie du round
-     If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Or (bMulti = False) Then fRoundTime := GetTime;
+     If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Or (bMulti = False) Then fRoundTime := GetTime();
 End;
 
 
@@ -1471,7 +1471,7 @@ Begin
 
      // initialisation du premier round
      nRound := 0;
-     InitRound();
+     If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Or (bMulti = False) Then InitRound();
      
      // initialisation du panneau d'affichage
      InitScreen();

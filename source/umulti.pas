@@ -698,6 +698,8 @@ Begin
                End;
                HEADER_ROUND :
                Begin
+                    fRoundTime := GetTime;
+                    InitRound();
                     For k := 1 To GRIDWIDTH Do Begin
                         For l := 1 To GRIDHEIGHT Do Begin
                             nDisease[k, l] := -1;
@@ -766,7 +768,6 @@ Begin
                             End;
                         End;
                     End;
-                    fRoundTime := GetTime;
                End;
                HEADER_BOMBERMAN :
                Begin
