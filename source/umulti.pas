@@ -629,7 +629,7 @@ Var nIndex : DWord;
     nBonus : Integer;
     _nNetID : Integer;
     sTemp : String;
-Var k, l, m : Integer;
+Var k, l, m, i : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
           Case nHeader Of
@@ -820,6 +820,33 @@ Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DoIgnition();
+               End;
+               HEADER_WAIT :
+               Begin
+                    l := 1;
+                    k := StrToInt( GetString( sData, l ) ); l += 1;
+                    If k = -1 Then Begin
+                       If GetBombermanCount() <> 0 Then Begin
+                          For i := 1 To GetBombermanCount() Do Begin
+                              GetBombermanByCount(i).Alive := False;
+                          End;
+                       End;
+                    End Else Begin
+                       If GetBombermanCount() <> 0 Then Begin
+                          For i := 1 To GetBombermanCount() Do Begin
+                              GetBombermanByCount(i).Alive := False;
+                          End;
+                       End;
+                       GetBombermanByCount(k).Alive := True;
+                    End;
+                    If GetBombermanCount() <> 0 Then Begin
+                       For i := 1 To GetBombermanCount() Do Begin
+                           GetBombermanByCount(i).Score := StrToInt( GetString( sData, l ) ); l += 1;
+                           GetBombermanByCount(i).Kills := StrToInt( GetString( sData, l ) ); l += 1;
+                           GetBombermanByCount(i).Deaths := StrToInt( GetString( sData, l ) ); l += 1;
+                       End;
+                    End;
+                    InitWait();
                End;
                HEADER_BOMB :
                Begin

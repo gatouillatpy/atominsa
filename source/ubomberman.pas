@@ -156,16 +156,16 @@ type
   property BIndex : integer Read nIndex Write nIndex;
   property Name : string Read sName Write sName;
   property Team : integer Read nTeam Write nTeam;
-  property Kills : integer Read nKills;
-  property Deaths : integer Read nDeaths;
-  property Score : integer Read nScore;
+  property Kills : integer Read nKills Write nKills;
+  property Deaths : integer Read nDeaths Write nDeaths;
+  property Score : integer Read nScore Write nScore;
   property AISkill : integer Read nAISkill;
 
 
   property BombCount : integer Read nBombCount Write nBombCount;
   property FlameSize : integer Read nFlameSize Write nFlameSize;
   property Speed : single Read fSpeed Write fSpeed;
-  property Alive : boolean Read bAlive;
+  property Alive : boolean Read bAlive Write bAlive;
   property NoBomb : Boolean Read bNoBomb Write bNoBomb;
   property Kick : boolean Read bCanKick;
   property Punch : Boolean Read bCanPunch;

@@ -1488,7 +1488,8 @@ End;
 
 
 Procedure ProcessGame () ;
-Var k : Integer;
+Var k, i : Integer;
+    sData : String;
 Begin
      // définition de la camera
      SetCamera();
@@ -1541,7 +1542,22 @@ Begin
      CheckTimer();
 
      // vérifie s'il reste des bomberman en jeu ou si la minuterie est à zéro
-     If (CheckEndGame() <> 0) Or (GetTime > fRoundTime + fRoundDuration + 3.0) Then InitWait();
+     If (CheckEndGame() <> 0) Or (GetTime > fRoundTime + fRoundDuration + 3.0) Then Begin
+        If (bMulti = False) Then Begin
+           InitWait();
+        End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+           InitWait();
+           sData := IntToStr(CheckEndGame()) + #31;
+           If GetBombermanCount() <> 0 Then Begin
+              For i := 1 To GetBombermanCount() Do Begin
+                  sData := sData + IntToStr(GetBombermanByCount(i).Score) + #31;
+                  sData := sData + IntToStr(GetBombermanByCount(i).Kills) + #31;
+                  sData := sData + IntToStr(GetBombermanByCount(i).Deaths) + #31;
+              End;
+           End;
+           Send( nLocalIndex, HEADER_WAIT, sData );
+        End;
+     End;
 End;
 
 
