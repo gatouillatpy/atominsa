@@ -628,6 +628,7 @@ Var nIndex : DWord;
     isBomb : Boolean;
     nBonus : Integer;
     _nNetID : Integer;
+    sTemp : String;
 Var k, l, m : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -823,7 +824,7 @@ Begin
                HEADER_BOMB :
                Begin
                     l := 1;
-                    For k := 1 To GetBombCount() Do Begin
+                    While ( GetString( sData, l ) <> 'NULL' ) Do Begin
                         _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
                         pBomb := GetBombByNetID( _nNetID );
                         If pBomb <> Nil Then Begin
