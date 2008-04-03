@@ -40,7 +40,8 @@ CBomb = Class(CBlock)
        procedure Jump(dt : Single);
 
      Public
-       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);Virtual;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
+       nNetID : Integer;
+       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);Virtual;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
        Destructor Destroy();Override;
        function UpdateBomb():boolean;virtual;                         // check le temps + mouvement
        procedure StartTime();
@@ -403,7 +404,7 @@ end;
 {*******************************************************************************}
 { Creation / destruction                                                        }
 {*******************************************************************************}
-constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
 var r : integer;
 begin
    if (aBombTime=BOMBTIME) and ( bMulti = false ) and ((random(100)+1)<=10)then
@@ -411,6 +412,7 @@ begin
    //play sound moisi !!!
 
    pUpCount        := UpCount;
+   nNetID          := _nNetID;
    pIsBomberman    := IsBomberman;
    bUpdateTime     := true;
    bExplosive      := true;                                                     //une bombe peut exploser

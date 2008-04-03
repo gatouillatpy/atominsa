@@ -14,7 +14,7 @@ type
         private
           bIgnition : boolean;
         public
-          Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);OverRide;
+          Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);OverRide;
           function UpdateBomb():boolean;override;
           procedure Ignition();
         end;
@@ -25,10 +25,10 @@ uses UListBomb;
 
 constructor CTriggerBomb.create(aX, aY: Single; aIndex, aBombSize: integer;
   aBombTime: Single; aGrid: CGrid; UpCount: LPUpCount;
-  IsBomberman: LPGetBomberman);
+  IsBomberman: LPGetBomberman; _nNetID : Integer);
 begin
   inherited create(aX, aY, aIndex, aBombSize, aBombTime, aGrid, UpCount,
-    IsBomberman);
+    IsBomberman, _nNetID);
   bIgnition    := false;
   bUpdateTime  := bIgnition;
   fExploseTime := 0.01;

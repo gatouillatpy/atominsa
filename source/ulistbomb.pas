@@ -20,7 +20,7 @@ Type LPBombItem = ^BombItem;
               end;
 
 
-    procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+    procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
     procedure RemoveBombByCount(i : integer);
     procedure RemoveBombByGridCoo(aX,aY : integer);
     procedure RemoveThisBomb(bomb: CBomb);
@@ -29,6 +29,7 @@ Type LPBombItem = ^BombItem;
     function GetBombCount():integer;
     function GetBombByCount(i : integer):CBomb;
     function GetBombByGridCoo(aX,aY : integer):CBomb;
+    function GetBombByNetID(_nNetID : integer):CBomb;
 
 implementation
 
@@ -50,7 +51,7 @@ Procedure UpdateCountList();Forward;                                 // pour lui
 { Ajout / Suppression                                                           }
 {*******************************************************************************}
 // ajout
-procedure AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aTrigger : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
+procedure AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aTrigger : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
 var pTemp : LPBombItem;
     sData : String;
 begin
@@ -59,9 +60,9 @@ begin
  begin
    New(pBombItem);
    pBombItem^.Next:=Nil;
-   if aJelly then pBombItem^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
-   else if aTrigger then pBombItem^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
-   else pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
+   if aJelly then pBombItem^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID)
+   else if aTrigger then pBombItem^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID)
+   else pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID);
    pBombItem^.Count:=BombCount;
  end
  else
@@ -73,13 +74,14 @@ begin
    pTemp:=pTemp^.Next;
    pTemp^.Count:=BombCount;
    pTemp^.Next:=Nil;
-   if aJelly then pTemp^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
-   else if aTrigger then pTemp^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman)
-   else pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman);
+   if aJelly then pTemp^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID)
+   else if aTrigger then pTemp^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID)
+   else pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID);
  end;
  
  If ( bMulti = true ) Then Begin
     sData := IntToStr(aIndex) + #31;
+    sData := sData + IntToStr(_nNetID) + #31;
     sData := sData + IntToStr(aBombSize) + #31;
     sData := sData + FloatToStr(aBombTime) + #31;
     sData := sData + FormatFloat('0.000',aX) + #31;
@@ -237,6 +239,31 @@ begin
   pTemp:=pTemp^.Next;
 
  result:=pTemp^.Bomb;
+end;
+end;
+
+
+
+function GetBombByNetID(_nNetID : integer):CBomb;
+var pTemp : LPBombItem;
+    Find, Last : Boolean;
+begin
+result:=Nil;
+if (pBombItem<>Nil) then
+begin
+ pTemp:=pBombItem;
+ Find:=(pTemp^.Bomb.nNetID=_nNetID);
+ Last:=(pTemp^.Next=Nil);
+
+ While Not(Find or Last) do
+ begin
+  pTemp:=pTemp^.Next;
+  Find:=(pTemp^.Bomb.nNetID=_nNetID);
+  Last:=(pTemp^.Next=Nil);
+ end;
+
+ if Find then result:=pTemp^.Bomb;
+
 end;
 end;
 

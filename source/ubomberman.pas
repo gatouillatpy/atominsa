@@ -891,7 +891,8 @@ begin
       uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
-      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo);
+
+      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
       DelTriggerBomb();
     end;//while
   end;//if uTriggerBomb
@@ -930,7 +931,7 @@ begin
       if uGrid.GetBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil then
       begin
         bTrigger := nTriggerBomb<>0;
-        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo);
+        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
         Dec(nBombCount);
         if bTrigger then
         begin
@@ -977,7 +978,7 @@ begin
               else
               begin
                 bTrigger := nTriggerBomb<>0;
-                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo);
+                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
                 Dec(nBombCount);
                 if bTrigger then
                 begin

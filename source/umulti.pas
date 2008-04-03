@@ -403,6 +403,7 @@ Var nIndex : DWord;
     pBomberman : CBomberman;
     pBomb : CBomb;
     fX, fY : Single;
+    _nNetID : Integer;
 Var k : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -568,12 +569,13 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
-                    pBomberman.nFlameSize := StrToInt( GetString( sData, 2 ) );
-                    pBomberman.fBombTime := StrToFloat( GetString( sData, 3 ) );
-                    fX := StrToFloat( GetString( sData, 4 ) );
-                    fY := StrToFloat( GetString( sData, 5 ) );
+                    _nNetID := StrToInt( GetString( sData, 2 ) );
+                    pBomberman.nFlameSize := StrToInt( GetString( sData, 3 ) );
+                    pBomberman.fBombTime := StrToFloat( GetString( sData, 4 ) );
+                    fX := StrToFloat( GetString( sData, 5 ) );
+                    fY := StrToFloat( GetString( sData, 6 ) );
                     If Not ( pGrid.GetBlock( Trunc( fX ),Trunc( fY ) ) Is CBomb ) Then Begin
-                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
+                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo, _nNetID);
                     End;
                     SendEx( nIndex, nHeader, sData );
                End;
@@ -600,9 +602,9 @@ Begin
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
 
         If GetBombCount() > 0 Then Begin
-           sData := IntToStr(GetBombCount()) + #31;
            For k := 1 To GetBombCount() Do Begin
                pBomb := GetBombByCount( k );
+               sData := sData + IntToStr(pBomb.nNetID) + #31;
                sData := sData + FloatToStr(pBomb.Position.x) + #31;
                sData := sData + FloatToStr(pBomb.Position.y) + #31;
            End;
@@ -624,7 +626,7 @@ Var nIndex : DWord;
     nX, nY : Integer;
     isBomb : Boolean;
     nBonus : Integer;
-    nBombCount : Integer;
+    _nNetID : Integer;
 Var k, l, m : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -802,12 +804,13 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
-                    pBomberman.nFlameSize := StrToInt( GetString( sData, 2 ) );
-                    pBomberman.fBombTime := StrToFloat( GetString( sData, 3 ) );
-                    fX := StrToFloat( GetString( sData, 4 ) );
-                    fY := StrToFloat( GetString( sData, 5 ) );
+                    _nNetID := StrToInt( GetString( sData, 2 ) );
+                    pBomberman.nFlameSize := StrToInt( GetString( sData, 3 ) );
+                    pBomberman.fBombTime := StrToFloat( GetString( sData, 4 ) );
+                    fX := StrToFloat( GetString( sData, 5 ) );
+                    fY := StrToFloat( GetString( sData, 6 ) );
                     If Not ( pGrid.GetBlock( Trunc( fX ),Trunc( fY ) ) Is CBomb ) Then Begin
-                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
+                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo, _nNetID);
                     End;
                End;
                HEADER_ACTION1 :
@@ -819,11 +822,9 @@ Begin
                HEADER_BOMB :
                Begin
                     l := 1;
-                    nBombCount := StrToInt( GetString( sData, l ) ); l += 1;
-                    If ( GetBombCount() < nBombCount ) Then
-                       nBombCount := GetBombCount();
-                    For k := 1 To nBombCount Do Begin
-                        pBomb := GetBombByCount( k );
+                    For k := 1 To GetBombCount() Do Begin
+                        _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
+                        pBomb := GetBombByNetID( _nNetID );
                         If pBomb <> Nil Then Begin
                            fX := StrToFloat( GetString( sData, l ) ); l += 1;
                            fY := StrToFloat( GetString( sData, l ) ); l += 1;
