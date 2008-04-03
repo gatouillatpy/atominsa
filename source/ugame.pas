@@ -1387,9 +1387,11 @@ Begin
                            sData := sData + IntToStr( k + 100 * l + 10000 * i );
                            sData := sData + #31;
                       End
-                      Else Begin                  // Cela ne devrait jamais arriver...
-                           sData := sData + IntToStr( POWERUP_RANDOM );
+                      Else Begin                  // Cela ne devrait jamais arriver... et poutant : POWERUP_RANDOM
+                           sData := sData + IntToStr( POWERUP_FLAMEUP );
                            sData := sData + #31;
+                           pGrid.aBlock[i, j].Destroy();
+                           pGrid.aBlock[i, j] := CFlameUp.Create(i,j);
                       End;
                    End;
                End;
@@ -1400,7 +1402,7 @@ Begin
      End;
 
      // initialisation de la minuterie du round
-     fRoundTime := GetTime;
+     If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Or (bMulti = False) Then fRoundTime := GetTime;
 End;
 
 

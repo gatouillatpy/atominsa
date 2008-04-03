@@ -17,6 +17,8 @@ Uses Classes, SysUtils, UJellyBomb, UPunch, USpoog, UGoldFLame, UTrigger, UTrigg
 Var nClientCount : Integer;
 Var nClientIndex : Array [0..255] Of Integer;
 Var sClientName : Array [0..255] Of String;
+Var fPingTime, fPing : Single;
+Var fPlayerPing : Array [1..8] Of Single;
 
 
 
@@ -482,6 +484,11 @@ Begin
                     Send( nIndex, nHeader, sData );
                     UpdateMenu();
                End;
+               HEADER_PINGREQ :
+               Begin
+                    sData := '';
+                    SendTo( nIndex, HEADER_PINGRES, sData );
+               End;
                HEADER_UPDATE :
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
@@ -657,6 +664,12 @@ Begin
                Begin
                     nGame := GAME_INIT;
                End;
+               HEADER_PINGRES :
+               Begin
+                    fPing := (GetTime - fPingTime) * 500;
+                    sData := FloatToStr(fPing) + #31;
+                    Send( nLocalIndex, HEADER_PINGRES, sData );
+               End;
                HEADER_ROUND :
                Begin
                     For k := 1 To GRIDWIDTH Do Begin
@@ -727,6 +740,7 @@ Begin
                             End;
                         End;
                     End;
+                    fRoundTime := GetTime;
                End;
                HEADER_BOMBERMAN :
                Begin
@@ -779,6 +793,12 @@ Begin
                     End;
                End;
           End;
+     End;
+     
+     If (nGame = GAME_ROUND) And (GetTime > fPingTime + 1.0) Then Begin
+        sData := '';
+        Send( nLocalIndex, HEADER_PINGREQ, sData );
+        fPingTime := GetTime;
      End;
 End;
 

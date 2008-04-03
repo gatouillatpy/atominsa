@@ -27,6 +27,8 @@ Const HEADER_UPDATE            = 1303;
 Const HEADER_SETUP             = 1304;
 Const HEADER_FIGHT             = 1305;
 Const HEADER_ROUND             = 1306;
+Const HEADER_PINGREQ           = 1307;
+Const HEADER_PINGRES           = 1308;
 
 Const HEADER_MOVEUP            = 1401;
 Const HEADER_MOVEDOWN          = 1402;
@@ -292,6 +294,7 @@ Function GetPacket ( Var nIndex : DWord ; Var nHeader : Integer ; Var sData : St
 
 Procedure Send ( nIndex : DWord ; nHeader : Integer ; sData : String );
 Procedure SendEx ( nIndex : DWord ; nHeader : Integer ; sData : String );
+Procedure SendTo ( nIndex : DWord ; nHeader : Integer ; sData : String );
 
 Function ServerInit ( Const nPort : Word ) : Boolean ;
 Procedure ServerTerminate () ;
@@ -420,6 +423,17 @@ Begin
      End Else Begin
         For k := 0 To nSocket Do
             If aSocket[k].Connected And (nIndex <> nClientIndex[k]) Then aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
+     End;
+End;
+
+Procedure SendTo ( nIndex : DWord ; nHeader : Integer ; sData : String );
+Var k : Integer;
+Begin
+     If nSocket = -1 Then Begin
+        If pTCP.Connected Then pTCP.SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
+     End Else Begin
+        For k := 0 To nSocket Do
+            If aSocket[k].Connected And (nIndex = nClientIndex[k]) Then aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
      End;
 End;
 
