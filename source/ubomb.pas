@@ -67,7 +67,7 @@ end;
 
 
 implementation
-uses UItem, UListBomb;
+uses UItem, UListBomb, UGame;
 
 
 
@@ -406,7 +406,7 @@ end;
 constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman);
 var r : integer;
 begin
-   if (aBombTime=BOMBTIME) and ((random(100)+1)<=10)then
+   if (aBombTime=BOMBTIME) and ( bMulti = false ) and ((random(100)+1)<=10)then
       aBombtime := (random(200)+1)*BOMBTIME/100;
    //play sound moisi !!!
 

@@ -575,6 +575,12 @@ Begin
                     End;
                     SendEx( nIndex, nHeader, sData );
                End;
+               HEADER_ACTION1 :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    pBomberman.DoIgnition();
+               End;
           End;
      End;
      
@@ -702,7 +708,7 @@ Begin
                     InitRound();
                     For k := 1 To GRIDWIDTH Do Begin
                         For l := 1 To GRIDHEIGHT Do Begin
-                            nDisease[k, l] := -1;
+                            numDisease[k, l] := -1;
                         End;
                     End;
                     m := 1;
@@ -723,7 +729,7 @@ Begin
                                     POWERUP_DISEASE         : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
                                                                    pGrid.aBlock[k,l] := CDisease.Create(k,l);
-                                                                   nDisease[k,l] := StrToInt( GetString( sData, m ) );
+                                                                   numDisease[k,l] := StrToInt( GetString( sData, m ) );
                                                                    m += 1;
                                                               End;
                                     POWERUP_KICK            : Begin
@@ -761,7 +767,7 @@ Begin
                                     POWERUP_SUPERDISEASE    : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
                                                                    pGrid.aBlock[k,l] := CSuperDisease.Create(k,l);
-                                                                   nDisease[k,l] := StrToInt( GetString( sData, m ) );
+                                                                   numDisease[k,l] := StrToInt( GetString( sData, m ) );
                                                                    m += 1;
                                                               End;
                                End;

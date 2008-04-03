@@ -106,7 +106,7 @@ Var pPlayer1 : CBomberman;
     pPlayer2 : CBomberman;
     
     
-Var nDisease : Array [1..GRIDWIDTH, 1..GRIDHEIGHT] Of Integer;
+Var numDisease : Array [1..GRIDWIDTH, 1..GRIDHEIGHT] Of Integer;
 
 
 
@@ -1320,7 +1320,7 @@ Begin
         If nLocalIndex = nClientIndex[0] Then Begin
           For i := 1 To GRIDWIDTH Do Begin
                For j := 1 To GRIDHEIGHT Do Begin
-                   nDisease[i, j] := -1;
+                   numDisease[i, j] := -1;
                End;
            End;
            sData := '';
@@ -1338,8 +1338,8 @@ Begin
                       Else If ( pGrid.GetBlock(i, j) Is CDisease ) Then Begin // Attention : Plusieurs types de maladies.
                            sData := sData + IntToStr( POWERUP_DISEASE );
                            sData := sData + #31;
-                           nDisease[i, j] := Random(DISEASECOUNT) + 1;
-                           sData := sData + IntToStr( nDisease[i, j] );
+                           numDisease[i, j] := Random(DISEASECOUNT) + 1;
+                           sData := sData + IntToStr( numDisease[i, j] );
                            sData := sData + #31;
                       End
                       Else If ( pGrid.GetBlock(i, j) Is CKick ) Then Begin
@@ -1386,6 +1386,7 @@ Begin
                            Repeat
                                  m := Random(DISEASECOUNT)+1;
                            Until ( m <> k ) And ( m <> l ) And ( m <> DISEASE_SWITCH );
+                           numDisease[i, j] := k + 100 * l + 10000 * i;
                            sData := sData + IntToStr( k + 100 * l + 10000 * i );
                            sData := sData + #31;
                       End

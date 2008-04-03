@@ -217,7 +217,7 @@ type
 
 
 implementation
-uses uForm,uCore,uItem,uDisease,UGame,Classes,SysUtils,USetup;
+uses uForm,uCore,uItem,uDisease,UGame,Classes,SysUtils,USetup,USuperDisease;
 
 
 
@@ -873,9 +873,9 @@ var sData : String;
 begin
   GetTargetTriggerBomb.Ignition();
   DelTriggerBomb();
-  If ( bMulti = true ) Then Begin
+  If ( bMulti = true ) And ( nPlayerClient[nIndex] = nLocalIndex ) Then Begin
      sData := IntToStr( nIndex ) + #31;
-     Send( nLocalIndex, HEADER_ACTION1, sData );
+     SendEx( nLocalIndex, HEADER_ACTION1, sData );
   End;
 end;
 
@@ -1229,50 +1229,36 @@ end;
 {*******************************************************************************}
 procedure CBomberman.CheckBonus();
 var oldX, oldY : integer;
+    aDisease : CDisease;
 begin
   if Not(uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil) then
     if (uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5)) is CItem) then    // PLANTE REGULIEREMENT ICI!!!!
       begin
          oldX:=Trunc(fPosition.x+0.5);                                                   //a cause de la maladie SWITCH il faut se souvenir de ou il etait
          oldY:=Trunc(fPosition.y+0.5);                                                   //avant de prendre le bonus
-      {  If ( bMulti = false ) Or Not ( ( uGrid.GetBlock(oldX,oldY) is CDisease )
+         If ( bMulti = false ) Or Not ( ( uGrid.GetBlock(oldX,oldY) is CDisease )
          Or ( uGrid.GetBlock(oldX, oldY ) is CSuperDisease ) ) Then
             CItem(uGrid.getBlock(oldX,oldY)).Bonus(Self)
          Else Begin
               If ( uGrid.GetBlock(oldX,oldY) is CDisease ) Then Begin
                  If ( DiseaseNumber = 0 )
-                 Or ( nDisease[Trunc(nPlayer.Position.X + 0.5), Trunc(nPlayer.Position.Y + 0.5)] = DISEASE_SWITCH ) Then Begin
-                      CDisease(uGrid.getBlock(oldX,oldY)).BonusForced(nPlayer,nDisease[Trunc(nPlayer.Position.X + 0.5), Trunc(nPlayer.Position.Y + 0.5)]);
-                 End
-                 Else
-                     aBonus.Destroy();
-         End;}
-         CItem(uGrid.getBlock(oldX,oldY)).Bonus(Self);
+                 Or ( numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)] = DISEASE_SWITCH ) Then Begin
+                      aDisease := CDisease.Create(0,0);
+                      aDisease.BonusForced(Self,numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)]);
+                 End;
+                 // Else CDisease(uGrid.getBlock(oldX,oldY)).Destroy();
+              End;
+              If ( uGrid.GetBlock(oldX,oldY) is CSuperDisease ) Then Begin
+                 aDisease := CDisease.Create(0,0);
+                 aDisease.BonusForced(Self,numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)] mod 100);
+                 aDisease := CDisease.Create(0,0);
+                 aDisease.BonusForced(Self,( numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)] mod 10000 ) div 100);
+                 aDisease := CDisease.Create(0,0);
+                 aDisease.BonusForced(Self,numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)] div 10000);
+              End;
+         End;
+         // CItem(uGrid.getBlock(oldX,oldY)).Bonus(Self);
          uGrid.DelBlock(oldX,oldY);
-         {  If ( bMulti = false ) Or ( ( r <> POWERUP_DISEASE ) And ( r <> POWERUP_SUPERDISEASE ) ) Then
-       aBonus.Bonus(nPlayer)
-    Else Begin
-         If ( r = POWERUP_DISEASE ) Then Begin
-            If ( nPlayer.DiseaseNumber = 0 )
-            Or ( nDisease[Trunc(nPlayer.Position.X + 0.5), Trunc(nPlayer.Position.Y + 0.5)] = DISEASE_SWITCH) Then Begin
-               aDisease := CDisease.Create(0,0);
-               aDisease.BonusForced(nPlayer,nDisease[Trunc(nPlayer.Position.X + 0.5), Trunc(nPlayer.Position.Y + 0.5)]);
-            End
-            Else
-                aBonus.Destroy();
-         End;
-         If ( r = POWERUP_SUPERDISEASE ) Then Begin
-            aDisease := CDisease.Create(0,0);
-            numDisease := nDisease[Trunc(nPlayer.Position.X + 0.5), Trunc(nPlayer.Position.Y + 0.5)] mod 100;
-            aDisease.BonusForced(nPlayer,numDisease);
-            aDisease := CDisease.Create(0,0);
-            numDisease := ( nDisease[Trunc(nPlayer.Position.X + 0.5), Trunc(nPlayer.Position.Y + 0.5)] mod 10000 ) div 100;
-            aDisease.BonusForced(nPlayer,numDisease);
-            aDisease := CDisease.Create(0,0);
-            numDisease := nDisease[Trunc(nPlayer.Position.X + 0.5), Trunc(nPlayer.Position.Y + 0.5)] div 10000;
-            aDisease.BonusForced(nPlayer,numDisease);
-         End;
-    End;   }
       end;
 end;
 
