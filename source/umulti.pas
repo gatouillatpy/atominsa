@@ -592,7 +592,7 @@ Begin
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
 
         If GetBombCount() > 0 Then Begin
-           sData := '';
+           sData := IntToStr(GetBombCount()) + #31;
            For k := 1 To GetBombCount() Do Begin
                pBomb := GetBombByCount( k );
                sData := sData + FloatToStr(pBomb.Position.x) + #31;
@@ -616,6 +616,7 @@ Var nIndex : DWord;
     nX, nY : Integer;
     isBomb : Boolean;
     nBonus : Integer;
+    nBombCount : Integer;
 Var k, l, m : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -807,7 +808,10 @@ Begin
                HEADER_BOMB :
                Begin
                     l := 1;
-                    For k := 1 To GetBombCount() Do Begin
+                    nBombCount := StrToInt( GetString( sData, l ) ); l += 1;
+                    If ( GetBombCount() < nBombCount ) Then
+                       nBombCount := GetBombCount();
+                    For k := 1 To nBombCount Do Begin
                         pBomb := GetBombByCount( k );
                         If pBomb <> Nil Then Begin
                            fX := StrToFloat( GetString( sData, l ) ); l += 1;
