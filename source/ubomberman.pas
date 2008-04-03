@@ -863,7 +863,10 @@ end;
 
 function CBomberman.GetTargetTriggerBomb(): CTriggerBomb;
 begin
-  result:=(uTriggerBomb^.Bomb as CTriggerBomb);
+     if (uTriggerBomb = nil) then
+        result := nil
+     else
+        result:=(uTriggerBomb^.Bomb as CTriggerBomb);
 end;
 
 
@@ -871,12 +874,14 @@ end;
 procedure CBomberman.DoIgnition();
 var sData : String;
 begin
-  GetTargetTriggerBomb.Ignition();
-  DelTriggerBomb();
-  If ( bMulti = true ) And ( nPlayerClient[nIndex] = nLocalIndex ) Then Begin
-     sData := IntToStr( nIndex ) + #31;
-     SendEx( nLocalIndex, HEADER_ACTION1, sData );
-  End;
+     if GetTargetTriggerBomb <> nil then begin
+        GetTargetTriggerBomb.Ignition();
+        DelTriggerBomb();
+        If ( bMulti = true ) And ( nPlayerClient[nIndex] = nLocalIndex ) Then Begin
+           sData := IntToStr( nIndex ) + #31;
+           SendEx( nLocalIndex, HEADER_ACTION1, sData );
+        End;
+     end;
 end;
 
 procedure CBomberman.TriggerToNormalBomb();

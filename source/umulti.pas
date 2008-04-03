@@ -602,6 +602,7 @@ Begin
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
 
         If GetBombCount() > 0 Then Begin
+           sData := '';
            For k := 1 To GetBombCount() Do Begin
                pBomb := GetBombByCount( k );
                sData := sData + IntToStr(pBomb.nNetID) + #31;
