@@ -18,7 +18,6 @@ type
 
   CBomberman = class
   public
-    procedure DoIgnition();
     fCX, fCY,                    // coordonnées ciblées par l'intelligence artificielle
     fLX, fLY : Single;           // dernières coordonnées
     fDanger,                     // danger aux coordonnées courantes
@@ -94,6 +93,7 @@ type
     procedure AddTriggerBomb();
     procedure DelTriggerBomb();
     procedure TriggerToNormalBomb();
+    procedure DoIgnition();
 
     
     function TestBomb(aX,aY : integer):boolean;
@@ -869,9 +869,14 @@ end;
 
 
 procedure CBomberman.DoIgnition();
+var sData : String;
 begin
   GetTargetTriggerBomb.Ignition();
   DelTriggerBomb();
+  If ( bMulti = true ) Then Begin
+     sData := IntToStr( nIndex ) + #31;
+     Send( nLocalIndex, HEADER_ACTION1, sData );
+  End;
 end;
 
 procedure CBomberman.TriggerToNormalBomb();

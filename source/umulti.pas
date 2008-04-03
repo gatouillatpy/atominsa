@@ -681,7 +681,7 @@ Begin
                                                               End;
                                     POWERUP_DISEASE         : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
-                                                                   pGrid.aBlock[k,l] := CFlameUp.Create(k,l);
+                                                                   pGrid.aBlock[k,l] := CDisease.Create(k,l);
                                                                    nDisease[k,l] := StrToInt( GetString( sData, m ) );
                                                                    m += 1;
                                                               End;
@@ -695,7 +695,7 @@ Begin
                                                               End;
                                     POWERUP_PUNCH           : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
-                                                                   pGrid.aBlock[k,l] := CFlameUp.Create(k,l);
+                                                                   pGrid.aBlock[k,l] := CPunch.Create(k,l);
                                                               End;
                                     POWERUP_GRAB            : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
@@ -758,6 +758,12 @@ Begin
                     If Not ( pGrid.GetBlock( Trunc( fX ),Trunc( fY ) ) Is CBomb ) Then Begin
                        AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo);
                     End;
+               End;
+               HEADER_ACTION1 :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    pBomberman.DoIgnition();
                End;
                HEADER_BOMB :
                Begin
