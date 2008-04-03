@@ -1241,6 +1241,7 @@ begin
             CItem(uGrid.getBlock(oldX,oldY)).Bonus(Self)
          Else Begin
               If ( uGrid.GetBlock(oldX,oldY) is CDisease ) Then Begin
+                 SetString( STRING_NOTIFICATION, Name + ' has picked up a disease.', 0.0, 0.2, 5 );
                  If ( DiseaseNumber = 0 )
                  Or ( numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)] = DISEASE_SWITCH ) Then Begin
                       aDisease := CDisease.Create(0,0);
@@ -1249,6 +1250,7 @@ begin
                  // Else CDisease(uGrid.getBlock(oldX,oldY)).Destroy();
               End;
               If ( uGrid.GetBlock(oldX,oldY) is CSuperDisease ) Then Begin
+                 SetString( STRING_NOTIFICATION, Name + ' has picked up a super disease.', 0.0, 0.2, 5 );
                  aDisease := CDisease.Create(0,0);
                  aDisease.BonusForced(Self,numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)] mod 100);
                  aDisease := CDisease.Create(0,0);

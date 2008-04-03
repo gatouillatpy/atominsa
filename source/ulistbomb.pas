@@ -80,6 +80,8 @@ begin
  
  If ( bMulti = true ) Then Begin
     sData := IntToStr(aIndex) + #31;
+    sData := sData + IntToStr(aBombSize) + #31;
+    sData := sData + FloatToStr(aBombTime) + #31;
     sData := sData + FormatFloat('0.000',aX) + #31;
     sData := sData + FormatFloat('0.000',aY) + #31;
     Send( nLocalIndex, HEADER_ACTION0, sData );
