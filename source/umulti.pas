@@ -499,10 +499,10 @@ Begin
                HEADER_PINGRES :
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
-                    fPlayerPing[k] := StrToInt( GetString( sData, 2 ) );
+                    fPlayerPing[k] := StrToFloat( GetString( sData, 2 ) );
                     sData := '';
                     For k := 1 To 8 Do Begin
-                        sData := sData + fPlayerPing[k] + #31;
+                        sData := sData + FloatToStr(fPlayerPing[k]) + #31;
                     End;
                     Send( nIndex, HEADER_PINGARY, sData );
                End;

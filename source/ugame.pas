@@ -1179,6 +1179,7 @@ End;
 Procedure ProcessWait () ;
 Var w, h : Single;
     i : Integer;
+    sData : String;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -1215,7 +1216,11 @@ Begin
         For i := 1 To GetBombermanCount() Do
             DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.7 - 0.2 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
-     If GetKey(KEY_ENTER) Then InitRound(); // player ready en multiplayer
+     If GetKey(KEY_ENTER) Then Begin
+       If (bMulti = False) Or ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+          InitRound();
+       End;
+     End;
 End;
 
 
@@ -1995,7 +2000,11 @@ Procedure InitMenu () ;
 Var k : Integer;
 Begin
      // ajout du titre
-     SetString( STRING_GAME_MENU(1), 'practice', 0.2, 0.2, 600 );
+     If (bMulti = True) Then Begin
+          SetString( STRING_GAME_MENU(1), '  multi', 0.2, 0.2, 600 );
+     End Else Begin
+          SetString( STRING_GAME_MENU(1), 'practice', 0.2, 0.2, 600 );
+     End;
 
      // ajout de la liste de joueurs
      SetString( STRING_GAME_MENU(11), PlayerInfo(1), 0.2, 1.0, 600 );
