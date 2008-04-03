@@ -423,7 +423,8 @@ Begin
         If pTCP.Connected Then pTCP.SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
      End Else Begin
         For k := 0 To nSocket Do
-            If aSocket[k].Connected And (nIndex <> nClientIndex[k]) Then aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
+            If aSocket[k].Connected And (nIndex <> nClientIndex[k]) Then
+               aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
      End;
 End;
 
@@ -434,7 +435,8 @@ Begin
         If pTCP.Connected Then pTCP.SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
      End Else Begin
         For k := 0 To nSocket Do
-            If aSocket[k].Connected And (nIndex = nClientIndex[k]) Then aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
+            If aSocket[k].Connected And (nIndex = nClientIndex[k]) Then
+               aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
      End;
 End;
 

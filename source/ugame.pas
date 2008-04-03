@@ -1284,6 +1284,8 @@ Begin
      // ajout d'un round
      nRound += 1;
 
+     fPingTime := GetTime();
+     
      // affectation des touches au joueur 1
      If pPlayer1 <> NIL Then Begin
         BindKeyObj( nKey1MoveUp, True, False, @pPlayer1.MoveUp );
@@ -1947,7 +1949,11 @@ Procedure UpdateMenu () ;
 Var k : Integer;
 Begin
      // ajout du titre
-     SetString( STRING_GAME_MENU(1), 'practice', 0.0, 0.02, 600 );
+     If (bMulti = True) Then Begin
+          SetString( STRING_GAME_MENU(1), '  multi', 0.0, 0.02, 600 );
+     End Else Begin
+          SetString( STRING_GAME_MENU(1), 'practice', 0.0, 0.02, 600 );
+     End;
 
      // ajout de la liste de joueurs
      SetString( STRING_GAME_MENU(11), PlayerInfo(1), 0.0, 0.02, 600 );
