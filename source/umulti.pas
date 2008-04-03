@@ -18,7 +18,6 @@ Var nClientCount : Integer;
 Var nClientIndex : Array [0..255] Of Integer;
 Var sClientName : Array [0..255] Of String;
 Var fPingTime, fPing : Single;
-Var fPlayerPing : Array [1..8] Of Single;
 
 
 
@@ -379,6 +378,14 @@ End;
 
 
 
+Function PlayerIndex( nIndex : DWord ) : Integer ;
+Var k : Integer;
+Begin
+     PlayerIndex := -1;
+     For k := 1 To 8 Do
+         If nPlayerClient[k] = nIndex Then PlayerIndex := k;
+End;
+
 Function ClientIndex( nIndex : DWord ) : Integer ;
 Var k : Integer;
 Begin
@@ -488,6 +495,16 @@ Begin
                Begin
                     sData := '';
                     SendTo( nIndex, HEADER_PINGRES, sData );
+               End;
+               HEADER_PINGRES :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    fPlayerPing[k] := StrToInt( GetString( sData, 2 ) );
+                    sData := '';
+                    For k := 1 To 8 Do Begin
+                        sData := sData + fPlayerPing[k] + #31;
+                    End;
+                    Send( nIndex, HEADER_PINGARY, sData );
                End;
                HEADER_UPDATE :
                Begin
@@ -667,8 +684,16 @@ Begin
                HEADER_PINGRES :
                Begin
                     fPing := (GetTime - fPingTime) * 500;
-                    sData := FloatToStr(fPing) + #31;
+                    sData := IntToStr(nPlayer) + #31;
+                    sData := sData + FloatToStr(fPing) + #31;
                     Send( nLocalIndex, HEADER_PINGRES, sData );
+               End;
+               HEADER_PINGARY :
+               Begin
+                    l := 1;
+                    For k := 1 To 8 Do Begin
+                        fPlayerPing[k] := StrToFloat( GetString( sData, l ) ); l += 1;
+                    End;
                End;
                HEADER_ROUND :
                Begin

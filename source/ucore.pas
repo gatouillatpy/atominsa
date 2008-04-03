@@ -29,6 +29,7 @@ Const HEADER_FIGHT             = 1305;
 Const HEADER_ROUND             = 1306;
 Const HEADER_PINGREQ           = 1307;
 Const HEADER_PINGRES           = 1308;
+Const HEADER_PINGARY           = 1309;
 
 Const HEADER_MOVEUP            = 1401;
 Const HEADER_MOVEDOWN          = 1402;

@@ -903,10 +903,10 @@ Begin
         If Not bScoreTable Then Begin
            If GetBombermanCount() <> 0 Then
               For i := 1 To GetBombermanCount() Do
-              begin
+              Begin
                   aBomberman := GetBombermanByCount(i);
-                  SetString( STRING_SCORE_TABLE(i), aBomberman.Name + Format(' : %2d ; %d kill(s), %d death(s).', [aBomberman.Score, aBomberman.Kills, aBomberman.Deaths]), Single(i) * 0.1 + 0.1, 1.0, 20 );
-              end;
+                  SetString( STRING_SCORE_TABLE(i), aBomberman.Name + Format(' : %2d ; %d kill(s), %d death(s). (%.2f ms)', [aBomberman.Score, aBomberman.Kills, aBomberman.Deaths, fPlayerPing[i]]), Single(i) * 0.1 + 0.1, 1.0, 20 );
+              End;
         End;
         If GetBombermanCount() <> 0 Then
            For i := 1 To GetBombermanCount() Do
@@ -2247,6 +2247,8 @@ Begin
                 If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
                     nGame := GAME_INIT;
                     Send( nLocalIndex, HEADER_FIGHT, sData );
+                End Else If (bMulti = False) Then Begin
+                    nGame := GAME_INIT;
                 End;
            End;
        End;

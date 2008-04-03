@@ -68,6 +68,7 @@ Var sPlayerName : Array [1..8] Of String;
 Var nPlayerType : Array [1..8] Of Integer;
 Var nPlayerSkill : Array [1..8] Of Integer;
 Var nPlayerClient : Array [1..8] Of Integer;
+Var fPlayerPing : Array [1..8] Of Single;
 
 Var nKey1Primary : Integer;
 Var nKey1Secondary : Integer;
