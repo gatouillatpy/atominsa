@@ -1010,10 +1010,12 @@ begin
   if ((_X=aX) or (_Y=aY)) then
   begin
    _Bomb:=GetBombByGridCoo(aX,aY);
-   if dX=1 then _Bomb.MoveRight(dt)
-   else if dX=-1 then _Bomb.MoveLeft(dt)
-   else if dY=1 then _Bomb.MoveDown(dt)
-   else if dY=-1 then _Bomb.MoveUp(dt);
+   If Not( _Bomb = nil ) Then Begin
+      if dX=1 then _Bomb.MoveRight(dt)
+      else if dX=-1 then _Bomb.MoveLeft(dt)
+      else if dY=1 then _Bomb.MoveDown(dt)
+      else if dY=-1 then _Bomb.MoveUp(dt);
+   End;
   end;
 end;
 

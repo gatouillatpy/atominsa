@@ -832,6 +832,8 @@ Begin
                            fY := StrToFloat( GetString( sData, l ) ); l += 1;
                            pBomb.Position.x := fX;
                            pBomb.Position.y := fY;
+                        End Else Begin
+                            l += 2;
                         End;
                     End;
                End;
