@@ -217,7 +217,7 @@ type
 
 
 implementation
-uses uForm,uCore,uItem,uDisease,UGame,Classes,SysUtils,USetup,USuperDisease;
+uses uForm,uCore,uItem,uDisease,UGame,Classes,SysUtils,USetup,USuperDisease, UMulti;
 
 
 
