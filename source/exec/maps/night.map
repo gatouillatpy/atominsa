@@ -1,0 +1,36 @@
+
+; NOTE! This is an atominsa Map File.
+; Modify at your own risk. It is machine-generated and updated.
+
+
+; version control number
+-V,2
+
+; map name
+-N,Night
+
+; solid block mesh
+-M,solid,./night/solid.m12
+
+; brick block mesh
+-M,brick,./night/brick.m12
+
+; plane mesh
+-M,plane,./night/plane.m12
+
+; solid block texture
+-T,solid,./night/solid.jpg
+
+; brick block texture
+-T,brick,./night/brick.jpg
+
+; plane texture
+-T,plane,./night/plane.jpg
+
+; skybox textures
+-S,bottom,./night/sb-bottom.jpg
+-S,top,./night/sb-top.jpg
+-S,front,./night/sb-front.jpg
+-S,back,./night/sb-back.jpg
+-S,left,./night/sb-left.jpg
+-S,right,./night/sb-right.jpg
