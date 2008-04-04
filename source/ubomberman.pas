@@ -805,10 +805,12 @@ procedure CBomberman.Dead();
 begin
 if bAlive then
  begin
-  bAlive:=False;
-  Inc(nDeaths);
-  fPosition.x:=0;
-  fPosition.y:=0;
+  If ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+     bAlive:=False;
+     Inc(nDeaths);
+     fPosition.x:=0;
+     fPosition.y:=0;
+  End;
  end;
 end;
 
