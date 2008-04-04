@@ -441,7 +441,7 @@ Randomize;
    And ( sum < 1024 )
    And ( ( nSkill <> SKILL_GODLIKE ) Or ( pBomberman.ExploseBombTime >= 3 ) )
    And ( PutBomb( Trunc( pBomberman.Position.X + 0.5), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill ) = true ) Then
-       pBomberman.CreateBomb( GetDelta );
+       pBomberman.CreateBomb( GetDelta, Random( 1000000000 ) );
 
      
      

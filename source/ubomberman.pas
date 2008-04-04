@@ -116,7 +116,7 @@ type
   procedure MoveDown(dt : Single);cdecl;
   procedure MoveLeft(dt : Single);cdecl;
   procedure MoveRight(dt : Single);cdecl;
-  procedure CreateBomb(dt : Single);cdecl;
+  procedure CreateBomb(dt : Single; nNetID : Integer);cdecl;
   procedure Update(dt : Single);
   procedure UpKills();
   procedure DownKills();
@@ -925,7 +925,7 @@ end;
 
 
 
-procedure CBomberman.CreateBomb(dt : Single); cdecl;
+procedure CBomberman.CreateBomb(dt : Single; nNetID : Integer); cdecl;
 var aX, aY, dX, dY : integer;
     bTrigger, Stop : boolean;
 begin
@@ -936,7 +936,7 @@ begin
       if uGrid.GetBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil then
       begin
         bTrigger := nTriggerBomb<>0;
-        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
+        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID);
         Dec(nBombCount);
         if bTrigger then
         begin
@@ -1212,7 +1212,7 @@ procedure CBomberman.Update(dt : Single);
 begin
   CheckBonus;
   if nDisease<>0 then ContaminateBomberman();
-  if bEjectBomb then CreateBomb(dt);
+  if bEjectBomb then CreateBomb(dt, Random(1000000000));
   if (uGrabbedBomb<>nil) then
   begin
     uGrabbedBomb.Position.x:=fPosition.x;
@@ -1382,7 +1382,7 @@ begin
   if ((uGrabbedBomb=Nil) and Not(bPrimaryPressed)) then
   begin
     if bCanGrabBomb then GrabBomb();
-    if (uGrabbedBomb=nil) then CreateBomb(dt);
+    if (uGrabbedBomb=nil) then CreateBomb(dt, Random(1000000000));
   end;
   
   bPrimaryPressed := true;

@@ -570,14 +570,9 @@ Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
                     _nNetID := StrToInt( GetString( sData, 2 ) );
-                    pBomberman.nFlameSize := StrToInt( GetString( sData, 3 ) );
-                    pBomberman.fBombTime := StrToFloat( GetString( sData, 4 ) );
-                    fX := StrToFloat( GetString( sData, 5 ) );
-                    fY := StrToFloat( GetString( sData, 6 ) );
-                    If Not ( pGrid.GetBlock( Trunc( fX ),Trunc( fY ) ) Is CBomb ) Then Begin
-                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo, _nNetID);
+                    If Not ( pGrid.GetBlock( Trunc(pBomberman.Position.X + 0.5), Trunc(pBomberman.Position.Y + 0.5) ) Is CBomb ) Then Begin
+                       pBomberman.CreateBomb(GetDelta, _nNetID);
                     End;
-                    SendEx( nIndex, nHeader, sData );
                End;
                HEADER_ACTION1 :
                Begin
@@ -807,12 +802,8 @@ Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
                     _nNetID := StrToInt( GetString( sData, 2 ) );
-                    pBomberman.nFlameSize := StrToInt( GetString( sData, 3 ) );
-                    pBomberman.fBombTime := StrToFloat( GetString( sData, 4 ) );
-                    fX := StrToFloat( GetString( sData, 5 ) );
-                    fY := StrToFloat( GetString( sData, 6 ) );
-                    If Not ( pGrid.GetBlock( Trunc( fX ),Trunc( fY ) ) Is CBomb ) Then Begin
-                       AddBomb(fX,fY,k,pBomberman.nFlameSize,pBomberman.fBombTime,pBomberman.bJelly,pBomberman.nTriggerBomb<>0,pBomberman.uGrid,@pBomberman.UpBombCount,@IsBombermanAtCoo, _nNetID);
+                    If Not ( pGrid.GetBlock( Trunc(pBomberman.Position.X + 0.5), Trunc(pBomberman.Position.Y + 0.5) ) Is CBomb ) Then Begin
+                       pBomberman.CreateBomb(GetDelta, _nNetID);
                     End;
                End;
                HEADER_ACTION1 :
