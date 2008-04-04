@@ -1162,7 +1162,8 @@ Begin
         SetString( STRING_SCORE_TABLE(0), 'draw game!', 1.0, 0.5, 300.0 );
      End Else Begin
         SetString( STRING_SCORE_TABLE(0), GetBombermanByIndex(CheckEndGame()).Name + ' wins the round.', 1.0, 0.5, 300.0 );
-        GetBombermanByIndex(CheckEndGame()).UpScore();
+        If ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) Then
+           GetBombermanByIndex(CheckEndGame()).UpScore();
      End;
 
      // affichage des scores

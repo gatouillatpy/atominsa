@@ -837,7 +837,7 @@ Begin
                               GetBombermanByCount(i).Alive := False;
                           End;
                        End;
-                       GetBombermanByCount(k).Alive := True;
+                       GetBombermanByIndex(k).Alive := True;
                     End;
                     If GetBombermanCount() <> 0 Then Begin
                        For i := 1 To GetBombermanCount() Do Begin
