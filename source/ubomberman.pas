@@ -20,11 +20,7 @@ type
   public
     fCX, fCY,                    // coordonnées ciblées par l'intelligence artificielle
     fLX, fLY : Single;           // dernières coordonnées
-    fDanger,                     // danger aux coordonnées courantes
-    fDangerLeft,                 // danger aux coordonnées de la case à gauche du personnage
-    fDangerRight,                // danger à droite du personnage
-    fDangerUp,                   // danger au-dessus du personnage
-    fDangerDown : Integer;       // danger au-dessous du personnage
+
     
 
 
@@ -32,14 +28,20 @@ type
     fOrigin   : Vector;          // position a la creation du personnage
     fSpeed,                      // vitesse du bomberman
     fBombTime : Single;          // temps avant explosion des bombes
-    
-    fSumGetDelta : Single;       // somme des GetDelta depuis le dernier changement de cible
+
     fSumFixGetDelta : Single;    // temps depuis lequel le bomberman est fixe.
+    fSumBombGetDelta : Single;   // temps depuis lequel le bomberman n'a pas posé de bombes.
+    fSumIgnitionGetDelta: Single;// temps depuis lequel la TriggerBomb a été posée.
 
     lastDir   : vectorN;         // memorise la derniere direction de mouvement du bomberman
 
     sName     : string;          // nom du joueur
 
+    nDanger,                     // danger aux coordonnées courantes
+    nDangerLeft,                 // danger aux coordonnées de la case à gauche du personnage
+    nDangerRight,                // danger à droite du personnage
+    nDangerUp,                   // danger au-dessus du personnage
+    nDangerDown : Integer;       // danger au-dessous du personnage
     nAISkill,
     nTriggerBomb,                // stock le nombre de bombe TRIGGER qu'il peut encore poser
     nDisease,                    // stock le numero d'identification de la maladie
@@ -143,13 +145,14 @@ type
   Property CX : Single Read fCX Write fCX;
   Property CY : Single Read fCY Write fCY;
   
-  Property Danger : Integer Read fDanger Write fDanger;
-  Property DangerLeft : Integer Read fDangerLeft Write fDangerLeft;
-  Property DangerRight : Integer Read fDangerRight Write fDangerRight;
-  Property DangerUp : Integer Read fDangerUp Write fDangerUp;
-  Property DangerDown : Integer Read fDangerDown Write fDangerDown;
-  Property SumGetDelta : Single Read fSumGetDelta Write fSumGetDelta;
+  Property Danger : Integer Read nDanger Write nDanger;
+  Property DangerLeft : Integer Read nDangerLeft Write nDangerLeft;
+  Property DangerRight : Integer Read nDangerRight Write nDangerRight;
+  Property DangerUp : Integer Read nDangerUp Write nDangerUp;
+  Property DangerDown : Integer Read nDangerDown Write nDangerDown;
   Property SumFixGetDelta : Single Read fSumFixGetDelta Write fSumFixGetDelta;
+  Property SumBombGetDelta : Single Read fSumBombGetDelta Write fSumBombGetDelta;
+  Property SumIgnitionGetDelta : Single Read fSumIgnitionGetDelta Write fSumIgnitionGetDelta;
   property ExploseBombTime : Single Read fBombTime Write fBombTime;
 
   property DiseaseNumber : integer Read nDisease Write nDisease;
@@ -217,7 +220,7 @@ type
 
 
 implementation
-uses uForm,uCore,uItem,uDisease,UGame,Classes,SysUtils,USetup,USuperDisease, UMulti;
+uses uForm,uCore,uItem,uDisease,UGame,Classes,SysUtils,USetup,USuperDisease,UMulti,UBlock;
 
 
 
@@ -802,6 +805,8 @@ begin
 end;
 
 procedure CBomberman.Dead();
+Var
+   sData : String;
 begin
 if bAlive then
  begin
@@ -810,6 +815,10 @@ if bAlive then
      Inc(nDeaths);
      fPosition.x:=0;
      fPosition.y:=0;
+     If ( bMulti = true ) Then Begin
+        sData := IntToStr( nIndex ) + #31;
+        Send( nLocalIndex, HEADER_DEAD, sData );
+     End;
   End;
  end;
 end;
@@ -1157,8 +1166,9 @@ begin
   lastDir.z          := 0;
   fCX                := aX;
   fCY                := aY;
-  fSumGetDelta       := 0;
-  fSumFixGetDelta    := 0;
+  fSumFixGetDelta    := 4 + Random * 4;
+  fSumBombGetDelta   := 8 + Random * 8;
+  fSumIgnitionGetDelta:=0;
 end;
 
 
@@ -1241,8 +1251,9 @@ procedure CBomberman.CheckBonus();
 var oldX, oldY : integer;
     aDisease : CDisease;
 begin
-  if Not(uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil) then
-    if (uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5)) is CItem) then    // PLANTE REGULIEREMENT ICI!!!!
+  if (Trunc(fPosition.x+0.5) in [1..GRIDWIDTH]) And (Trunc(fPosition.y+0.5) in [1..GRIDHEIGHT])
+  And Not(uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil) then
+    if (uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5)) is CItem) then
       begin
          oldX:=Trunc(fPosition.x+0.5);                                                   //a cause de la maladie SWITCH il faut se souvenir de ou il etait
          oldY:=Trunc(fPosition.y+0.5);                                                   //avant de prendre le bonus

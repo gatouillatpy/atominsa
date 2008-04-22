@@ -24,7 +24,6 @@ Implementation
 
 
 Procedure InitPractice () ;
-Var k : Integer;
 Begin
      // désactivation de la souris
      BindButton( BUTTON_LEFT, NIL );

@@ -23,7 +23,7 @@ Type LPBombItem = ^BombItem;
     procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
     procedure RemoveBombByCount(i : integer);
     procedure RemoveBombByGridCoo(aX,aY : integer);
-    procedure RemoveThisBomb(bomb: CBomb);
+    procedure RemoveThisBomb(wBomb: CBomb);
     procedure FreeBomb();overload;
     procedure FreeBomb(pList : LPBombItem);overload;
     function GetBombCount():integer;
@@ -157,7 +157,7 @@ end;
 
 
 // suppression par bombe
-procedure RemoveThisBomb(bomb: CBomb);
+procedure RemoveThisBomb(wBomb: CBomb);
 var Find : boolean;
     pTemp, pPrev : LPBombItem;
 begin
@@ -166,13 +166,13 @@ pPrev:=Nil;
   if pBombItem<>Nil then
   begin
     pTemp:=pBombItem;
-    Find:=(pTemp^.Bomb=Bomb);
+    Find:=(pTemp^.Bomb=wBomb);
 
     While Not(Find) do
     begin
       pPrev:=pTemp;
       pTemp:=pTemp^.Next;
-      Find:=(pTemp^.Bomb=Bomb);
+      Find:=(pTemp^.Bomb.XGrid=wBomb.XGrid) And (pTemp^.Bomb.YGrid=wBomb.YGrid);
     end;
 
     if pPrev<>nil then pPrev^.Next:=pTemp^.Next else pBombItem:=pTemp^.Next;

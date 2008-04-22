@@ -89,7 +89,6 @@ Procedure ProcessMenu () ;
 Var w, h : Single; // taille de la fenêtre
     x, y : Single; // coordonnées du pointeur
     u, v : Single; // coordonnées de la grille dans le repère OpenGL
-    c : Integer;
     i, j : Integer; // coordonnées du pointeur dans le repère du mask
     k : LongInt;
     r, g, b : Byte;

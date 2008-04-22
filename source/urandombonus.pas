@@ -22,7 +22,7 @@ End;
 
 
 Implementation
-Uses UExtraBomb, UFlameUp, uFlame, UDisease, USpeedUp, UKick, uGrab, uJelly,
+Uses UExtraBomb, UFlameUp, UDisease, USpeedUp, UKick, uGrab, uJelly,
      UPunch, USpoog, UGoldFLame, UTrigger, USuperDisease, UGame;
 
 { CGrab }

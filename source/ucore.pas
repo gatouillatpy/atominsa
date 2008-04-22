@@ -42,6 +42,8 @@ Const HEADER_ACTION1           = 1406;
 Const HEADER_BOMBERMAN         = 1501;
 Const HEADER_BOMB              = 1502;
 
+Const HEADER_DEAD              = 1601;
+
 
 
 Type LPPacketItem = ^PacketItem;

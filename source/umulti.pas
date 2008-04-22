@@ -435,6 +435,11 @@ Begin
                         sData := sData + IntToStr(nPlayerType[k]) + #31;
                     End;
                     Send( nIndex, nHeader, sData );
+                    // renvoi du scheme, de la map et du nombre de rounds.
+                    sData := IntToStr(nScheme) + #31;
+                    sData := sData + IntToStr(nMap) + #31;
+                    sData := sData + IntToStr(nRoundCount) + #31;
+                    Send( nIndex, HEADER_SETUP, sData );
                     UpdateMenu();
                End;
                HEADER_DISCONNECT :
@@ -654,7 +659,6 @@ Begin
                         LoadCharacter( k ); l += 1;
                         nPlayerType[k] := StrToInt( GetString( sData, l ) ); l += 1;
                     End;
-                    UpdateMenu();
                End;
                HEADER_LOCK :
                Begin
@@ -854,6 +858,12 @@ Begin
                             l += 2;
                         End;
                     End;
+               End;
+               HEADER_DEAD :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByCount( k );
+                    pBomberman.Alive := false;
                End;
           End;
      End;
