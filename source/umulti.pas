@@ -575,7 +575,9 @@ Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
                     _nNetID := StrToInt( GetString( sData, 2 ) );
-                    If Not ( pGrid.GetBlock( Trunc(pBomberman.Position.X + 0.5), Trunc(pBomberman.Position.Y + 0.5) ) Is CBomb ) Then Begin
+                    If ( Trunc(pBomberman.Position.X + 0.5) in [1..GRIDWIDTH] )
+                    And ( Trunc(pBomberman.Position.X + 0.5) in [1..GRIDHEIGHT] )
+                    And Not ( pGrid.GetBlock( Trunc(pBomberman.Position.X + 0.5), Trunc(pBomberman.Position.Y + 0.5) ) Is CBomb ) Then Begin
                        pBomberman.CreateBomb(GetDelta, _nNetID);
                     End;
                End;

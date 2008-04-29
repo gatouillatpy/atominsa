@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="18"/>
+      <ActiveEditorIndexAtStart Value="13"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -172,8 +172,8 @@
       <Unit18>
         <Filename Value="ubomb.pas"/>
         <UnitName Value="UBomb"/>
-        <CursorPos X="45" Y="71"/>
-        <TopLine Value="61"/>
+        <CursorPos X="1" Y="113"/>
+        <TopLine Value="106"/>
         <EditorIndex Value="18"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -376,7 +376,7 @@
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
         <CursorPos X="72" Y="1547"/>
-        <TopLine Value="1535"/>
+        <TopLine Value="1502"/>
         <EditorIndex Value="7"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -391,8 +391,8 @@
       <Unit48>
         <Filename Value="umulti.pas"/>
         <UnitName Value="UMulti"/>
-        <CursorPos X="50" Y="16"/>
-        <TopLine Value="10"/>
+        <CursorPos X="65" Y="581"/>
+        <TopLine Value="850"/>
         <EditorIndex Value="13"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -631,80 +631,7 @@
         <UsageCount Value="8"/>
       </Unit79>
     </Units>
-    <JumpHistory Count="18" HistoryIndex="17">
-      <Position1>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="868" Column="22" TopLine="845"/>
-      </Position1>
-      <Position2>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="867" Column="27" TopLine="859"/>
-      </Position2>
-      <Position3>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="858" Column="22" TopLine="405"/>
-      </Position3>
-      <Position4>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="50" Column="24" TopLine="25"/>
-      </Position4>
-      <Position5>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="219" Column="10" TopLine="189"/>
-      </Position5>
-      <Position6>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="38" Column="22" TopLine="17"/>
-      </Position6>
-      <Position7>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="39" Column="22" TopLine="18"/>
-      </Position7>
-      <Position8>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="50" Column="22" TopLine="29"/>
-      </Position8>
-      <Position9>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="51" Column="22" TopLine="30"/>
-      </Position9>
-      <Position10>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="52" Column="22" TopLine="31"/>
-      </Position10>
-      <Position11>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="53" Column="22" TopLine="32"/>
-      </Position11>
-      <Position12>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="60" Column="66" TopLine="39"/>
-      </Position12>
-      <Position13>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="854" Column="16" TopLine="847"/>
-      </Position13>
-      <Position14>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="113" Column="15" TopLine="102"/>
-      </Position14>
-      <Position15>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="122" Column="23" TopLine="90"/>
-      </Position15>
-      <Position16>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="139" Column="19" TopLine="128"/>
-      </Position16>
-      <Position17>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="170" Column="74" TopLine="158"/>
-      </Position17>
-      <Position18>
-        <Filename Value="ubomb.pas"/>
-        <Caret Line="71" Column="37" TopLine="64"/>
-      </Position18>
-    </JumpHistory>
+    <JumpHistory Count="0" HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>
@@ -728,12 +655,6 @@
     </Other>
   </CompilerOptions>
   <Debugging>
-    <BreakPoints Count="1">
-      <Item1>
-        <Source Value="ubomb.pas"/>
-        <Line Value="113"/>
-      </Item1>
-    </BreakPoints>
     <Watches Count="2">
       <Item1>
         <Expression Value="sData"/>
