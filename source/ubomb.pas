@@ -68,7 +68,7 @@ end;
 
 
 implementation
-uses UItem, UListBomb, UGame;
+uses UItem, UListBomb, UGame, USetup, UMulti;
 
 
 
@@ -167,7 +167,7 @@ begin
   bCanMove:=(TestGrid(aX,aY) or Not(ChangeCase(aX,aY)) ) AND Not(TestBomberman(aX,aY));
   
   {Si on peut se deplacer on fait le deplacement sans chercher a comprendre}
-  if bCanMove then
+  if bCanMove And ( (bMulti = false) Or (nLocalIndex = nClientIndex[0]) ) then
   begin
    DoMove(afX,afY,_X,_Y);
   end
