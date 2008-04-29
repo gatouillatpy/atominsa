@@ -785,19 +785,24 @@ Begin
                     l := 1;
                     For k := 1 To 8 Do Begin
                         pBomberman := GetBombermanByIndex( k );
-                        If (pBomberman <> Nil) And (nPlayerClient[k] <> nLocalIndex) Then Begin
-                          fX := StrToFloat( GetString( sData, l ) ); l += 1;
-                          fY := StrToFloat( GetString( sData, l ) ); l += 1;
-                          pBomberman.Position.x := fX;
-                          pBomberman.Position.y := fY;
-                          nX := StrToInt( GetString( sData, l ) ); l += 1;
-                          nY := StrToInt( GetString( sData, l ) ); l += 1;
-                          If nX = 1 Then pBomberman.Direction := -90
-                          Else If nX = -1 Then pBomberman.Direction := 90
-                          Else If nY = 1 Then pBomberman.Direction := 0
-                          Else If nY = -1 Then pBomberman.Direction := 180;
-                          pBomberman.LastDirN.x := nX;
-                          pBomberman.LastDirN.y := nY;
+                        If (pBomberman <> Nil) Then Begin
+                           If (nPlayerClient[k] <> nLocalIndex) Then Begin
+                              fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                              fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                              pBomberman.Position.x := fX;
+                              pBomberman.Position.y := fY;
+                              nX := StrToInt( GetString( sData, l ) ); l += 1;
+                              nY := StrToInt( GetString( sData, l ) ); l += 1;
+                              If nX = 1 Then pBomberman.Direction := -90
+                              Else If nX = -1 Then pBomberman.Direction := 90
+                              Else If nY = 1 Then pBomberman.Direction := 0
+                              Else If nY = -1 Then pBomberman.Direction := 180;
+                              pBomberman.LastDirN.x := nX;
+                              pBomberman.LastDirN.y := nY;
+                           End
+                           Else Begin
+                                l += 4;
+                           End;
                         End;
                     End;
                End;
@@ -806,7 +811,9 @@ Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByIndex( k );
                     _nNetID := StrToInt( GetString( sData, 2 ) );
-                    If Not ( pGrid.GetBlock( Trunc(pBomberman.Position.X + 0.5), Trunc(pBomberman.Position.Y + 0.5) ) Is CBomb ) Then Begin
+                    If ( Trunc(pBomberman.Position.X + 0.5) in [1..GRIDWIDTH] )
+                    And ( Trunc(pBomberman.Position.X + 0.5) in [1..GRIDHEIGHT] )
+                    And Not ( pGrid.GetBlock( Trunc(pBomberman.Position.X + 0.5), Trunc(pBomberman.Position.Y + 0.5) ) Is CBomb ) Then Begin
                        pBomberman.CreateBomb(GetDelta, _nNetID);
                     End;
                End;
@@ -863,7 +870,8 @@ Begin
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
                     pBomberman := GetBombermanByCount( k );
-                    pBomberman.Alive := false;
+                    If ( pBomberman Is CBomberman ) Then
+                       pBomberman.Alive := false;
                End;
           End;
      End;

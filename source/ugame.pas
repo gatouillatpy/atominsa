@@ -10,10 +10,9 @@ Interface
 
 
 Uses Classes, SysUtils,
-     UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
+     UCore, UUtils, UBlock, UItem, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UJelly, UGrid, UFlame, UListBomb, UBomb, USetup, UForm,
-     UJellyBomb, UPunch, USpoog, UGoldFLame, UTrigger, UTriggerBomb, USuperDisease, URandomBonus,
-     UCharacter, UComputer;
+     UJellyBomb, UPunch, USpoog, UGoldFLame, UTrigger, UTriggerBomb, USuperDisease, URandomBonus, UComputer;
 
 
 
@@ -1180,7 +1179,6 @@ End;
 Procedure ProcessWait () ;
 Var w, h : Single;
     i : Integer;
-    sData : String;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -1417,8 +1415,7 @@ End;
 
 
 Procedure InitGame () ;
-Var i, j, k, l, m: Integer;
-    sData : String;
+Var  k: Integer;
 Begin
      // enregistrement des paramètres
      WriteSettings( 'atominsa.cfg' );
@@ -1534,7 +1531,7 @@ Begin
      // gestion de l'intelligence artificielle
      For k := 1 To GetBombermanCount() Do Begin
          If ( GetBombermanByCount(k) Is CBomberman ) And ( GetBombermanByCount(k).Alive = true )
-         And ( ( bMulti = false ) Or ( nPlayerClient[k] <> nLocalIndex ) )  Then Begin
+         And ( ( bMulti = false ) Or ( nPlayerClient[GetBombermanByCount(k).nIndex] = nLocalIndex ) )  Then Begin
             If nPlayerType[GetBombermanByCount(k).BIndex] = PLAYER_COM Then
                ProcessComputer( GetBombermanByCount(k), nPlayerSkill[GetBombermanByCount(k).BIndex] );
          End;
@@ -1970,7 +1967,6 @@ End;
 
 
 Procedure UpdateMenu () ;
-Var k : Integer;
 Begin
      // ajout du titre
      If (bMulti = True) Then Begin
@@ -2015,7 +2011,6 @@ End;
 
 
 Procedure InitMenu () ;
-Var k : Integer;
 Begin
      // ajout du titre
      If (bMulti = True) Then Begin
@@ -2080,7 +2075,6 @@ Procedure ProcessMenu () ;
           End;
 Var w, h : Single;
     t : Single;
-    i, j, k, l, m : Integer;
     sData : String;
 Begin
      w := GetRenderWidth();
