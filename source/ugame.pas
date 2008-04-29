@@ -1533,7 +1533,8 @@ Begin
 
      // gestion de l'intelligence artificielle
      For k := 1 To GetBombermanCount() Do Begin
-         If ( GetBombermanByCount(k) Is CBomberman ) And ( GetBombermanByCount(k).Alive = true ) Then Begin
+         If ( GetBombermanByCount(k) Is CBomberman ) And ( GetBombermanByCount(k).Alive = true )
+         And ( ( bMulti = false ) Or ( nPlayerClient[k] <> nLocalIndex ) )  Then Begin
             If nPlayerType[GetBombermanByCount(k).BIndex] = PLAYER_COM Then
                ProcessComputer( GetBombermanByCount(k), nPlayerSkill[GetBombermanByCount(k).BIndex] );
          End;
