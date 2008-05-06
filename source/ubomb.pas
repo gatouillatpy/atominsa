@@ -52,6 +52,7 @@ CBomb = Class(CBlock)
        procedure MoveLeft(dt : Single);
        procedure MoveUp(dt : Single);
        procedure Punch(dir : integer; dt : Single);
+       procedure DoMove(afX, afY : Single;aX,aY : integer);
 
        property CanExplose : boolean Read bExplosive;
        property Position : Vector Read fPosition Write fPosition;
@@ -80,6 +81,19 @@ uses UItem, UListBomb, UGame, USetup, UMulti;
 {*******************************************************************************}
 { Deplacement normal des bombes                                                 }
 {*******************************************************************************}
+procedure CBomb.DoMove(afX, afY : Single;aX,aY : integer);
+begin
+   uGrid.DelBlock(nX,nY);
+   if nPunch>0 then
+     if ((aX<>nX) or (aY<>nY)) then
+       if (abs(afX-aX)<0.1) and (abs(afY-aY)<0.1) then nPunch -= 1;
+   nX:=aX;
+   nY:=aY;
+   fPosition.x:=afX;
+   fPosition.y:=afY;
+   uGrid.AddBlock(nX,nY,Self);
+end;
+   
 procedure CBomb.Move(dt : single);
 
    function ChangeCase(aX,aY : integer):boolean;
@@ -108,18 +122,6 @@ procedure CBomb.Move(dt : single);
       result:=((uGrid.GetBlock(aX,aY) as CItem).IsExplosed());
    end;
 
-   procedure DoMove(afX, afY : Single;aX,aY : integer);
-   begin
-     uGrid.DelBlock(nX,nY);
-     if nPunch>0 then
-       if ((aX<>nX) or (aY<>nY)) then
-         if (abs(afX-aX)<0.1) and (abs(afY-aY)<0.1) then nPunch -= 1;
-     nX:=aX;
-     nY:=aY;
-     fPosition.x:=afX;
-     fPosition.y:=afY;
-     uGrid.AddBlock(nX,nY,Self);
-   end;
 
 var
    afX, afY : Single;
@@ -127,6 +129,7 @@ var
    aX, aY : integer;
    _X, _Y : integer;
    bCanMove : Boolean;
+   sData : String;
 begin
 {On détermine d'abord la direction du mouvement}
 dX:=0;
@@ -167,9 +170,15 @@ begin
   bCanMove:=(TestGrid(aX,aY) or Not(ChangeCase(aX,aY)) ) AND Not(TestBomberman(aX,aY));
   
   {Si on peut se deplacer on fait le deplacement sans chercher a comprendre}
-  if bCanMove And ( (bMulti = false) Or (nLocalIndex = nClientIndex[0]) ) then
+  if bCanMove then
   begin
-   DoMove(afX,afY,_X,_Y);
+       If ( (bMulti = false) Or (nLocalIndex = nClientIndex[0]) ) Then
+          DoMove(afX,afY,_X,_Y)
+       Else Begin
+           sData := FloatToStr( afX ) + #31;
+           sData := sData + FloatToStr( afY ) + #31;
+           Send( nNetID, HEADER_MOVEBOMB, sData );
+       End;
   end
   
   {Sinon il faut voir si ce qui nous bloque ne peut pas etre franchi}

@@ -587,6 +587,14 @@ Begin
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DoIgnition();
                End;
+               HEADER_MOVEBOMB :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomb := GetBombByNetID( k );
+                    fX := StrToFloat( GetString( sData, 2 ) );
+                    fY := StrToFloat( GetString( sData, 3 ) );
+                    pBomb.DoMove( fX, fY, Trunc( fX ), Trunc( fY ) );
+               End;
           End;
      End;
      
@@ -871,7 +879,7 @@ Begin
                HEADER_DEAD :
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
-                    pBomberman := GetBombermanByCount( k );
+                    pBomberman := GetBombermanByIndex( k );
                     If ( pBomberman Is CBomberman ) Then
                        pBomberman.Alive := false;
                End;
