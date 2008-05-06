@@ -589,10 +589,10 @@ Begin
                End;
                HEADER_MOVEBOMB :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
-                    pBomb := GetBombByNetID( k );
-                    fX := StrToFloat( GetString( sData, 2 ) );
-                    fY := StrToFloat( GetString( sData, 3 ) );
+                    _nNetID := StrToInt( GetString( sData, 2 ) );
+                    pBomb := GetBombByNetID( _nNetID );
+                    fX := StrToFloat( GetString( sData, 3 ) );
+                    fY := StrToFloat( GetString( sData, 4 ) );
                     pBomb.DoMove( fX, fY, Trunc( fX ), Trunc( fY ) );
                End;
           End;

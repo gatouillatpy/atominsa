@@ -175,9 +175,10 @@ begin
        If ( (bMulti = false) Or (nLocalIndex = nClientIndex[0]) ) Then
           DoMove(afX,afY,_X,_Y)
        Else Begin
-           sData := FloatToStr( afX ) + #31;
+           sData := IntToStr( nNetId ) + #31;
+           sData := sData + FloatToStr( afX ) + #31;
            sData := sData + FloatToStr( afY ) + #31;
-           Send( nNetID, HEADER_MOVEBOMB, sData );
+           Send( nLocalIndex, HEADER_MOVEBOMB, sData );
        End;
   end
   
