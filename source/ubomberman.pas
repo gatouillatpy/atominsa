@@ -1017,19 +1017,30 @@ end;
 
 procedure CBomberman.MoveBomb(_X,_Y,aX,aY,dX,dY : integer; dt : Single);
 var _Bomb : CBomb;
+    sData : String;
 begin
   if ((_X=aX) or (_Y=aY)) then
   begin
-   _Bomb:=GetBombByGridCoo(aX,aY);
-   If Not( _Bomb = nil ) Then Begin
-      if dX=1 then _Bomb.MoveRight(dt)
-      else if dX=-1 then _Bomb.MoveLeft(dt)
-      else if dY=1 then _Bomb.MoveDown(dt)
-      else if dY=-1 then _Bomb.MoveUp(dt);
-   End;
-  end;
+    If ( (bMulti = false) Or (nLocalIndex = nClientIndex[0]) ) Then Begin
+       _Bomb:=GetBombByGridCoo(aX,aY);
+       If Not( _Bomb = nil ) Then Begin
+          If dX = 1 Then _Bomb.MoveRight(dt)
+          Else If dX = -1 Then _Bomb.MoveLeft(dt)
+          Else If dY = 1 Then _Bomb.MoveDown(dt)
+          Else If dY = -1 Then _Bomb.MoveUp(dt);
+       End;
+    End
+    Else Begin
+       sData := IntToStr( nIndex ) + #31;
+       sData := sData + IntToStr( aX ) + #31;
+       sData := sData + IntToStr( aY ) + #31;
+       sData := sData + IntToStr( dX ) + #31;
+       sData := sData + IntToStr( dY ) + #31;
+       sData := sData + FloatToStr( dt ) + #31;
+       Send( nLocalIndex, HEADER_MOVEBOMB, sData );
+    End;
+  End;
 end;
-
 
 
 

@@ -403,7 +403,9 @@ Var nIndex : DWord;
     pBomberman : CBomberman;
     pBomb : CBomb;
     fX, fY : Single;
+    dt : Single;
     _nNetID : Integer;
+    aX, aY, dX, dY : Integer;
 Var k : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -589,11 +591,14 @@ Begin
                End;
                HEADER_MOVEBOMB :
                Begin
-                    _nNetID := StrToInt( GetString( sData, 2 ) );
-                    pBomb := GetBombByNetID( _nNetID );
-                    fX := StrToFloat( GetString( sData, 3 ) );
-                    fY := StrToFloat( GetString( sData, 4 ) );
-                    pBomb.DoMove( fX, fY, Trunc( fX ), Trunc( fY ) );
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    aX := StrToInt( GetString( sData, 2 ) );
+                    aY := StrToInt( GetString( sData, 3 ) );
+                    dX := StrToInt( GetString( sData, 4 ) );
+                    dY := StrToInt( GetString( sData, 5 ) );
+                    dt := StrToFloat( GetString( sData, 6 ) );
+                    pBomberman.MoveBomb(aX,aY,aX,aY,dX,dY,dt);
                End;
           End;
      End;

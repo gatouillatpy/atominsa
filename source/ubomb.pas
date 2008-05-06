@@ -129,7 +129,6 @@ var
    aX, aY : integer;
    _X, _Y : integer;
    bCanMove : Boolean;
-   sData : String;
 begin
 {On détermine d'abord la direction du mouvement}
 dX:=0;
@@ -172,14 +171,7 @@ begin
   {Si on peut se deplacer on fait le deplacement sans chercher a comprendre}
   if bCanMove then
   begin
-       If ( (bMulti = false) Or (nLocalIndex = nClientIndex[0]) ) Then
-          DoMove(afX,afY,_X,_Y)
-       Else Begin
-           sData := IntToStr( nNetId ) + #31;
-           sData := sData + FloatToStr( afX ) + #31;
-           sData := sData + FloatToStr( afY ) + #31;
-           Send( nLocalIndex, HEADER_MOVEBOMB, sData );
-       End;
+       DoMove(afX,afY,_X,_Y);
   end
   
   {Sinon il faut voir si ce qui nous bloque ne peut pas etre franchi}
