@@ -840,6 +840,7 @@ end;
 {*******************************************************************************}
 procedure CBomberman.AddTriggerBomb();
 var pPrev, pTemp : LPBombItem;
+    sData : String;
 begin
   pPrev := nil;
   pTemp := uTriggerBomb;
@@ -855,11 +856,6 @@ begin
   pTemp^.Count:=nIndex;
   pTemp^.Next:=Nil;
   
-  If ( bMulti = true ) Then Begin
-      sData := IntToStr(aIndex) + #31;
-      sData := sData + IntToStr(_nNetID) + #31;
-      Send( nLocalIndex, HEADER_ACTION0, sData );
-  End;
 end;
 
 
@@ -1000,7 +996,7 @@ begin
               else
               begin
                 bTrigger := nTriggerBomb<>0;
-                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
+                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,nNetID);
                 Dec(nBombCount);
                 if bTrigger then
                 begin
