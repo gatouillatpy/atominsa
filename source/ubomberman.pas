@@ -896,7 +896,7 @@ begin
 end;
 
 procedure CBomberman.TriggerToNormalBomb();
-var aX, aY : integer;
+var aX, aY, _nNetID : integer;
 begin
   if uTriggerBomb<>nil then
   begin
@@ -904,11 +904,12 @@ begin
     begin
       aX := uTriggerBomb^.Bomb.XGrid;
       aY := uTriggerBomb^.Bomb.YGrid;
+      _nNetID := uTriggerBomb^.Bomb.nNetID;
       uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
 
-      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
+      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID);
       DelTriggerBomb();
     end;//while
   end;//if uTriggerBomb
@@ -977,33 +978,34 @@ begin
                        dX := 1;
                      end;
           end;
-          While (nBombCount<>0) and Not(Stop) do
-          begin
-            aX := aX + dX;
-            aY := aY + dY;
-            if Not(CheckCoordinates(aX,aY)) then
-            begin
-              Stop := True;
-            end
-            else
-            begin
-              if Not(uGrid.GetBlock(aX,aY)=nil) or IsBombermanAtCoo(aX,aY) then
+          If ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+            While (nBombCount<>0) and Not(Stop) do begin
+              aX := aX + dX;
+              aY := aY + dY;
+              if Not(CheckCoordinates(aX,aY)) then
               begin
-                stop := true;
+                Stop := True;
               end
               else
               begin
-                bTrigger := nTriggerBomb<>0;
-                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
-                Dec(nBombCount);
-                if bTrigger then
+                if Not(uGrid.GetBlock(aX,aY)=nil) or IsBombermanAtCoo(aX,aY) then
                 begin
-                  AddTriggerBomb();
-                  Dec(nTriggerBomb);
+                  stop := true;
+                end
+                else
+                begin
+                  bTrigger := nTriggerBomb<>0;
+                  AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
+                  Dec(nBombCount);
+                  if bTrigger then
+                  begin
+                    AddTriggerBomb();
+                    Dec(nTriggerBomb);
+                  end;
                 end;
               end;
             end;
-          end;
+          End;
       end;
     end;
   end;
