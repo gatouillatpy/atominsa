@@ -854,6 +854,12 @@ begin
   pTemp^.Bomb:=GetBombByCount(GetBombCount());
   pTemp^.Count:=nIndex;
   pTemp^.Next:=Nil;
+  
+  If ( bMulti = true ) Then Begin
+      sData := IntToStr(aIndex) + #31;
+      sData := sData + IntToStr(_nNetID) + #31;
+      Send( nLocalIndex, HEADER_ACTION0, sData );
+  End;
 end;
 
 
