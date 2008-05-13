@@ -149,8 +149,8 @@
       <Unit15>
         <Filename Value="ubomberman.pas"/>
         <UnitName Value="UBomberman"/>
-        <CursorPos X="40" Y="910"/>
-        <TopLine Value="941"/>
+        <CursorPos X="44" Y="909"/>
+        <TopLine Value="908"/>
         <EditorIndex Value="14"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -172,8 +172,8 @@
       <Unit18>
         <Filename Value="ubomb.pas"/>
         <UnitName Value="UBomb"/>
-        <CursorPos X="59" Y="52"/>
-        <TopLine Value="20"/>
+        <CursorPos X="4" Y="416"/>
+        <TopLine Value="404"/>
         <EditorIndex Value="18"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -476,8 +476,8 @@
         <Filename Value="ulistbomb.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UListBomb"/>
-        <CursorPos X="4" Y="82"/>
-        <TopLine Value="49"/>
+        <CursorPos X="34" Y="79"/>
+        <TopLine Value="54"/>
         <EditorIndex Value="19"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -641,19 +641,19 @@
     <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="ubomberman.pas"/>
-        <Caret Line="862" Column="3" TopLine="827"/>
+        <Caret Line="960" Column="19" TopLine="941"/>
       </Position1>
       <Position2>
         <Filename Value="ubomberman.pas"/>
-        <Caret Line="843" Column="20" TopLine="832"/>
+        <Caret Line="914" Column="12" TopLine="893"/>
       </Position2>
       <Position3>
-        <Filename Value="ubomberman.pas"/>
-        <Caret Line="860" Column="26" TopLine="843"/>
+        <Filename Value="ulistbomb.pas"/>
+        <Caret Line="79" Column="34" TopLine="54"/>
       </Position3>
       <Position4>
         <Filename Value="ubomberman.pas"/>
-        <Caret Line="861" Column="45" TopLine="838"/>
+        <Caret Line="914" Column="106" TopLine="893"/>
       </Position4>
     </JumpHistory>
   </ProjectOptions>

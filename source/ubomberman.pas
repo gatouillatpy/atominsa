@@ -898,7 +898,7 @@ begin
 end;
 
 procedure CBomberman.TriggerToNormalBomb();
-var aX, aY : integer;
+var aX, aY, _nNetID : integer;
 begin
   if uTriggerBomb<>nil then
   begin
@@ -906,11 +906,12 @@ begin
     begin
       aX := uTriggerBomb^.Bomb.XGrid;
       aY := uTriggerBomb^.Bomb.YGrid;
-      uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
+      _nNetID := uTriggerBomb^.Bomb.nNetID;
+      uGrid.DelBlock(aX,aY);
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
 
-      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
+      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID);
       DelTriggerBomb();
     end;//while
   end;//if uTriggerBomb
