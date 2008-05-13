@@ -840,7 +840,6 @@ end;
 {*******************************************************************************}
 procedure CBomberman.AddTriggerBomb();
 var pPrev, pTemp : LPBombItem;
-    sData : String;
 begin
   pPrev := nil;
   pTemp := uTriggerBomb;
@@ -855,7 +854,6 @@ begin
   pTemp^.Bomb:=GetBombByCount(GetBombCount());
   pTemp^.Count:=nIndex;
   pTemp^.Next:=Nil;
-  
 end;
 
 
@@ -898,7 +896,7 @@ begin
 end;
 
 procedure CBomberman.TriggerToNormalBomb();
-var aX, aY, _nNetID : integer;
+var aX, aY : integer;
 begin
   if uTriggerBomb<>nil then
   begin
@@ -906,12 +904,11 @@ begin
     begin
       aX := uTriggerBomb^.Bomb.XGrid;
       aY := uTriggerBomb^.Bomb.YGrid;
-      _nNetID := uTriggerBomb^.Bomb.nNetID;
-      uGrid.DelBlock(aX,aY);
+      uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
 
-      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID);
+      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
       DelTriggerBomb();
     end;//while
   end;//if uTriggerBomb
@@ -997,7 +994,7 @@ begin
               else
               begin
                 bTrigger := nTriggerBomb<>0;
-                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,nNetID);
+                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
                 Dec(nBombCount);
                 if bTrigger then
                 begin

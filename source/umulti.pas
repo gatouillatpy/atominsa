@@ -877,7 +877,7 @@ Begin
                            pBomb.Position.x := fX;
                            pBomb.Position.y := fY;
                         End Else Begin
-                            l := 2;
+                            l += 2;
                         End;
                     End;
                End;
