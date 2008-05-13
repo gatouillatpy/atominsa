@@ -404,9 +404,11 @@ Var nIndex : DWord;
     pBomb : CBomb;
     fX, fY : Single;
     dt : Single;
+    nBombSize : Integer;
+    fBombTime : Single;
     _nNetID : Integer;
     aX, aY, dX, dY : Integer;
-Var k : Integer;
+Var k, l : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
           Case nHeader Of
@@ -574,13 +576,18 @@ Begin
                End;
                HEADER_ACTION0 :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    l := 1;
+                    k := StrToInt( GetString( sData, l ) ); l += 1;
                     pBomberman := GetBombermanByIndex( k );
-                    _nNetID := StrToInt( GetString( sData, 2 ) );
-                    If ( Trunc(pBomberman.Position.X + 0.5) in [1..GRIDWIDTH] )
-                    And ( Trunc(pBomberman.Position.X + 0.5) in [1..GRIDHEIGHT] )
-                    And Not ( pGrid.GetBlock( Trunc(pBomberman.Position.X + 0.5), Trunc(pBomberman.Position.Y + 0.5) ) Is CBomb ) Then Begin
-                       pBomberman.CreateBomb(GetDelta, _nNetID);
+                    _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
+                    fX := StrToInt( GetString( sData, l ) ); l += 1;
+                    fY := StrToInt( GetString( sData, l ) ); l += 1;
+                    nBombSize := StrToInt( GetString( sData, l ) ); l += 1;
+                    fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
+                    If ( Trunc(fX + 0.5) in [1..GRIDWIDTH] )
+                    And ( Trunc(fY + 0.5) in [1..GRIDHEIGHT] )
+                    And Not ( pGrid.GetBlock( Trunc(fX + 0.5), Trunc(fY + 0.5) ) Is CBomb ) Then Begin
+                        pBomberman.CreateBombMulti(fX, fY, nBombSize, fBombTime, _nNetID );
                     End;
                End;
                HEADER_ACTION1 :
@@ -640,6 +647,8 @@ Var nIndex : DWord;
     pBomb : CBomb;
     fX, fY : Single;
     nX, nY : Integer;
+    nBombSize : Integer;
+    fBombTime : Single;
     isBomb : Boolean;
     nBonus : Integer;
     _nNetID : Integer;
@@ -823,13 +832,18 @@ Begin
                End;
                HEADER_ACTION0 :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    l := 1;
+                    k := StrToInt( GetString( sData, l ) ); l += 1;
                     pBomberman := GetBombermanByIndex( k );
-                    _nNetID := StrToInt( GetString( sData, 2 ) );
-                    If ( Trunc(pBomberman.Position.X + 0.5) in [1..GRIDWIDTH] )
-                    And ( Trunc(pBomberman.Position.X + 0.5) in [1..GRIDHEIGHT] )
-                    And Not ( pGrid.GetBlock( Trunc(pBomberman.Position.X + 0.5), Trunc(pBomberman.Position.Y + 0.5) ) Is CBomb ) Then Begin
-                       pBomberman.CreateBomb(GetDelta, _nNetID);
+                    _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
+                    fX := StrToInt( GetString( sData, l ) ); l += 1;
+                    fY := StrToInt( GetString( sData, l ) ); l += 1;
+                    nBombSize := StrToInt( GetString( sData, l ) ); l += 1;
+                    fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
+                    If ( Trunc(fX + 0.5) in [1..GRIDWIDTH] )
+                    And ( Trunc(fY + 0.5) in [1..GRIDHEIGHT] )
+                    And Not ( pGrid.GetBlock( Trunc(fX + 0.5), Trunc(fY + 0.5) ) Is CBomb ) Then Begin
+                        pBomberman.CreateBombMulti(fX, fY, nBombSize, fBombTime, _nNetID );
                     End;
                End;
                HEADER_ACTION1 :

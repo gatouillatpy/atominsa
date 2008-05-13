@@ -103,6 +103,7 @@ type
     function TestGrid(aX,aY : integer):boolean;
     function ChangeCase(aX,aY : integer;afX, afY : Single):boolean;
     function GetTargetTriggerBomb():CTriggerBomb;
+
     
   protected
     { protected declarations }
@@ -119,6 +120,7 @@ type
   procedure MoveLeft(dt : Single);cdecl;
   procedure MoveRight(dt : Single);cdecl;
   procedure CreateBomb(dt : Single; nNetID : Integer);cdecl;
+  procedure CreateBombMulti(fX, fY : Single; nBombSize : Integer; fExploseTime : Single; _nNetID : Integer );
   procedure Update(dt : Single);
   procedure UpKills();
   procedure DownKills();
@@ -978,39 +980,50 @@ begin
                        dX := 1;
                      end;
           end;
-          If ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
-            While (nBombCount<>0) and Not(Stop) do begin
-              aX := aX + dX;
-              aY := aY + dY;
-              if Not(CheckCoordinates(aX,aY)) then
+          While (nBombCount<>0) and Not(Stop) do begin
+            aX := aX + dX;
+            aY := aY + dY;
+            if Not(CheckCoordinates(aX,aY)) then
+            begin
+              Stop := True;
+            end
+            else
+            begin
+              if Not(uGrid.GetBlock(aX,aY)=nil) or IsBombermanAtCoo(aX,aY) then
               begin
-                Stop := True;
+                stop := true;
               end
               else
               begin
-                if Not(uGrid.GetBlock(aX,aY)=nil) or IsBombermanAtCoo(aX,aY) then
+                bTrigger := nTriggerBomb<>0;
+                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
+                Dec(nBombCount);
+                if bTrigger then
                 begin
-                  stop := true;
-                end
-                else
-                begin
-                  bTrigger := nTriggerBomb<>0;
-                  AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
-                  Dec(nBombCount);
-                  if bTrigger then
-                  begin
-                    AddTriggerBomb();
-                    Dec(nTriggerBomb);
-                  end;
+                  AddTriggerBomb();
+                  Dec(nTriggerBomb);
                 end;
               end;
             end;
-          End;
+          end;
       end;
     end;
   end;
 end;
 
+
+procedure CBomberman.CreateBombMulti(fX, fY : Single; nBombSize : Integer; fExploseTime : Single; _nNetID : Integer );
+Var bTrigger : Boolean;
+Begin
+     bTrigger := nTriggerBomb<>0;
+     AddBomb(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID);
+     Dec(nBombCount);
+     if bTrigger then
+     begin
+          AddTriggerBomb();
+          Dec(nTriggerBomb);
+     end;
+End;
 
 
 

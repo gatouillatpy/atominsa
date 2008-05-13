@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="14"/>
+      <ActiveEditorIndexAtStart Value="13"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -149,8 +149,8 @@
       <Unit15>
         <Filename Value="ubomberman.pas"/>
         <UnitName Value="UBomberman"/>
-        <CursorPos X="106" Y="912"/>
-        <TopLine Value="895"/>
+        <CursorPos X="44" Y="1012"/>
+        <TopLine Value="1001"/>
         <EditorIndex Value="14"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -391,8 +391,8 @@
       <Unit48>
         <Filename Value="umulti.pas"/>
         <UnitName Value="UMulti"/>
-        <CursorPos X="40" Y="832"/>
-        <TopLine Value="821"/>
+        <CursorPos X="9" Y="411"/>
+        <TopLine Value="388"/>
         <EditorIndex Value="13"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -451,7 +451,7 @@
         <CursorPos X="81" Y="21"/>
         <TopLine Value="15"/>
         <EditorIndex Value="10"/>
-        <UsageCount Value="87"/>
+        <UsageCount Value="88"/>
         <Loaded Value="True"/>
       </Unit56>
       <Unit57>
@@ -476,8 +476,8 @@
         <Filename Value="ulistbomb.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UListBomb"/>
-        <CursorPos X="6" Y="85"/>
-        <TopLine Value="64"/>
+        <CursorPos X="51" Y="88"/>
+        <TopLine Value="52"/>
         <EditorIndex Value="19"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -544,7 +544,7 @@
         <UnitName Value="USuperDisease"/>
         <CursorPos X="25" Y="26"/>
         <TopLine Value="7"/>
-        <UsageCount Value="199"/>
+        <UsageCount Value="200"/>
       </Unit67>
       <Unit68>
         <Filename Value="urandomdisease.pas"/>
@@ -552,7 +552,7 @@
         <UnitName Value="URandomDisease"/>
         <CursorPos X="1" Y="57"/>
         <TopLine Value="20"/>
-        <UsageCount Value="197"/>
+        <UsageCount Value="199"/>
       </Unit68>
       <Unit69>
         <Filename Value="urandombonus.pas"/>
@@ -561,7 +561,7 @@
         <CursorPos X="1" Y="59"/>
         <TopLine Value="18"/>
         <EditorIndex Value="8"/>
-        <UsageCount Value="196"/>
+        <UsageCount Value="198"/>
         <Loaded Value="True"/>
       </Unit69>
       <Unit70>
@@ -583,7 +583,7 @@
         <UnitName Value="uAI"/>
         <CursorPos X="29" Y="190"/>
         <TopLine Value="166"/>
-        <UsageCount Value="195"/>
+        <UsageCount Value="197"/>
       </Unit72>
       <Unit73>
         <Filename Value="C:\Users\Public\Documents\School\Informatique\Pascal\Programmes\correction_addition.pas"/>
@@ -601,8 +601,8 @@
       </Unit74>
       <Unit75>
         <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
-        <CursorPos X="6" Y="50"/>
-        <TopLine Value="29"/>
+        <CursorPos X="10" Y="106"/>
+        <TopLine Value="98"/>
         <UsageCount Value="19"/>
       </Unit75>
       <Unit76>
@@ -631,19 +631,127 @@
         <UsageCount Value="8"/>
       </Unit79>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="832" Column="41" TopLine="821"/>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="14" Column="28" TopLine="1"/>
       </Position1>
       <Position2>
         <Filename Value="ubomberman.pas"/>
-        <Caret Line="980" Column="51" TopLine="943"/>
+        <Caret Line="34" Column="67" TopLine="13"/>
       </Position2>
       <Position3>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="832" Column="40" TopLine="821"/>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="46" Column="69" TopLine="25"/>
       </Position3>
+      <Position4>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="80" Column="13" TopLine="59"/>
+      </Position4>
+      <Position5>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="95" Column="25" TopLine="74"/>
+      </Position5>
+      <Position6>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="96" Column="25" TopLine="75"/>
+      </Position6>
+      <Position7>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="97" Column="22" TopLine="76"/>
+      </Position7>
+      <Position8>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="105" Column="45" TopLine="84"/>
+      </Position8>
+      <Position9>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="135" Column="26" TopLine="114"/>
+      </Position9>
+      <Position10>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="951" Column="86" TopLine="932"/>
+      </Position10>
+      <Position11>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="839" Column="106" TopLine="825"/>
+      </Position11>
+      <Position12>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="840" Column="81" TopLine="829"/>
+      </Position12>
+      <Position13>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="951" Column="115" TopLine="924"/>
+      </Position13>
+      <Position14>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="840" Column="80" TopLine="829"/>
+      </Position14>
+      <Position15>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="951" Column="121" TopLine="938"/>
+      </Position15>
+      <Position16>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="840" Column="81" TopLine="829"/>
+      </Position16>
+      <Position17>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="466" Column="22" TopLine="448"/>
+      </Position17>
+      <Position18>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="951" Column="102" TopLine="932"/>
+      </Position18>
+      <Position19>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="840" Column="68" TopLine="829"/>
+      </Position19>
+      <Position20>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="846" Column="64" TopLine="829"/>
+      </Position20>
+      <Position21>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="106" Column="70" TopLine="77"/>
+      </Position21>
+      <Position22>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="1014" Column="107" TopLine="999"/>
+      </Position22>
+      <Position23>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="10" Column="91" TopLine="1"/>
+      </Position23>
+      <Position24>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="123" Column="24" TopLine="112"/>
+      </Position24>
+      <Position25>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="838" Column="72" TopLine="826"/>
+      </Position25>
+      <Position26>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="1015" Column="10" TopLine="1004"/>
+      </Position26>
+      <Position27>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="1018" Column="36" TopLine="1007"/>
+      </Position27>
+      <Position28>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="1024" Column="15" TopLine="992"/>
+      </Position28>
+      <Position29>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="1018" Column="34" TopLine="1007"/>
+      </Position29>
+      <Position30>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="408" Column="24" TopLine="390"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

@@ -82,6 +82,10 @@ begin
  If ( bMulti = true ) Then Begin
     sData := IntToStr(aIndex) + #31;
     sData := sData + IntToStr(_nNetID) + #31;
+    sData := sData + FloatToStr(aX) + #31;
+    sData := sData + FloatToStr(aY) + #31;
+    sData := sData + IntToStr(aBombSize) + #31;
+    sData := sData + FloatToStr(aBombTime) + #31;
     Send( nLocalIndex, HEADER_ACTION0, sData );
  End;
 end;
