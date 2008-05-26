@@ -549,8 +549,13 @@ end;
 
 procedure CBomberman.DoMove(afX, afY : Single);
 begin
- fPosition.x:=afX;
- fPosition.y:=afY;
+     If CheckCoordinates( Trunc( afX + 0.5 ), Trunc( afY + 0.5 ) )
+     And ( TestGrid( Trunc( afX + 0.5 ) , Trunc( afY + 0.5 ) )
+     Or TestBomb( Trunc( afX + 0.5 ), Trunc( afY + 0.5 ) )
+     Or TestBonus( Trunc( afX + 0.5 ), Trunc( afY + 0.5 ) ) ) Then Begin
+        fPosition.x:=afX;
+        fPosition.y:=afY;
+     End;
 end;
 
 
