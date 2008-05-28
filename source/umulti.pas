@@ -852,6 +852,12 @@ Begin
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DoIgnition();
                End;
+               HEADER_EXPLOSE :
+               Begin
+                    _nNetID := StrToInt( GetString( sData, 1 ) );
+                    pBomb := GetBombByNetID( _nNetID );
+                    pBomb.Explose();
+               End;
                HEADER_WAIT :
                Begin
                     l := 1;
@@ -885,14 +891,13 @@ Begin
                     While ( GetString( sData, l ) <> 'NULL' ) Do Begin
                         _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
                         pBomb := GetBombByNetID( _nNetID );
-                        fX := StrToFloat( GetString( sData, l ) ); l += 1;
-                        fY := StrToFloat( GetString( sData, l ) ); l += 1;
                         If pBomb <> Nil Then Begin
+                           fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                           fY := StrToFloat( GetString( sData, l ) ); l += 1;
                            pBomb.Position.x := fX;
                            pBomb.Position.y := fY;
                         End Else Begin
-                            pGrid.GetBlock( Trunc( fX ), Trunc( fY ) ).Destroy();
-                            pGrid.aBlock[ Trunc( fX ), Trunc( fY ) ] := Nil;
+                            l += 2;
                         End;
                     End;
                End;

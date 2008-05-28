@@ -512,6 +512,7 @@ Procedure CBomb.Explose();
            
            
 var k : integer;
+    sData : String;
 begin
   k := (Random(3) + 1) * 10;
   PlaySound( SOUND_BOMB(k + nIndex) );
@@ -525,6 +526,10 @@ begin
   uGrid.DelBlock(nX,nY);                                                        //mise a nil de la case 
   uGrid.CreateFlame(nX,nY,nIndex);                                              //histoire de remplacer la bombe par une flame
   Destroy;                                                                      // bye-bye ...
+  If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+     sData := IntToStr( nNetID ) + #31;
+     Send( nLocalIndex, HEADER_EXPLOSE, sData );
+  End;
 end;
 
 
