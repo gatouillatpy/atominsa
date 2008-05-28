@@ -141,7 +141,6 @@ Type GLVector = RECORD
 
 Type LPOGLMesh = ^OGLMesh;
      OGLMesh = RECORD
-                      Path : String;
                       PolygonCount : LongInt;
                       PolygonData : Array Of LPOGLPolygon;
                       VertexCount : LongInt;
@@ -155,9 +154,22 @@ Type LPOGLMesh = ^OGLMesh;
 
                 
 
+Type LPOGLAction = ^OGLAction;
+     LPOGLFrame = ^OGLFrame;
+     OGLAction = RECORD
+                        framestart : LongInt;
+                        framecount : LongInt;
+                  END;
+     OGLFrame = RECORD
+                      Time : LongInt;
+                      Mesh : LPOGLMesh;
+                      VectorArray : Array Of GLVector;
+                 END;
+
+
+
 Type LPOGLTexture = ^OGLTexture;
      OGLTexture = RECORD
-                        Path : String;
 			Width : Integer;
 			Height : Integer;
 			Data : Array Of GLUByte;
@@ -178,7 +190,11 @@ Procedure InitDataStack () ;
 Procedure FreeDataStack () ;
 Procedure ReloadDataStack () ;
 
-//Function GetTexture ( sFile : String ) : LPOGLTexture;
+Procedure AddItem( nData : Integer ; nIndex : Integer ; pItem : Pointer ; sPath : String ) ;
+Function FindItem( nData : Integer ; nIndex : Integer ) : Pointer ;
+Function FindItemByPath( nData : Integer ; sPath : String ) : Pointer ;
+Procedure DelItem( nData : Integer ; nIndex : Integer ) ;
+
 Function AddTexture ( sFile : String ; nIndex : LongInt ) : LPOGLTexture;
 Procedure DelTexture ( nIndex : LongInt ) ;
 Procedure SetTexture( nStage : Integer ; nIndex : LongInt ) ;
@@ -858,6 +874,23 @@ End;
 
 
 
+Function FindItemByPath( nData : Integer ; sPath : String ) : Pointer ;
+Var pDataItem : LPDataItem;
+    pItem : Pointer;
+Begin
+     pDataItem := pDataStack;
+     pItem := NIL;
+     While pDataItem <> NIL Do Begin
+          If (pDataItem^.data = nData) And (pDataItem^.path = sPath) Then pItem := pDataItem^.item;
+          If pItem <> NIL Then Break;
+          pDataItem := pDataItem^.next;
+     End;
+
+     FindItemByPath := pItem;
+End;
+
+
+
 Procedure DelItem( nData : Integer ; nIndex : Integer ) ;
 Var pDataItem : LPDataItem;
     pTempItem : LPDataItem;
@@ -1158,11 +1191,6 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// GetTexture : Recherche une OGLTexture dans le manager de ressources.       //
-////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////
 // AddTexture : Charge une OGLTexture depuis un fichier bitmap, l'ajoute à la //
 //              pile de données, puis renvoie son pointeur.                   //
 ////////////////////////////////////////////////////////////////////////////////
@@ -1188,6 +1216,14 @@ Begin
      l := 4 * (Round(j * v) * (w + 1) + Round(i * u));
 End;
 Begin
+     // appel au manager de ressources pour éviter de charger une texture déjà chargée
+     pTexture := FindItemByPath( DATA_TEXTURE, sFile );
+     If pTexture <> NIL Then Begin
+        AddLineToConsole( 'Reloading texture ' + sFile + '.' );
+        AddTexture := pTexture;
+        Exit;
+     End;
+
      AddLineToConsole( 'Loading texture ' + sFile + '...' );
 
      // création du pointeur vers la nouvelle texture
@@ -1371,6 +1407,14 @@ Var ioLong : File Of LongInt ; ioPolygon : File Of OGLPolygon ; ioVertex : File 
     i, j : LongInt ;
 Begin
      j := 0;
+
+     // appel au manager de ressources pour éviter de charger un mesh déjà chargé
+     pMesh := FindItemByPath( DATA_MESH, sFile );
+     If pMesh <> NIL Then Begin
+        AddLineToConsole( 'Reloading mesh ' + sFile + '.' );
+        AddMesh := pMesh;
+        Exit;
+     End;
 
      AddLineToConsole( 'Loading mesh ' + sFile + '...' );
 
@@ -2275,6 +2319,13 @@ End;
 Procedure AddSound ( sFile : String ; nIndex : LongInt ) ;
 Var pSound : PFSoundSample;
 Begin
+     // appel au manager de ressources pour éviter de charger un son déjà chargé
+     pSound := FindItemByPath( DATA_SOUND, sFile );
+     If pSound <> NIL Then Begin
+        AddLineToConsole( 'Reloading sound ' + sFile + '.' );
+        Exit;
+     End;
+
      AddLineToConsole( 'Loading sound ' + sFile + '...' );
 
      // chargement du son

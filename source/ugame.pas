@@ -191,21 +191,21 @@ Begin
      End Else Begin
         pPlayerCharacter[tPlayer] := aCharacterList[nPlayerCharacter[tPlayer]];
      End;
-     DelMesh( MESH_BOMBERMAN(tPlayer) );
+     //DelMesh( MESH_BOMBERMAN(tPlayer) );
      AddMesh( './characters/' + pPlayerCharacter[tPlayer].PlayerMesh, MESH_BOMBERMAN(tPlayer) );
-     DelMesh( MESH_BOMB(tPlayer) );
+     //DelMesh( MESH_BOMB(tPlayer) );
      AddMesh( './characters/' + pPlayerCharacter[tPlayer].BombMesh, MESH_BOMB(tPlayer) );
-     DelTexture( TEXTURE_BOMBERMAN(tPlayer) );
+     //DelTexture( TEXTURE_BOMBERMAN(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].PlayerSkin[tPlayer], TEXTURE_BOMBERMAN(tPlayer) );
-     DelTexture( TEXTURE_BOMB(tPlayer) );
+     //DelTexture( TEXTURE_BOMB(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].BombSkin, TEXTURE_BOMB(tPlayer) );
-     DelTexture( TEXTURE_FLAME(tPlayer) );
+     //DelTexture( TEXTURE_FLAME(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].FlameTexture, TEXTURE_FLAME(tPlayer) );
-     DelSound( SOUND_BOMB(10+tPlayer) );
+     //DelSound( SOUND_BOMB(10+tPlayer) );
      AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[1], SOUND_BOMB(10+tPlayer) );
-     DelSound( SOUND_BOMB(20+tPlayer) );
+     //DelSound( SOUND_BOMB(20+tPlayer) );
      AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[2], SOUND_BOMB(20+tPlayer) );
-     DelSound( SOUND_BOMB(30+tPlayer) );
+     //DelSound( SOUND_BOMB(30+tPlayer) );
      AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[3], SOUND_BOMB(30+tPlayer) );
 End;
 
