@@ -140,6 +140,7 @@ Type GLVector = RECORD
 
 Type LPOGLMesh = ^OGLMesh;
      OGLMesh = RECORD
+                      Path : String;
                       PolygonCount : LongInt;
                       PolygonData : Array Of LPOGLPolygon;
                       VertexCount : LongInt;
@@ -155,6 +156,7 @@ Type LPOGLMesh = ^OGLMesh;
 
 Type LPOGLTexture = ^OGLTexture;
      OGLTexture = RECORD
+                        Path : String;
 			Width : Integer;
 			Height : Integer;
 			Data : Array Of GLUByte;
@@ -175,6 +177,7 @@ Procedure InitDataStack () ;
 Procedure FreeDataStack () ;
 Procedure ReloadDataStack () ;
 
+//Function GetTexture ( sFile : String ) : LPOGLTexture;
 Function AddTexture ( sFile : String ; nIndex : LongInt ) : LPOGLTexture;
 Procedure DelTexture ( nIndex : LongInt ) ;
 Procedure SetTexture( nStage : Integer ; nIndex : LongInt ) ;
@@ -1151,6 +1154,11 @@ Begin
      gluPerspective( fFOV, fRatio, fNearPlane, fFarPlane );
 End;
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// GetTexture : Recherche une OGLTexture dans le manager de ressources.       //
+////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -580,8 +580,8 @@ Begin
                     k := StrToInt( GetString( sData, l ) ); l += 1;
                     pBomberman := GetBombermanByIndex( k );
                     _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
-                    fX := StrToInt( GetString( sData, l ) ); l += 1;
-                    fY := StrToInt( GetString( sData, l ) ); l += 1;
+                    fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                    fY := StrToFloat( GetString( sData, l ) ); l += 1;
                     nBombSize := StrToInt( GetString( sData, l ) ); l += 1;
                     fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
                     If ( Trunc(fX + 0.5) in [1..GRIDWIDTH] )
