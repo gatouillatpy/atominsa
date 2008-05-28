@@ -885,13 +885,14 @@ Begin
                     While ( GetString( sData, l ) <> 'NULL' ) Do Begin
                         _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
                         pBomb := GetBombByNetID( _nNetID );
+                        fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                        fY := StrToFloat( GetString( sData, l ) ); l += 1;
                         If pBomb <> Nil Then Begin
-                           fX := StrToFloat( GetString( sData, l ) ); l += 1;
-                           fY := StrToFloat( GetString( sData, l ) ); l += 1;
                            pBomb.Position.x := fX;
                            pBomb.Position.y := fY;
                         End Else Begin
-                            l += 2;
+                            pGrid.GetBlock( Trunc( fX ), Trunc( fY ) ).Destroy();
+                            pGrid.aBlock[ Trunc( fX ), Trunc( fY ) ] := Nil;
                         End;
                     End;
                End;
