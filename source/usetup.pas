@@ -65,10 +65,12 @@ Var nCharacterCount : Integer;
 Var pPlayerCharacter : Array [1..8] Of CCharacter;
 Var nPlayerCharacter : Array [1..8] Of Integer;
 Var sPlayerName : Array [1..8] Of String;
+Var sKeyToString : Array[0..255] Of String;
 Var nPlayerType : Array [1..8] Of Integer;
 Var nPlayerSkill : Array [1..8] Of Integer;
 Var nPlayerClient : Array [1..8] Of Integer;
 Var fPlayerPing : Array [1..8] Of Single;
+
 
 Var nKey1Primary : Integer;
 Var nKey1Secondary : Integer;
@@ -148,6 +150,41 @@ Var bLeft   : Boolean;
 Var bRight  : Boolean;
 Var bEnter  : Boolean;
 Var bEscape : Boolean;
+
+
+
+Procedure InitKeyToStr();
+Var i : Integer;
+Begin
+     sKeyToString[ 0 ] := chr( 0 );
+     For i := 1 To 12 Do
+         sKeyToString[ i ] := 'F' + IntToStr( i );
+     For i := 13 To 99 Do
+         sKeyToString[ i ] := chr( i );
+     sKeyToString[ 34 ] := 'DOUBLE QUOTE';
+     sKeyToString[ 36 ] := 'DOLLAR';
+     sKeyToString[ 42 ] := 'STAR';
+     sKeyToString[ 61 ] := 'EQUAL';
+     sKeyToString[ 94 ] := 'POWER';
+     sKeyToString[ 95 ] := 'UNDERSCORE';
+     sKeyToString[ 100 ] := 'LEFT';
+     sKeyToString[ 101 ] := 'UP';
+     sKeyToString[ 102 ] := 'RIGHT';
+     sKeyToString[ 103 ] := 'DOWN';
+     sKeyToString[ 104 ] := 'PAGE_UP';
+     sKeyToString[ 105 ] := 'PAGE_DOWN';
+     sKeyToString[ 106 ] := 'HOME';
+     sKeyToString[ 107 ] := 'END';
+     sKeyToString[ 108 ] := 'INSERT';
+     For i := 109 To 255 Do
+         sKeyToString[ i ] := chr( i );
+     sKeyToString[ 224 ] := 'ACCENTED A';
+     sKeyToString[ 231 ] := 'C CEDILLA';
+     sKeyToString[ 232 ] := 'E GRAVE';
+     sKeyToString[ 233 ] := 'E ACUTE';
+     sKeyToString[ 249 ] := 'U ACUTE';
+End;
+
 
 
 Procedure InitMenu () ;
@@ -636,6 +673,9 @@ Var tFile : TSearchRec;
     sFile : String;
     k : Integer;
 Begin
+     // Initialisation du tableau de correspondance String-Key.
+     InitKeyToStr();
+     
      // initialisation du menu
      InitMenu();
 

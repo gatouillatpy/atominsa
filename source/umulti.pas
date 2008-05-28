@@ -856,7 +856,8 @@ Begin
                Begin
                     _nNetID := StrToInt( GetString( sData, 1 ) );
                     pBomb := GetBombByNetID( _nNetID );
-                    pBomb.Explose();
+                    If ( pBomb <> Nil ) Then
+                       pBomb.Explose();
                End;
                HEADER_WAIT :
                Begin
