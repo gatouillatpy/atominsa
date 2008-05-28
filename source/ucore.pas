@@ -1220,6 +1220,7 @@ Begin
      pTexture := FindItemByPath( DATA_TEXTURE, sFile );
      If pTexture <> NIL Then Begin
         AddLineToConsole( 'Reloading texture ' + sFile + '.' );
+        AddItem( DATA_TEXTURE, nIndex, pTexture, sFile );
         AddTexture := pTexture;
         Exit;
      End;
@@ -1412,6 +1413,7 @@ Begin
      pMesh := FindItemByPath( DATA_MESH, sFile );
      If pMesh <> NIL Then Begin
         AddLineToConsole( 'Reloading mesh ' + sFile + '.' );
+        AddItem( DATA_MESH, nIndex, pMesh, sFile );
         AddMesh := pMesh;
         Exit;
      End;
@@ -2323,6 +2325,7 @@ Begin
      pSound := FindItemByPath( DATA_SOUND, sFile );
      If pSound <> NIL Then Begin
         AddLineToConsole( 'Reloading sound ' + sFile + '.' );
+        AddItem( DATA_SOUND, nIndex, pSound, sFile );
         Exit;
      End;
 

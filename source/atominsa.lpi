@@ -40,8 +40,8 @@
       <Unit1>
         <Filename Value="ucore.pas"/>
         <UnitName Value="UCore"/>
-        <CursorPos X="1" Y="170"/>
-        <TopLine Value="133"/>
+        <CursorPos X="44" Y="2328"/>
+        <TopLine Value="2307"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
@@ -149,8 +149,8 @@
       <Unit15>
         <Filename Value="ubomberman.pas"/>
         <UnitName Value="UBomberman"/>
-        <CursorPos X="1" Y="34"/>
-        <TopLine Value="13"/>
+        <CursorPos X="39" Y="36"/>
+        <TopLine Value="1"/>
         <EditorIndex Value="14"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -637,55 +637,15 @@
         <UsageCount Value="10"/>
       </Unit80>
     </Units>
-    <JumpHistory Count="12" HistoryIndex="11">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
-        <Filename Value="atominsa.lpr"/>
-        <Caret Line="92" Column="86" TopLine="44"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="2328" Column="28" TopLine="2319"/>
       </Position1>
       <Position2>
-        <Filename Value="atominsa.lpr"/>
-        <Caret Line="154" Column="45" TopLine="142"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1416" Column="42" TopLine="1395"/>
       </Position2>
-      <Position3>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1280" Column="13" TopLine="1269"/>
-      </Position3>
-      <Position4>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="198" Column="9" TopLine="174"/>
-      </Position4>
-      <Position5>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="1332" Column="109" TopLine="1323"/>
-      </Position5>
-      <Position6>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="198" Column="9" TopLine="174"/>
-      </Position6>
-      <Position7>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="195" Column="9" TopLine="173"/>
-      </Position7>
-      <Position8>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="2311" Column="51" TopLine="2290"/>
-      </Position8>
-      <Position9>
-        <Filename Value="atominsa.lpr"/>
-        <Caret Line="111" Column="6" TopLine="95"/>
-      </Position9>
-      <Position10>
-        <Filename Value="atominsa.lpr"/>
-        <Caret Line="116" Column="12" TopLine="90"/>
-      </Position10>
-      <Position11>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="120" Column="39" TopLine="99"/>
-      </Position11>
-      <Position12>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="122" Column="30" TopLine="100"/>
-      </Position12>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
