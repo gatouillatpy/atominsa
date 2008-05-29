@@ -26,6 +26,7 @@ type
 
     fPosition,                   // position graphique du personnage
     fOrigin   : Vector;          // position a la creation du personnage
+    fMoveTime,                     // temps de référence du dernier mouvement
     fSpeed,                      // vitesse du bomberman
     fBombTime : Single;          // temps avant explosion des bombes
 
@@ -136,6 +137,8 @@ type
   procedure ActiveSpoog();
   procedure ActiveTrigger();
 
+    function IsMoving():boolean;
+
   function CanBomb():boolean;
 
   property Position : Vector Read fPosition Write fPosition;
@@ -146,7 +149,7 @@ type
   Property LY : Single Read fLY Write fLY;
   Property CX : Single Read fCX Write fCX;
   Property CY : Single Read fCY Write fCY;
-  
+
   Property Danger : Integer Read nDanger Write nDanger;
   Property DangerLeft : Integer Read nDangerLeft Write nDangerLeft;
   Property DangerRight : Integer Read nDangerRight Write nDangerRight;
@@ -518,6 +521,11 @@ End;
 { Toute la gestion du deplacement des bombermans                                }
 {*******************************************************************************}
 
+function CBomberman.IsMoving():boolean;
+begin
+     If (GetTime() - fMoveTime < 0.1) Then IsMoving := true Else IsMoving := false;
+end;
+
 function CBomberman.TestBomb(aX,aY : integer):boolean;
 {True = c'est une bombe}
 begin
@@ -610,6 +618,8 @@ var  aX1, aX2, aY1, aY2 : integer;
      bExtrem1, bExtrem2, bBomb1, bBomb2 : boolean;
      sData : String;
 begin
+    fMoveTime := GetTime();
+
   {On modifie l'orientation du bomberman}
   nDirection:=-dX*90+90*dY*(dY-1);
 

@@ -191,21 +191,14 @@ Begin
      End Else Begin
         pPlayerCharacter[tPlayer] := aCharacterList[nPlayerCharacter[tPlayer]];
      End;
-     //DelMesh( MESH_BOMBERMAN(tPlayer) );
+     AddAnimation( './characters/' + pPlayerCharacter[tPlayer].PlayerAnim, ANIMATION_BOMBERMAN(tPlayer), MESH_BOMBERMAN(tPlayer) );
      AddMesh( './characters/' + pPlayerCharacter[tPlayer].PlayerMesh, MESH_BOMBERMAN(tPlayer) );
-     //DelMesh( MESH_BOMB(tPlayer) );
      AddMesh( './characters/' + pPlayerCharacter[tPlayer].BombMesh, MESH_BOMB(tPlayer) );
-     //DelTexture( TEXTURE_BOMBERMAN(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].PlayerSkin[tPlayer], TEXTURE_BOMBERMAN(tPlayer) );
-     //DelTexture( TEXTURE_BOMB(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].BombSkin, TEXTURE_BOMB(tPlayer) );
-     //DelTexture( TEXTURE_FLAME(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].FlameTexture, TEXTURE_FLAME(tPlayer) );
-     //DelSound( SOUND_BOMB(10+tPlayer) );
      AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[1], SOUND_BOMB(10+tPlayer) );
-     //DelSound( SOUND_BOMB(20+tPlayer) );
      AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[2], SOUND_BOMB(20+tPlayer) );
-     //DelSound( SOUND_BOMB(30+tPlayer) );
      AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[3], SOUND_BOMB(30+tPlayer) );
 End;
 
@@ -234,29 +227,29 @@ Begin
      End Else Begin
         pMap := aMapList[nMap];
      End;
-     DelMesh( MESH_BLOCK_SOLID );
+     //DelMesh( MESH_BLOCK_SOLID );
      AddMesh( './maps/' + pMap.SolidMesh, MESH_BLOCK_SOLID );
-     DelMesh( MESH_BLOCK_BRICK );
+     //DelMesh( MESH_BLOCK_BRICK );
      AddMesh( './maps/' + pMap.BrickMesh, MESH_BLOCK_BRICK );
-     DelMesh( MESH_PLANE );
+     //DelMesh( MESH_PLANE );
      AddMesh( './maps/' + pMap.PlaneMesh, MESH_PLANE );
-     DelTexture( TEXTURE_MAP_SOLID );
+     //DelTexture( TEXTURE_MAP_SOLID );
      AddTexture( './maps/' + pMap.SolidTexture, TEXTURE_MAP_SOLID );
-     DelTexture( TEXTURE_MAP_BRICK );
+     //DelTexture( TEXTURE_MAP_BRICK );
      AddTexture( './maps/' + pMap.BrickTexture, TEXTURE_MAP_BRICK );
-     DelTexture( TEXTURE_MAP_PLANE );
+     //DelTexture( TEXTURE_MAP_PLANE );
      AddTexture( './maps/' + pMap.PlaneTexture, TEXTURE_MAP_PLANE );
-     DelTexture( TEXTURE_MAP_SKYBOX(1) );
+     //DelTexture( TEXTURE_MAP_SKYBOX(1) );
      AddTexture( './maps/' + pMap.SkyboxBottom, TEXTURE_MAP_SKYBOX(1) );
-     DelTexture( TEXTURE_MAP_SKYBOX(2) );
+     //DelTexture( TEXTURE_MAP_SKYBOX(2) );
      AddTexture( './maps/' + pMap.SkyboxTop, TEXTURE_MAP_SKYBOX(2) );
-     DelTexture( TEXTURE_MAP_SKYBOX(3) );
+     //DelTexture( TEXTURE_MAP_SKYBOX(3) );
      AddTexture( './maps/' + pMap.SkyboxFront, TEXTURE_MAP_SKYBOX(3) );
-     DelTexture( TEXTURE_MAP_SKYBOX(4) );
+     //DelTexture( TEXTURE_MAP_SKYBOX(4) );
      AddTexture( './maps/' + pMap.SkyboxBack, TEXTURE_MAP_SKYBOX(4) );
-     DelTexture( TEXTURE_MAP_SKYBOX(5) );
+     //DelTexture( TEXTURE_MAP_SKYBOX(5) );
      AddTexture( './maps/' + pMap.SkyboxLeft, TEXTURE_MAP_SKYBOX(5) );
-     DelTexture( TEXTURE_MAP_SKYBOX(6) );
+     //DelTexture( TEXTURE_MAP_SKYBOX(6) );
      AddTexture( './maps/' + pMap.SkyboxRight, TEXTURE_MAP_SKYBOX(6) );
 End;
 
@@ -497,7 +490,12 @@ Begin
           Begin
                SetTexture( 1, TEXTURE_BOMBERMAN(i) );
                PushObjectMatrix( aBomberman.Position.X-0.15, aBomberman.Position.Z, aBomberman.Position.Y-0.15, 0.05, 0.05, 0.05, 0, aBomberman.Direction, 0 );
-               DrawMesh( MESH_BOMBERMAN(aBomberman.BIndex), False );
+               //DrawMesh( MESH_BOMBERMAN(aBomberman.BIndex), False );
+               If aBomberman.IsMoving() Then Begin
+                  DrawAnimation( ANIMATION_BOMBERMAN(aBomberman.BIndex), False, 1 );
+               End Else Begin
+                  DrawAnimation( ANIMATION_BOMBERMAN(aBomberman.BIndex), False, 0 );
+               End;
                PopObjectMatrix();
                If bUpdate Then aBomberman.Update(GetDelta());
           End;

@@ -156,13 +156,21 @@ Type LPOGLMesh = ^OGLMesh;
 
 Type LPOGLAction = ^OGLAction;
      LPOGLFrame = ^OGLFrame;
+     LPOGLAnimation = ^OGLAnimation;
      OGLAction = RECORD
-                        framestart : LongInt;
-                        framecount : LongInt;
+                        framestart : Smallint;
+                        framecount : Smallint;
                   END;
      OGLFrame = RECORD
                       Time : LongInt;
+                      VectorArray : Array Of GLVector;
+                 END;
+     OGLAnimation = RECORD
                       Mesh : LPOGLMesh;
+                      ActionCount : LongInt;
+                      ActionArray : Array Of OGLAction;
+                      FrameCount : LongInt;
+                      FrameArray : Array Of OGLFrame;
                       VectorArray : Array Of GLVector;
                  END;
 
@@ -204,6 +212,11 @@ Function AddMesh ( sFile : String ; nIndex : LongInt ) : LPOGLMesh ;
 Procedure DelMesh ( nIndex : LongInt ) ;
 Procedure DrawMesh ( nIndex : LongInt ; t : Boolean ) ;
 Procedure FreeMesh ( pMesh : LPOGLMesh ) ;
+
+Function AddAnimation ( sFile : String ; nIndex : LongInt ; nMeshIndex : LongInt ) : LPOGLAnimation ;
+Procedure DelAnimation ( nIndex : LongInt ) ;
+Procedure DrawAnimation ( nIndex : LongInt ; t : Boolean ; nAction : LongInt ) ;
+Procedure FreeAnimation ( pAnimation : LPOGLAnimation ) ;
 
 Procedure Clear ( r, g, b, a : Single ) ;
 
@@ -698,11 +711,12 @@ End;
 
 
 
-Const DATA_NONE    = 0;
-Const DATA_MESH    = 1;
-Const DATA_TEXTURE = 2;
-Const DATA_SOUND   = 3;
-Const DATA_MUSIC   = 4;
+Const DATA_NONE      = 0;
+Const DATA_MESH      = 1;
+Const DATA_TEXTURE   = 2;
+Const DATA_SOUND     = 3;
+Const DATA_MUSIC     = 4;
+Const DATA_ANIMATION = 5;
 
 
 
@@ -1578,6 +1592,245 @@ Begin
 
      // destruction de l'objet dans la pile de données
      DelItem( DATA_MESH, nIndex );
+End;
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// AddAnimation : Charge un OGLAnimation depuis un fichier (*.A12), l'ajoute à la pile  //
+//                de données, puis renvoie son pointeur.                                //
+//////////////////////////////////////////////////////////////////////////////////////////
+Function AddAnimation ( sFile : String ; nIndex : LongInt ; nMeshIndex : LongInt ) : LPOGLAnimation ;
+Var ioLong : File Of LongInt ; ioAction : File Of OGLAction ; ioVector : File Of GLVector ;
+    pAnimation : LPOGLAnimation ;
+    tAnimation : LPOGLAnimation ;
+    pMesh : LPOGLMesh ;
+    nSize : LongInt ;
+    tAction : OGLAction ;
+    i, j, k : LongInt ;
+Begin
+     j := 0;
+
+     // appel au manager de ressources pour éviter de charger une animation déjà chargé
+     pAnimation := FindItemByPath( DATA_ANIMATION, sFile );
+     If pAnimation <> NIL Then Begin
+        AddLineToConsole( 'Reloading animation ' + sFile + '.' );
+        New( tAnimation );
+        tAnimation^.FrameArray := pAnimation^.FrameArray;
+        tAnimation^.ActionArray := pAnimation^.ActionArray;
+        tAnimation^.FrameCount := pAnimation^.FrameCount;
+        tAnimation^.ActionCount := pAnimation^.ActionCount;
+        tAnimation^.Mesh := pAnimation^.Mesh;
+        SetLength( tAnimation^.VectorArray, pAnimation^.Mesh^.VertexCount );
+        AddItem( DATA_ANIMATION, nIndex, tAnimation, sFile );
+        AddAnimation := tAnimation;
+        Exit;
+     End;
+
+     AddLineToConsole( 'Loading animation ' + sFile + '...' );
+
+     // création du pointeur vers la nouvelle animation
+     New( pAnimation );
+
+     // appel au manager de ressources pour récupérer le mesh associé
+     pMesh := FindItem( DATA_MESH, nMeshIndex );
+     pAnimation^.Mesh := pMesh;
+
+     // lecture du nombre d'actions
+     Assign( ioLong, sFile );
+     Reset( ioLong, 4 );
+     Seek( ioLong, j );
+     Read( ioLong, nSize ); j += 1;
+     Close( ioLong );
+
+     // allocation de la mémoire pour le tableau d'actions
+     pAnimation^.ActionCount := nSize;
+     SetLength( pAnimation^.ActionArray, nSize );
+
+     // allocation de la mémoire pour le tableau de vecteurs temporaires
+     SetLength( pAnimation^.VectorArray, pMesh^.VertexCount );
+
+     // lecture de chaque action
+     Assign( ioAction, sFile );
+     Reset( ioAction, 4 );
+     For i := 0 To nSize - 1 Do
+     Begin
+          Seek( ioAction, j );
+          Read( ioAction, tAction ); j += 1;
+          pAnimation^.ActionArray[i].framestart := tAction.framestart;
+          pAnimation^.ActionArray[i].framecount := tAction.framecount;
+     End;
+     Close( ioAction );
+
+     // lecture du nombre de frames
+     Assign( ioLong, sFile );
+     Reset( ioLong, 4 );
+     Seek( ioLong, j ); j += 1;
+     Read( ioLong, nSize );
+     Close( ioLong );
+
+     // allocation de la mémoire pour le tableau de frames
+     pAnimation^.FrameCount := nSize;
+     SetLength( pAnimation^.FrameArray, nSize );
+
+     // lecture de chaque frame
+     For i := 0 To nSize - 1 Do
+     Begin
+          // allocation de la mémoire pour le tableau de vecteurs de la frame
+          SetLength( pAnimation^.FrameArray[i].VectorArray, pMesh^.VertexCount );
+
+          // lecture de la durée de la frame
+          Assign( ioLong, sFile );
+          Reset( ioLong, 4 );
+          Seek( ioLong, j ); j += 1;
+          Read( ioLong, pAnimation^.FrameArray[i].Time );
+          Close( ioLong );
+
+          // lecture des vecteurs de la frame
+          Assign( ioVector, sFile );
+          Reset( ioVector, 4 );
+          For k := 0 To pMesh^.VertexCount - 1 Do
+          Begin
+               Seek( ioVector, j );
+               Read( ioVector, pAnimation^.FrameArray[i].VectorArray[k] ); j += 3;
+          End;
+          Close( ioVector );
+     End;
+
+     // ajout de l'animation à la pile de données
+     AddItem( DATA_ANIMATION, nIndex, pAnimation, sFile );
+
+     AddStringToConsole( Format('OK. (%d bytes)', [j*4]) );
+
+     AddAnimation := pAnimation;
+End;
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// DrawAnimation : Procède au rendu d'une OGLAnimation en fonction de son indice.        //
+///////////////////////////////////////////////////////////////////////////////////////////
+Procedure DrawAnimation ( nIndex : LongInt ; t : Boolean ; nAction : LongInt ) ;
+Var pAnimation : LPOGLAnimation ;
+    pMesh : LPOGLMesh ;
+    nTime : LongInt ;
+    nFrameStart : LongInt ;
+    nFrameCount : LongInt ;
+    nDuration : LongInt ;
+    nFrame : LongInt ;
+    nNextFrame : LongInt ;
+    fTime : Single ;
+    fTick : Single ;
+    fDuration : Single ;
+    fFactor : Single ;
+    pFrameA : LPOGLFrame ;
+    pFrameB : LPOGLFrame ;
+Begin
+     AddLineToConsole(IntToStr(nAction));
+
+     // recherche de l'animation à afficher en fonction de son indice
+     pAnimation := FindItem( DATA_ANIMATION, nIndex );
+     If pAnimation = NIL Then Exit;
+
+     pMesh := pAnimation^.Mesh;
+     
+     If t Then Begin
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+     End;
+
+     nTime := Round(GetTime() * 1000);
+
+     nFrameStart := pAnimation^.ActionArray[nAction].framestart;
+     nFrameCount := pAnimation^.ActionArray[nAction].framecount;
+     
+     // calcul de la durée de l'animation
+     nDuration := 0;
+     For i := nFrameStart To nFrameStart + nFrameCount - 1 Do
+     Begin
+          nDuration += pAnimation^.FrameArray[i].Time;
+     End;
+
+     // détermination de la frame en cours et de la suivante
+     nTime := (nTime Mod nDuration);
+     nDuration := 0;
+     For i := nFrameStart To nFrameStart + nFrameCount - 1 Do
+     Begin
+          nDuration += pAnimation^.FrameArray[i].Time;
+          If nDuration >= nTime Then nFrame := i - nFrameStart;
+          If nDuration >= nTime Then Break;
+     End;
+     If nFrame < nFrameCount - 1 Then nNextFrame := nFrame + 1 Else nNextFrame := 0;
+
+     // calcul du facteur d'interpolation
+     fTime := nTime;
+     fTick := 0;
+     fDuration := pAnimation^.FrameArray[nFrameStart+nFrame].Time;
+     For i := nFrameStart To nFrameStart + nFrame - 1 Do
+     Begin
+          fTick += pAnimation^.FrameArray[i].Time;
+     End;
+     fFactor := (fTime - fTick) / fDuration;
+     
+     // interpolation linéaire entre deux frames
+     pFrameA := @pAnimation^.FrameArray[nFrameStart+nFrame];
+     pFrameB := @pAnimation^.FrameArray[nFrameStart+nNextFrame];
+     For i := 0 To pAnimation^.Mesh^.PolygonCount - 1 Do
+     Begin
+          pAnimation^.VectorArray[i].x := pFrameA^.VectorArray[i].x + (pFrameB^.VectorArray[i].x - pFrameA^.VectorArray[i].x) * fFactor;
+          pAnimation^.VectorArray[i].y := pFrameA^.VectorArray[i].y + (pFrameB^.VectorArray[i].y - pFrameA^.VectorArray[i].y) * fFactor;
+          pAnimation^.VectorArray[i].z := pFrameA^.VectorArray[i].z + (pFrameB^.VectorArray[i].z - pFrameA^.VectorArray[i].z) * fFactor;
+     End;
+
+     glEnableClientState(GL_VERTEX_ARRAY);
+     glEnableClientState(GL_NORMAL_ARRAY);
+     glEnableClientState(GL_COLOR_ARRAY);
+     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+     glVertexPointer(3, GL_FLOAT, 0, @pAnimation^.VectorArray[0]);
+     glNormalPointer(GL_FLOAT, 0, @pMesh^.NormalArray[0]);
+     glColorPointer(3, GL_FLOAT, 0, @pMesh^.ColorArray[0]);
+     glTexCoordPointer(2, GL_FLOAT, 0, @pMesh^.TextureArray[0]);
+
+     glDrawElements(GL_TRIANGLES, pMesh^.PolygonCount * 3, GL_UNSIGNED_INT, @pMesh^.IndexArray[0]);
+
+     glDisableClientState(GL_VERTEX_ARRAY);
+     glDisableClientState(GL_NORMAL_ARRAY);
+     glDisableClientState(GL_COLOR_ARRAY);
+     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+     glDisable( GL_BLEND );
+End;
+
+
+
+Procedure FreeAnimation ( pAnimation : LPOGLAnimation ) ;
+Var i : Integer;
+Begin
+     For i := 0 To pAnimation^.FrameCount Do
+     Begin
+          Finalize( pAnimation^.FrameArray[i].VectorArray );
+     End;
+     Finalize( pAnimation^.VectorArray );
+     Finalize( pAnimation^.FrameArray );
+     Finalize( pAnimation^.ActionArray );
+     Dispose( pAnimation );
+End;
+
+
+
+Procedure DelAnimation ( nIndex : LongInt ) ;
+Var pAnimation : LPOGLAnimation;
+Begin
+     // recherche de l'animation à sélectionner en fonction de son indice
+     pAnimation := FindItem( DATA_ANIMATION, nIndex );
+     If pAnimation = NIL Then Exit;
+
+     // destruction de l'animation
+     FreeAnimation( pAnimation );
+
+     // destruction de l'objet dans la pile de données
+     DelItem( DATA_ANIMATION, nIndex );
 End;
 
 

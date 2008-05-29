@@ -140,6 +140,9 @@ Function SOUND_BOMB( k : Integer ) : Integer ;
 
 
 
+// constantes de définition des animations
+Const ANIMATION_BOMBERMAN_NULL    = 9700;
+
 // constantes de définition des meshes
 Const MESH_BOMBERMAN_NULL    = 5300;
 
@@ -160,6 +163,7 @@ Function MESH_BOMBERMAN( k : Integer ) : Integer ;
 
 Function MESH_BOMB( k : Integer ) : Integer ;
 
+Function ANIMATION_BOMBERMAN( k : Integer ) : Integer ;
 
 // constantes de définition des textures et sprites
 Const TEXTURE_NONE              = 0;
@@ -321,6 +325,11 @@ End;
 Function TEXTURE_MAP_SKYBOX( k : Integer ) : Integer ;
 Begin
      TEXTURE_MAP_SKYBOX := k + TEXTURE_MAP_SKYBOX_NULL;
+End;
+
+Function ANIMATION_BOMBERMAN( k : Integer ) : Integer ;
+Begin
+     ANIMATION_BOMBERMAN := k + ANIMATION_BOMBERMAN_NULL;
 End;
 
 

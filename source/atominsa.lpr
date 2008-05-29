@@ -149,22 +149,15 @@ Begin
          End Else Begin
              pPlayerCharacter[k] := aCharacterList[nPlayerCharacter[k]];
          End;
-         DelMesh( MESH_BOMBERMAN(k) );
          AddMesh( './characters/' + pPlayerCharacter[k].PlayerMesh, MESH_BOMBERMAN(k) );
-         DelMesh( MESH_BOMB(k) );
          AddMesh( './characters/' + pPlayerCharacter[k].BombMesh, MESH_BOMB(k) );
-         DelTexture( TEXTURE_BOMBERMAN(k) );
          AddTexture( './characters/' + pPlayerCharacter[k].PlayerSkin[k], TEXTURE_BOMBERMAN(k) );
-         DelTexture( TEXTURE_BOMB(k) );
          AddTexture( './characters/' + pPlayerCharacter[k].BombSkin, TEXTURE_BOMB(k) );
-         DelTexture( TEXTURE_FLAME(k) );
          AddTexture( './characters/' + pPlayerCharacter[k].FlameTexture, TEXTURE_FLAME(k) );
-         DelSound( SOUND_BOMB(10+k) );
          AddSound( './characters/' + pPlayerCharacter[k].BombSound[1], SOUND_BOMB(10+k) );
-         DelSound( SOUND_BOMB(20+k) );
          AddSound( './characters/' + pPlayerCharacter[k].BombSound[2], SOUND_BOMB(20+k) );
-         DelSound( SOUND_BOMB(30+k) );
          AddSound( './characters/' + pPlayerCharacter[k].BombSound[3], SOUND_BOMB(30+k) );
+         AddAnimation( './characters/' + pPlayerCharacter[k].PlayerAnim, ANIMATION_BOMBERMAN(k), MESH_BOMBERMAN(k) );
      End;
 
      // initialisation de la machine d'état
