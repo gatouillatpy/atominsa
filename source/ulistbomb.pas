@@ -176,6 +176,8 @@ pPrev:=Nil;
     begin
       pPrev:=pTemp;
       pTemp:=pTemp^.Next;
+      // TODO
+      // il y a un bug a corriger lorsqu'une trigger bombe est supprimée
       Find:=(pTemp^.Bomb.XGrid=wBomb.XGrid) And (pTemp^.Bomb.YGrid=wBomb.YGrid);
     end;
 

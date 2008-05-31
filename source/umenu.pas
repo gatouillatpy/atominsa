@@ -109,7 +109,6 @@ Begin
      // affichage de la croix
      SetTexture( 1, SPRITE_MENU_CROSS );
      DrawImage( u, v, -1, 2 * w / h, 2, 1, 1, 1, 0.1, True );
-     DrawText( w - 170, h - 20, 1, 1, 1, FONT_NORMAL, 'atominsa ' + VERSION );
 
      // identification du bouton en surbrillance
      i := Round(x / w * Window.Mask.Picture.Width);

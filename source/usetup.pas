@@ -42,6 +42,8 @@ Var nFramerate : Integer;
 Var bLighting : Boolean;
 Var bShadowing : Boolean;
 Var bReflection : Boolean;
+Var bEffects : Boolean;
+Var bBlur : Boolean;
 Var nTexturing : Integer;
 Var bDisplayFullscreen : Boolean;
 Var nDisplayWidth : Integer;
@@ -862,6 +864,8 @@ Begin
      bLighting := False;
      bShadowing := False;
      bReflection := False;
+     bEffects := False;
+     bBlur := False;
      nTexturing := 8;
      bDisplayFullscreen := False;
      nDisplayWidth := 640;
@@ -909,8 +913,11 @@ Begin
      nKey2MoveRight := 100;
 
      Assign( ioLine, sFile );
+     {$I-}
      Reset( ioLine );
-
+     {$I+}
+     If IOResult <> 0 Then Exit;
+     
      While EOF(ioLine) = False Do
      Begin
           ReadLn( ioLine, sLine );
@@ -931,8 +938,8 @@ Begin
                        End Else Begin
                           AddLineToConsole( 'Player ' + IntToStr(k) + ' character : ' + '*UNKNOWN*' );
                        End;
-                       End Else Begin
-                          AddLineToConsole( 'Player ' + IntToStr(k) + ' character : ' + '*RANDOM*' );
+                    End Else Begin
+                        AddLineToConsole( 'Player ' + IntToStr(k) + ' character : ' + '*RANDOM*' );
                     End;
                     sPlayerName[k] := GetString(sLine, 3);
                     AddLineToConsole( 'Player ' + IntToStr(k) + ' name : ' + sPlayerName[k] );
@@ -1040,7 +1047,13 @@ Begin
                     If LowerCase(GetString(sLine, 4)) = 'true' Then bReflection := True;
                     If LowerCase(GetString(sLine, 4)) = 'false' Then bReflection := False;
                     If bReflection Then AddLineToConsole( 'Reflection : Enabled' ) Else AddLineToConsole( 'Reflection : Disabled' );
-                    nTexturing := GetInteger(sLine, 5);
+                    If LowerCase(GetString(sLine, 5)) = 'true' Then bEffects := True;
+                    If LowerCase(GetString(sLine, 5)) = 'false' Then bEffects := False;
+                    If bEffects Then AddLineToConsole( 'Effects : Enabled' ) Else AddLineToConsole( 'Effects : Disabled' );
+                    If LowerCase(GetString(sLine, 6)) = 'true' Then bBlur := True;
+                    If LowerCase(GetString(sLine, 6)) = 'false' Then bBlur := False;
+                    If bBlur Then AddLineToConsole( 'Blur : Enabled' ) Else AddLineToConsole( 'Blur : Disabled' );
+                    nTexturing := GetInteger(sLine, 7);
                     AddLineToConsole( Format('Texturing quality : %d', [nTexturing]) );
                End;
                STEP_WINDOW :
@@ -1156,12 +1169,14 @@ Begin
      WriteLn( ioLine, s );
 
      WriteLn( ioLine );
-     WriteLn( ioLine , '; quality settings (framerate, lighting, shadowing, reflection, texturing)' );
+     WriteLn( ioLine , '; quality settings (framerate, lighting, shadowing, reflection, effects, blur, texturing)' );
      s := '-Q,';
      s := s + IntToStr(nFramerate) + ',';
      If bLighting Then s := s + 'true,' Else s := s + 'false,';
      If bShadowing Then s := s + 'true,' Else s := s + 'false,';
      If bReflection Then s := s + 'true,' Else s := s + 'false,';
+     If bEffects Then s := s + 'true,' Else s := s + 'false,';
+     If bBlur Then s := s + 'true,' Else s := s + 'false,';
      s := s + IntToStr(nTexturing);
      WriteLn( ioLine, s );
 

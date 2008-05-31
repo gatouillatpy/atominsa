@@ -114,16 +114,16 @@ Procedure LoadScheme () ;
 Procedure LoadMap () ;
 
 Procedure SetCamera () ;
-Procedure SetLighting ( h : Single ; a0, a1, a2 : Single ) ;
+Procedure SetLighting ( w : Single ; h : Single ; a0, a1, a2 : Single ) ;
 
 Procedure DrawBomberman ( w : Single; bUpdate : boolean ) ;
 Procedure DrawGrid ( w : Single ) ;
 Procedure DrawBomb ( w : Single; bUpdate : boolean ) ;
 Procedure DrawFlame ( w : Single; bUpdate : boolean ) ;
 Procedure DrawPlane ( w : Single ) ;
-Procedure DrawTimer () ;
-Procedure DrawScore () ;
-Procedure DrawScreen () ;
+Procedure DrawTimer ( p : Single ) ;
+Procedure DrawScore ( p : Single ) ;
+Procedure DrawScreen ( p : Single ) ;
 
 Procedure InitScreen () ;
 Procedure AddBlankToScreen () ;
@@ -412,7 +412,7 @@ End;
 
 
 
-Procedure SetLighting ( h : Single ; a0, a1, a2 : Single ) ;
+Procedure SetLighting ( w : Single ; h : Single ; a0, a1, a2 : Single ) ;
 Var k : Integer;
     aBomberman : CBomberman;
 Begin
@@ -425,49 +425,49 @@ Begin
         begin
            aBomberman:=GetBombermanByIndex(1);
            if aBomberman.Alive then
-           SetLight( 0, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 1, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 0, aBomberman.Position.X, h, aBomberman.Position.Y - 2, w, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         end;
         If nPlayerType[2] > 0 Then
         begin
            aBomberman:=GetBombermanByIndex(2);
            if aBomberman.Alive then
-           SetLight( 1, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 1, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 0, w, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         end;
         If nPlayerType[3] > 0 Then
         begin
            aBomberman:=GetBombermanByIndex(3);
            if aBomberman.Alive then
-           SetLight( 2, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 2, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, w, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         end;
         If nPlayerType[4] > 0 Then
         begin
            aBomberman:=GetBombermanByIndex(4);
            if aBomberman.Alive then
-           SetLight( 3, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 1, 1, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 3, aBomberman.Position.X, h, aBomberman.Position.Y - 2, w, w, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         end;
         If nPlayerType[5] > 0 Then
         begin
            aBomberman:=GetBombermanByIndex(5);
            if aBomberman.Alive then
-           SetLight( 4, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 4, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, w, w, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         end;
         If nPlayerType[6] > 0 Then
         begin
            aBomberman:=GetBombermanByIndex(6);
            if aBomberman.Alive then
-           SetLight( 5, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 1, 0, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 5, aBomberman.Position.X, h, aBomberman.Position.Y - 2, w, 0, w, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         end;
         If nPlayerType[7] > 0 Then
         begin
            aBomberman:=GetBombermanByIndex(7);
            if aBomberman.Alive then
-           SetLight( 6, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 1, 1, 1, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 6, aBomberman.Position.X, h, aBomberman.Position.Y - 2, w, w, w, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         end;
         If nPlayerType[8] > 0 Then
         begin
            aBomberman:=GetBombermanByIndex(8);
            if aBomberman.Alive then
-           SetLight( 7, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0, 0, 0, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
+           SetLight( 7, aBomberman.Position.X, h, aBomberman.Position.Y - 2, 0.2 * w, 0.2 * w, 0.2 * w, 1, a0 * 0.1, a1 * 0.5, a2 * 1.0, True );
         end;
      End;
 End;
@@ -479,7 +479,7 @@ Var i : Integer;
     aBomberman : CBomberman;
 Begin
      EnableLighting();
-     SetLighting( 2.0, 1.0, 0.3, 0.6 );
+     SetLighting( w, 2.0, 1.0, 0.3, 0.6 );
 
      SetMaterial( w, w, w, 1.0 );
 
@@ -488,12 +488,12 @@ Begin
           aBomberman:=GetBombermanByCount(i);
           If aBomberman.Alive then
           Begin
-               SetTexture( 1, TEXTURE_BOMBERMAN(i) );
+               SetTexture( 1, TEXTURE_BOMBERMAN(aBomberman.BIndex) );
                PushObjectMatrix( aBomberman.Position.X-0.15, aBomberman.Position.Z, aBomberman.Position.Y-0.15, 0.05, 0.05, 0.05, 0, aBomberman.Direction, 0 );
-               //DrawMesh( MESH_BOMBERMAN(aBomberman.BIndex), False );
                If aBomberman.IsMoving() Then Begin
                   DrawAnimation( ANIMATION_BOMBERMAN(aBomberman.BIndex), False, 1 );
                End Else Begin
+                  //DrawMesh( MESH_BOMBERMAN(aBomberman.BIndex), False );
                   DrawAnimation( ANIMATION_BOMBERMAN(aBomberman.BIndex), False, 0 );
                End;
                PopObjectMatrix();
@@ -509,7 +509,7 @@ Var i, j : Integer;
     pBlock : CBlock;
 Begin
      EnableLighting();
-     SetLighting( 5.0, 1.0, 1.8, 2.4 );
+     SetLighting( w, 5.0, 1.0, 1.8, 2.4 );
 
      For j := 1 To GRIDHEIGHT Do Begin
           For i := 1 To GRIDWIDTH Do Begin
@@ -626,7 +626,7 @@ Var i : Integer;
     aBomb : CBomb;
 Begin
      EnableLighting();
-     SetLighting( 5.0, 1.0, 1.8, 2.4 );
+     SetLighting( w, 5.0, 1.0, 1.8, 2.4 );
 
      i := 1;
      While ( i <= GetBombCount() ) Do Begin
@@ -774,7 +774,7 @@ End;
 Procedure DrawPlane ( w : Single ) ;
 Begin
      EnableLighting();
-     SetLighting( 2.0, 1.0, 0.3, 0.6 );
+     SetLighting( w, 2.0, 1.0, 0.3, 0.6 );
 
      SetMaterial( w, w, w, 1.0 );
 
@@ -789,7 +789,7 @@ End;
 Var fBlinkTime : Single;
     bBlinkState : Boolean;
 
-Procedure DrawTimer () ;
+Procedure DrawTimer ( p : Single ) ;
 Var w, h : Single;
 Var nMin, nSec : Integer;
     fTime : Single;
@@ -804,7 +804,7 @@ Begin
      DisableLighting();
 
      SetString( STRING_TIMER, Format('****', [nMin, nSec]), 0.0, 0.0, 0.0 );
-     DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, 1, 1, 1, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+     DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, p, p, p, p * 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
 
      If nSec < 10 Then Begin
         SetString( STRING_TIMER, Format('%d:0%d', [nMin, nSec]), 0.0, 0.0, 0.0 );
@@ -829,9 +829,9 @@ Begin
      End;
      
      If bBlinkState Then Begin
-        DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, 1.0, 0.0, 0.0, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+        DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, p, p, p, p * 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
      End Else Begin
-        DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+        DrawString( STRING_TIMER, w / h * 0.7, 0.8, -1, 0.064 * w / h, 0.096, p, p, p, p * 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
      End;
 End;
 
@@ -856,7 +856,7 @@ Begin
      sScreenMessage := sScreenMessage + '************************' + sMessage + '************************';
 End;
 
-Procedure DrawScreen () ;
+Procedure DrawScreen ( p : Single ) ;
 Var w, h : Single;
     k : Integer;
     s : String;
@@ -876,19 +876,19 @@ Begin
      DisableLighting();
 
      SetString( STRING_SCREEN, '************************', 0.0, 0.0, 0.0 );
-     DrawString( STRING_SCREEN, w / h * -0.9, 0.8, -1, 0.064 * w / h, 0.096, 1, 1, 1, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+     DrawString( STRING_SCREEN, w / h * -0.9, 0.8, -1, 0.064 * w / h, 0.096, p, p, p, p * 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
 
      SetLength( s, 24 );
      For k := 1 To 24 Do
          s[k] := sScreenMessage[k];
 
      SetString( STRING_SCREEN, s, 0.0, 0.0, 0.0 );
-     DrawString( STRING_SCREEN, w / h * -0.9, 0.8, -1, 0.064 * w / h, 0.096, 1, 1, 1, 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
+     DrawString( STRING_SCREEN, w / h * -0.9, 0.8, -1, 0.064 * w / h, 0.096, p, p, p, p * 0.8, True, SPRITE_CHARSET_DIGITAL, SPRITE_CHARSET_DIGITALX, EFFECT_NONE );
 End;
 
 
 
-Procedure DrawScore () ;
+Procedure DrawScore ( p : Single ) ;
 Var w, h : Single;
     i : Integer;
     aBomberman : CBomberman;
@@ -907,7 +907,7 @@ Begin
         End;
         If GetBombermanCount() <> 0 Then
            For i := 1 To GetBombermanCount() Do
-               DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.6 - 0.15 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+               DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.6 - 0.15 * Single(i), -1, 0.018 * w / h, 0.024, p, p, p, p * 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
         bScoreTable := True;
      End Else Begin
         bScoreTable := False;
@@ -916,7 +916,7 @@ End;
 
 
 
-Procedure DrawMessage () ;
+Procedure DrawMessage ( p : Single ) ;
 Var w, h : Single;
 Begin
      w := GetRenderWidth();
@@ -932,7 +932,7 @@ Begin
      End;
 
      If bMessage Then Begin
-         DrawString( STRING_MESSAGE, -w / h * 0.9, -0.75, -1, 0.018 * w / h, 0.024, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+         DrawString( STRING_MESSAGE, -w / h * 0.9, -0.75, -1, 0.018 * w / h, 0.024, p, p, p, p * 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
          If GetKey( KEY_ENTER ) Then Begin
             If Not bEnter Then Begin
@@ -965,13 +965,13 @@ End;
 
 
 
-Procedure DrawNotification () ;
+Procedure DrawNotification ( p : Single ) ;
 Var w, h : Single;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
 
-     DrawString( STRING_NOTIFICATION, -w / h * 0.9, -0.9, -1, 0.018 * w / h, 0.024, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     DrawString( STRING_NOTIFICATION, -w / h * 0.9, -0.9, -1, 0.018 * w / h, 0.024, p, p, p, p * 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 End;
 
 
@@ -1187,10 +1187,10 @@ Begin
      // rendu des reflets
      If bReflection Then Begin
         PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
-        DrawBomberman( 0.4,false );
+        DrawBomberman( 0.4, False );
         DrawGrid( 0.4 );
-        DrawBomb( 0.4,false );
-        DrawFlame( 0.4,false );
+        DrawBomb( 0.4, False );
+        DrawFlame( 0.4, False );
         PopObjectMatrix();
         PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
         DrawSkybox( 0.4, 0.4, 0.4, 0.4, TEXTURE_MAP_SKYBOX(0) );
@@ -1199,10 +1199,10 @@ Begin
 
      // rendu global
      DrawPlane( 1.0 );
-     DrawBomberman( 1.0,false );
+     DrawBomberman( 1.0, False );
      DrawGrid( 1.0 );
-     DrawBomb( 1.0,false );
-     DrawFlame( 1.0,false );
+     DrawBomb( 1.0, False );
+     DrawFlame( 1.0, True );
      DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
 
      // affichage du vainqueur
@@ -1486,45 +1486,109 @@ End;
 Procedure ProcessGame () ;
 Var k, i : Integer;
     sData : String;
+    w, h : Single; // taille de la fenêtre
 Begin
-     // définition de la camera
-     SetCamera();
+     // gestion de l'effet de motion blur
+     If bBlur Then Begin
+        // récupération de la taille de la fenêtre
+        w := GetRenderWidth();
+        h := GetRenderHeight();
 
-     // rendu des reflets
-     If bReflection Then Begin
-        PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
-        DrawBomberman( 0.4,false );
-        DrawGrid( 0.4 );
-        DrawBomb( 0.4,false );
-        DrawFlame( 0.4,false );
-        PopObjectMatrix();
-        PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
-        DrawSkybox( 0.4, 0.4, 0.4, 0.4, TEXTURE_MAP_SKYBOX(0) );
-        PopObjectMatrix();
+        // appel d'une texture de rendu
+        PutRenderTexture();
+
+        // définition de la camera
+        SetCamera();
+
+        // rendu des reflets
+        If bReflection Then Begin
+          PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
+          DrawBomberman( 0.1, False );
+          DrawGrid( 0.1 );
+          DrawBomb( 0.1, False );
+          DrawFlame( 0.1, False );
+          PopObjectMatrix();
+          PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
+          DrawSkybox( 0.1, 0.1, 0.1, 0.1, TEXTURE_MAP_SKYBOX(0) );
+          PopObjectMatrix();
+        End;
+
+        // rendu global
+        DrawPlane( 0.3 );
+        DrawBomberman( 0.3, True );
+        DrawGrid( 0.3 );
+        DrawBomb( 0.3, True );
+        DrawFlame( 0.3, True );
+        DrawSkybox( 0.3, 0.3, 0.3, 0.3, TEXTURE_MAP_SKYBOX(0) );
+
+        // affichage de l'invite de messages
+        If bMulti Then DrawMessage( 0.5 );
+
+        // affichage des informations
+        DrawNotification( 0.5 );
+
+        // affichage des scores
+        DrawScore( 0.5 );
+
+        // affichage de la minuterie
+        DrawTimer( 0.5 );
+
+        // affichage du panneau d'affichage
+        DrawScreen( 0.5 );
+
+        // affichage du rendu précédent en transparence pour l'effet de flou
+        SetRenderTexture();
+        DrawImage( 0, 0, -1, 1, 1, 1.0, 1.0, 1.0, 0.8, True );
+
+        // récupération de la texture de rendu
+        GetRenderTexture();
+
+        // remplissage noir de l'écran
+        Clear( 0.0, 0.0, 0.0, 0.0 );
+
+        // affichage final du rendu en transparence
+        SetRenderTexture();
+        DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+     End Else Begin
+        // définition de la camera
+        SetCamera();
+
+        // rendu des reflets
+        If bReflection Then Begin
+          PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
+          DrawBomberman( 0.4, False );
+          DrawGrid( 0.4 );
+          DrawBomb( 0.4, False );
+          DrawFlame( 0.4, False );
+          PopObjectMatrix();
+          PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
+          DrawSkybox( 0.4, 0.4, 0.4, 0.4, TEXTURE_MAP_SKYBOX(0) );
+          PopObjectMatrix();
+        End;
+
+        // rendu global
+        DrawPlane( 1.0 );
+        DrawBomberman( 1.0, True );
+        DrawGrid( 1.0 );
+        DrawBomb( 1.0, True );
+        DrawFlame( 1.0, True );
+        DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
+
+        // affichage de l'invite de messages
+        If bMulti Then DrawMessage( 1.0 );
+
+        // affichage des informations
+        DrawNotification( 1.0 );
+
+        // affichage des scores
+        DrawScore( 1.0 );
+
+        // affichage de la minuterie
+        DrawTimer( 1.0 );
+
+        // affichage du panneau d'affichage
+        DrawScreen( 1.0 );
      End;
-
-     // rendu global
-     DrawPlane( 1.0 );
-     DrawBomberman( 1.0,true );
-     DrawGrid( 1.0 );
-     DrawBomb( 1.0,true );
-     DrawFlame( 1.0,true );
-     DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
-
-     // affichage de l'invite de messages
-     If bMulti Then DrawMessage();
-     
-     // affichage des informations
-     DrawNotification();
-
-     // affichage des scores
-     DrawScore();
-     
-     // affichage de la minuterie
-     DrawTimer();
-
-     // affichage du panneau d'affichage
-     DrawScreen();
 
      // gestion de l'intelligence artificielle
      For k := 1 To GetBombermanCount() Do Begin
@@ -1538,8 +1602,15 @@ Begin
      // mise à jour de la minuterie
      CheckTimer();
 
+     // force l'arrêt du round par la minuterie
+     If GetKeyS( KEY_F10 ) Then Begin
+        If (bMulti = False) Or ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+           fRoundTime := fRoundTime - fRoundDuration - 3.0;
+        End;
+     End;
+        
      // vérifie s'il reste des bomberman en jeu ou si la minuterie est à zéro
-     If (CheckEndGame() <> 0) Or (GetTime > fRoundTime + fRoundDuration + 3.0) Then Begin
+     If (CheckEndGame() <> 0) Or (GetTime >= fRoundTime + fRoundDuration + 3.0) Then Begin
         If (bMulti = False) Then Begin
            InitWait();
         End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
@@ -1555,7 +1626,21 @@ Begin
            Send( nLocalIndex, HEADER_WAIT, sData );
         End;
      End;
-End;
+
+     // force l'abandon du jeu
+     If GetKey( KEY_ESC ) Then Begin
+        If (bMulti = False) Then Begin
+           InitMenu();
+           ClearInput();
+        End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+            // TODO
+            // retour au menu multi et envoi d'un paquet serveur -> client signalant la fin forcée du jeu
+        End Else Begin
+            // TODO
+            // retour au menu principal et envoi d'un paquet client -> serveur signalant la déconnexion du joueur
+        End;
+     End;
+ End;
 
 
 
@@ -2012,7 +2097,7 @@ Procedure InitMenu () ;
 Begin
      // ajout du titre
      If (bMulti = True) Then Begin
-          SetString( STRING_GAME_MENU(1), '  multi', 0.2, 0.2, 600 );
+          SetString( STRING_GAME_MENU(1), '   multi', 0.2, 0.2, 600 );
      End Else Begin
           SetString( STRING_GAME_MENU(1), 'practice', 0.2, 0.2, 600 );
      End;

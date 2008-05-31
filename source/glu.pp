@@ -5,7 +5,7 @@
   These units are free to use
 }
 
-(*++ BUILD Version: 0004    // Increment this if a change has global effects
+{*++ BUILD Version: 0004    // Increment this if a change has global effects
 
 Copyright (c) 1985-95, Microsoft Corporation
 
@@ -18,9 +18,9 @@ Abstract:
     Procedure declarations, constant definitions and macros for the OpenGL
     Utility Library.
 
---*)
+--*}
 
-(*
+{*
 ** Copyright 1991-1993, Silicon Graphics, Inc.
 ** All Rights Reserved.
 **
@@ -35,9 +35,9 @@ Abstract:
 ** and Computer Software clause at DFARS 252.227-7013, and/or in similar or
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished -
 ** rights reserved under the Copyright Laws of the United States.
-*)
+*}
 
-(*
+{*
 ** Return the error string associated with a particular error code.
 ** This will return 0 for an invalid error code.
 **
@@ -45,7 +45,7 @@ Abstract:
 ** is defined as follows:
 **
 ** LPCTSTR APIENTRY gluErrorStringWIN (GLenum errCode);
-*)
+*}
 
 {******************************************************************************}
 { Converted to Delphi by Tom Nuydens (tom@delphi3d.net)                        }
@@ -54,7 +54,7 @@ Abstract:
 
 {$MACRO ON}
 {$MODE Delphi}
-{$IFDEF Win32}
+{$IFDEF Windows}
   {$DEFINE extdecl := stdcall}
 {$ELSE}
   {$DEFINE extdecl := cdecl}
@@ -71,7 +71,7 @@ interface
 
 uses
   SysUtils,
-  {$IFDEF Win32}
+  {$IFDEF Windows}
   Windows,
   {$ELSE}
   {$IFDEF MORPHOS}
@@ -99,6 +99,15 @@ type
   GLUquadricObj = GLUquadric;           PGLUquadricObj = PGLUquadric;
   GLUtesselatorObj = GLUtesselator;     PGLUtesselatorObj = PGLUtesselator;
   GLUtriangulatorObj = GLUtesselator;   PGLUtriangulatorObj = PGLUtesselator;
+
+  TGLUnurbs = GLUnurbs;
+  TGLUquadric = GLUquadric;
+  TGLUtesselator = GLUtesselator;
+
+  TGLUnurbsObj = GLUnurbsObj;
+  TGLUquadricObj = GLUquadricObj;
+  TGLUtesselatorObj = GLUtesselatorObj;
+  TGLUtriangulatorObj = GLUtriangulatorObj;
 
 {$IFDEF MORPHOS}
 
@@ -469,7 +478,7 @@ end;
 {$ELSE MORPHOS}
 var
   MethodName: string = '';
-  
+
   function GetGLuProcAddress(Lib: PtrInt; ProcName: PChar): Pointer;
   begin
     MethodName:=ProcName;
@@ -544,7 +553,7 @@ end;
 
 initialization
 
-  {$IFDEF Win32}
+  {$IFDEF Windows}
   LoadGLu('glu32.dll');
   {$ELSE}
   {$ifdef darwin}

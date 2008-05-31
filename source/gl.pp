@@ -20,7 +20,7 @@ Abstract:
 
 --*)
 
-(*
+{*
 ** Copyright 1996 Silicon Graphics, Inc.
 ** All Rights Reserved.
 **
@@ -35,16 +35,16 @@ Abstract:
 ** and Computer Software clause at DFARS 252.227-7013, and/or in similar or
 ** successor clauses in the FAR, DOD or NASA FAR Supplement. Unpublished -
 ** rights reserved under the Copyright Laws of the United States.
-*)
+*}
 
 {******************************************************************************}
 { Converted to Delphi by Tom Nuydens (tom@delphi3d.net)                        }
 { For the latest updates, visit Delphi3D: http://www.delphi3d.net              }
 {******************************************************************************}
 
-{$MACRO ON}
 {$MODE Delphi}
-{$IFDEF Win32}
+{$MACRO ON}
+{$IFDEF Windows}
   {$DEFINE extdecl := stdcall}
 {$ELSE}
   {$DEFINE extdecl := cdecl}
@@ -62,15 +62,15 @@ interface
 
 uses
   SysUtils,
-  {$IFDEF Win32}
+  {$IFDEF Windows}
   Windows, dynlibs
-  {$ELSE Win32}
+  {$ELSE Windows}
   {$IFDEF MorphOS}
   TinyGL
   {$ELSE MorphOS}
   dynlibs
   {$ENDIF MorphOS}
-  {$ENDIF Win32};
+  {$ENDIF Windows};
 
 {$IFNDEF MORPHOS}
 var
@@ -94,6 +94,21 @@ type
   GLclampd   = Double;        PGLclampd   = ^GLclampd;
 { GLvoid     = void; }        PGLvoid     = Pointer;
                               PPGLvoid    = ^PGLvoid;
+
+  TGLenum     = GLenum;
+  TGLboolean  = GLboolean;
+  TGLbitfield = GLbitfield;
+  TGLbyte     = GLbyte;
+  TGLshort    = GLshort;
+  TGLint      = GLint;
+  TGLsizei    = GLsizei;
+  TGLubyte    = GLubyte;
+  TGLushort   = GLushort;
+  TGLuint     = GLuint;
+  TGLfloat    = GLfloat;
+  TGLclampf   = GLclampf;
+  TGLdouble   = GLdouble;
+  TGLclampd   = GLclampd;
 
 {******************************************************************************}
 
@@ -1516,7 +1531,7 @@ var
   glVertex4sv: procedure(const v: PGLshort); extdecl;
   glVertexPointer: procedure(size: GLint; atype: GLenum; stride: GLsizei; const pointer: Pointer); extdecl;
   glViewport: procedure(x, y: GLint; width, height: GLsizei); extdecl;
-  {$IFDEF Win32}
+  {$IFDEF Windows}
   ChoosePixelFormat: function(DC: HDC; p2: PPixelFormatDescriptor): Integer; extdecl;
   {$ENDIF}
 {$ENDIF MORPHOS}
@@ -1558,7 +1573,7 @@ procedure FreeOpenGL;
 
 implementation
 
-{$ifdef win32}
+{$ifdef windows}
 function WinChoosePixelFormat(DC: HDC; p2: PPixelFormatDescriptor): Integer; extdecl; external 'gdi32' name 'ChoosePixelFormat';
 {$endif}
 
@@ -1913,7 +1928,7 @@ begin
   @glVertex4sv := nil;
   @glVertexPointer := nil;
   @glViewport := nil;
-  {$IFDEF Win32}
+  {$IFDEF Windows}
   @ChoosePixelFormat := nil;
   {$ENDIF}
 
@@ -2284,7 +2299,7 @@ begin
     raise Exception.Create('Failed loading ' + MethodName +' from ' + dll);
   end;
 
-  {$IFDEF Win32}
+  {$IFDEF Windows}
   try
     @ChoosePixelFormat := GetGLProcAddress(LibGL, 'ChoosePixelFormat');
     if not Assigned(ChoosePixelFormat) then
@@ -2298,11 +2313,13 @@ end;
 
 initialization
 
-  {$IFDEF WIN32}
+  { according to bug 7570, this is necessary on all x86 platforms,
+    maybe we've to fix the sse control word as well }
+  {$ifdef x86}
   Set8087CW($133F);
-  {$ENDIF WIN32}
+  {$endif x86}
 
-  {$IFDEF Win32}
+  {$IFDEF Windows}
   LoadOpenGL('opengl32.dll');
   {$ELSE}
   {$ifdef darwin}

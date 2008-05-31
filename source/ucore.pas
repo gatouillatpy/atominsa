@@ -6,7 +6,7 @@ Unit UCore;
 Interface
 
 Uses Classes, SysUtils, LazJPEG, Math, Graphics, IntfGraphics,
-     GL, GLU, GLUT, GLEXT,
+     gl, glu, glut, glext,
      fmod, fmodtypes, fmoderrors,
      lnet,
      UForm, UUtils, USetup;
@@ -62,6 +62,7 @@ Const KEY_UP = -GLUT_KEY_UP;
       KEY_DOWN = -GLUT_KEY_DOWN;
       KEY_LEFT = -GLUT_KEY_LEFT;
       KEY_RIGHT = -GLUT_KEY_RIGHT;
+      KEY_F10 = -GLUT_KEY_F10;
       KEY_F11 = -GLUT_KEY_F11;
 
 Const KEY_TAB = 9;
@@ -70,7 +71,7 @@ Const KEY_TAB = 9;
       KEY_SQUARE = 178;
       KEY_N = 110;
       KEY_Y = 121;
-      
+
 
 
 Const EFFECT_NONE     = 0;
@@ -150,6 +151,10 @@ Type LPOGLMesh = ^OGLMesh;
                       NormalArray : Array Of GLVector;
                       ColorArray : Array Of GLColor;
                       TextureArray : Array Of GLPoint;
+                      VectorID : GLUInt;
+                      NormalID : GLUInt;
+                      ColorID : GLUInt;
+                      TextureID : GLUInt;
                 END;
 
                 
@@ -172,6 +177,7 @@ Type LPOGLAction = ^OGLAction;
                       FrameCount : LongInt;
                       FrameArray : Array Of OGLFrame;
                       VectorArray : Array Of GLVector;
+                      VectorID : GLUInt;
                  END;
 
 
@@ -1500,6 +1506,20 @@ Begin
      End;
      Close( ioVertex );
 
+     // envoie la géométrie dans la mémoire vidéo
+     glGenBuffersARB( 1, @pMesh^.VectorID );
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.VectorID );
+     glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 12, @pMesh^.VectorArray[0], GL_STATIC_DRAW_ARB );
+     glGenBuffersARB( 1, @pMesh^.NormalID );
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.NormalID );
+     glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 12, @pMesh^.NormalArray[0], GL_STATIC_DRAW_ARB );
+     glGenBuffersARB( 1, @pMesh^.ColorID );
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.ColorID );
+     glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 12, @pMesh^.ColorArray[0], GL_STATIC_DRAW_ARB );
+     glGenBuffersARB( 1, @pMesh^.TextureID );
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.TextureID );
+     glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 8, @pMesh^.TextureArray[0], GL_STATIC_DRAW_ARB );
+
      // ajout du mesh à la pile de données
      AddItem( DATA_MESH, nIndex, pMesh, sFile );
 
@@ -1549,11 +1569,15 @@ Begin
      glEnableClientState(GL_NORMAL_ARRAY);
      glEnableClientState(GL_COLOR_ARRAY);
      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-     
-     glVertexPointer(3, GL_FLOAT, 0, @pMesh^.VectorArray[0]);
-     glNormalPointer(GL_FLOAT, 0, @pMesh^.NormalArray[0]);
-     glColorPointer(3, GL_FLOAT, 0, @pMesh^.ColorArray[0]);
-     glTexCoordPointer(2, GL_FLOAT, 0, @pMesh^.TextureArray[0]);
+
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.VectorID );
+     glVertexPointer(3, GL_FLOAT, 0, NIL);
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.NormalID );
+     glNormalPointer(GL_FLOAT, 0, NIL);
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.ColorID );
+     glColorPointer(3, GL_FLOAT, 0, NIL);
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.TextureID );
+     glTexCoordPointer(2, GL_FLOAT, 0, NIL);
 
      glDrawElements(GL_TRIANGLES, pMesh^.PolygonCount * 3, GL_UNSIGNED_INT, @pMesh^.IndexArray[0]);
 
@@ -1569,6 +1593,10 @@ End;
 
 Procedure FreeMesh ( pMesh : LPOGLMesh ) ;
 Begin
+     glDeleteBuffersARB( 1, @pMesh^.VectorID );
+     glDeleteBuffersARB( 1, @pMesh^.NormalID );
+     glDeleteBuffersARB( 1, @pMesh^.ColorID );
+     glDeleteBuffersARB( 1, @pMesh^.TextureID );
      Finalize( pMesh^.VectorArray );
      Finalize( pMesh^.NormalArray );
      Finalize( pMesh^.ColorArray );
@@ -1697,6 +1725,11 @@ Begin
           Close( ioVector );
      End;
 
+     // envoie la géométrie dans la mémoire vidéo
+     glGenBuffersARB( 1, @pAnimation^.VectorID );
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pAnimation^.VectorID );
+     glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 12, @pAnimation^.VectorArray[0], GL_STREAM_DRAW_ARB );
+
      // ajout de l'animation à la pile de données
      AddItem( DATA_ANIMATION, nIndex, pAnimation, sFile );
 
@@ -1725,9 +1758,8 @@ Var pAnimation : LPOGLAnimation ;
     fFactor : Single ;
     pFrameA : LPOGLFrame ;
     pFrameB : LPOGLFrame ;
+    p : QWord ;
 Begin
-     AddLineToConsole(IntToStr(nAction));
-
      // recherche de l'animation à afficher en fonction de son indice
      pAnimation := FindItem( DATA_ANIMATION, nIndex );
      If pAnimation = NIL Then Exit;
@@ -1775,7 +1807,7 @@ Begin
      // interpolation linéaire entre deux frames
      pFrameA := @pAnimation^.FrameArray[nFrameStart+nFrame];
      pFrameB := @pAnimation^.FrameArray[nFrameStart+nNextFrame];
-     For i := 0 To pAnimation^.Mesh^.PolygonCount - 1 Do
+     For i := 0 To pAnimation^.Mesh^.VertexCount - 1 Do
      Begin
           pAnimation^.VectorArray[i].x := pFrameA^.VectorArray[i].x + (pFrameB^.VectorArray[i].x - pFrameA^.VectorArray[i].x) * fFactor;
           pAnimation^.VectorArray[i].y := pFrameA^.VectorArray[i].y + (pFrameB^.VectorArray[i].y - pFrameA^.VectorArray[i].y) * fFactor;
@@ -1787,10 +1819,15 @@ Begin
      glEnableClientState(GL_COLOR_ARRAY);
      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-     glVertexPointer(3, GL_FLOAT, 0, @pAnimation^.VectorArray[0]);
-     glNormalPointer(GL_FLOAT, 0, @pMesh^.NormalArray[0]);
-     glColorPointer(3, GL_FLOAT, 0, @pMesh^.ColorArray[0]);
-     glTexCoordPointer(2, GL_FLOAT, 0, @pMesh^.TextureArray[0]);
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pAnimation^.VectorID );
+     glBufferDataARB( GL_ARRAY_BUFFER_ARB, pAnimation^.Mesh^.VertexCount * 12, @pAnimation^.VectorArray[0], GL_STREAM_DRAW_ARB );
+     glVertexPointer(3, GL_FLOAT, 0, NIL);
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.NormalID );
+     glNormalPointer(GL_FLOAT, 0, NIL);
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.ColorID );
+     glColorPointer(3, GL_FLOAT, 0, NIL);
+     glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.TextureID );
+     glTexCoordPointer(2, GL_FLOAT, 0, NIL);
 
      glDrawElements(GL_TRIANGLES, pMesh^.PolygonCount * 3, GL_UNSIGNED_INT, @pMesh^.IndexArray[0]);
 
@@ -1807,6 +1844,7 @@ End;
 Procedure FreeAnimation ( pAnimation : LPOGLAnimation ) ;
 Var i : Integer;
 Begin
+     glDeleteBuffersARB( 1, @pAnimation^.VectorID );
      For i := 0 To pAnimation^.FrameCount Do
      Begin
           Finalize( pAnimation^.FrameArray[i].VectorArray );
@@ -2448,7 +2486,7 @@ Begin
      glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
 
-     // définie les techniques de rendu
+     // définit les techniques de rendu
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
      glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
@@ -3286,13 +3324,17 @@ Begin
      glutPassiveMotionFunc( @OGLMouseMove );
 
      If bDebug Then Begin
-        Window.Memo.Lines.Add( 'OpenGL Infos :' );
-        Window.Memo.Lines.Add( '   Vendor : ' + PChar(glGetString(GL_VENDOR)) );
-        Window.Memo.Lines.Add( '   Renderer : ' + PChar(glGetString(GL_RENDERER)) );
-        Window.Memo.Lines.Add( '   Version : ' + PChar(glGetString(GL_VERSION)) );
-        Window.Memo.Lines.Add( '   Extensions : ' + PChar(glGetString(GL_EXTENSIONS)) );
+        AddLineToConsole( 'OpenGL Infos :' );
+        AddLineToConsole( '   Vendor : ' + PChar(glGetString(GL_VENDOR)) );
+        AddLineToConsole( '   Renderer : ' + PChar(glGetString(GL_RENDERER)) );
+        AddLineToConsole( '   Version : ' + PChar(glGetString(GL_VERSION)) );
+        AddLineToConsole( '   Extensions : ' + PChar(glGetString(GL_EXTENSIONS)) );
      End;
 
+     If Not load_GL_ARB_vertex_buffer_object() Then Begin
+        AddLineToConsole( 'OpenGL Error : Vertex buffer objects are not supported by your graphical drivers !' );
+     End;
+     
      fTime := GetTime();
      fDelta := GetTime();
 End;
