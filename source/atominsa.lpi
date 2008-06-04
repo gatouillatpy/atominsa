@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="9"/>
+      <ActiveEditorIndexAtStart Value="24"/>
     </General>
     <RST OutDir="exec"/>
     <PublishOptions>
@@ -382,9 +382,9 @@
       <Unit46>
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="55" Y="1543"/>
-        <TopLine Value="1526"/>
-        <EditorIndex Value="9"/>
+        <CursorPos X="58" Y="1546"/>
+        <TopLine Value="1528"/>
+        <EditorIndex Value="10"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit46>
@@ -567,7 +567,7 @@
         <UnitName Value="URandomBonus"/>
         <CursorPos X="37" Y="25"/>
         <TopLine Value="18"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="9"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit69>
@@ -646,8 +646,8 @@
       <Unit81>
         <Filename Value="glext.pp"/>
         <UnitName Value="GLext"/>
-        <CursorPos X="17" Y="3518"/>
-        <TopLine Value="3494"/>
+        <CursorPos X="3" Y="3515"/>
+        <TopLine Value="3499"/>
         <EditorIndex Value="1"/>
         <UsageCount Value="18"/>
         <Loaded Value="True"/>
@@ -710,30 +710,42 @@
         <Filename Value="uexplosion.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UExplosion"/>
-        <CursorPos X="32" Y="15"/>
+        <CursorPos X="35" Y="14"/>
         <TopLine Value="1"/>
         <EditorIndex Value="24"/>
-        <UsageCount Value="26"/>
+        <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit90>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="7" HistoryIndex="6">
       <Position1>
         <Filename Value="C:\Lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
         <Caret Line="66" Column="51" TopLine="53"/>
       </Position1>
       <Position2>
         <Filename Value="ugame.pas"/>
-        <Caret Line="1576" Column="19" TopLine="1551"/>
+        <Caret Line="1553" Column="34" TopLine="1526"/>
       </Position2>
       <Position3>
         <Filename Value="ugame.pas"/>
-        <Caret Line="1623" Column="51" TopLine="1608"/>
+        <Caret Line="1554" Column="95" TopLine="1506"/>
       </Position3>
       <Position4>
         <Filename Value="ugame.pas"/>
-        <Caret Line="1567" Column="17" TopLine="1551"/>
+        <Caret Line="1553" Column="76" TopLine="1533"/>
       </Position4>
+      <Position5>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="1545" Column="61" TopLine="1535"/>
+      </Position5>
+      <Position6>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="1535" Column="58" TopLine="1532"/>
+      </Position6>
+      <Position7>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="1554" Column="27" TopLine="1523"/>
+      </Position7>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

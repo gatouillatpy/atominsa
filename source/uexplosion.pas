@@ -6,7 +6,7 @@ Interface
 
 Uses Classes, SysUtils, UCore;
 
-Const EXPLOSION_DURATION : Single = 6.6;
+Const EXPLOSION_DURATION : Single = 1.6;
 
 Type LPExplosion = ^Explosion;
      Explosion = Record
