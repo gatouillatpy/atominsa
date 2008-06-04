@@ -2866,10 +2866,7 @@ End;
 
 Function KeyToStr( nKey : Integer ) : String ;
 Begin
-     If ( Random( 2 ) = 1 ) Then
-        KeyToStr := IntToStr( abs( nKey ) )
-     Else
-         KeyToStr := sKeyToString[ abs( nKey ) ];
+     KeyToStr := sKeyToString[ abs( nKey ) ];
 End;
 
 
