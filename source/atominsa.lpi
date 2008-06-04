@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="0"/>
+      <ActiveEditorIndexAtStart Value="10"/>
     </General>
     <RST OutDir="exec"/>
     <PublishOptions>
@@ -41,8 +41,8 @@
       <Unit1>
         <Filename Value="ucore.pas"/>
         <UnitName Value="UCore"/>
-        <CursorPos X="41" Y="3408"/>
-        <TopLine Value="3377"/>
+        <CursorPos X="95" Y="3386"/>
+        <TopLine Value="3373"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
@@ -88,7 +88,7 @@
         <Filename Value="usetup.pas"/>
         <UnitName Value="USetup"/>
         <CursorPos X="22" Y="866"/>
-        <TopLine Value="559"/>
+        <TopLine Value="563"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -156,8 +156,8 @@
       <Unit15>
         <Filename Value="ubomberman.pas"/>
         <UnitName Value="UBomberman"/>
-        <CursorPos X="33" Y="32"/>
-        <TopLine Value="13"/>
+        <CursorPos X="106" Y="26"/>
+        <TopLine Value="23"/>
         <EditorIndex Value="17"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -382,8 +382,8 @@
       <Unit46>
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="58" Y="1546"/>
-        <TopLine Value="1528"/>
+        <CursorPos X="43" Y="2427"/>
+        <TopLine Value="2416"/>
         <EditorIndex Value="10"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -717,11 +717,31 @@
         <Loaded Value="True"/>
       </Unit90>
     </Units>
-    <JumpHistory Count="1" HistoryIndex="0">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
         <Filename Value="C:\Lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
         <Caret Line="66" Column="51" TopLine="53"/>
       </Position1>
+      <Position2>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="1546" Column="58" TopLine="1528"/>
+      </Position2>
+      <Position3>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="2034" Column="47" TopLine="2023"/>
+      </Position3>
+      <Position4>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="1823" Column="28" TopLine="1812"/>
+      </Position4>
+      <Position5>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="2427" Column="43" TopLine="2416"/>
+      </Position5>
+      <Position6>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="2430" Column="64" TopLine="2416"/>
+      </Position6>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

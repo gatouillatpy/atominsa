@@ -922,7 +922,7 @@ begin
       aX := uTriggerBomb^.Bomb.XGrid;
       aY := uTriggerBomb^.Bomb.YGrid;
       _nNetID := uTriggerBomb^.Bomb.nNetID;
-      uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
+    //  uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
 

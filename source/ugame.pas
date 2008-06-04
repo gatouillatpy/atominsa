@@ -2215,6 +2215,8 @@ Procedure ProcessMenu () ;
           End;
 Var w, h : Single;
     t : Single;
+    k : Integer;
+    bSend : Boolean;
     sData : String;
 Begin
      w := GetRenderWidth();
@@ -2412,9 +2414,18 @@ Begin
                 MENU_PLAYER8 :
                      InitMenuPlayer(8);
                 MENU_FIGHT :
-                If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
-                    nGame := GAME_INIT;
-                    Send( nLocalIndex, HEADER_FIGHT, sData );
+                If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
+                    // Si un client est en train de choisir un personnage,
+                    // le serveur n'a pas le droit de lancer la partie.
+                    bSend := True;
+                    For k := 1 To 8 Do Begin
+                        If ( nPlayerClient[k] <> -1 ) And ( nPlayerType[k] = PLAYER_NIL ) Then
+                           bSend := False;
+                    End;
+                    If ( bSend = True ) Then Begin
+                       nGame := GAME_INIT;
+                       Send( nLocalIndex, HEADER_FIGHT, sData );
+                    End;
                 End Else If (bMulti = False) Then Begin
                     nGame := GAME_INIT;
                 End;
