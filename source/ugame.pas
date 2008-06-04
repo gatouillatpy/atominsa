@@ -1275,7 +1275,7 @@ Begin
      // rechargement de la grille
      If (bMulti = True) And (nLocalIndex = nClientIndex[0]) And (nScheme = -1) Then Begin
         nSchemeMulti := Random(nSchemeCount);
-        LoadScheme();
+        pScheme := aSchemeList[nSchemeMulti];
         sData := IntToStr(nScheme) + #31;
         sData := sData + IntToStr(nSchemeMulti) + #31;
         sData := sData + IntToStr(nMap) + #31;
