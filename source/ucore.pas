@@ -3390,22 +3390,26 @@ Begin
 
      glCompileShaderARB( VertexShader );
      glGetObjectParameterivARB( VertexShader, GL_COMPILE_STATUS, @b );
-     AddLineToConsole( 'Vertex Shader Compilation Status : ' + GetShaderError(VertexShader) );
+     If b = 0 Then
+        AddLineToConsole( 'Vertex Shader Compilation Status : ' + GetShaderError(VertexShader) );
 
      glCompileShaderARB( FragmentShader );
      glGetObjectParameterivARB( FragmentShader, GL_COMPILE_STATUS, @b );
-     AddLineToConsole( 'Fragment Shader Compilation Status : ' + GetShaderError(FragmentShader) );
+     If b = 0 Then
+        AddLineToConsole( 'Fragment Shader Compilation Status : ' + GetShaderError(FragmentShader) );
 
      glAttachObjectARB( ShaderProgram, VertexShader );
      glAttachObjectARB( ShaderProgram, FragmentShader );
 
      glLinkProgramARB( ShaderProgram );
      glGetObjectParameterivARB( ShaderProgram, GL_LINK_STATUS, @b );
-     AddLineToConsole( 'Shader Program Link Status : ' + GetShaderError(ShaderProgram) );
+     If b = 0 Then
+        AddLineToConsole( 'Shader Program Link Status : ' + GetShaderError(ShaderProgram) );
 
      glLinkProgramARB( ShaderProgram );
      glGetObjectParameterivARB( ShaderProgram, GL_VALIDATE_STATUS, @b );
-     AddLineToConsole( 'Shader Program Validation Status : ' + GetShaderError(ShaderProgram) );
+     If b = 0 Then
+        AddLineToConsole( 'Shader Program Validation Status : ' + GetShaderError(ShaderProgram) );
 
      glUseProgramObjectARB( 0 );
 

@@ -44,6 +44,7 @@ Var bShadowing : Boolean;
 Var bReflection : Boolean;
 Var bEffects : Boolean;
 Var bBlur : Boolean;
+Var nShaderModel : Integer;
 Var nTexturing : Integer;
 Var bDisplayFullscreen : Boolean;
 Var nDisplayWidth : Integer;
@@ -121,7 +122,10 @@ Const MENU_FRAMERATE     = 21;
 Const MENU_LIGHTING      = 22;
 Const MENU_SHADOWING     = 23;
 Const MENU_REFLECTION    = 24;
-Const MENU_TEXTURING     = 25;
+Const MENU_EFFECTS       = 25;
+Const MENU_BLUR          = 26;
+Const MENU_TEXTURING     = 27;
+Const MENU_SHADERMODEL   = 28;
 
 Const MENU_FULLSCREEN    = 31;
 Const MENU_RESOLUTION    = 32;
@@ -199,8 +203,11 @@ Begin
      SetString( STRING_SETUP_MENU(22), 'lighting : ' + BoolToStr(bLighting), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(23), 'shadowing : ' + BoolToStr(bShadowing), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(24), 'reflection : ' + BoolToStr(bReflection), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(25), 'texturing quality : ' + IntToStr(nTexturing), 0.2, 1.0, 600 );
-     
+     SetString( STRING_SETUP_MENU(25), 'effects : ' + BoolToStr(bEffects), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(26), 'blur : ' + BoolToStr(bBlur), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(27), 'texturing quality : ' + IntToStr(nTexturing), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(28), 'shader model : ' + IntToStr(nShaderModel), 0.2, 1.0, 600 );
+
      SetString( STRING_SETUP_MENU(31), 'fullscreen : ' + BoolToStr(bDisplayFullscreen), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(32), 'resolution : ' + Format('%d x %d', [nDisplayWidth,nDisplayHeight]), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(33), 'format : ' + IntToStr(nDisplayBPP) + ' bits', 0.2, 1.0, 600 );
@@ -330,7 +337,10 @@ Begin
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(22), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_LIGHTING), IsActive(MENU_LIGHTING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(23), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_SHADOWING), IsActive(MENU_SHADOWING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(24), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_REFLECTION), IsActive(MENU_REFLECTION), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
-     If fScroll <= t Then DrawString( STRING_SETUP_MENU(25), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_TEXTURING), IsActive(MENU_TEXTURING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(25), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_EFFECTS), IsActive(MENU_EFFECTS), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(26), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_BLUR), IsActive(MENU_BLUR), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(27), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_TEXTURING), IsActive(MENU_TEXTURING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(28), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_SHADERMODEL), IsActive(MENU_SHADERMODEL), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
 
      t += 0.2;
 
@@ -370,8 +380,11 @@ Begin
            If nMenu = MENU_LIGHTING Then nMenu := MENU_FRAMERATE Else
            If nMenu = MENU_SHADOWING Then nMenu := MENU_LIGHTING Else
            If nMenu = MENU_REFLECTION Then nMenu := MENU_SHADOWING Else
-           If nMenu = MENU_TEXTURING Then nMenu := MENU_REFLECTION Else
-           If nMenu = MENU_FULLSCREEN Then nMenu := MENU_TEXTURING Else
+           If nMenu = MENU_EFFECTS Then nMenu := MENU_REFLECTION Else
+           If nMenu = MENU_BLUR Then nMenu := MENU_EFFECTS Else
+           If nMenu = MENU_TEXTURING Then nMenu := MENU_BLUR Else
+           If nMenu = MENU_SHADERMODEL Then nMenu := MENU_TEXTURING Else
+           If nMenu = MENU_FULLSCREEN Then nMenu := MENU_SHADERMODEL Else
            If nMenu = MENU_RESOLUTION Then nMenu := MENU_FULLSCREEN Else
            If nMenu = MENU_FORMAT Then nMenu := MENU_RESOLUTION Else
            If nMenu = MENU_REFRESHRATE Then nMenu := MENU_FORMAT Else
@@ -396,7 +409,10 @@ Begin
            If (nMenu = MENU_LIGHTING) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_SHADOWING) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_REFLECTION) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_EFFECTS) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_BLUR) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_TEXTURING) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_SHADERMODEL) And (fScroll > t) Then fScroll := t; t += 0.2;
            t += 0.2;
            If (nMenu = MENU_FULLSCREEN) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_RESOLUTION) And (fScroll > t) Then fScroll := t; t += 0.2;
@@ -436,15 +452,21 @@ Begin
            If nMenu = MENU_FORMAT Then nMenu := MENU_REFRESHRATE Else
            If nMenu = MENU_RESOLUTION Then nMenu := MENU_FORMAT Else
            If nMenu = MENU_FULLSCREEN Then nMenu := MENU_RESOLUTION Else
-           If nMenu = MENU_TEXTURING Then nMenu := MENU_FULLSCREEN Else
+           If nMenu = MENU_SHADERMODEL Then nMenu := MENU_FULLSCREEN Else
+           If nMenu = MENU_TEXTURING Then nMenu := MENU_SHADERMODEL Else
+           If nMenu = MENU_BLUR Then nMenu := MENU_TEXTURING Else
+           If nMenu = MENU_EFFECTS Then nMenu := MENU_BLUR Else
+           If nMenu = MENU_REFLECTION Then nMenu := MENU_EFFECTS Else
            If nMenu = MENU_SHADOWING Then nMenu := MENU_REFLECTION Else
-           If nMenu = MENU_REFLECTION Then nMenu := MENU_TEXTURING Else
            If nMenu = MENU_LIGHTING Then nMenu := MENU_SHADOWING Else
            If nMenu = MENU_FRAMERATE Then nMenu := MENU_LIGHTING Else
            If nMenu = MENU_INTRO Then nMenu := MENU_FRAMERATE;
 
            t := 0.0;
            If nMenu = MENU_INTRO Then fScroll := 0.0;
+           t += 0.2;
+           If (nMenu = MENU_TEXTURING) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_SHADERMODEL) And (fScroll < t) Then fScroll := t; t += 0.2;
            t += 0.2;
            If (nMenu = MENU_FULLSCREEN) And (fScroll < t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_RESOLUTION) And (fScroll < t) Then fScroll := t; t += 0.2;
@@ -500,11 +522,27 @@ Begin
                      bReflection := Not bReflection;
                      SetString( STRING_SETUP_MENU(24), 'reflection : ' + BoolToStr(bReflection), 0.0, 0.02, 600 );
                 End;
+                MENU_EFFECTS :
+                Begin
+                     bEffects := Not bEffects;
+                     SetString( STRING_SETUP_MENU(25), 'effects : ' + BoolToStr(bEffects), 0.0, 0.02, 600 );
+                End;
+                MENU_BLUR :
+                Begin
+                     bBlur := Not bBlur;
+                     SetString( STRING_SETUP_MENU(26), 'blur : ' + BoolToStr(bBlur), 0.0, 0.02, 600 );
+                End;
                 MENU_TEXTURING :
                 Begin
                      nTexturing -= 1;
                      If nTexturing < 1 Then nTexturing := 1;
-                     SetString( STRING_SETUP_MENU(25), 'texturing quality : ' + IntToStr(nTexturing), 0.0, 0.02, 600 );
+                     SetString( STRING_SETUP_MENU(27), 'texturing quality : ' + IntToStr(nTexturing), 0.0, 0.02, 600 );
+                End;
+                MENU_SHADERMODEL :
+                Begin
+                     nShaderModel -= 1;
+                     If nShaderModel < 2 Then nShaderModel := 2;
+                     SetString( STRING_SETUP_MENU(28), 'shader model : ' + IntToStr(nShaderModel), 0.0, 0.02, 600 );
                 End;
                 MENU_FULLSCREEN :
                 Begin
@@ -585,11 +623,27 @@ Begin
                      bReflection := Not bReflection;
                      SetString( STRING_SETUP_MENU(24), 'reflection : ' + BoolToStr(bReflection), 0.0, 0.02, 600 );
                 End;
+                MENU_EFFECTS :
+                Begin
+                     bEffects := Not bEffects;
+                     SetString( STRING_SETUP_MENU(25), 'effects : ' + BoolToStr(bEffects), 0.0, 0.02, 600 );
+                End;
+                MENU_BLUR :
+                Begin
+                     bBlur := Not bBlur;
+                     SetString( STRING_SETUP_MENU(26), 'blur : ' + BoolToStr(bBlur), 0.0, 0.02, 600 );
+                End;
                 MENU_TEXTURING :
                 Begin
                      nTexturing += 1;
                      If nTexturing > 11 Then nTexturing := 11;
-                     SetString( STRING_SETUP_MENU(25), 'texturing quality : ' + IntToStr(nTexturing), 0.0, 0.02, 600 );
+                     SetString( STRING_SETUP_MENU(27), 'texturing quality : ' + IntToStr(nTexturing), 0.0, 0.02, 600 );
+                End;
+                MENU_SHADERMODEL :
+                Begin
+                     nShaderModel += 1;
+                     If nShaderModel > 4 Then nShaderModel := 4;
+                     SetString( STRING_SETUP_MENU(28), 'shader model : ' + IntToStr(nShaderModel), 0.0, 0.02, 600 );
                 End;
                 MENU_FULLSCREEN :
                 Begin
@@ -680,6 +734,13 @@ Begin
      
      // initialisation du menu
      InitMenu();
+
+     // initialisation des listes
+     For k := 0 To 255 Do Begin
+         aSchemeList[k] := NIL;
+         aMapList[k] := NIL;
+         aCharacterList[k] := NIL;
+     End;
 
      // création de la liste des schemes
      sFile := '';
@@ -832,24 +893,60 @@ End;
 
 
 Procedure ReadSettings ( sFile : String ) ;
-Var ioLine : TEXT;
+Var tFile : TSearchRec;
+    pFile : String;
+    ioLine : TEXT;
     sLine : String;
     i, k : Integer;
 Begin
      Window.Memo.Lines.Add( 'Reading ' + sFile );
      
-     For i := 0 To 255 Do Begin
-         aSchemeList[i] := NIL;
-         aMapList[i] := NIL;
-         aCharacterList[i] := NIL;
-     End;
-
      sLocalName := 'atominsa server';
      nLocalIndex := Random(1073741824);
      sServerAddress := '192.168.0.2';
      nServerPort := 1212;
      nServerType := SERVER_STANDARD;
      
+     // initialisation des listes
+     For i := 0 To 255 Do Begin
+         aSchemeList[i] := NIL;
+         aMapList[i] := NIL;
+         aCharacterList[i] := NIL;
+     End;
+
+     // création de la liste des schemes
+     pFile := '';
+     FindFirst( './schemes/*.sch', faAnyFile, tFile );
+     For k := 0 To 255 Do Begin
+         If pFile = tFile.Name Then Break;
+         pFile := tFile.Name;
+         aSchemeList[k] := CScheme.Create( pFile, False );
+         FindNext( tFile );
+     End;
+     nSchemeCount := k;
+
+     // création de la liste des maps
+     pFile := '';
+     FindFirst( './maps/*.map', faAnyFile, tFile );
+     For k := 0 To 255 Do Begin
+         If pFile = tFile.Name Then Break;
+         pFile := tFile.Name;
+         aMapList[k] := CMap.Create( pFile, False );
+         FindNext( tFile );
+     End;
+     nMapCount := k;
+
+     // création de la liste des characters
+     pFile := '';
+     FindFirst( './characters/*.chr', faAnyFile, tFile );
+     For k := 0 To 255 Do Begin
+         If pFile = tFile.Name Then Break;
+         pFile := tFile.Name;
+         aCharacterList[k] := CCharacter.Create( pFile, False );
+         FindNext( tFile );
+     End;
+     nCharacterCount := k;
+
      bIntro := True;
      
      bColor := True;
@@ -872,6 +969,7 @@ Begin
      nDisplayHeight := 480;
      nDisplayBPP := 32;
      nDisplayRefreshrate := 60;
+     nShaderModel := 2;
 
      nRoundCount := 3;
      fRoundDuration := 180.0*2;
@@ -1055,6 +1153,8 @@ Begin
                     If bBlur Then AddLineToConsole( 'Blur : Enabled' ) Else AddLineToConsole( 'Blur : Disabled' );
                     nTexturing := GetInteger(sLine, 7);
                     AddLineToConsole( Format('Texturing quality : %d', [nTexturing]) );
+                    nShaderModel := GetInteger(sLine, 8);
+                    AddLineToConsole( Format('Shader Model : %d', [nShaderModel]) );
                End;
                STEP_WINDOW :
                Begin
@@ -1169,7 +1269,7 @@ Begin
      WriteLn( ioLine, s );
 
      WriteLn( ioLine );
-     WriteLn( ioLine , '; quality settings (framerate, lighting, shadowing, reflection, effects, blur, texturing)' );
+     WriteLn( ioLine , '; quality settings (framerate, lighting, shadowing, reflection, effects, blur, texturing, shadermodel)' );
      s := '-Q,';
      s := s + IntToStr(nFramerate) + ',';
      If bLighting Then s := s + 'true,' Else s := s + 'false,';
@@ -1178,6 +1278,8 @@ Begin
      If bEffects Then s := s + 'true,' Else s := s + 'false,';
      If bBlur Then s := s + 'true,' Else s := s + 'false,';
      s := s + IntToStr(nTexturing);
+     WriteLn( ioLine, s );
+     s := s + IntToStr(nShaderModel);
      WriteLn( ioLine, s );
 
      WriteLn( ioLine );
