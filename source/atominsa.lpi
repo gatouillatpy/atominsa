@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="11"/>
+      <ActiveEditorIndexAtStart Value="26"/>
     </General>
     <RST OutDir="exec"/>
     <PublishOptions>
@@ -384,7 +384,7 @@
       <Unit46>
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="31" Y="1286"/>
+        <CursorPos X="52" Y="1293"/>
         <TopLine Value="1268"/>
         <EditorIndex Value="11"/>
         <UsageCount Value="100"/>
@@ -670,7 +670,7 @@
       </Unit83>
       <Unit84>
         <Filename Value="C:\Lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
-        <CursorPos X="51" Y="66"/>
+        <CursorPos X="1" Y="74"/>
         <TopLine Value="53"/>
         <EditorIndex Value="26"/>
         <UsageCount Value="14"/>
@@ -715,7 +715,7 @@
         <CursorPos X="37" Y="15"/>
         <TopLine Value="1"/>
         <EditorIndex Value="25"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="31"/>
         <Loaded Value="True"/>
       </Unit90>
       <Unit91>
@@ -732,7 +732,7 @@
         <UsageCount Value="10"/>
       </Unit92>
     </Units>
-    <JumpHistory Count="6" HistoryIndex="5">
+    <JumpHistory Count="7" HistoryIndex="6">
       <Position1>
         <Filename Value="C:\Lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
         <Caret Line="66" Column="51" TopLine="53"/>
@@ -757,6 +757,10 @@
         <Filename Value="ubomberman.pas"/>
         <Caret Line="1200" Column="7" TopLine="1190"/>
       </Position6>
+      <Position7>
+        <Filename Value="ugame.pas"/>
+        <Caret Line="1293" Column="52" TopLine="1268"/>
+      </Position7>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

@@ -1289,8 +1289,8 @@ Begin
      If GetBombermanCount() <> 0 Then Begin
         For i := 1 To GetBombermanCount() Do Begin
             tBomberman := GetBombermanByCount(i);
-            tBomberman.fOrigin.x := pScheme.Spawn(k).X;
-            tBomberman.fOrigin.y := pScheme.Spawn(k).Y;
+            tBomberman.fOrigin.x := pScheme.Spawn(i).X;
+            tBomberman.fOrigin.y := pScheme.Spawn(i).Y;
             tBomberman.Restore();
         End;
      End;
