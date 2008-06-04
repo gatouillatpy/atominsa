@@ -785,11 +785,11 @@ Begin
                     pTexture := pDataStack^.item;
                     If pTexture <> NIL Then FreeTexture( pTexture );
                End;
-               DATA_SOUND :
+              { DATA_SOUND : // Ca plante sur Vista. A REVOIR SI ON A LE TEMPS.
                Begin
                     pSound := pDataStack^.item;
                     If pSound <> NIL Then FSOUND_Sample_Free( pSound );
-               End;
+               End; }
                DATA_MUSIC :
                Begin
                     pMusic := pDataStack^.item;

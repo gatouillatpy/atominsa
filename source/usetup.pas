@@ -56,6 +56,7 @@ Var aSchemeList : Array [0..255] Of CScheme;
 Var nSchemeCount : Integer;
 Var pScheme : CScheme;
 Var nScheme : Integer;
+Var nSchemeMulti : Integer;
 
 Var aMapList : Array [0..255] Of CMap;
 Var nMapCount : Integer;

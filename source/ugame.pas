@@ -208,7 +208,10 @@ Procedure LoadScheme () ;
 Var k : Integer;
 Begin
      If nScheme = -1 Then Begin
-        pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
+        If (bMulti = True) Then
+           pScheme := aSchemeList[nSchemeMulti]
+        Else
+            pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
      End Else Begin
         pScheme := aSchemeList[nScheme];
      End;
@@ -1270,6 +1273,15 @@ Begin
      nCamera := CAMERA_OVERALL;
 
      // rechargement de la grille
+     If (bMulti = True) And (nLocalIndex = nClientIndex[0]) And (nScheme = -1) Then Begin
+        nSchemeMulti := Random(nSchemeCount);
+        LoadScheme();
+        sData := IntToStr(nScheme) + #31;
+        sData := sData + IntToStr(nSchemeMulti) + #31;
+        sData := sData + IntToStr(nMap) + #31;
+        sData := sData + IntToStr(nRoundCount) + #31;
+        Send( nLocalIndex, HEADER_SETUP, sData );
+     End;
      pGrid.LoadScheme( pScheme );
 
      // restauration des bomberman
@@ -2310,6 +2322,10 @@ Begin
                   Begin
                        nScheme -= 1;
                        If nScheme < -1 Then nScheme := nSchemeCount - 1;
+                       If ( nScheme = - 1 ) Then
+                          nSchemeMulti := Random(nSchemeCount)
+                       Else
+                           nSchemeMulti := -1;
                        LoadScheme();
                        If nScheme = -1 Then Begin
                           SetString( STRING_GAME_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
@@ -2337,6 +2353,7 @@ Begin
              End;
              If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
                 sData := IntToStr(nScheme) + #31;
+                sData := sData + IntToStr(nSchemeMulti) + #31;
                 sData := sData + IntToStr(nMap) + #31;
                 sData := sData + IntToStr(nRoundCount) + #31;
                 Send( nLocalIndex, HEADER_SETUP, sData );
@@ -2355,6 +2372,10 @@ Begin
                   Begin
                        nScheme += 1;
                        If nScheme = nSchemeCount Then nScheme := -1;
+                       If ( nScheme = - 1 ) Then
+                          nSchemeMulti := Random(nSchemeCount)
+                       Else
+                           nSchemeMulti := -1;
                        LoadScheme();
                        If nScheme = -1 Then Begin
                           SetString( STRING_GAME_MENU(21), 'scheme : ' + 'random', 0.0, 0.02, 600 );
@@ -2382,6 +2403,7 @@ Begin
              End;
              If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
                 sData := IntToStr(nScheme) + #31;
+                sData := sData + IntToStr(nSchemeMulti) + #31;
                 sData := sData + IntToStr(nMap) + #31;
                 sData := sData + IntToStr(nRoundCount) + #31;
                 Send( nLocalIndex, HEADER_SETUP, sData );

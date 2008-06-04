@@ -441,6 +441,7 @@ Begin
                     Send( nIndex, nHeader, sData );
                     // renvoi du scheme, de la map et du nombre de rounds.
                     sData := IntToStr(nScheme) + #31;
+                    sData := sData + IntToStr(nSchemeMulti) + #31;
                     sData := sData + IntToStr(nMap) + #31;
                     sData := sData + IntToStr(nRoundCount) + #31;
                     Send( nIndex, HEADER_SETUP, sData );
@@ -709,8 +710,9 @@ Begin
                HEADER_SETUP :
                Begin
                     nScheme := StrToInt( GetString( sData, 1 ) );
-                    nMap := StrToInt( GetString( sData, 2 ) );
-                    nRoundCount := StrToInt( GetString( sData, 3 ) );
+                    nSchemeMulti := StrToInt( GetString( sData, 2 ) );
+                    nMap := StrToInt( GetString( sData, 3 ) );
+                    nRoundCount := StrToInt( GetString( sData, 4 ) );
                     UpdateMenu();
                End;
                HEADER_FIGHT :
