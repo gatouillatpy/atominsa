@@ -28,7 +28,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="91">
+    <Units Count="93">
       <Unit0>
         <Filename Value="atominsa.lpr"/>
         <UnitName Value="atominsa"/>
@@ -41,7 +41,7 @@
       <Unit1>
         <Filename Value="ucore.pas"/>
         <UnitName Value="UCore"/>
-        <CursorPos X="13" Y="1886"/>
+        <CursorPos X="40" Y="1885"/>
         <TopLine Value="1873"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="102"/>
@@ -87,8 +87,8 @@
       <Unit6>
         <Filename Value="usetup.pas"/>
         <UnitName Value="USetup"/>
-        <CursorPos X="53" Y="906"/>
-        <TopLine Value="890"/>
+        <CursorPos X="59" Y="1129"/>
+        <TopLine Value="1110"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -117,7 +117,7 @@
       <Unit10>
         <Filename Value="ucharacter.pas"/>
         <UnitName Value="UCharacter"/>
-        <CursorPos X="36" Y="47"/>
+        <CursorPos X="22" Y="28"/>
         <TopLine Value="16"/>
         <EditorIndex Value="6"/>
         <UsageCount Value="101"/>
@@ -212,8 +212,8 @@
       <Unit22>
         <Filename Value="fmodtypes.pas"/>
         <UnitName Value="fmodtypes"/>
-        <CursorPos X="3" Y="74"/>
-        <TopLine Value="55"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
         <UsageCount Value="10"/>
       </Unit22>
       <Unit23>
@@ -718,20 +718,37 @@
         <UsageCount Value="29"/>
         <Loaded Value="True"/>
       </Unit90>
+      <Unit91>
+        <Filename Value="fmod.inc"/>
+        <CursorPos X="19" Y="22"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="10"/>
+      </Unit91>
+      <Unit92>
+        <Filename Value="fmod.pas"/>
+        <UnitName Value="fmod"/>
+        <CursorPos X="12" Y="748"/>
+        <TopLine Value="742"/>
+        <UsageCount Value="10"/>
+      </Unit92>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="C:\Lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
         <Caret Line="66" Column="51" TopLine="53"/>
       </Position1>
       <Position2>
-        <Filename Value="umap.pas"/>
-        <Caret Line="167" Column="1" TopLine="146"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1886" Column="13" TopLine="1873"/>
       </Position2>
       <Position3>
+        <Filename Value="ucharacter.pas"/>
+        <Caret Line="28" Column="22" TopLine="16"/>
+      </Position3>
+      <Position4>
         <Filename Value="ucore.pas"/>
         <Caret Line="1895" Column="1" TopLine="1874"/>
-      </Position3>
+      </Position4>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

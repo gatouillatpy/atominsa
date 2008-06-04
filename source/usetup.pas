@@ -1135,6 +1135,8 @@ Begin
           End;
      End;
 
+     If (nShaderModel < 2) Or (nShaderModel > 4) Then nShaderModel := 2;
+     
      Close( ioLine );
 End;
 
