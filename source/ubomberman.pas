@@ -1344,7 +1344,7 @@ begin
    aVictim:=GetBombermanByIndex(aArrayVictim.Tab[index]);
    if (aVictim.DiseaseNumber=0) then
    begin
-     SetString( STRING_NOTIFICATION, aVictim.Name + ' has contaminated by ' + sName, 0.0, 0.2, 5 );
+     SetString( STRING_NOTIFICATION, aVictim.Name + ' has been stephaned by ' + sName, 0.0, 0.2, 5 );
      aDisease:=CDisease.Create(1,1);
      aDisease.BonusForced(aVictim,nDisease);
    end;

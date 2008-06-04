@@ -1241,7 +1241,7 @@ Begin
      If bEffects Then s := s + 'true,' Else s := s + 'false,';
      If bBlur Then s := s + 'true,' Else s := s + 'false,';
      s := s + IntToStr(nTexturing);
-     WriteLn( ioLine, s );
+     s := s + ',';
      s := s + IntToStr(nShaderModel);
      WriteLn( ioLine, s );
 

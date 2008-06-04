@@ -1260,6 +1260,7 @@ End;
 Procedure InitRound () ;
 Var i, j, l, k, m : Integer;
     sData : String;
+    tBomberman : CBomberman;
 Begin
      // supression des différents éléments du jeu
      FreeFlame();
@@ -1285,10 +1286,15 @@ Begin
      pGrid.LoadScheme( pScheme );
 
      // restauration des bomberman
-     If GetBombermanCount() <> 0 Then
-        For i := 1 To GetBombermanCount() Do
-            GetBombermanByCount(i).Restore();
-
+     If GetBombermanCount() <> 0 Then Begin
+        For i := 1 To GetBombermanCount() Do Begin
+            tBomberman := GetBombermanByCount(i);
+            tBomberman.fOrigin.x := pScheme.Spawn(k).X;
+            tBomberman.fOrigin.y := pScheme.Spawn(k).Y;
+            tBomberman.Restore();
+        End;
+     End;
+     
      // chargement de la map
      LoadMap();
 
