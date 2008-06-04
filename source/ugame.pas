@@ -1545,14 +1545,19 @@ Procedure ProcessGame () ;
     Begin
          UpdateExplosion();
 
-         n := GetExplosionCount();
-         If n > 8 Then n := 8;
-
          p := glGetUniformLocationARB( ShaderProgram, PChar('color') );
          glUniform4fARB( p, 1.0, 1.0, 1.0, 0.8 );
 
-         p := glGetUniformLocationARB( ShaderProgram, PChar('count') );
-         glUniform1iARB( p, n );
+         If nShaderModel = 2 Then Begin
+            n := GetExplosionCount();
+            If n > 4 Then n := 4;
+         End Else Begin
+            n := GetExplosionCount();
+            If n > 8 Then n := 8;
+
+            p := glGetUniformLocationARB( ShaderProgram, PChar('count') );
+            glUniform1iARB( p, n );
+         End;
 
          For k := 1 To n Do Begin
              tExplosion := GetExplosion(k);
@@ -1562,14 +1567,25 @@ Procedure ProcessGame () ;
                 t := (GetTime() - tExplosion^.T) / EXPLOSION_DURATION;
                 s := 0.2 * (0.6 - t) * (0.6 - t);
 
-                p := glGetUniformLocationARB( ShaderProgram, PChar('center' + IntToStr(k)) );
-                glUniform2fARB( p, x, y );
-                p := glGetUniformLocationARB( ShaderProgram, PChar('inbound' + IntToStr(k)) );
-                glUniform1fARB( p, t );
-                p := glGetUniformLocationARB( ShaderProgram, PChar('exbound' + IntToStr(k)) );
-                glUniform1fARB( p, t + 0.2 - s );
-                p := glGetUniformLocationARB( ShaderProgram, PChar('strength' + IntToStr(k)) );
-                glUniform1fARB( p, s );
+                If nShaderModel = 4 Then Begin
+                   p := glGetUniformLocationARB( ShaderProgram, PChar('center') ) + 2 * (k - 1);
+                   glUniform2fARB( p, x, y );
+                   p := glGetUniformLocationARB( ShaderProgram, PChar('inbound') ) + (k - 1);;
+                   glUniform1fARB( p, t );
+                   p := glGetUniformLocationARB( ShaderProgram, PChar('exbound') ) + (k - 1);;
+                   glUniform1fARB( p, t + 0.2 - s );
+                   p := glGetUniformLocationARB( ShaderProgram, PChar('strength') ) + (k - 1);;
+                   glUniform1fARB( p, s );
+                End Else Begin
+                   p := glGetUniformLocationARB( ShaderProgram, PChar('center' + IntToStr(k)) );
+                   glUniform2fARB( p, x, y );
+                   p := glGetUniformLocationARB( ShaderProgram, PChar('inbound' + IntToStr(k)) );
+                   glUniform1fARB( p, t );
+                   p := glGetUniformLocationARB( ShaderProgram, PChar('exbound' + IntToStr(k)) );
+                   glUniform1fARB( p, t + 0.2 - s );
+                   p := glGetUniformLocationARB( ShaderProgram, PChar('strength' + IntToStr(k)) );
+                   glUniform1fARB( p, s );
+                End;
              End;
          End;
     End;

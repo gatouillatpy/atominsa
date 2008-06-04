@@ -160,6 +160,8 @@ Begin
          AddAnimation( './characters/' + pPlayerCharacter[k].PlayerAnim, ANIMATION_BOMBERMAN(k), MESH_BOMBERMAN(k) );
      End;
 
+     InitShaderProgram();
+
      // initialisation de la machine d'état
      If bIntro Then Begin
         nState := PHASE_INTRO;

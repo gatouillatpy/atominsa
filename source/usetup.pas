@@ -544,6 +544,7 @@ Begin
                      nShaderModel -= 1;
                      If nShaderModel < 2 Then nShaderModel := 2;
                      SetString( STRING_SETUP_MENU(28), 'shader model : ' + IntToStr(nShaderModel), 0.0, 0.02, 600 );
+                     InitShaderProgram();
                 End;
                 MENU_FULLSCREEN :
                 Begin
@@ -645,6 +646,7 @@ Begin
                      nShaderModel += 1;
                      If nShaderModel > 4 Then nShaderModel := 4;
                      SetString( STRING_SETUP_MENU(28), 'shader model : ' + IntToStr(nShaderModel), 0.0, 0.02, 600 );
+                     InitShaderProgram();
                 End;
                 MENU_FULLSCREEN :
                 Begin
@@ -894,9 +896,7 @@ End;
 
 
 Procedure ReadSettings ( sFile : String ) ;
-Var tFile : TSearchRec;
-    pFile : String;
-    ioLine : TEXT;
+Var ioLine : TEXT;
     sLine : String;
     i, k : Integer;
 Begin
@@ -907,46 +907,6 @@ Begin
      sServerAddress := '192.168.0.2';
      nServerPort := 1212;
      nServerType := SERVER_STANDARD;
-     
-     // initialisation des listes
-     For i := 0 To 255 Do Begin
-         aSchemeList[i] := NIL;
-         aMapList[i] := NIL;
-         aCharacterList[i] := NIL;
-     End;
-
-     // création de la liste des schemes
-     pFile := '';
-     FindFirst( './schemes/*.sch', faAnyFile, tFile );
-     For k := 0 To 255 Do Begin
-         If pFile = tFile.Name Then Break;
-         pFile := tFile.Name;
-         aSchemeList[k] := CScheme.Create( pFile, False );
-         FindNext( tFile );
-     End;
-     nSchemeCount := k;
-
-     // création de la liste des maps
-     pFile := '';
-     FindFirst( './maps/*.map', faAnyFile, tFile );
-     For k := 0 To 255 Do Begin
-         If pFile = tFile.Name Then Break;
-         pFile := tFile.Name;
-         aMapList[k] := CMap.Create( pFile, False );
-         FindNext( tFile );
-     End;
-     nMapCount := k;
-
-     // création de la liste des characters
-     pFile := '';
-     FindFirst( './characters/*.chr', faAnyFile, tFile );
-     For k := 0 To 255 Do Begin
-         If pFile = tFile.Name Then Break;
-         pFile := tFile.Name;
-         aCharacterList[k] := CCharacter.Create( pFile, False );
-         FindNext( tFile );
-     End;
-     nCharacterCount := k;
 
      bIntro := True;
      

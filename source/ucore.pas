@@ -224,6 +224,8 @@ Procedure DelAnimation ( nIndex : LongInt ) ;
 Procedure DrawAnimation ( nIndex : LongInt ; t : Boolean ; nAction : LongInt ) ;
 Procedure FreeAnimation ( pAnimation : LPOGLAnimation ) ;
 
+Procedure InitShaderProgram () ;
+
 Procedure Clear ( r, g, b, a : Single ) ;
 
 Procedure DrawText ( x, y : Single ; r, g, b : Single ; nFont : Integer ; sText : String ) ;
@@ -1880,6 +1882,77 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// InitShaderProgram : Charge le shader en fonction du modèle.                //
+////////////////////////////////////////////////////////////////////////////////
+Procedure InitShaderProgram () ;
+    Function GetShaderSource( sFile : String ) : PChar;
+    Var F : TEXT;
+        T, S : String;
+    Begin
+         S := '';
+         Assign( F, sFile );
+         Reset( F );
+         While Not EOF(F) Do
+         Begin
+              ReadLn( F, T );
+              S := S + T;
+         End;
+         Close( F );
+         GetShaderSource := PChar(S);
+    End;
+    Function GetShaderError( tHandle : GLenum ) : String;
+    Var
+       maxLength : Integer;
+    Begin
+       maxLength := 0;
+       glGetObjectParameterivARB( tHandle, GL_OBJECT_INFO_LOG_LENGTH_ARB, @maxLength );
+       SetLength(Result, maxLength);
+       If maxLength > 0 Then Begin
+          glGetInfoLogARB(tHandle, maxLength, @maxLength, @Result[1]);
+          SetLength(Result, maxLength);
+       End;
+    End;
+Var p : PChar;
+    b : GLint;
+Begin
+     ShaderProgram := glCreateProgramObjectARB();
+     VertexShader := glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+     FragmentShader := glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+
+     p := GetShaderSource('./shaders/bomb.vs');
+     glShaderSourceARB( VertexShader, 1, @p, NIL );
+     p := GetShaderSource('./shaders/bomb' + IntToStr(nShaderModel) + '.ps');
+     glShaderSourceARB( FragmentShader, 1, @p, NIL );
+
+     glCompileShaderARB( VertexShader );
+     glGetObjectParameterivARB( VertexShader, GL_COMPILE_STATUS, @b );
+     If b = 0 Then
+        AddLineToConsole( 'Vertex Shader Compilation Status : ' + GetShaderError(VertexShader) );
+
+     glCompileShaderARB( FragmentShader );
+     glGetObjectParameterivARB( FragmentShader, GL_COMPILE_STATUS, @b );
+     If b = 0 Then
+        AddLineToConsole( 'Fragment Shader Compilation Status : ' + GetShaderError(FragmentShader) );
+
+     glAttachObjectARB( ShaderProgram, VertexShader );
+     glAttachObjectARB( ShaderProgram, FragmentShader );
+
+     glLinkProgramARB( ShaderProgram );
+     glGetObjectParameterivARB( ShaderProgram, GL_LINK_STATUS, @b );
+     If b = 0 Then
+        AddLineToConsole( 'Shader Program Link Status : ' + GetShaderError(ShaderProgram) );
+
+     glLinkProgramARB( ShaderProgram );
+     glGetObjectParameterivARB( ShaderProgram, GL_VALIDATE_STATUS, @b );
+     If b = 0 Then
+        AddLineToConsole( 'Shader Program Validation Status : ' + GetShaderError(ShaderProgram) );
+
+     glUseProgramObjectARB( 0 );
+End;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // DrawText : Procède au rendu d'une ligne de texte à l'écran.                //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawText ( x, y : Single ; r, g, b : Single ; nFont : integer ;
@@ -3297,35 +3370,6 @@ End;
 
 
 Procedure InitGlut ( sTitle : String ; pCallback : GameCallback ) ;
-    Function GetShaderSource( sFile : String ) : PChar;
-    Var F : TEXT;
-        T, S : String;
-    Begin
-         S := '';
-         Assign( F, sFile );
-         Reset( F );
-         While Not EOF(F) Do
-         Begin
-              ReadLn( F, T );
-              S := S + T;
-         End;
-         Close( F );
-         GetShaderSource := PChar(S);
-    End;
-    Function GetShaderError( tHandle : GLenum ) : String;
-    Var
-       maxLength : Integer;
-    Begin
-       maxLength := 0;
-       glGetObjectParameterivARB( tHandle, GL_OBJECT_INFO_LOG_LENGTH_ARB, @maxLength );
-       SetLength(Result, maxLength);
-       If maxLength > 0 Then Begin
-          glGetInfoLogARB(tHandle, maxLength, @maxLength, @Result[1]);
-          SetLength(Result, maxLength);
-       End;
-    End;
-Var p : PChar;
-    b : GLint;
 Begin
      OGLCallback := pCallback;
   
@@ -3378,40 +3422,6 @@ Begin
      If Not Load_GL_ARB_fragment_shader() Then Begin
         AddLineToConsole( 'OpenGL Error : GL_ARB_fragment_shader extension is not supported !' );
      End;
-
-     ShaderProgram := glCreateProgramObjectARB();
-     VertexShader := glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-     FragmentShader := glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-
-     p := GetShaderSource('./shaders/bomb.vs');
-     glShaderSourceARB( VertexShader, 1, @p, NIL );
-     p := GetShaderSource('./shaders/bomb.ps');
-     glShaderSourceARB( FragmentShader, 1, @p, NIL );
-
-     glCompileShaderARB( VertexShader );
-     glGetObjectParameterivARB( VertexShader, GL_COMPILE_STATUS, @b );
-     If b = 0 Then
-        AddLineToConsole( 'Vertex Shader Compilation Status : ' + GetShaderError(VertexShader) );
-
-     glCompileShaderARB( FragmentShader );
-     glGetObjectParameterivARB( FragmentShader, GL_COMPILE_STATUS, @b );
-     If b = 0 Then
-        AddLineToConsole( 'Fragment Shader Compilation Status : ' + GetShaderError(FragmentShader) );
-
-     glAttachObjectARB( ShaderProgram, VertexShader );
-     glAttachObjectARB( ShaderProgram, FragmentShader );
-
-     glLinkProgramARB( ShaderProgram );
-     glGetObjectParameterivARB( ShaderProgram, GL_LINK_STATUS, @b );
-     If b = 0 Then
-        AddLineToConsole( 'Shader Program Link Status : ' + GetShaderError(ShaderProgram) );
-
-     glLinkProgramARB( ShaderProgram );
-     glGetObjectParameterivARB( ShaderProgram, GL_VALIDATE_STATUS, @b );
-     If b = 0 Then
-        AddLineToConsole( 'Shader Program Validation Status : ' + GetShaderError(ShaderProgram) );
-
-     glUseProgramObjectARB( 0 );
 
      fTime := GetTime();
      fDelta := GetTime();

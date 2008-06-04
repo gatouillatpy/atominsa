@@ -1,0 +1,29 @@
+
+uniform sampler2D texdata;
+
+uniform vec2 center[8];
+uniform float inbound[8];
+uniform float exbound[8];
+uniform float strength[8];
+uniform int count;
+uniform vec4 color;
+
+void main(void)
+{
+	vec2 texcoord = gl_TexCoord[0].st;
+
+	for ( int k = 0 ; k < count ; k++ )
+	{
+		float dist = distance( texcoord, center[k] );
+		if ( dist > inbound[k] && dist < exbound[k] )
+		{
+			vec2 dir = normalize(texcoord - center[k]);
+			
+			float f = sin(3.14159 * (exbound[k] - dist) / (exbound[k] - inbound[k]));
+			
+			texcoord += f * (exbound[k] - inbound[k]) * strength[k] * dir;
+		}
+	}
+	
+	gl_FragColor = texture2D( texdata, texcoord ) * color;
+}

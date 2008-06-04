@@ -1,0 +1,56 @@
+
+uniform sampler2D texdata;
+
+uniform vec2 center1, center2, center3, center4;
+uniform float inbound1, inbound2, inbound3, inbound4;
+uniform float exbound1, exbound2, exbound3, exbound4;
+uniform float strength1, strength2, strength3, strength4;
+
+uniform vec4 color;
+
+void main(void)
+{
+	vec2 texcoord = gl_TexCoord[0].st;
+	
+    float dist = distance( texcoord, center1 );
+    if ( dist > inbound1 && dist < exbound1 )
+    {
+        vec2 dir = normalize(texcoord - center1);
+        
+        float f = sin(3.14159 * (exbound1 - dist) / (exbound1 - inbound1));
+        
+        texcoord += f * (exbound1 - inbound1) * strength1 * dir;
+    }
+    
+    dist = distance( texcoord, center2 );
+    if ( dist > inbound2 && dist < exbound2 )
+    {
+        vec2 dir = normalize(texcoord - center2);
+        
+        float f = sin(3.14159 * (exbound2 - dist) / (exbound2 - inbound2));
+        
+        texcoord += f * (exbound2 - inbound2) * strength2 * dir;
+    }
+    
+    dist = distance( texcoord, center3 );
+    if ( dist > inbound3 && dist < exbound3 )
+    {
+        vec2 dir = normalize(texcoord - center3);
+        
+        float f = sin(3.14159 * (exbound3 - dist) / (exbound3 - inbound3));
+        
+        texcoord += f * (exbound3 - inbound3) * strength3 * dir;
+    }
+    
+     dist = distance( texcoord, center4 );
+    if ( dist > inbound4 && dist < exbound4 )
+    {
+        vec2 dir = normalize(texcoord - center4);
+        
+        float f = sin(3.14159 * (exbound4 - dist) / (exbound4 - inbound4));
+        
+        texcoord += f * (exbound4 - inbound4) * strength4 * dir;
+    }
+	
+	gl_FragColor = texture2D( texdata, texcoord ) * color;
+}
