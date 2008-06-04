@@ -1550,13 +1550,13 @@ Procedure ProcessGame () ;
                 t := (GetTime() - tExplosion^.T) / EXPLOSION_DURATION;
                 s := 0.2 * (0.6 - t) * (0.6 - t);
 
-                p := glGetUniformLocationARB( ShaderProgram, PChar('center') ) + 2 * (k - 1);
+                p := glGetUniformLocationARB( ShaderProgram, PChar('center' + IntToStr(k)) );
                 glUniform2fARB( p, x, y );
-                p := glGetUniformLocationARB( ShaderProgram, PChar('inbound') ) + (k - 1);;
+                p := glGetUniformLocationARB( ShaderProgram, PChar('inbound' + IntToStr(k)) );
                 glUniform1fARB( p, t );
-                p := glGetUniformLocationARB( ShaderProgram, PChar('exbound') ) + (k - 1);;
+                p := glGetUniformLocationARB( ShaderProgram, PChar('exbound' + IntToStr(k)) );
                 glUniform1fARB( p, t + 0.2 - s );
-                p := glGetUniformLocationARB( ShaderProgram, PChar('strength') ) + (k - 1);;
+                p := glGetUniformLocationARB( ShaderProgram, PChar('strength' + IntToStr(k)) );
                 glUniform1fARB( p, s );
              End;
          End;

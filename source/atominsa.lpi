@@ -717,15 +717,11 @@
         <Loaded Value="True"/>
       </Unit90>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="1" HistoryIndex="0">
       <Position1>
         <Filename Value="C:\Lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
         <Caret Line="66" Column="51" TopLine="53"/>
       </Position1>
-      <Position2>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="3410" Column="57" TopLine="3377"/>
-      </Position2>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

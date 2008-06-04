@@ -1,27 +1,50 @@
 
 uniform sampler2D texdata;
 
-uniform vec2 center[8];
-uniform float inbound[8];
-uniform float exbound[8];
-uniform float strength[8];
+uniform vec2 center1, center2, center3, center4, center5, center6, center7, center8;
+uniform float inbound1, inbound2, inbound3, inbound4, inbound5, inbound6, inbound7, inbound8;
+uniform float exbound1, exbound2, exbound3, exbound4, exbound5, exbound6, exbound7, exbound8;
+uniform float strength1, strength2, strength3, strength4, strength5, strength6, strength7, strength8;
+
 uniform int count;
 uniform vec4 color;
 
 void main(void)
 {
 	vec2 texcoord = gl_TexCoord[0].st;
-
-	for ( int k = 0 ; k < count ; k++ )
+	
+	vec2 center;
+	float inbound;
+	float exbound;
+	float strength;
+	
+	for ( int k = 1 ; k <= count ; k++ )
 	{
-		float dist = distance( texcoord, center[k] );
-		if ( dist > inbound[k] && dist < exbound[k] )
+		if ( k == 1 )
+		{ center = center1; inbound = inbound1; exbound = exbound1;	strength = strength1; }
+		else if ( k == 2 )
+		{ center = center2; inbound = inbound2; exbound = exbound2;	strength = strength2; }
+		else if ( k == 3 )
+		{ center = center3; inbound = inbound3; exbound = exbound3;	strength = strength3; }
+		else if ( k == 4 )
+		{ center = center4; inbound = inbound4; exbound = exbound4;	strength = strength4; }
+		else if ( k == 5 )
+		{ center = center5; inbound = inbound5; exbound = exbound5;	strength = strength5; }
+		else if ( k == 6 )
+		{ center = center6; inbound = inbound6; exbound = exbound6;	strength = strength6; }
+		else if ( k == 7 )
+		{ center = center7; inbound = inbound7; exbound = exbound7;	strength = strength7; }
+		else if ( k == 8 )
+		{ center = center8; inbound = inbound8; exbound = exbound8;	strength = strength8; }
+	
+		float dist = distance( texcoord, center );
+		if ( dist > inbound && dist < exbound )
 		{
-			vec2 dir = normalize(texcoord - center[k]);
+			vec2 dir = normalize(texcoord - center);
 			
-			float f = sin(3.14159 * (exbound[k] - dist) / (exbound[k] - inbound[k]));
+			float f = sin(3.14159 * (exbound - dist) / (exbound - inbound));
 			
-			texcoord += f * (exbound[k] - inbound[k]) * strength[k] * dir;
+			texcoord += f * (exbound - inbound) * strength * dir;
 		}
 	}
 	
