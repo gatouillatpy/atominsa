@@ -4,7 +4,7 @@ Unit UBomb;
 
 Interface
 
-Uses Classes, SysUtils, UGrid, UBlock, UUtils, UCore;
+Uses Classes, SysUtils, UGrid, UBlock, UUtils, UCore, UExplosion;
 
 Type LPUpCount = procedure() of Object ;cdecl;
 Type LPGetBomberman = function(aX,aY : integer):boolean;cdecl;
@@ -518,6 +518,7 @@ begin
   PlaySound( SOUND_BOMB(k + nIndex) );
   RemoveThisBomb(Self);                                                         //On supprime la bombe de la liste
   bExplosive:=False;                                                            //elle pete elle peut plus exploser ... pour eviter qu'une bombe fasse sauter une bombe et celle ci fasse resaute la meme qu au debut ...
+  AddExplosion(fPosition.x, fPosition.y);
   CreateFlame(1,0);                                                             //gauche
   CreateFlame(-1,0);                                                            //droite
   CreateFlame(0,1);                                                             //haut

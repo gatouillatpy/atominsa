@@ -350,6 +350,12 @@ Procedure ClientLoop () ;
 
 
 
+Var ShaderProgram : GLenum;
+Var VertexShader : GLenum;
+Var FragmentShader : GLenum;
+
+
+
 Implementation
 
 Uses UMulti;
@@ -3294,6 +3300,35 @@ End;
 
 
 Procedure InitGlut ( sTitle : String ; pCallback : GameCallback ) ;
+    Function GetShaderSource( sFile : String ) : PChar;
+    Var F : TEXT;
+        T, S : String;
+    Begin
+         S := '';
+         Assign( F, sFile );
+         Reset( F );
+         While Not EOF(F) Do
+         Begin
+              ReadLn( F, T );
+              S := S + T;
+         End;
+         Close( F );
+         GetShaderSource := PChar(S);
+    End;
+    Function GetShaderError( tHandle : GLenum ) : String;
+    Var
+       maxLength : Integer;
+    Begin
+       maxLength := 0;
+       glGetObjectParameterivARB( tHandle, GL_OBJECT_INFO_LOG_LENGTH_ARB, @maxLength );
+       SetLength(Result, maxLength);
+       If maxLength > 0 Then Begin
+          glGetInfoLogARB(tHandle, maxLength, @maxLength, @Result[1]);
+          SetLength(Result, maxLength);
+       End;
+    End;
+Var p : PChar;
+    b : GLint;
 Begin
      OGLCallback := pCallback;
   
@@ -3331,10 +3366,50 @@ Begin
         AddLineToConsole( '   Extensions : ' + PChar(glGetString(GL_EXTENSIONS)) );
      End;
 
-     If Not load_GL_ARB_vertex_buffer_object() Then Begin
-        AddLineToConsole( 'OpenGL Error : Vertex buffer objects are not supported by your graphical drivers !' );
+     If Not Load_GL_ARB_vertex_buffer_object() Then Begin
+        AddLineToConsole( 'OpenGL Error : GL_ARB_vertex_buffer_object extension is not supported !' );
+     End;
+     If Not Load_GL_ARB_shader_objects() Then Begin
+        AddLineToConsole( 'OpenGL Error : GL_ARB_shader_objects extension is not supported !' );
+     End;
+     If Not Load_GL_ARB_shading_language_100() Then Begin
+        AddLineToConsole( 'OpenGL Error : GL_ARB_shading_language_100 extension is not supported !' );
+     End;
+     If Not Load_GL_ARB_vertex_shader() Then Begin
+        AddLineToConsole( 'OpenGL Error : GL_ARB_vertex_shader extension is not supported !' );
+     End;
+     If Not Load_GL_ARB_fragment_shader() Then Begin
+        AddLineToConsole( 'OpenGL Error : GL_ARB_fragment_shader extension is not supported !' );
+     End;
+
+     ShaderProgram := glCreateProgramObjectARB();
+     VertexShader := glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+     FragmentShader := glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+
+     p := GetShaderSource('./shaders/bomb.vs');
+     glShaderSourceARB( VertexShader, 1, @p, NIL );
+     p := GetShaderSource('./shaders/bomb.ps');
+     glShaderSourceARB( FragmentShader, 1, @p, NIL );
+
+     glCompileShaderARB( VertexShader );
+     glGetObjectParameterivARB( VertexShader, GL_COMPILE_STATUS, @b );
+     If b = 0 Then Begin
+       AddLineToConsole( 'OpenGL Error : ' + GetShaderError(VertexShader) );
      End;
      
+     glCompileShaderARB( FragmentShader );
+     glGetObjectParameterivARB( FragmentShader, GL_COMPILE_STATUS, @b );
+     If b = 0 Then Begin
+       AddLineToConsole( 'OpenGL Error : ' + GetShaderError(FragmentShader) );
+     End;
+
+     glAttachObjectARB( ShaderProgram, VertexShader );
+     glAttachObjectARB( ShaderProgram, FragmentShader );
+
+     glLinkProgramARB( ShaderProgram );
+
+     glUseProgramObjectARB( 0 );
+
      fTime := GetTime();
      fDelta := GetTime();
 End;

@@ -9,8 +9,8 @@ Interface
 
 
 
-Uses Classes, SysUtils,
-     UCore, UUtils, UBlock, UItem, UBomberman, UDisease,
+Uses Classes, SysUtils, GLext, GL,
+     UCore, UUtils, UBlock, UItem, UBomberman, UDisease, UExplosion,
      USpeedUp, UExtraBomb, UFlameUp, UKick, UGrab, UJelly, UGrid, UFlame, UListBomb, UBomb, USetup, UForm,
      UJellyBomb, UPunch, USpoog, UGoldFLame, UTrigger, UTriggerBomb, USuperDisease, URandomBonus, UComputer;
 
@@ -1484,110 +1484,167 @@ End;
 
 
 Procedure ProcessGame () ;
-Var k, i : Integer;
+    Procedure Render( p : Single ) ;
+    Begin
+        // définition de la camera
+        SetCamera();
+
+        // rendu des reflets
+        If bReflection Then Begin
+          PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
+          DrawBomberman( p * 0.4, False );
+          DrawGrid( p * 0.4 );
+          DrawBomb( p * 0.4, False );
+          DrawFlame( p * 0.4, False );
+          PopObjectMatrix();
+          PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
+          DrawSkybox( p * 0.4, p * 0.4, p * 0.4, p * 0.4, TEXTURE_MAP_SKYBOX(0) );
+          PopObjectMatrix();
+        End;
+
+        // rendu global
+        DrawPlane( p * 1.0 );
+        DrawBomberman( p * 1.0, True );
+        DrawGrid( p * 1.0 );
+        DrawBomb( p * 1.0, True );
+        DrawFlame( p * 1.0, True );
+        DrawSkybox( p * 1.0, p * 1.0, p * 1.0, p * 1.0, TEXTURE_MAP_SKYBOX(0) );
+
+        // affichage de l'invite de messages
+        If bMulti Then DrawMessage( p * 1.0 );
+
+        // affichage des informations
+        DrawNotification( p * 1.0 );
+
+        // affichage des scores
+        DrawScore( p * 1.0 );
+
+        // affichage de la minuterie
+        DrawTimer( p * 1.0 );
+
+        // affichage du panneau d'affichage
+        DrawScreen( p * 1.0 );
+    End;
+    Procedure SetupEffect() ;
+    Var k, n : Integer;
+        p : GLint;
+        tExplosion : LPExplosion;
+        x, y, t, s : Single;
+    Begin
+         UpdateExplosion();
+
+         n := GetExplosionCount();
+         If n > 8 Then n := 8;
+
+         p := glGetUniformLocationARB( ShaderProgram, PChar('color') );
+         glUniform4fARB( p, 1.0, 1.0, 1.0, 0.8 );
+
+         p := glGetUniformLocationARB( ShaderProgram, PChar('count') );
+         glUniform1iARB( p, n );
+
+         For k := 1 To n Do Begin
+             tExplosion := GetExplosion(k);
+             If tExplosion <> NIL Then Begin
+                x := tExplosion^.X * 0.063;
+                y := 0.83 - tExplosion^.Y * 0.063;
+                t := (GetTime() - tExplosion^.T) / EXPLOSION_DURATION;
+                s := 0.2 * (0.6 - t) * (0.6 - t);
+
+                p := glGetUniformLocationARB( ShaderProgram, PChar('center' + IntToStr(k)) );
+                glUniform2fARB( p, x, y );
+                p := glGetUniformLocationARB( ShaderProgram, PChar('inbound' + IntToStr(k)) );
+                glUniform1fARB( p, t );
+                p := glGetUniformLocationARB( ShaderProgram, PChar('exbound' + IntToStr(k)) );
+                glUniform1fARB( p, t + 0.2 - s );
+                p := glGetUniformLocationARB( ShaderProgram, PChar('strength' + IntToStr(k)) );
+                glUniform1fARB( p, s );
+             End;
+         End;
+    End;
+Var k : Integer;
     sData : String;
     w, h : Single; // taille de la fenêtre
 Begin
+     // récupération de la taille de la fenêtre
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
      // gestion de l'effet de motion blur
      If bBlur Then Begin
-        // récupération de la taille de la fenêtre
-        w := GetRenderWidth();
-        h := GetRenderHeight();
+        If bEffects Then Begin
+           // appel d'une texture de rendu
+           PutRenderTexture();
 
-        // appel d'une texture de rendu
-        PutRenderTexture();
+           // rendu plus sombre
+           Render( 0.4 );
+            
+           glUseProgramObjectARB( ShaderProgram );
 
-        // définition de la camera
-        SetCamera();
+           SetupEffect();
+           
+           // affichage du rendu précédent en transparence pour l'effet de flou
+           SetRenderTexture();
+           DrawImage( 0, 0, -1, 1, 1, 1.0, 1.0, 1.0, 0.8, True );
 
-        // rendu des reflets
-        If bReflection Then Begin
-          PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
-          DrawBomberman( 0.1, False );
-          DrawGrid( 0.1 );
-          DrawBomb( 0.1, False );
-          DrawFlame( 0.1, False );
-          PopObjectMatrix();
-          PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
-          DrawSkybox( 0.1, 0.1, 0.1, 0.1, TEXTURE_MAP_SKYBOX(0) );
-          PopObjectMatrix();
+           glUseProgramObjectARB( 0 );
+
+           // récupération de la texture de rendu
+           GetRenderTexture();
+
+           // remplissage noir de l'écran
+           Clear( 0.0, 0.0, 0.0, 0.0 );
+
+           // affichage final du rendu
+           SetRenderTexture();
+           DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+        End Else Begin
+           // appel d'une texture de rendu
+           PutRenderTexture();
+
+           // rendu plus sombre
+           Render( 0.4 );
+
+           // affichage du rendu précédent en transparence pour l'effet de flou
+           SetRenderTexture();
+           DrawImage( 0, 0, -1, 1, 1, 1.0, 1.0, 1.0, 0.8, True );
+
+           // récupération de la texture de rendu
+           GetRenderTexture();
+
+           // remplissage noir de l'écran
+           Clear( 0.0, 0.0, 0.0, 0.0 );
+
+           // affichage final du rendu
+           SetRenderTexture();
+           DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
         End;
-
-        // rendu global
-        DrawPlane( 0.3 );
-        DrawBomberman( 0.3, True );
-        DrawGrid( 0.3 );
-        DrawBomb( 0.3, True );
-        DrawFlame( 0.3, True );
-        DrawSkybox( 0.3, 0.3, 0.3, 0.3, TEXTURE_MAP_SKYBOX(0) );
-
-        // affichage de l'invite de messages
-        If bMulti Then DrawMessage( 0.5 );
-
-        // affichage des informations
-        DrawNotification( 0.5 );
-
-        // affichage des scores
-        DrawScore( 0.5 );
-
-        // affichage de la minuterie
-        DrawTimer( 0.5 );
-
-        // affichage du panneau d'affichage
-        DrawScreen( 0.5 );
-
-        // affichage du rendu précédent en transparence pour l'effet de flou
-        SetRenderTexture();
-        DrawImage( 0, 0, -1, 1, 1, 1.0, 1.0, 1.0, 0.8, True );
-
-        // récupération de la texture de rendu
-        GetRenderTexture();
-
-        // remplissage noir de l'écran
-        Clear( 0.0, 0.0, 0.0, 0.0 );
-
-        // affichage final du rendu en transparence
-        SetRenderTexture();
-        DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
      End Else Begin
-        // définition de la camera
-        SetCamera();
+        If bEffects Then Begin
+           // appel d'une texture de rendu
+           PutRenderTexture();
 
-        // rendu des reflets
-        If bReflection Then Begin
-          PushObjectMatrix( 0, -1, 0, 1, -1, 1, 0, 0, 0 );
-          DrawBomberman( 0.4, False );
-          DrawGrid( 0.4 );
-          DrawBomb( 0.4, False );
-          DrawFlame( 0.4, False );
-          PopObjectMatrix();
-          PushObjectMatrix( 0, -1, 0, 1.2, -1.2, 1.2, 0, 0, 0 );
-          DrawSkybox( 0.4, 0.4, 0.4, 0.4, TEXTURE_MAP_SKYBOX(0) );
-          PopObjectMatrix();
+           // rendu normal
+           Render( 1.0 );
+
+           // récupération de la texture de rendu
+           GetRenderTexture();
+
+           // remplissage noir de l'écran
+           Clear( 0.0, 0.0, 0.0, 0.0 );
+
+           glUseProgramObjectARB( ShaderProgram );
+
+           SetupEffect();
+
+           // affichage final du rendu
+           SetRenderTexture();
+           DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+
+           glUseProgramObjectARB( 0 );
+        End Else Begin
+           // rendu normal
+           Render( 1.0 );
         End;
-
-        // rendu global
-        DrawPlane( 1.0 );
-        DrawBomberman( 1.0, True );
-        DrawGrid( 1.0 );
-        DrawBomb( 1.0, True );
-        DrawFlame( 1.0, True );
-        DrawSkybox( 1.0, 1.0, 1.0, 1.0, TEXTURE_MAP_SKYBOX(0) );
-
-        // affichage de l'invite de messages
-        If bMulti Then DrawMessage( 1.0 );
-
-        // affichage des informations
-        DrawNotification( 1.0 );
-
-        // affichage des scores
-        DrawScore( 1.0 );
-
-        // affichage de la minuterie
-        DrawTimer( 1.0 );
-
-        // affichage du panneau d'affichage
-        DrawScreen( 1.0 );
      End;
 
      // gestion de l'intelligence artificielle
@@ -1617,10 +1674,10 @@ Begin
            InitWait();
            sData := IntToStr(CheckEndGame()) + #31;
            If GetBombermanCount() <> 0 Then Begin
-              For i := 1 To GetBombermanCount() Do Begin
-                  sData := sData + IntToStr(GetBombermanByCount(i).Score) + #31;
-                  sData := sData + IntToStr(GetBombermanByCount(i).Kills) + #31;
-                  sData := sData + IntToStr(GetBombermanByCount(i).Deaths) + #31;
+              For k := 1 To GetBombermanCount() Do Begin
+                  sData := sData + IntToStr(GetBombermanByCount(k).Score) + #31;
+                  sData := sData + IntToStr(GetBombermanByCount(k).Kills) + #31;
+                  sData := sData + IntToStr(GetBombermanByCount(k).Deaths) + #31;
               End;
            End;
            Send( nLocalIndex, HEADER_WAIT, sData );
