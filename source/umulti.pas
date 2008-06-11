@@ -882,7 +882,7 @@ Begin
                Begin
                     l := 1;
                     k := StrToInt( GetString( sData, l ) ); l += 1;
-                    If k = -1 Then Begin
+                    If k <= 0 Then Begin
                        If GetBombermanCount() <> 0 Then Begin
                           For i := 1 To GetBombermanCount() Do Begin
                               GetBombermanByCount(i).Alive := False;
