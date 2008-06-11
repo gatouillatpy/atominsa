@@ -25,6 +25,8 @@ Var fPingTime, fPing : Single;
 Procedure InitMulti () ;
 Procedure ProcessMulti () ;
 
+Function ClientIndex( nIndex : DWord ) : Integer ;
+
 
 
 Implementation
@@ -724,7 +726,7 @@ Begin
                End;
                HEADER_FIGHT :
                Begin
-                    For k := 0 To 255 Begin
+                    For k := 0 To 255 Do Begin
                         bClientReady[ClientIndex(nIndex)] := False;
                     End;
                     nGame := GAME_INIT;
@@ -998,7 +1000,7 @@ Begin
           GAME_MENU_PLAYER : ProcessMenuPlayer();
           GAME_MENU_MULTI : ProcessMenuMulti();
           GAME_INIT : InitGame();
-          GAME_READY : SynchroGame();
+          GAME_SYNCHRO : SynchroGame();
           GAME_ROUND : ProcessGame();
           GAME_WAIT : ProcessWait();
           GAME_SCORE : ProcessScore();

@@ -138,6 +138,7 @@ Procedure ProcessWait () ;
 
 Procedure InitRound () ;
 Procedure InitGame () ;
+Procedure SynchroGame () ;
 Procedure ProcessGame () ;
 
 Procedure InitMenu () ;
@@ -1480,13 +1481,6 @@ Begin
        End;
      End;
 
-     // mise à zéro de la minuterie du jeu
-     fGameTime := GetTime();
-
-     // initialisation du premier round
-     nRound := 0;
-     If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Or (bMulti = False) Then InitRound();
-
      // initialisation du panneau d'affichage
      InitScreen();
      AddStringToScreen( 'Welcome to Bomberman Returns!' ); // IL VA FALLOIR QU'ON TROUVE UN VRAI TITRE
@@ -1498,6 +1492,13 @@ Begin
 
         // lancement de la synchro
         nGame := GAME_SYNCHRO;
+     End Else Begin
+        // mise à zéro de la minuterie du jeu
+        fGameTime := GetTime();
+
+        // initialisation du premier round
+        nRound := 0;
+        InitRound();
      End;
 End;
 
@@ -2487,8 +2488,8 @@ Begin
                            bSend := False;
                     End;
                     If ( bSend = True ) Then Begin
-                       For k := 0 To 255 Begin
-                           bClientReady[ClientIndex(nIndex)] := False;
+                       For k := 0 To 255 Do Begin
+                           bClientReady[ClientIndex(k)] := False;
                        End;
                        If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
                           If ( nScheme = - 1 ) Then
