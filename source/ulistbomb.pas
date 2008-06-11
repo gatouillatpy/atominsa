@@ -172,13 +172,13 @@ pPrev:=Nil;
     pTemp:=pBombItem;
     Find:=(pTemp^.Bomb=wBomb);
 
-    While Not(Find) do
+    While (Find = False) And (pTemp <> Nil) do
     begin
       pPrev:=pTemp;
       pTemp:=pTemp^.Next;
       // TODO
       // il y a un bug a corriger lorsqu'une trigger bombe est supprimée
-      Find:=(pTemp <> Nil ) And (pTemp^.Bomb.XGrid=wBomb.XGrid)
+      Find:=(pTemp <> Nil) And (pTemp^.Bomb.XGrid=wBomb.XGrid)
       And (pTemp^.Bomb.YGrid=wBomb.YGrid);
     end;
 

@@ -1492,6 +1492,8 @@ Begin
 
         // lancement de la synchro
         nGame := GAME_SYNCHRO;
+        
+        If nLocalIndex = nClientIndex[0] Then bClientReady[0] := True;
      End Else Begin
         // mise à zéro de la minuterie du jeu
         fGameTime := GetTime();
