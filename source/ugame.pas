@@ -22,9 +22,10 @@ Var bMulti : Boolean;
 
 Const GAME_MENU         = 1;
 Const GAME_INIT         = 2;
-Const GAME_ROUND        = 3;
-Const GAME_WAIT         = 4;
-Const GAME_SCORE        = 5;
+Const GAME_SYNCHRO      = 3;
+Const GAME_ROUND        = 4;
+Const GAME_WAIT         = 5;
+Const GAME_SCORE        = 6;
 Const GAME_MENU_PLAYER  = 11;
 
 Var nGame  : Integer;
@@ -1485,11 +1486,37 @@ Begin
      // initialisation du premier round
      nRound := 0;
      If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Or (bMulti = False) Then InitRound();
-     
+
      // initialisation du panneau d'affichage
      InitScreen();
      AddStringToScreen( 'Welcome to Bomberman Returns!' ); // IL VA FALLOIR QU'ON TROUVE UN VRAI TITRE
      AddStringToScreen( 'Good luck!   Have fun!' );
+
+     If bMulti = True Then Begin
+        sData := '';
+        Send( nLocalIndex, HEADER_READY, sData );
+
+        // lancement de la synchro
+        nGame := GAME_SYNCHRO;
+     End;
+End;
+
+
+
+Procedure SynchroGame () ;
+Var  k: Integer;
+     sData : String;
+Begin
+     // si l'un des client n'est pas ready alors on quitte violemment la procédure
+     For k := 0 To nClientCount - 1 Do
+         If bClientReady[k] = False Then Exit;
+         
+     // mise à zéro de la minuterie du jeu
+     fGameTime := GetTime();
+
+     // initialisation du premier round
+     nRound := 0;
+     If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Or (bMulti = False) Then InitRound();
 End;
 
 
@@ -2460,6 +2487,9 @@ Begin
                            bSend := False;
                     End;
                     If ( bSend = True ) Then Begin
+                       For k := 0 To 255 Begin
+                           bClientReady[ClientIndex(nIndex)] := False;
+                       End;
                        If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
                           If ( nScheme = - 1 ) Then
                              nSchemeMulti := Random(nSchemeCount)

@@ -17,6 +17,7 @@ Uses Classes, SysUtils, UJellyBomb, UPunch, USpoog, UGoldFLame, UTrigger, UTrigg
 Var nClientCount : Integer;
 Var nClientIndex : Array [0..255] Of Integer;
 Var sClientName : Array [0..255] Of String;
+Var bClientReady : Array [0..255] Of Boolean;
 Var fPingTime, fPing : Single;
 
 
@@ -487,6 +488,12 @@ Begin
                     AddStringToScreen( sClientName[ClientIndex(nIndex)] + ' says : ' + sData );
                     Send( nIndex, nHeader, sData );
                End;
+               HEADER_READY :
+               Begin
+                    bClientReady[ClientIndex(nIndex)] := True;
+                    AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
+                    Send( nIndex, nHeader, sData );
+               End;
                HEADER_LOCK :
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
@@ -717,7 +724,15 @@ Begin
                End;
                HEADER_FIGHT :
                Begin
+                    For k := 0 To 255 Begin
+                        bClientReady[ClientIndex(nIndex)] := False;
+                    End;
                     nGame := GAME_INIT;
+               End;
+               HEADER_READY :
+               Begin
+                    bClientReady[ClientIndex(nIndex)] := True;
+                    AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
                End;
                HEADER_PINGRES :
                Begin
@@ -983,6 +998,7 @@ Begin
           GAME_MENU_PLAYER : ProcessMenuPlayer();
           GAME_MENU_MULTI : ProcessMenuMulti();
           GAME_INIT : InitGame();
+          GAME_READY : SynchroGame();
           GAME_ROUND : ProcessGame();
           GAME_WAIT : ProcessWait();
           GAME_SCORE : ProcessScore();
