@@ -1274,23 +1274,12 @@ Begin
      nCamera := CAMERA_OVERALL;
 
      // rechargement de la grille
-     If (bMulti = True) And (nLocalIndex = nClientIndex[0]) And (nScheme = -1) Then Begin
-        nSchemeMulti := Random(nSchemeCount);
-        pScheme := aSchemeList[nSchemeMulti];
-        sData := IntToStr(nScheme) + #31;
-        sData := sData + IntToStr(nSchemeMulti) + #31;
-        sData := sData + IntToStr(nMap) + #31;
-        sData := sData + IntToStr(nRoundCount) + #31;
-        Send( nLocalIndex, HEADER_SETUP, sData );
-     End;
      pGrid.LoadScheme( pScheme );
 
      // restauration des bomberman
      If GetBombermanCount() <> 0 Then Begin
         For i := 1 To GetBombermanCount() Do Begin
             tBomberman := GetBombermanByCount(i);
-            tBomberman.fOrigin.x := pScheme.Spawn(i).X;
-            tBomberman.fOrigin.y := pScheme.Spawn(i).Y;
             tBomberman.Restore();
         End;
      End;
@@ -1432,6 +1421,7 @@ End;
 
 Procedure InitGame () ;
 Var  k: Integer;
+     sData : String;
 Begin
      // enregistrement des paramètres
      WriteSettings( 'atominsa.cfg' );
@@ -1453,7 +1443,10 @@ Begin
 
      // chargement du scheme
      If nScheme = -1 Then Begin
-        pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
+        If (bMulti = True) Then
+           pScheme := aSchemeList[nSchemeMulti]
+        Else
+            pScheme := aSchemeList[Trunc(Random(nSchemeCount))];
      End Else Begin
         pScheme := aSchemeList[nScheme];
      End;
@@ -2467,7 +2460,19 @@ Begin
                            bSend := False;
                     End;
                     If ( bSend = True ) Then Begin
+                       If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
+                          If ( nScheme = - 1 ) Then
+                             nSchemeMulti := Random(nSchemeCount)
+                          Else
+                              nSchemeMulti := -1;
+                          sData := IntToStr(nScheme) + #31;
+                          sData := sData + IntToStr(nSchemeMulti) + #31;
+                          sData := sData + IntToStr(nMap) + #31;
+                          sData := sData + IntToStr(nRoundCount) + #31;
+                          Send( nLocalIndex, HEADER_SETUP, sData );
+                       End;
                        nGame := GAME_INIT;
+                       sData := '';
                        Send( nLocalIndex, HEADER_FIGHT, sData );
                     End;
                 End Else If (bMulti = False) Then Begin
