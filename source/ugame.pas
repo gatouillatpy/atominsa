@@ -1017,6 +1017,8 @@ Procedure InitScore () ;
 Var i : Integer;
     aBomberman : CBomberman;
 Begin
+     ClearInput();
+     
      // suppression des touches des joueurs
      BindKeyObj( nKey1MoveUp, True, False, NIL );
      BindKeyObj( nKey1MoveDown, True, False, NIL );
@@ -2209,6 +2211,8 @@ End;
 
 Procedure InitMenu () ;
 Begin
+     ClearInput();
+     
      // ajout du titre
      If (bMulti = True) Then Begin
           SetString( STRING_GAME_MENU(1), '   multi', 0.2, 0.2, 600 );
@@ -2491,7 +2495,7 @@ Begin
                     End;
                     If ( bSend = True ) Then Begin
                        For k := 0 To 255 Do Begin
-                           bClientReady[ClientIndex(k)] := False;
+                           bClientReady[k] := False;
                        End;
                        If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
                           If ( nScheme = - 1 ) Then
