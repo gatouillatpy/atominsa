@@ -7,7 +7,7 @@ Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
      UPractice, UMenu, UIntro, UEditor, UMulti, UGrab, uJelly, UJellyBomb,
      UListBomb, UPunch, USpoog, UGoldFlame, UTriggerBomb, UTrigger,
-     USuperDisease, URandomBonus, UExplosion;
+     USuperDisease, URandomBonus, UExplosion, UOnline;
 
 
 

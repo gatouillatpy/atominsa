@@ -905,7 +905,7 @@ Begin
      sLocalName := 'atominsa server';
      nLocalIndex := Random(1073741824);
      sServerAddress := '192.168.0.2';
-     nServerPort := 1212;
+     nServerPort := 7070;
      nServerType := SERVER_STANDARD;
 
      bIntro := True;
