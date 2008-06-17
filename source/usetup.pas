@@ -22,6 +22,8 @@ Var nLocalIndex : DWord;
 Var sServerAddress : String; // a sauvegarder
 Var nServerPort : Word; // a sauvegarder
 Var nServerType : Integer; // a sauvegarder
+Var sMasterAddress : String;
+Var nMasterPort : Word;
 
 Var nVersion : Integer;
 
@@ -907,6 +909,8 @@ Begin
      sServerAddress := '192.168.0.2';
      nServerPort := 7070;
      nServerType := SERVER_STANDARD;
+     sMasterAddress := '192.168.0.2';
+     nMasterPort := 7070;
 
      bIntro := True;
      

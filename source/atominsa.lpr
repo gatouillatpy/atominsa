@@ -72,6 +72,9 @@ Begin
           STATE_SETUP     : ProcessSetup();
           PHASE_MULTI     : InitMulti();
           STATE_MULTI     : ProcessMulti();
+          PHASE_ONLINE    : InitMenuOnline();
+          STATE_ONLINE    : ProcessMenuOnline();
+          REFRESH_ONLINE  : ProcessClientOnline();
      End;
 End;
 

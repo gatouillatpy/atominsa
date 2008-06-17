@@ -735,7 +735,7 @@ begin
     else if (_fY-Trunc(_fY))<0.4 then DoMove(Position.x,_fY);
   end;
 
-  If bMulti = True Then Begin
+  If (bMulti = True) And (nLocalIndex <> nClientIndex[0]) Then Begin
      sData := IntToStr(nIndex) + #31;
      sData := sData + FormatFloat('0.000',fPosition.x) + #31;
      sData := sData + FormatFloat('0.000',fPosition.y) + #31;

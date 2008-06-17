@@ -40,6 +40,7 @@ Const HEADER_ACTION0           = 1405;
 Const HEADER_ACTION1           = 1406;
 Const HEADER_MOVEBOMB          = 1407;
 Const HEADER_EXPLOSE           = 1408;
+Const HEADER_SWITCH            = 1409;
 
 Const HEADER_BOMBERMAN         = 1501;
 Const HEADER_BOMB              = 1502;
@@ -47,6 +48,8 @@ Const HEADER_BOMB              = 1502;
 Const HEADER_DEAD              = 1601;
 
 Const HEADER_READY             = 1701;
+
+Const HEADER_SERVER            = 2001;
 
 
 

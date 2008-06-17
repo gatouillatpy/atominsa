@@ -68,7 +68,7 @@ Begin
           BUTTON_MULTI :
           Begin
                PlaySound( SOUND_MENU_SELECT );
-               nState := PHASE_MULTI;
+               nState := PHASE_ONLINE;
           End;
           BUTTON_SETUP :
           Begin

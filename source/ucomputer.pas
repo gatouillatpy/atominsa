@@ -15,9 +15,9 @@ Uses Classes, SysUtils,
 Type Table = Array [1..GRIDWIDTH,1..GRIDHEIGHT] Of Integer;
 
 Procedure ProcessComputer ( pBomberman : CBomberman ; nSkill : Integer ) ;
-Function CalculateFastDanger ( x, y : Integer ; pState : Table ; iSkill : Integer ; isAfraid : Boolean ) : Integer ;
-Function CalculateDanger ( x : Integer ; y : Integer ; xMin : Integer ; xMax : Integer ; yMin : Integer ;
-                         yMax : Integer ; wState : Table ; wSkill : Integer ; canPush : Boolean ; isAfraid : Boolean ) : Integer ;
+Function CalculateFastDanger ( fX, fY : Single; x, y : Integer ; pState : Table ; iSkill : Integer ; isAfraid : Boolean ) : Integer ;
+Function CalculateDanger ( fX, fY : Single; x, y, xMin, xMax, yMin, yMax : Integer ; wState : Table ;
+                               wSkill : Integer ; canPush : Boolean ; isAfraid : Boolean ) : Integer ;
 Function PutBomb( x, y : Integer; pState : Table; wSkill : Integer; m_bMustPut : Boolean ) : Boolean ;
 Function SmallWay( aX, aY, bX, bY, n : Integer; m_aState : Table ) : Boolean;
 Procedure DangerWay( aX, aY, bX, bY, n : Integer; m_aState : Table; Var p_nDangerMin, p_nDirection : Integer );
@@ -122,27 +122,27 @@ Begin
       Else
           canPush := false;
       // Case du bomberman : pas de poussée de bombes possible
-      pBomberman.Danger := CalculateDanger(pX, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      pBomberman.Danger := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
       // Gauche : poussée possible s'il y a une bombe à gauche et rien après
       If ( pX >= 3 ) And ( aState[pX - 1, pY] mod 4 >= 2 ) And ( aState[pX - 2, pY] mod 16 = 0 ) Then
-         pBomberman.DangerLeft := CalculateDanger(pX - 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+         pBomberman.DangerLeft := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX - 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
       Else
-          pBomberman.DangerLeft := CalculateDanger(pX - 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+          pBomberman.DangerLeft := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX - 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
       // Droite
       If ( pX <= GRIDWIDTH - 2 ) And ( aState[pX + 1, pY] mod 4 >= 2 ) And ( aState[pX + 2, pY] mod 16 = 0 ) Then
-         pBomberman.DangerRight := CalculateDanger(pX + 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+         pBomberman.DangerRight := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX + 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
       Else
-          pBomberman.DangerRight := CalculateDanger(pX + 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+          pBomberman.DangerRight := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX + 1, pY, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
       // Haut
       If ( pY >= 3 ) And ( aState[pX, pY - 1] mod 4 >= 2 ) And ( aState[pX, pY - 2] mod 16 = 0 ) Then
-         pBomberman.DangerUp := CalculateDanger(pX, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+         pBomberman.DangerUp := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
       Else
-          pBomberman.DangerUp := CalculateDanger(pX, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+          pBomberman.DangerUp := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
       // Bas
       If ( pY <= GRIDHEIGHT - 2 ) And ( aState[pX, pY + 1] mod 4 >= 2 ) And ( aState[pX, pY + 2] mod 16 = 0 ) Then
-         pBomberman.DangerDown := CalculateDanger(pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+         pBomberman.DangerDown := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
       Else
-          pBomberman.DangerDown := CalculateDanger(pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+          pBomberman.DangerDown := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
    End;
 
 
@@ -160,7 +160,7 @@ Begin
    // Puis on calcule les dangers et sélectionne le minimum.
       For i := bLeft To bRight Do Begin
          For j := bUp To bDown Do Begin
-              sum := CalculateFastDanger( i, j, aState, nSkill, afraid );
+              sum := CalculateFastDanger( pBomberman.Position.X, pBomberman.Position.Y, i, j, aState, nSkill, afraid );
               continue := SmallWay( pX, pY, i, j, nSkill + 2, aState );
               If ( sum < dangerMin ) And ( continue = true )
               Or ( ( sum = dangerMin ) And ( Random < 0.5 ) ) Then Begin
@@ -204,10 +204,10 @@ Begin
       doExplosion := false;
       bX := Trunc(pBomberman.TriggerBomb^.Bomb.Position.X + 0.5);
       bY := Trunc(pBomberman.TriggerBomb^.Bomb.Position.Y + 0.5);
-      If ( bX - pBomberman.FlameSize <= 1 ) Then bLeft := 1 Else bLeft := bX - pBomberman.FlameSize;
-      If ( bX + pBomberman.FlameSize >= GRIDWIDTH ) Then bRight := GRIDWIDTH Else bRight := bX + pBomberman.FlameSize;
-      If ( bY - pBomberman.FlameSize <= 1 ) Then bUp := 1 Else bUp := bY - pBomberman.FlameSize;
-      If ( bY + pBomberman.FlameSize >= GRIDHEIGHT ) Then bDown := GRIDHEIGHT Else bDown := bY + pBomberman.FlameSize;
+      If ( bX - (pBomberman.FlameSize - 1) <= 1 ) Then bLeft := 1 Else bLeft := bX - (pBomberman.FlameSize - 1);
+      If ( bX + (pBomberman.FlameSize - 1) >= GRIDWIDTH ) Then bRight := GRIDWIDTH Else bRight := bX + (pBomberman.FlameSize - 1);
+      If ( bY - (pBomberman.FlameSize - 1) <= 1 ) Then bUp := 1 Else bUp := bY - (pBomberman.FlameSize - 1);
+      If ( bY + (pBomberman.FlameSize - 1) >= GRIDHEIGHT ) Then bDown := GRIDHEIGHT Else bDown := bY + (pBomberman.FlameSize - 1);
 
       // S'il y a quelqu'un sur la ligne/colonne de la bombe et qu'il n'y a pas de bloc ou de bonus entre alors on fait exploser la bombe
       // Gauche
@@ -457,7 +457,7 @@ End;
 
 
 
-Function CalculateFastDanger ( x : Integer ; y : Integer ; pState : Table ; iSkill : Integer ; isAfraid : Boolean ) : Integer ;
+Function CalculateFastDanger ( fX, fY : Single; x, y : Integer; pState : Table ; iSkill : Integer ; isAfraid : Boolean ) : Integer ;
 Var
    result1 : Integer;                            // résultat renvoyé
    cLeft, cRight, cUp, cDown : Integer;          // limites pour les calculs du tableau.
@@ -470,7 +470,7 @@ Begin
    If ( y + ( iSkill + 2 ) > GRIDHEIGHT ) Then cDown := GRIDHEIGHT Else cDown := y + ( iSkill + 2 );
 
 // Traitement des flammes, des bombes et des bombermans.
-   result1 := CalculateDanger( x, y, cLeft, cRight, cUp, cDown, pState, iSkill, false, isAfraid );
+   result1 := CalculateDanger( fX, fY, x, y, cLeft, cRight, cUp, cDown, pState, iSkill, false, isAfraid );
 // Pour que les coins ne soient pas favorisés.
    result1 := result1 * 49 div ( ( cRight - cLeft + 1 ) *  ( cDown - cUp + 1 ) );
 
@@ -480,8 +480,8 @@ End;
 
 
 
-Function CalculateDanger ( x : Integer ; y : Integer ; xMin : Integer ; xMax : Integer ; yMin : Integer ;
-                         yMax : Integer ; wState : Table ; wSkill : Integer ; canPush : Boolean ; isAfraid : Boolean ) : Integer ;
+Function CalculateDanger ( fX, fY : Single; x, y, xMin, xMax, yMin, yMax : Integer ; wState : Table ;
+                               wSkill : Integer ; canPush : Boolean ; isAfraid : Boolean ) : Integer ;
 Var
    iBomb,                                        // Position de la bombe
    iExit,                                        // Position de la sortie
@@ -493,6 +493,7 @@ Var
    freeCase,                                     // Vrai si une case est libre
    upBomb, downBomb,                             // Vrai s'il y a une bombe sur la ligne/colonne supérieure (resp. inférieure)
    blocked : Boolean;                            // Vrai si le bomberman est coincé ( avec au maximum une case de liberté ).
+   pBomb : CBomb;
 Begin
 // Initialisation des variables
    result2 := 0;                                 // Le minimum est 0, le maximum est autour de 10000.
@@ -663,6 +664,21 @@ Begin
              End;
           End;
        End;
+   End;
+   
+   // Traitement des bombes sur la même case que le bomberman pour qu'il ne soit pas coincé.
+   If ( GetBombByGridCoo( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) is CBomb ) Then Begin
+      pBomb := GetBombByGridCoo( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) );
+      // Si le bomberman est un peu à gauche de la bombe, alors il doit aller à gauche.
+      // De même pour les autres directions.
+      If ( ( fX + 0.5 < pBomb.Position.X ) And ( x = Trunc( fX + 0.5 ) - 1 ) )
+      Or ( ( fX + 0.5 > pBomb.Position.X ) And ( x = Trunc( fX + 0.5 ) + 1 ) )
+      Or ( ( fY + 0.5 < pBomb.Position.Y ) And ( y = Trunc( fX + 0.5 ) - 1 ) )
+      Or ( ( fY + 0.5 > pBomb.Position.Y ) And ( y = Trunc( fX + 0.5 ) + 1 ) ) Then Begin
+         result2 := result2 - 512;
+         If ( pBomb.Time + 1 >= pBomb.ExploseTime ) Then
+            result2 := result2 - 512;
+      End;
    End;
    
    // Traitement des cases hors plateau.

@@ -26,6 +26,7 @@ Procedure InitMulti () ;
 Procedure ProcessMulti () ;
 
 Function ClientIndex( nIndex : DWord ) : Integer ;
+Function GetString ( sData : String ; nString : Integer ) : String ;
 
 
 
@@ -403,7 +404,7 @@ Procedure ProcessServer () ;
 Var nIndex : DWord;
     nHeader : Integer;
     sData : String;
-    pBomberman : CBomberman;
+    pBomberman, pSecondBomberman : CBomberman;
     pBomb : CBomb;
     fX, fY : Single;
     dt : Single;
@@ -617,6 +618,22 @@ Begin
                     dt := StrToFloat( GetString( sData, 6 ) );
                     pBomberman.MoveBomb(aX,aY,aX,aY,dX,dY,dt);
                End;
+               HEADER_SWITCH :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    pBomberman.DiseaseNumber := DISEASE_NONE;
+                    pBomberman.Position.X := StrToFloat( GetString( sData, 2 ) );
+                    pBomberman.Position.Y := StrToFloat( GetString( sData, 3 ) );
+                    l := StrToInt( GetString( sData, 4 ) );
+                    pSecondBomberman := GetBombermanByIndex( l );
+                    fX := StrToFloat( GetString( sData, 5 ) );
+                    fY := StrToFloat( GetString( sData, 6 ) );
+                    pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ).Destroy();
+                    pGrid.aBlock[ Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ] := Nil;
+                    pSecondBomberman.Position.X := fX;
+                    pSecondBomberman.Position.Y := fY;
+               End;
           End;
      End;
      
@@ -625,8 +642,8 @@ Begin
         For k := 1 To 8 Do Begin
             pBomberman := GetBombermanByIndex( k );
             If pBomberman <> Nil Then Begin
-               sData := sData + FloatToStr(pBomberman.Position.x) + #31;
-               sData := sData + FloatToStr(pBomberman.Position.y) + #31;
+               sData := sData + FormatFloat('0.000',pBomberman.Position.x) + #31;
+               sData := sData + FormatFloat('0.000',pBomberman.Position.y) + #31;
                sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
                sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
             End;
@@ -638,8 +655,8 @@ Begin
            For k := 1 To GetBombCount() Do Begin
                pBomb := GetBombByCount( k );
                sData := sData + IntToStr(pBomb.nNetID) + #31;
-               sData := sData + FloatToStr(pBomb.Position.x) + #31;
-               sData := sData + FloatToStr(pBomb.Position.y) + #31;
+               sData := sData + FormatFloat('0.000',pBomb.Position.x) + #31;
+               sData := sData + FormatFloat('0.000',pBomb.Position.y) + #31;
            End;
            Send( nLocalIndex, HEADER_BOMB, sData );
         End;
@@ -653,7 +670,7 @@ Var nIndex : DWord;
     nHeader : Integer;
     sData : String;
     sBuffer : String;
-    pBomberman : CBomberman;
+    pBomberman, pSecondBomberman : CBomberman;
     pBomb : CBomb;
     fX, fY : Single;
     nX, nY : Integer;
@@ -877,6 +894,22 @@ Begin
                     pBomb := GetBombByNetID( _nNetID );
                     If ( pBomb <> Nil ) Then
                        pBomb.Explose();
+               End;
+               HEADER_SWITCH :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    pBomberman.DiseaseNumber := DISEASE_NONE;
+                    pBomberman.Position.X := StrToFloat( GetString( sData, 2 ) );
+                    pBomberman.Position.Y := StrToFloat( GetString( sData, 3 ) );
+                    l := StrToInt( GetString( sData, 4 ) );
+                    pSecondBomberman := GetBombermanByIndex( l );
+                    fX := StrToFloat( GetString( sData, 5 ) );
+                    fY := StrToFloat( GetString( sData, 6 ) );
+                    pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ).Destroy();
+                    pGrid.aBlock[ Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ] := Nil;
+                    pSecondBomberman.Position.X := fX;
+                    pSecondBomberman.Position.Y := fY;
                End;
                HEADER_WAIT :
                Begin

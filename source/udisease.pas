@@ -43,6 +43,8 @@ End;
 
 Implementation
 
+Uses UGame, USetup;
+
 { CDisease }
 
 Procedure CDisease.Bonus( _uPlayer : CBomberman );
@@ -202,23 +204,37 @@ Procedure CDisease.switchbomberman (); cdecl;
 var i : Integer;                                  // variable qui va definir l'index du bomberman avec qui on va changer de coordonnees
     uSecondPlayer : CBomberman;                    // variable qui va servir a recuperer les coordonnees d'un autre bomberman
     xtemp,ytemp : Single;                         // variable temporaire pour echanger les coordonnees des deux joueurs
+    sData : String;
 BEGIN
-     i := 1;                                       // initialisation de la variable
+     If ( bMulti = false ) Or ( nPlayerClient[uPlayer.nIndex] = nLocalIndex ) Then Begin
+         i := 1;                                       // initialisation de la variable
 
-     Repeat                                        // boucle pour trouver un autre bomberman pour echanger de coordonnees
-     i := random(GetBombermanCount())+1;             // on prend un joueur au hasard pour echanger ses coordonnees
-     uSecondPlayer := GetBombermanByCount(i);
-     until ( ( i <> uPlayer.BIndex ) and (uSecondPlayer.Alive) );  // on termine la boucle quand on a trouve un bomberman autre que celui du joueur qui a prit le bonus et qui n'est pas mort
+         Repeat                                        // boucle pour trouver un autre bomberman pour echanger de coordonnees
+         i := random(GetBombermanCount())+1;             // on prend un joueur au hasard pour echanger ses coordonnees
+         uSecondPlayer := GetBombermanByCount(i);
+         until ( ( i <> uPlayer.BIndex ) and (uSecondPlayer.Alive) );  // on termine la boucle quand on a trouve un bomberman autre que celui du joueur qui a prit le bonus et qui n'est pas mort
 
-     // Echange de coordonnees des deux joueurs
-     xtemp := uSecondPlayer.Position.X;
-     ytemp := uSecondPlayer.Position.Y;
-     uSecondPlayer.Position.X := uPlayer.Position.X;
-     uSecondPlayer.Position.Y := uPlayer.Position.Y;
-     uPlayer.Position.X := xtemp;
-     uPlayer.Position.Y := ytemp;
+         // Echange de coordonnees des deux joueurs
+         xtemp := uSecondPlayer.Position.X;
+         ytemp := uSecondPlayer.Position.Y;
+         uSecondPlayer.Position.X := uPlayer.Position.X;
+         uSecondPlayer.Position.Y := uPlayer.Position.Y;
+         uPlayer.Position.X := xtemp;
+         uPlayer.Position.Y := ytemp;
+     End;
+     
      uPlayer.DiseaseNumber := DISEASE_NONE;
      Self.destroy();                    // on peut detruire le bonus
+     
+     If ( bMulti = true ) And ( nPlayerClient[uPlayer.nIndex] = nLocalIndex ) Then Begin
+         sData := IntToStr( uPlayer.nIndex ) + #31;
+         sData := sData + FormatFloat( '0.000', uPlayer.Position.X ) + #31;
+         sData := sData + FormatFloat( '0.000', uPlayer.Position.Y ) + #31;
+         sData := sData + IntToStr( uSecondPlayer.nIndex ) + #31;
+         sData := sData + FormatFloat( '0.000', uSecondPlayer.Position.X ) + #31;
+         sData := sData + FormatFloat( '0.000', uSecondPlayer.Position.Y ) + #31;
+         Send( nLocalIndex, HEADER_SWITCH, sData );
+     End;
 END;
 
 procedure CDisease.FastBomb(); cdecl;

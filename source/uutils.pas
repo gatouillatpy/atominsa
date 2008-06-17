@@ -64,6 +64,9 @@ Const PHASE_SETUP         =  5;
 Const STATE_SETUP         = 15;
 Const PHASE_MULTI         =  6;
 Const STATE_MULTI         = 16;
+Const PHASE_ONLINE        =  7;
+Const STATE_ONLINE        = 17;
+Const REFRESH_ONLINE      = 27;
 
 Var nState : Integer;
 
