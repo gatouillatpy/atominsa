@@ -26,12 +26,14 @@ type
 
     fPosition,                   // position graphique du personnage
     fOrigin   : Vector;          // position a la creation du personnage
-    fMoveTime,                     // temps de référence du dernier mouvement
+    fIATime,                     // dernier temps pour l'IA
+    fMoveTime,                   // temps de référence du dernier mouvement
     fSpeed,                      // vitesse du bomberman
     fBombTime : Single;          // temps avant explosion des bombes
 
     fSumFixGetDelta : Single;    // temps depuis lequel le bomberman est fixe.
     fSumBombGetDelta : Single;   // temps depuis lequel le bomberman n'a pas posé de bombes.
+    fSumGrabGetDelta : Single;   // temps depuis lequel la bombe est portée.
     fSumIgnitionGetDelta: Single;// temps depuis lequel la TriggerBomb a été posée.
 
     lastDir   : vectorN;         // memorise la derniere direction de mouvement du bomberman
@@ -71,11 +73,13 @@ type
     bAlive,                      // personnage en vie ou non
     bcanKick     : Boolean;      // shoot dans une bombe possible ou non
 
-    bCanCalculate,               // les dangers doivent-ils être recalculés?
+    bCanCalculate,               // les dangers doivent-ils être recalculés
     bCanGoToTheRight,
     bCanGoToTheLeft,
     bCanGoToTheUp,
     bCanGoToTheDown : Boolean;   // peut-il aller dans la direction indiquée
+    
+    bGrabbed : Boolean;          // le bomberman porte-t-il la bombe
 
 
     uTriggerBomb : LPBombItem;   // pointe sur les bombes a declenchement manuel
@@ -90,7 +94,9 @@ type
     procedure TestCase(aX,aY : integer;var bBomb : boolean;var bResult : boolean);
     procedure MoveBomb(_X,_Y,aX,aY,dX,dY : integer; dt : Single);
     function  GrabBomb():boolean;
+    procedure GrabBombMulti( dX, dY : Integer );
     procedure DropBomb(dt : Single);
+    procedure DropBombMulti(dt : Single);
     procedure ContaminateBomberman();
     procedure PunchBomb(dt : Single);
     procedure AddTriggerBomb();
@@ -155,8 +161,10 @@ type
   Property DangerRight : Integer Read nDangerRight Write nDangerRight;
   Property DangerUp : Integer Read nDangerUp Write nDangerUp;
   Property DangerDown : Integer Read nDangerDown Write nDangerDown;
+  Property IATime : Single Read fIATime Write fIATime;
   Property SumFixGetDelta : Single Read fSumFixGetDelta Write fSumFixGetDelta;
   Property SumBombGetDelta : Single Read fSumBombGetDelta Write fSumBombGetDelta;
+  Property SumGrabGetDelta : Single Read fSumGrabGetDelta Write fSumGrabGetDelta;
   Property SumIgnitionGetDelta : Single Read fSumIgnitionGetDelta Write fSumIgnitionGetDelta;
   property ExploseBombTime : Single Read fBombTime Write fBombTime;
 
@@ -624,6 +632,9 @@ begin
   nDirection:=-dX*90+90*dY*(dY-1);
 
   {On repere d'abord dans quel case on est cence arriver}
+  
+  
+  
   delta := 1;
   _fX:=fPosition.x + dx*fSpeed*dt;
   _fY:=fPosition.y + dy*fSpeed*dt;
@@ -926,7 +937,7 @@ begin
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
 
-      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID);
+      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID,true);
       DelTriggerBomb();
     end;//while
   end;//if uTriggerBomb
@@ -965,7 +976,7 @@ begin
       if uGrid.GetBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil then
       begin
         bTrigger := nTriggerBomb>0;
-        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID);
+        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID,true);
         Dec(nBombCount);
         if bTrigger then
         begin
@@ -1011,7 +1022,7 @@ begin
               else
               begin
                 bTrigger := nTriggerBomb>0;
-                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
+                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000),true);
                 Dec(nBombCount);
                 if bTrigger then
                 begin
@@ -1031,7 +1042,7 @@ procedure CBomberman.CreateBombMulti(fX, fY : Single; nBombSize : Integer; fExpl
 Var bTrigger : Boolean;
 Begin
      bTrigger := nTriggerBomb > 0;
-     AddBomb(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID);
+     AddBomb(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,_nNetID,False);
      Dec(nBombCount);
      if bTrigger then
      begin
@@ -1082,20 +1093,46 @@ end;
 
 function CBomberman.GrabBomb():boolean;
 var dX, dY : integer;
+    sData : String;
+    bResult : Boolean;
 begin
-  dX := Trunc(fPosition.x+0.5);
-  dY := Trunc(fPosition.y+0.5);
- if CheckCoordinates(dX,dY) then
-  if ((uGrid.GetBlock(dX,dY)<>nil) AND (uGrid.GetBlock(dX,dY) is CBomb)) then
-  begin
-    uGrabbedBomb:=CBomb(uGrid.GetBlock(dX,dY));
-    uGrid.DelBlock(dX,dY);
-    uGrabbedBomb.StopTime();
-    uGrabbedBomb.Position.z:=0.75;
-  end;
-
- result:=Not(uGrabbedBomb=Nil)
+    bResult := ( uGrabbedBomb = Nil );
+    dX := Trunc(fPosition.x+0.5);
+    dY := Trunc(fPosition.y+0.5);
+    if CheckCoordinates(dX,dY) then Begin
+        if ((uGrid.GetBlock(dX,dY)<>nil) AND (uGrid.GetBlock(dX,dY) is CBomb)) then
+        begin
+             bResult := False;
+             If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+                GrabBombMulti( dX, dY );
+                bResult := ( uGrabbedBomb = Nil );
+                If ( bMulti = True ) Then Begin
+                   sData := IntToStr( nIndex ) + #31;
+                   sData := sData + IntToStr( dX ) + #31;
+                   sData := sData + IntToStr( dY ) + #31;
+                   Send( nLocalIndex, HEADER_GRAB_CLIENT, sData );
+                End;
+             End;
+             If ( bMulti = True ) And ( nLocalIndex <> nClientIndex[0] ) Then Begin
+                  bGrabbed := True;
+                  sData := IntToStr( nIndex ) + #31;
+                  sData := sData + IntToStr( dX ) + #31;
+                  sData := sData + IntToStr( dY ) + #31;
+                  Send( nLocalIndex, HEADER_GRAB_SERVER, sData );
+             End;
+        end;
+    End;
+    result := bResult;
 end;
+
+
+procedure CBomberman.GrabBombMulti( dX, dY : Integer );
+Begin
+     uGrabbedBomb:=CBomb(uGrid.GetBlock(dX,dY));
+     uGrid.DelBlock(dX,dY);
+     uGrabbedBomb.StopTime();
+     uGrabbedBomb.Position.z:=0.75;
+End;
 
 
 
@@ -1106,25 +1143,46 @@ end;
 
 
 procedure CBomberman.DropBomb(dt : Single);
+Var sData : String;
 begin
-  if uGrabbedBomb<>nil then
+  if (uGrabbedBomb<>nil) Or (bGrabbed = True) then
   begin
-    uGrabbedBomb.Position.x:=fPosition.x;
-    uGrabbedBomb.Position.y:=fPosition.y;
-    uGrabbedBomb.StartTime();
-    uGrabbedBomb.Position.Z:=0;
-    uGrabbedBomb.JumpMovement:=True;
-    case nDirection of
-      0    : uGrabbedBomb.MoveDown(dt);
-      90   : uGrabbedBomb.MoveLeft(dt);
-      180  : uGrabbedBomb.MoveUp(dt);
-      -90  : uGrabbedBomb.MoveRight(dt);
-    end;
-    uGrabbedBomb:=nil;
+       If ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+          DropBombMulti( dt );
+          If ( bMulti = True ) Then Begin
+             sData := IntToStr( nIndex ) + #31;
+             Send( nLocalIndex, HEADER_DROP_CLIENT, sData );
+          End;
+       End
+       Else Begin
+            bGrabbed := False;
+            sData := IntToStr( nIndex ) + #31;
+            sData := sData + FloatToStr( dt ) + #31;
+            Send( nLocalIndex, HEADER_DROP_SERVER, sData );
+       End;
   end;
 end;
 
 
+
+procedure CBomberman.DropBombMulti(dt : Single);
+begin
+  if uGrabbedBomb<>nil then
+  begin
+       uGrabbedBomb.Position.x:=fPosition.x;
+       uGrabbedBomb.Position.y:=fPosition.y;
+       uGrabbedBomb.StartTime();
+       uGrabbedBomb.Position.Z:=0;
+       uGrabbedBomb.JumpMovement:=True;
+       case nDirection of
+         0    : uGrabbedBomb.MoveDown(dt);
+         90   : uGrabbedBomb.MoveLeft(dt);
+         180  : uGrabbedBomb.MoveUp(dt);
+         -90  : uGrabbedBomb.MoveRight(dt);
+       end;
+       uGrabbedBomb:=nil;
+  end;
+end;
 
 
 
@@ -1205,11 +1263,13 @@ begin
   nDeaths            := 0;
   nScore             := 0;
   lastDir.z          := 0;
+  bGrabbed           := False;
   fCX                := aX;
   fCY                := aY;
-  fSumFixGetDelta    := 4 + Random * 4;
-  fSumBombGetDelta   := 8 + Random * 8;
+  fSumFixGetDelta    := 1 + Random * 1;
+  fSumBombGetDelta   := 2 + Random * 2;
   fSumIgnitionGetDelta:=0;
+  uGrabbedBomb       := Nil;
 end;
 
 
@@ -1231,6 +1291,7 @@ begin
   bEjectBomb         := False;
   bNoBomb            := False;
   bReverse           := False;
+  bGrabbed           := False;
   nDisease           := DISEASE_NONE;
   nTriggerBomb       := 0;
   nBombCount         := DEFAULTBOMBCOUNT;
@@ -1240,6 +1301,9 @@ begin
   nDirection         := 0;
   lastDir.x          := 0;
   lastDir.y          := 0;
+  fSumFixGetDelta    := 1 + Random * 1;
+  fSumBombGetDelta   := 2 + Random * 2;
+  fSumIgnitionGetDelta:=0;
   uTriggerBomb       := nil;
   uGrabbedBomb       := nil;
 end;
@@ -1265,7 +1329,8 @@ procedure CBomberman.Update(dt : Single);
 begin
   CheckBonus;
   if nDisease<>0 then ContaminateBomberman();
-  if bEjectBomb then CreateBomb(dt, Random(1000000000));
+  if (bEjectBomb) And ((bMulti = False) Or (nLocalIndex = nClientIndex[0])) then
+     CreateBomb(dt, Random(1000000000));
   if (uGrabbedBomb<>nil) then
   begin
     uGrabbedBomb.Position.x:=fPosition.x;
@@ -1290,14 +1355,51 @@ end;
 {*******************************************************************************}
 procedure CBomberman.CheckBonus();
 var oldX, oldY : integer;
+    mDirection, k : Integer;
     aDisease : CDisease;
+    sData : String;
+    pBomberman : CBomberman;
 begin
   if (Trunc(fPosition.x+0.5) in [1..GRIDWIDTH]) And (Trunc(fPosition.y+0.5) in [1..GRIDHEIGHT])
   And Not(uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil) then
     if (uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5)) is CItem) then
       begin
          oldX:=Trunc(fPosition.x+0.5);                                                   //a cause de la maladie SWITCH il faut se souvenir de ou il etait
-         oldY:=Trunc(fPosition.y+0.5);                                                   //avant de prendre le bonus
+         oldY:=Trunc(fPosition.y+0.5);
+         If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
+            sData := '';
+            For k := 1 To 8 Do Begin
+              pBomberman := GetBombermanByIndex( k );
+              If pBomberman <> Nil Then Begin
+                 sData := sData + FormatFloat('0.000',pBomberman.Position.x) + #31;
+                 sData := sData + FormatFloat('0.000',pBomberman.Position.y) + #31;
+                 sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
+                 sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
+                 If (pBomberman.Direction = 0) Then mDirection := 0
+                 Else If (pBomberman.Direction = 90) Then mDirection := 1
+                 Else If (pBomberman.Direction = 180) Then mDirection := 2
+                 Else If (pBomberman.Direction = -90) Then mDirection := 3
+                 Else mDirection := -1;
+                 sData := sData + IntToStr(mDirection) + #31;
+              End;
+            End;
+            Send( nLocalIndex, HEADER_BOMBERMAN, sData );
+         End;
+         If ( bMulti = True ) And ( nLocalIndex <> nClientIndex[0] )
+         And ( nPlayerClient[ nIndex ] = nLocalIndex ) Then Begin
+            sData := IntToStr( nIndex ) + #31;
+            sData := sData + FormatFloat('0.000',Position.x) + #31;
+            sData := sData + FormatFloat('0.000',Position.y) + #31;
+            sData := sData + IntToStr(LastDirN.x) + #31;
+            sData := sData + IntToStr(LastDirN.y) + #31;
+            If (Direction = 0) Then mDirection := 0
+            Else If (Direction = 90) Then mDirection := 1
+            Else If (Direction = 180) Then mDirection := 2
+            Else If (Direction = -90) Then mDirection := 3
+            Else mDirection := -1;
+            sData := sData + IntToStr(mDirection) + #31;
+            Send( nLocalIndex, HEADER_CHECK_BONUS, sData );
+         End;
          If ( bMulti = false ) Or Not ( ( uGrid.GetBlock(oldX,oldY) is CDisease )
          Or ( uGrid.GetBlock(oldX, oldY ) is CSuperDisease ) ) Then
             CItem(uGrid.getBlock(oldX,oldY)).Bonus(Self)
@@ -1309,7 +1411,6 @@ begin
                       aDisease := CDisease.Create(0,0);
                       aDisease.BonusForced(Self,numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)]);
                  End;
-                 // Else CDisease(uGrid.getBlock(oldX,oldY)).Destroy();
               End;
               If ( uGrid.GetBlock(oldX,oldY) is CSuperDisease ) Then Begin
                  SetString( STRING_NOTIFICATION, Name + ' has picked up a super disease.', 0.0, 0.2, 5 );
@@ -1321,7 +1422,6 @@ begin
                  aDisease.BonusForced(Self,numDisease[Trunc(Position.X + 0.5), Trunc(Position.Y + 0.5)] div 10000);
               End;
          End;
-         // CItem(uGrid.getBlock(oldX,oldY)).Bonus(Self);
          uGrid.DelBlock(oldX,oldY);
       end;
 end;
@@ -1335,20 +1435,28 @@ var aArrayVictim : ArrayIndex;
     aVictim : CBomberman;
     aDisease : CDisease;
     index : integer;
+    sData : String;
 begin
- aArrayVictim := GetBombermanIndexByCoo(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5));
- if Not(aArrayVictim.Count<=1) then
- for index:=Low(aArrayVictim.tab) to aArrayVictim.Count do
- if aArrayVictim.tab[index]<>nIndex then
- begin
-   aVictim:=GetBombermanByIndex(aArrayVictim.Tab[index]);
-   if (aVictim.DiseaseNumber=0) then
-   begin
-     SetString( STRING_NOTIFICATION, aVictim.Name + ' has been stephaned by ' + sName, 0.0, 0.2, 5 );
-     aDisease:=CDisease.Create(1,1);
-     aDisease.BonusForced(aVictim,nDisease);
-   end;
- end;
+     If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+         aArrayVictim := GetBombermanIndexByCoo(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5));
+         if Not(aArrayVictim.Count<=1) then
+         for index:=Low(aArrayVictim.tab) to aArrayVictim.Count do
+         if aArrayVictim.tab[index]<>nIndex then
+         begin
+           aVictim:=GetBombermanByIndex(aArrayVictim.Tab[index]);
+           if (aVictim.DiseaseNumber=0) then
+           begin
+             SetString( STRING_NOTIFICATION, aVictim.Name + ' has been stephaned by ' + sName, 0.0, 0.2, 5 );
+             aDisease:=CDisease.Create(1,1);
+             aDisease.BonusForced(aVictim,nDisease);
+             If ( bMulti = True )  Then Begin
+                 sData := IntToStr( nIndex ) + #31;
+                 sData := sData + IntToStr( aVictim.nIndex ) + #31;
+                 Send( nLocalIndex, HEADER_CONTAMINATE, sData );
+             End;
+           end;
+         end;
+     End;
 end;
 
 
@@ -1433,10 +1541,18 @@ procedure CBomberman.PrimaryKeyDown(dt: Single); cdecl;
 begin
  if bAlive then
  begin
-  if ((uGrabbedBomb=Nil) and Not(bPrimaryPressed)) then
+  if (uGrabbedBomb=Nil) and Not(bGrabbed) and Not(bPrimaryPressed) then
   begin
-    if bCanGrabBomb then GrabBomb();
-    if (uGrabbedBomb=nil) then CreateBomb(dt, Random(1000000000));
+    If bCanGrabBomb Then Begin
+       If GrabBomb() Then Begin
+          CreateBomb(dt, Random(1000000000));
+       End;
+    End
+    Else Begin
+         If (uGrabbedBomb=Nil) and Not(bGrabbed) Then Begin
+            CreateBomb(dt, Random(1000000000));
+         End;
+    End;
   end;
   
   bPrimaryPressed := true;
@@ -1461,7 +1577,7 @@ begin
   if bAlive then
   begin
     bPrimaryPressed := false;
-    if (uGrabbedBomb<>Nil) then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
+    if (uGrabbedBomb<>Nil) Or (bGrabbed = True) then DropBomb(dt);                  // si on appuie plus mais qu'on a une bombe on la jete
   end;
 end;
 

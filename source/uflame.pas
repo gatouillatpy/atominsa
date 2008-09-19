@@ -210,7 +210,7 @@ end;
 
 
 
-//FonctionSSSS de vidage complet de la liste
+//Fonction de vidage complet de la liste
 procedure FreeFlameP(pList: LPFlameItem);
 begin
  if (pList<>Nil) then                            //Si on est toujours dans la liste
@@ -244,10 +244,12 @@ result:=Nil;
 pTemp:=pFlameItem;
 if ((i<=FlameCount) AND (pTemp<>Nil)) then    //si le numero recherche est inferieur au nombre de flame
 begin                                         //en stock et que notre liste n'est pas vide
- While (pTemp^.Count<>i) do
-  pTemp:=pTemp^.Next;                         //et bien tant que tu n'as pas la bonne ... tu passes a l'element suivant
+   While (pTemp^.Count<>i) do begin
+       pTemp:=pTemp^.Next;
+       If pTemp = NIL Then Exit;                   //et bien tant que tu n'as pas la bonne ... tu passes a l'element suivant
+   End;
 
- result:=pTemp^.Flame;
+   result:=pTemp^.Flame;
 end;
 end;
 

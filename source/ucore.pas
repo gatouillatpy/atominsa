@@ -39,8 +39,16 @@ Const HEADER_MOVERIGHT         = 1404;
 Const HEADER_ACTION0           = 1405;
 Const HEADER_ACTION1           = 1406;
 Const HEADER_MOVEBOMB          = 1407;
-Const HEADER_EXPLOSE           = 1408;
-Const HEADER_SWITCH            = 1409;
+Const HEADER_SWITCH            = 1408;
+Const HEADER_GRAB_CLIENT       = 1409;
+Const HEADER_GRAB_SERVER       = 1410;
+Const HEADER_DROP_CLIENT       = 1411;
+Const HEADER_DROP_SERVER       = 1412;
+Const HEADER_CHECK_BONUS       = 1413;
+Const HEADER_EXPLOSE_BOMB      = 1414;
+Const HEADER_EXPLOSE_BLOCK     = 1415;
+Const HEADER_ISEXPLOSED_ITEM   = 1416;
+Const HEADER_CONTAMINATE       = 1417;
 
 Const HEADER_BOMBERMAN         = 1501;
 Const HEADER_BOMB              = 1502;
@@ -792,11 +800,11 @@ Begin
                     pTexture := pDataStack^.item;
                     If pTexture <> NIL Then FreeTexture( pTexture );
                End;
-              { DATA_SOUND : // Ca plante sur Vista. A REVOIR SI ON A LE TEMPS.
+               DATA_SOUND :
                Begin
                     pSound := pDataStack^.item;
                     If pSound <> NIL Then FSOUND_Sample_Free( pSound );
-               End; }
+               End;
                DATA_MUSIC :
                Begin
                     pMusic := pDataStack^.item;
@@ -2316,7 +2324,7 @@ Type OGLString = RECORD
                        fRate  : Single;
 		       sData  : String;
                   END;
-Var aString : Array [0..255] Of OGLString;
+Var aString: Array [0..255] Of OGLString;
 
 
 

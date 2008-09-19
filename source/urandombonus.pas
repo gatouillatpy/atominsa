@@ -41,8 +41,8 @@ Begin
          POWERUP_KICK            : aBonus := CKick.Create(0,0);                // pousse avec rebonds
          POWERUP_SPEEDUP         : aBonus := CSpeedUp.Create(0,0);             // plus de vitesse
          POWERUP_PUNCH           : aBonus := CPunch.Create(0,0);               // pousse sans rebonds
-         POWERUP_GRAB            : aBonus := CGrab.Create(0,0);                // bombe par dessus les boîtes?
-         POWERUP_SPOOGER         : aBonus := CSpoog.Create(0,0);               // 2 bombes avec la deuxième plus loin que la première
+         POWERUP_GRAB            : aBonus := CGrab.Create(0,0);                // bombe par dessus les boîtes et portée de bombe.
+         POWERUP_SPOOGER         : aBonus := CSpoog.Create(0,0);               // plusieurs bombes avec la deuxième plus loin que la première
          POWERUP_GOLDFLAME       : aBonus := CGoldFlame.Create(0,0);           // flammes infinies
          POWERUP_TRIGGERBOMB     : aBonus := CTrigger.Create(0,0);             // bombes à retardement
          POWERUP_JELLYBOMB       : aBonus := CJelly.Create(0,0);               // bombes spéciales

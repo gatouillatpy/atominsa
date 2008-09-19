@@ -213,7 +213,7 @@ procedure CBomb.MoveRight(dt : Single);
 begin
   bMoving := True;
   nMoveDir := RIGHT;
-  if bMoveJump then
+  If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
   begin
     bJumping:=true;
     Jump(dt);
@@ -225,7 +225,7 @@ procedure CBomb.MoveDown(dt : Single);
 begin
   bMoving := True;
   nMoveDir := DOWN;
-  if bMoveJump then
+  If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
   begin
     bJumping:=true;
     Jump(dt);
@@ -237,7 +237,7 @@ procedure CBomb.MoveLeft(dt : Single);
 begin
   bMoving := True;
   nMoveDir := LEFT;
-  if bMoveJump then
+  If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
   begin
     bJumping:=true;
     Jump(dt);
@@ -249,7 +249,7 @@ procedure CBomb.MoveUp(dt : Single);
 begin
   bMoving := True;
   nMoveDir := UP;
-  if bMoveJump then
+  If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
   begin
     bJumping:=true;
     Jump(dt);
@@ -274,16 +274,18 @@ end;
 procedure CBomb.MoveJump(dt : single);
 var r : integer;
 begin
-   bJumping:=True;
-   //Repeat
-   r:=Random(4)+1;
-   case r of
-    1 : nMoveDir := UP;
-    2 : nMoveDir := DOWN;
-    3 : nMoveDir := RIGHT;
-    4 : nMoveDir := LEFT;
-   end;
-   Jump(dt);
+     If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+         bJumping:=True;
+         //Repeat
+         r:=Random(4)+1;
+         case r of
+          1 : nMoveDir := UP;
+          2 : nMoveDir := DOWN;
+          3 : nMoveDir := RIGHT;
+          4 : nMoveDir := LEFT;
+         end;
+         Jump(dt);
+     End;
 end;
 
 
@@ -408,7 +410,7 @@ end;
 {*******************************************************************************}
 constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
 begin
-   if (aBombTime=BOMBTIME) and ( bMulti = false ) and ((random(100)+1)<=10)then
+   if (aBombTime=BOMBTIME) and (bMulti = false) and ((random(100)+1)<=10)then
       aBombtime := (random(200)+1)*BOMBTIME/100;
    //play sound moisi !!!
 
@@ -487,7 +489,7 @@ Procedure CBomb.Explose();
                           end
                  else if (tempBlock is CItem) then
                           begin
-                          if CItem(tempBlock).IsExplosed()then
+                          if CItem(tempBlock).IsExplosed() And (CItem(tempBlock).bIsExplosedMulti = False) then
                              uGrid.delBlock(nX+Size*dx,nY+Size*dy);
                            CItem(tempBlock).Explose;                            // si c'est un bonus on fait exploser
                           end
@@ -529,7 +531,7 @@ begin
   Destroy;                                                                      // bye-bye ...
   If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
      sData := IntToStr( nNetID ) + #31;
-     Send( nLocalIndex, HEADER_EXPLOSE, sData );
+     Send( nLocalIndex, HEADER_EXPLOSE_BOMB, sData );
   End;
 end;
 
@@ -568,7 +570,7 @@ begin
   end;
   if bMoving then
   begin
-    if bMoveJump then
+     If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
     begin
       if bJumping then begin Jump(dt); end  else MoveJump(dt);
     end

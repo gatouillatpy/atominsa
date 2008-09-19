@@ -75,7 +75,8 @@ Begin
                         While (aBlock[i,j] = NIL) And (n > 0) Do // tant qu'il n'y a aucun bloc et qu'il reste des bonus à placer
                         Begin
                              r := Random( POWERUPCOUNT + 1 ) - 1; // on choisit un nombre aléatoire parmi les codes de bonus
-                             If (r = POWERUP_NONE) And (m > n) Then aBlock[i,j] := CBlock.Create(i,j,b); // si aucun bonus n'est choisi et qu'il reste assez d'emplacements vides alors on en fait une brique standard
+                             If (r = POWERUP_NONE) And (m > n) Then
+                                aBlock[i,j] := CBlock.Create(i,j,b); // si aucun bonus n'est choisi et qu'il reste assez d'emplacements vides alors on en fait une brique standard
                               For k := 1 To POWERUPCOUNT Do Begin // on regarde à quoi cela correspond dans le tableau
                                  If (uScheme.PowerUp(k).Code = r) And (qt[k] > 0) Then Begin // ainsi que la quantité restante à placer
                                     Case r Of

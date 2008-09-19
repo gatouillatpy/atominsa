@@ -19,8 +19,10 @@ Function CalculateFastDanger ( fX, fY : Single; x, y : Integer ; pState : Table 
 Function CalculateDanger ( fX, fY : Single; x, y, xMin, xMax, yMin, yMax : Integer ; wState : Table ;
                                wSkill : Integer ; canPush : Boolean ; isAfraid : Boolean ) : Integer ;
 Function PutBomb( x, y : Integer; pState : Table; wSkill : Integer; m_bMustPut : Boolean ) : Boolean ;
+Function CanSpoog( nX, nY : Integer; wState : Table; wSkill, wDirection : Integer ) : Boolean;
 Function SmallWay( aX, aY, bX, bY, n : Integer; m_aState : Table ) : Boolean;
 Procedure DangerWay( aX, aY, bX, bY, n : Integer; m_aState : Table; Var p_nDangerMin, p_nDirection : Integer );
+
 
 
 
@@ -36,8 +38,10 @@ Const SKILL_GODLIKE        = 4;
 
 
 
-Procedure ProcessComputer ( pBomberman : CBomberman ; nSkill : Integer ) ;
 
+
+
+Procedure ProcessComputer ( pBomberman : CBomberman ; nSkill : Integer ) ;
 Var
     i, j, k : Integer;
     isBombermanFound,                                                // Le bomberman a-t-il déjà été comptabilisé dans le tableau
@@ -50,10 +54,14 @@ Var
     nDirection : Integer;                                            // La direction pour aller à la cible.
     sum : Integer;                                                   // La somme des dangers sans tenir compte des blocks et des bords.
     pX, pY, cX, cY, lX, lY, bX, bY : Integer;                        // Renommage des coordonnées pour améliorer la lisibilité du code.
+    fTime, dt : Single;                                              // Temps actuel et différence de temps.
     aState : Array [1..GRIDWIDTH,1..GRIDHEIGHT] Of Integer ;         // tableau du contenu de chaque case, 0 pour vide, 1 pour flamme, 2 pour bombe et 4 pour autre bomberman.
 Begin
 
-// Initialisation des variables.
+// Initialisation des variables
+   fTime := GetTime();
+   dt := fTime - pBomberman.IATime;
+   pBomberman.IATime := fTime;
    pX := Trunc(pBomberman.Position.X + 0.5);
    pY := Trunc(pBomberman.Position.Y + 0.5);
    cX := Trunc(pBomberman.CX + 0.5);
@@ -64,7 +72,8 @@ Begin
    isBombermanFound := false;
    
    If ( pBomberman.SumFixGetDelta >= 8 )
-   Or ( ( nSkill = SKILL_GODLIKE ) And ( pBomberman.DiseaseNumber <> DISEASE_NONE ) ) Then
+   Or ( ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.DiseaseNumber <> DISEASE_NONE )
+   Or ( pBomberman.uTriggerBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) ) Then
       afraid := false
    Else
        afraid := true;
@@ -197,9 +206,10 @@ Begin
 
 
 
-// Explosion des bombes pour le niveau godlike
-   If ( nSkill = SKILL_GODLIKE ) And ( pBomberman.TriggerBomb <> Nil ) Then Begin
-      pBomberman.SumIgnitionGetDelta := pBomberman.SumIgnitionGetDelta + GetDelta;
+// Explosion des trigger bombes.
+   If ( pBomberman.TriggerBomb <> Nil ) Then Begin
+      pBomberman.SumIgnitionGetDelta := pBomberman.SumIgnitionGetDelta + dt;
+
       // Initialisation des données
       doExplosion := false;
       bX := Trunc(pBomberman.TriggerBomb^.Bomb.Position.X + 0.5);
@@ -209,50 +219,53 @@ Begin
       If ( bY - (pBomberman.FlameSize - 1) <= 1 ) Then bUp := 1 Else bUp := bY - (pBomberman.FlameSize - 1);
       If ( bY + (pBomberman.FlameSize - 1) >= GRIDHEIGHT ) Then bDown := GRIDHEIGHT Else bDown := bY + (pBomberman.FlameSize - 1);
 
-      // S'il y a quelqu'un sur la ligne/colonne de la bombe et qu'il n'y a pas de bloc ou de bonus entre alors on fait exploser la bombe
-      // Gauche
-      continue := true;
-      i := bX - 1;
-      While ( continue = true ) And ( i >= bLeft ) Do Begin
-            If ( aState[i, bY] mod 8 >= 4 ) Then
-               doExplosion := true;
-            If ( aState[i, bY] >= 8 ) Then
-               continue := false;
-            i -= 1;
-      End;
-      // Droite
-      continue := true;
-      i := bX + 1;
-      While ( continue = true ) And ( i <= bRight ) Do Begin
-            If ( aState[i, bY] mod 8 >= 4 ) Then
-               doExplosion := true;
-            If ( aState[i, bY] >= 8 ) Then
-               continue := false;
-            i += 1;
-      End;
-      // Haut
-      continue := true;
-      j := bY - 1;
-      While ( continue = true ) And ( j >= bUp ) Do Begin
-            If ( aState[bX, j] mod 8 >= 4 ) Then
-               doExplosion := true;
-            If ( aState[bX, j] >= 8 ) Then
-               continue := false;
-            j -= 1;
-      End;
-      // Bas
-      continue := true;
-      j := bY + 1;
-      While ( continue = true ) And ( j <= bDown ) Do Begin
-            If ( aState[bX, j] mod 8 >= 4 ) Then
-               doExplosion := true;
-            If ( aState[bX, j] >= 8 ) Then
-               continue := false;
-            j += 1;
+      // Rechercher d'un bomberman pour le niveau godlike.
+      If ( nSkill = SKILL_GODLIKE ) Then Begin
+          // S'il y a quelqu'un sur la ligne/colonne de la bombe et qu'il n'y a pas de bloc ou de bonus entre alors on fait exploser la bombe
+          // Gauche
+          continue := true;
+          i := bX - 1;
+          While ( continue = true ) And ( i >= bLeft ) Do Begin
+                If ( aState[i, bY] mod 8 >= 4 ) Then
+                   doExplosion := true;
+                If ( aState[i, bY] >= 8 ) Then
+                   continue := false;
+                i -= 1;
+          End;
+          // Droite
+          continue := true;
+          i := bX + 1;
+          While ( continue = true ) And ( i <= bRight ) Do Begin
+                If ( aState[i, bY] mod 8 >= 4 ) Then
+                   doExplosion := true;
+                If ( aState[i, bY] >= 8 ) Then
+                   continue := false;
+                i += 1;
+          End;
+          // Haut
+          continue := true;
+          j := bY - 1;
+          While ( continue = true ) And ( j >= bUp ) Do Begin
+                If ( aState[bX, j] mod 8 >= 4 ) Then
+                   doExplosion := true;
+                If ( aState[bX, j] >= 8 ) Then
+                   continue := false;
+                j -= 1;
+          End;
+          // Bas
+          continue := true;
+          j := bY + 1;
+          While ( continue = true ) And ( j <= bDown ) Do Begin
+                If ( aState[bX, j] mod 8 >= 4 ) Then
+                   doExplosion := true;
+                If ( aState[bX, j] >= 8 ) Then
+                   continue := false;
+                j += 1;
+          End;
       End;
       
       // Si cela fait plus de 32 secondes que la bombe est posée, alors on peut la faire exploser.
-      If ( pBomberman.SumIgnitionGetDelta > 32 ) Then
+      If ( pBomberman.SumIgnitionGetDelta > 16 ) Then
          doExplosion := true;
 
       // S'il le bomberman est sur la ligne/colonne de la bombe, alors on ne fait pas exploser la bombe
@@ -309,6 +322,30 @@ Begin
 
 
 
+// DropBomb pour le niveau Godlike.
+If ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.uGrabbedBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) Then Begin
+     pBomberman.SumGrabGetDelta := pBomberman.SumGrabGetDelta + dt;
+     // Si la case suivante est un bloc, le bout de la map ou un bomberman, alors on lance la bombe.
+     If ( ( pBomberman.Direction = 0 ) And ( ( pY + 1 > GRIDHEIGHT )
+     Or ( aState[ pX, pY + 1 ] = 8 ) Or ( aState[ pX, pY + 1 ] = 4 ) ) )
+     Or ( ( pBomberman.Direction = 180 ) And ( ( pY - 1 < 1 )
+     Or ( aState[ pX, pY - 1 ] = 8 ) Or ( aState[ pX, pY - 1 ] = 4 ) ) )
+     Or ( ( pBomberman.Direction = -90 ) And ( ( pX + 1 > GRIDWIDTH )
+     Or ( aState[ pX + 1, pY ] = 8 ) Or ( aState[ pX + 1, pY ] = 4 ) ) )
+     Or ( ( pBomberman.Direction = 90 ) And ( ( pX - 1 < 1 )
+     Or ( aState[ pX - 1, pY ] = 8 ) Or ( aState[ pX - 1, pY ] = 4 ) ) )
+     // Si ça fait plus de 8 secondes que l'on porte la bombe et qu'il n'y a ni bombe, ni flamme à la case suivante,
+     // alors on lance la bombe.
+     Or ( ( pBomberman.SumGrabGetDelta >= 8 )
+     And ( ( ( pBomberman.Direction = 0 ) And ( aState[ pX, pY + 1 ] mod 4 = 0 ) )
+     Or ( ( pBomberman.Direction = 180 ) And ( aState[ pX, pY - 1 ] mod 4 = 0 ) )
+     Or ( ( pBomberman.Direction = -90 ) And ( aState[ pX + 1, pY ] mod 4 = 0 ) )
+     Or ( ( pBomberman.Direction = 90 ) And ( aState[ pX - 1, pY ] mod 4 = 0 ) ) ) ) Then Begin
+        pBomberman.PrimaryKeyUp( dt );
+     End;
+End;
+
+
 // Si le bomberman ne bouge pas depuis trop longtemps, alors il a plus de chances de bouger.
    If ( pBomberman.SumFixGetDelta >= 8 ) Then
       pBomberman.Danger := pBomberman.Danger + 32;
@@ -321,30 +358,30 @@ Begin
       // Mise à jour de lX et lY et de SumFixGetDelta;
       pBomberman.LX := pBomberman.Position.X;
       pBomberman.LY := pBomberman.Position.Y;
-      If ( pBomberman.SumFixGetDelta >= 8 ) And ( pBomberman.SumFixGetDelta - GetDelta <= 8 ) Then
+      If ( pBomberman.SumFixGetDelta >= 8 ) And ( pBomberman.SumFixGetDelta - dt <= 8 ) Then
          pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta - 4;
-      If ( pBomberman.SumFixGetDelta - GetDelta >= 0 ) Then
-         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta - GetDelta
+      If ( pBomberman.SumFixGetDelta - dt >= 0 ) Then
+         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta - dt
       Else
           pBomberman.SumFixGetDelta := 0;
 
       // Comparaison des dangers.
       If ( pBomberman.DangerLeft < pBomberman.Danger ) And ( pBomberman.DangerLeft <= pBomberman.DangerRight )
       And ( pBomberman.DangerLeft <= pBomberman.DangerUp ) And ( pBomberman.DangerLeft <= pBomberman.DangerDown ) Then Begin
-         pBomberman.MoveLeft( GetDelta );
+         pBomberman.MoveLeft( dt );
          pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerRight < pBomberman.Danger ) And ( pBomberman.DangerRight <= pBomberman.DangerUp )
       And ( pBomberman.DangerRight <= pBomberman.DangerDown ) Then Begin
-         pBomberman.MoveRight( GetDelta );
+         pBomberman.MoveRight( dt );
          pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerUp < pBomberman.Danger ) And ( pBomberman.DangerUp <= pBomberman.DangerDown ) Then Begin
-           pBomberman.MoveUp( GetDelta );
+           pBomberman.MoveUp( dt );
            pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerDown < pBomberman.Danger ) Then Begin
-           pBomberman.MoveDown( GetDelta );
+           pBomberman.MoveDown( dt );
            pBomberman.CanCalculate := false;
       End
       Else
@@ -364,10 +401,10 @@ Begin
       // Mise à jour de lX et lY et de SumFixGetDelta;
       pBomberman.LX := pBomberman.Position.X;
       pBomberman.LY := pBomberman.Position.Y;
-      If ( pBomberman.SumFixGetDelta <= 8 ) And ( pBomberman.SumFixGetDelta + GetDelta >= 8 ) Then
-         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + GetDelta + 4
+      If ( pBomberman.SumFixGetDelta <= 8 ) And ( pBomberman.SumFixGetDelta + dt >= 8 ) Then
+         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + dt + 4
       Else
-          pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + GetDelta;
+          pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + dt;
 
       // Si le bomberman ne bouge pas, alors tout recommence.
       // Sinon, il y a des problèmes...
@@ -389,22 +426,22 @@ Begin
            And ( ( pBomberman.DangerLeft <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
            And ( ( pBomberman.DangerLeft <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheLeft = true ) Then Begin
-               pBomberman.MoveLeft( GetDelta );
+               pBomberman.MoveLeft( dt );
                pBomberman.CanGoToTheLeft := false;
            End
            Else If ( ( pBomberman.DangerRight <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
            And ( ( pBomberman.DangerRight <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheRight = true ) Then Begin
-               pBomberman.MoveRight( GetDelta );
+               pBomberman.MoveRight( dt );
                pBomberman.CanGoToTheRight := false;
            End
            Else If ( ( pBomberman.DangerUp <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheUp = true ) Then Begin
-               pBomberman.MoveUp( GetDelta );
+               pBomberman.MoveUp( dt );
                pBomberman.CanGoToTheUp := false;
            End
            Else Begin
-                pBomberman.MoveDown( GetDelta );
+                pBomberman.MoveDown( dt );
                 pBomberman.CanGoToTheDown := false;
            End;
       End;
@@ -438,11 +475,20 @@ Begin
    And ( ( nSkill <> SKILL_GODLIKE ) Or ( pBomberman.ExploseBombTime >= 3 ) )
    And ( PutBomb( Trunc( pBomberman.Position.X + 0.5), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill,
    pBomberman.SumBombGetDelta > 16 ) ) Then Begin
-       pBomberman.CreateBomb( GetDelta, Random( 1000000000 ) );
+       pBomberman.CreateBomb( dt, Random( 1000000000 ) );
+       If ( pBomberman.bCanGrabBomb ) And ( nSkill = SKILL_GODLIKE ) Then Begin
+          pBomberman.PrimaryKeyDown( dt );
+          pBomberman.SumGrabGetDelta := 0;
+       End;
+       If ( pBomberman.bCanSpoog ) And ( nSkill = SKILL_GODLIKE )
+       And ( CanSpoog( Trunc( pBomberman.Position.X + 0.5), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill,
+       pBomberman.Direction ) ) Then Begin
+          pBomberman.CreateBomb( dt, Random( 1000000000 ) );
+       End;
        pBomberman.SumBombGetDelta := 0;
    End
    Else
-       pBomberman.SumBombGetDelta := pBomberman.SumBombGetDelta + GetDelta;
+       pBomberman.SumBombGetDelta := pBomberman.SumBombGetDelta + dt;
 
      
      
@@ -1188,7 +1234,7 @@ Begin
             j := j + 1;
       End;
       
-   // S'il n'y pas plus de deux directions libres, alors on ne pose pas la bombe.
+   // S'il n'y pas de directions libres, alors on ne pose pas la bombe.
       If ( FreeDirections < 1 ) Then
          CanPut := false;
    End;
@@ -1197,6 +1243,63 @@ Begin
 
 // On renvoye la variable.
    PutBomb := CanPut;
+End;
+
+
+
+
+// Renvoie true si le bomberman peut spooger.
+Function CanSpoog( nX, nY : Integer; wState : Table; wSkill, wDirection : Integer ) : Boolean;
+Var CanDo : Boolean;
+    i : Integer;
+Begin
+     CanDo := True;
+     // Bas
+     If ( wDirection = 0 ) Then Begin
+        If ( wState[ nX, nY + 1 ] mod 16 <> 0 ) And ( wState[ nX, nY + 1 ] mod 16 <> 4 ) Then Begin
+           CanDo := False;
+        End
+        Else If ( wState[ nX, nY + 2 ] mod 16 <> 0 ) And ( wState[ nX, nY + 2 ] mod 16 <> 4 )
+        And ( wState[ nX - 1, nY + 1 ] mod 16 <> 0 ) And ( wState[ nX - 1, nY + 1 ] mod 16 <> 4 )
+        And ( wState[ nX + 1, nY + 1 ] mod 16 <> 0 ) And ( wState[ nX + 1, nY + 1 ] mod 16 <> 4 ) Then Begin
+            CanDo := False;
+        End;
+     End;
+     // Haut
+     If ( wDirection = 180 ) Then Begin
+        If ( wState[ nX, nY - 1 ] mod 16 <> 0 ) And ( wState[ nX, nY - 1 ] mod 16 <> 4 ) Then Begin
+           CanDo := False;
+        End
+        Else If ( wState[ nX, nY - 2 ] mod 16 <> 0 ) And ( wState[ nX, nY - 2 ] mod 16 <> 4 )
+        And ( wState[ nX - 1, nY - 1 ] mod 16 <> 0 ) And ( wState[ nX - 1, nY - 1 ] mod 16 <> 4 )
+        And ( wState[ nX + 1, nY - 1 ] mod 16 <> 0 ) And ( wState[ nX + 1, nY - 1 ] mod 16 <> 4 ) Then Begin
+            CanDo := False;
+        End;
+     End;
+     // Droite
+     If ( wDirection = -90 ) Then Begin
+        If ( wState[ nX + 1, nY ] mod 16 <> 0 ) And ( wState[ nX + 1, nY ] mod 16 <> 4 ) Then Begin
+           CanDo := False;
+        End
+        Else If ( wState[ nX + 2, nY ] mod 16 <> 0 ) And ( wState[ nX + 2, nY ] mod 16 <> 4 )
+        And ( wState[ nX + 1, nY - 1 ] mod 16 <> 0 ) And ( wState[ nX + 1, nY - 1 ] mod 16 <> 4 )
+        And ( wState[ nX + 1, nY + 1 ] mod 16 <> 0 ) And ( wState[ nX + 1, nY + 1 ] mod 16 <> 4 ) Then Begin
+            CanDo := False;
+        End;
+     End;
+     // Gauche
+     If ( wDirection = 90 ) Then Begin
+        If ( wState[ nX - 1, nY ] mod 16 <> 0 ) And ( wState[ nX - 1, nY ] mod 16 <> 4 ) Then Begin
+           CanDo := False;
+        End
+        Else If ( wState[ nX - 2, nY ] mod 16 <> 0 ) And ( wState[ nX - 2, nY ] mod 16 <> 4 )
+        And ( wState[ nX - 1, nY - 1 ] mod 16 <> 0 ) And ( wState[ nX - 1, nY - 1 ] mod 16 <> 4 )
+        And ( wState[ nX - 1, nY + 1 ] mod 16 <> 0 ) And ( wState[ nX - 1, nY + 1 ] mod 16 <> 4 ) Then Begin
+            CanDo := False;
+        End;
+     End;
+
+     CanSpoog := CanDo;
 End;
 
 
@@ -1546,6 +1649,7 @@ Begin
               End;
               // Si on a atteint les coordonées, on est content.
               If ( i = bX ) And ( j = bY ) And ( m_nDangerWay < p_nDangerMin ) Then Begin
+                 If ( m_nNbCases < 0 ) Then m_nNbCases := 0;
                  p_nDangerMin := 2 * m_nDangerWay div ( m_nNbCases + 2 );
                  p_nDirection := m_aDirPrefered[ m_aDirCases[ aX, aY ] - 1 ];
               End;
@@ -1554,6 +1658,7 @@ Begin
         End;
      End;
 End;
+
 
 
 

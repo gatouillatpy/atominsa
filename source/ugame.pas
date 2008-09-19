@@ -692,10 +692,12 @@ Begin
      i := 1;
      While ( i <= GetFlameCount() ) Do Begin
           aFlame := GetFlameByCount(i);
+          If ( aFlame = Nil ) Then Exit;
           SetTexture( 1, TEXTURE_FLAME(aFlame.Owner.BIndex) );
           // flamme intérieure
           If bColor Then Begin
              Case aFlame.Owner.BIndex Of
+             
                   1 : Begin r := 1.0; g := 0.6; b := 0.6; End;
                   2 : Begin r := 0.6; g := 0.6; b := 1.0; End;
                   3 : Begin r := 0.6; g := 1.0; b := 0.6; End;
@@ -942,7 +944,11 @@ Begin
          If GetKey( KEY_ENTER ) Then Begin
             If Not bEnter Then Begin
                PlaySound( SOUND_MESSAGE );
-               Send( nLocalIndex, HEADER_MESSAGE, sMessage );
+               If ( bMulti = False ) Then Begin
+                    AddLineToConsole( sClientName[ClientIndex(nLocalIndex)] + ' says : ' + sMessage );
+                    AddStringToScreen( sClientName[ClientIndex(nLocalIndex)] + ' says : ' + sMessage );
+               End
+               Else Send( nLocalIndex, HEADER_MESSAGE, sMessage );
                bMessage := False;
                sMessage := '';
             End;
@@ -1339,7 +1345,7 @@ Begin
            sData := '';
            For i := 1 To GRIDWIDTH Do Begin
                For j := 1 To GRIDHEIGHT Do Begin
-                   If ( pGrid.GetBlock(i, j) Is CItem ) Then Begin
+                   If ( pGrid.GetBlock(i, j) Is CBlock ) And ( pGrid.GetBlock(i,j).IsExplosive() = true ) Then Begin
                       If ( pGrid.GetBlock(i, j) Is CExtraBomb ) Then Begin
                          sData := sData + IntToStr( POWERUP_EXTRABOMB );
                          sData := sData + #31;
@@ -1403,11 +1409,17 @@ Begin
                            sData := sData + IntToStr( k + 100 * l + 10000 * i );
                            sData := sData + #31;
                       End
-                      Else Begin                  // Cela ne devrait jamais arriver... et poutant : POWERUP_RANDOM
-                           sData := sData + IntToStr( POWERUP_FLAMEUP );
-                           sData := sData + #31;
-                           pGrid.aBlock[i, j].Destroy();
-                           pGrid.aBlock[i, j] := CFlameUp.Create(i,j);
+                      Else Begin
+                           If ( pGrid.GetBlock(i,j) Is CItem ) Then Begin                  // pour POWERUP_RANDOM
+                               sData := sData + IntToStr( POWERUP_FLAMEUP );
+                               sData := sData + #31;
+                               pGrid.aBlock[i, j].Destroy();
+                               pGrid.aBlock[i, j] := CFlameUp.Create(i,j);
+                           End
+                           Else Begin
+                                sData:= sData + IntToStr( POWERUP_NONE );
+                                sData := sData + #31;
+                           End;
                       End;
                    End;
                End;
@@ -1465,18 +1477,22 @@ Begin
        If ((bMulti = True) And (nLocalIndex = nPlayerClient[k])) Or (bMulti = False) Then Begin
            Case nPlayerType[k] Of
                 PLAYER_KB1 :
-                     pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                     If ( pPlayer1 = NIL ) Then      // TODO : A vérifier en multi.
+                        pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_KB2 :
-                     pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                     If ( pPlayer2 = NIL ) Then
+                        pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_COM :
                      AddBomberman( sPlayerName[k], k, k, nPlayerSkill[k], pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
            End;
        End Else Begin
            Case nPlayerType[k] Of
                 PLAYER_KB1 :
-                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                     If ( pPlayer1 = NIL ) Then
+                           AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_KB2 :
-                     AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
+                     If ( pPlayer2 = NIL ) Then
+                        AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_COM :
                      AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
            End;
@@ -1554,7 +1570,8 @@ Procedure ProcessGame () ;
         DrawSkybox( p * 1.0, p * 1.0, p * 1.0, p * 1.0, TEXTURE_MAP_SKYBOX(0) );
 
         // affichage de l'invite de messages
-        If bMulti Then DrawMessage( p * 1.0 );
+        //If bMulti Then DrawMessage( p * 1.0 );
+        DrawMessage( p * 1.0 );
 
         // affichage des informations
         DrawNotification( p * 1.0 );
@@ -2018,9 +2035,30 @@ Begin
                 End;
                 MENU_PLAYER_TYPE :
                 Begin
-                     If nPlayerType[nPlayer] = PLAYER_KB1 Then nPlayerType[nPlayer] := PLAYER_NIL;
-                     If nPlayerType[nPlayer] = PLAYER_KB2 Then nPlayerType[nPlayer] := PLAYER_KB1;
-                     If nPlayerType[nPlayer] = PLAYER_COM Then nPlayerType[nPlayer] := PLAYER_KB2;
+                     If nPlayerType[nPlayer] = PLAYER_KB1 Then Begin
+                        bPlayer1 := False;
+                        nPlayerType[nPlayer] := PLAYER_NIL;
+                     End;
+                     If nPlayerType[nPlayer] = PLAYER_KB2 Then Begin
+                        bPlayer2 := False;
+                        If ( bPlayer1 = False ) Then Begin
+                           nPlayerType[nPlayer] := PLAYER_KB1;
+                           bPlayer1 := True;
+                        End
+                        Else nPlayerType[nPlayer] := PLAYER_NIL;
+                     End;
+                     If nPlayerType[nPlayer] = PLAYER_COM Then Begin
+                        If ( bPlayer2 = False ) Then Begin
+                           bPlayer2 := True;
+                           nPlayerType[nPlayer] := PLAYER_KB2;
+                        End
+                        Else Begin If ( bPlayer1 = False ) Then Begin
+                             bPlayer1 := True;
+                             nPlayerType[nPlayer] := PLAYER_KB1;
+                           End
+                           Else nPlayerType[nPlayer] := PLAYER_NIL;
+                        End;
+                     End;
                      SetString( STRING_GAME_MENU(63), 'type : ' + PlayerType, 0.0, 0.02, 600 );
                 End;
                 MENU_PLAYER_CHARACTER :
@@ -2053,9 +2091,30 @@ Begin
                 End;
                 MENU_PLAYER_TYPE :
                 Begin
-                     If nPlayerType[nPlayer] = PLAYER_KB2 Then nPlayerType[nPlayer] := PLAYER_COM;
-                     If nPlayerType[nPlayer] = PLAYER_KB1 Then nPlayerType[nPlayer] := PLAYER_KB2;
-                     If nPlayerType[nPlayer] = PLAYER_NIL Then nPlayerType[nPlayer] := PLAYER_KB1;
+                     If nPlayerType[nPlayer] = PLAYER_KB2 Then Begin
+                        nPlayerType[nPlayer] := PLAYER_COM;
+                        bPlayer2 := False;
+                     End;
+                     If nPlayerType[nPlayer] = PLAYER_KB1 Then Begin
+                        bPlayer1 := False;
+                        If ( bPlayer2 = False ) Then Begin
+                           nPlayerType[nPlayer] := PLAYER_KB2;
+                           bPlayer2 := True;
+                        End
+                        Else nPlayerType[nPlayer] := PLAYER_COM;
+                     End;
+                     If nPlayerType[nPlayer] = PLAYER_NIL Then Begin
+                        If ( bPlayer1 = False ) Then Begin
+                           nPlayerType[nPlayer] := PLAYER_KB1;
+                           bPlayer1 := True;
+                        End
+                        Else Begin If ( bPlayer2 = False ) Then Begin
+                             nPlayerType[nPlayer] := PLAYER_KB2;
+                             bPlayer2 := True;
+                           End
+                           Else nPlayerType[nPlayer] := PLAYER_COM;
+                        End;
+                     End;
                      SetString( STRING_GAME_MENU(63), 'type : ' + PlayerType, 0.0, 0.02, 600 );
                 End;
                 MENU_PLAYER_CHARACTER :

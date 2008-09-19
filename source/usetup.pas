@@ -33,6 +33,9 @@ Var bColor : Boolean; // a sauvegarder et afficher
 
 Var bIntro : Boolean;
 
+Var bPlayer1 : Boolean;
+Var bPlayer2 : Boolean;
+
 Var nRoundCount : Integer;
 Var fRoundDuration : Single; // a sauvegarder et afficher
 
@@ -981,6 +984,9 @@ Begin
      {$I+}
      If IOResult <> 0 Then Exit;
      
+     bPlayer1 := False;
+     bPlayer2 := False;
+     
      While EOF(ioLine) = False Do
      Begin
           ReadLn( ioLine, sLine );
@@ -1008,8 +1014,26 @@ Begin
                     AddLineToConsole( 'Player ' + IntToStr(k) + ' name : ' + sPlayerName[k] );
                     nPlayerType[k] := GetInteger(sLine, 4);
                     If nPlayerType[k] = PLAYER_NIL Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : None' );
-                    If nPlayerType[k] = PLAYER_KB1 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Keyboard 1' );
-                    If nPlayerType[k] = PLAYER_KB2 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Keyboard 2' );
+                    If ( nPlayerType[k] = PLAYER_KB1 ) Then Begin
+                       If ( bPlayer1 = False ) Then Begin
+                          AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Keyboard 1' );
+                          bPlayer1 := True;
+                       End
+                       Else Begin
+                           AddLineToConsole( 'Player ' + IntToStr(k) + ' type : None' );
+                           nPlayerType[k] := PLAYER_NIL;
+                       End;
+                    End;
+                    If ( nPlayerType[k] = PLAYER_KB2 ) Then Begin
+                       If ( bPlayer2 = False ) Then Begin
+                          AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Keyboard 2' );
+                          bPlayer2 := True;
+                       End
+                       Else Begin
+                           AddLineToConsole( 'Player ' + IntToStr(k) + ' type : None' );
+                           nPlayerType[k] := PLAYER_NIL;
+                       End;
+                    End;
                     If nPlayerType[k] = PLAYER_COM Then AddLineToConsole( 'Player ' + IntToStr(k) + ' type : Computer' );
                     nPlayerSkill[k] := GetInteger(sLine, 5);
                     If nPlayerSkill[k] = 1 Then AddLineToConsole( 'Player ' + IntToStr(k) + ' skill : Novice' );

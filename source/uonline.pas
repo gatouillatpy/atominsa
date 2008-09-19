@@ -11,8 +11,8 @@ Uses Classes, SysUtils, UUtils, UMap, UScheme, UCharacter, UForm;
 
 
 Var nServerCount : Integer;
-    sServerIP : Array [0..255] Of String;
-    sServerName : Array[0..255] Of String;
+    sServerIP : Array [2..255] Of String;
+    sServerName : Array[2..255] Of String;
 
 
 
@@ -51,47 +51,16 @@ Procedure InitMenuOnline () ;
 Begin
 
 
-     SetString( STRING_SETUP_MENU(-2), 'online', 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(-1), 'manual connection', 0.2, 1.0, 600 );
-     
+     SetString( STRING_SETUP_MENU(0), 'online', 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(1), 'manual connection', 0.2, 1.0, 600 );
+     {
      If Not ClientInit( sMasterAddress, nMasterPort ) Then Begin
         nState := PHASE_MULTI;
         Exit;
      End;
-{
-     SetString( STRING_SETUP_MENU(11), 'show intro : ' + BoolToStr(bIntro), 0.2, 1.0, 600 );
-
-     SetString( STRING_SETUP_MENU(21), 'desired framerate : ' + IntToStr(nFramerate), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(22), 'lighting : ' + BoolToStr(bLighting), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(23), 'shadowing : ' + BoolToStr(bShadowing), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(24), 'reflection : ' + BoolToStr(bReflection), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(25), 'effects : ' + BoolToStr(bEffects), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(26), 'blur : ' + BoolToStr(bBlur), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(27), 'texturing quality : ' + IntToStr(nTexturing), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(28), 'shader model : ' + IntToStr(nShaderModel), 0.2, 1.0, 600 );
-
-     SetString( STRING_SETUP_MENU(31), 'fullscreen : ' + BoolToStr(bDisplayFullscreen), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(32), 'resolution : ' + Format('%d x %d', [nDisplayWidth,nDisplayHeight]), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(33), 'format : ' + IntToStr(nDisplayBPP) + ' bits', 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(34), 'refresh rate : ' + IntToStr(nDisplayRefreshrate) + ' Hz', 0.2, 1.0, 600 );
-
-     SetString( STRING_SETUP_MENU(41), 'p1 move up    : ' + KeyToStr(nKey1MoveUp), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(42), 'p1 move down  : ' + KeyToStr(nKey1MoveDown), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(43), 'p1 move left  : ' + KeyToStr(nKey1MoveLeft), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(44), 'p1 move right : ' + KeyToStr(nKey1MoveRight), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(45), 'p1 primary    : ' + KeyToStr(nKey1Primary), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(46), 'p1 secondary  : ' + KeyToStr(nKey1Secondary), 0.2, 1.0, 600 );
-
-     SetString( STRING_SETUP_MENU(51), 'p2 move up    : ' + KeyToStr(nKey2MoveUp), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(52), 'p2 move down  : ' + KeyToStr(nKey2MoveDown), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(53), 'p2 move left  : ' + KeyToStr(nKey2MoveLeft), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(54), 'p2 move right : ' + KeyToStr(nKey2MoveRight), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(55), 'p2 primary    : ' + KeyToStr(nKey2Primary), 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(56), 'p2 secondary  : ' + KeyToStr(nKey2Secondary), 0.2, 1.0, 600 );
-
-     fScroll := 0.0;
-}
-     nMenu := -1;
+     }
+     
+     nMenu := 1;
 
      bUp := False;
      bDown := False;
@@ -108,7 +77,7 @@ End;
 Procedure ProcessMenuOnline () ;
           Function IsActive( nConst : Integer ) : Single ;
           Begin
-               If nConst = nMenu Then IsActive := 0.0 Else IsActive := 1.0;
+               If nConst = nMenu Then IsActive:= 0.0 Else IsActive := 1.0;
           End;
 Var w, h : Single;
     x, y, z : Integer;
@@ -119,12 +88,13 @@ Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
 
-     DrawString( STRING_SETUP_MENU(-2), -w / h * 0.5,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     DrawString( STRING_SETUP_MENU(0), -w / h * 0.5,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
      t := 0.0;
-     If fScroll <= t Then DrawString( STRING_SETUP_MENU(-1), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(-1), IsActive(-1), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(1), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(1), IsActive(1), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      t += 0.2;
-     For i := 0 To nServerCount - 1 Do Begin
+     For i := 2 To nServerCount + 1 Do Begin
          If fScroll <= t Then DrawString( STRING_SETUP_MENU(i), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(i), IsActive(i), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+
      End;
      
      
@@ -139,19 +109,19 @@ Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
 
-           nMenu := nMenu + 1;
-           If ( nMenu = nServerCount ) Then Begin
-              nMenu := - 1;
+           nMenu := nMenu - 1;
+           If ( nMenu = 0 ) Then Begin
+              nMenu := nServerCount + 1;
            End;
 
            t := 0.0;
-           If (nMenu = -1) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = 1) And (fScroll > t) Then fScroll := t; t += 0.2;
            t += 0.2;
-           For i := 0 To nServerCount - 2 Do Begin
+           For i := 2 To nServerCount - 6 Do Begin
                If (nMenu = i) And (fScroll > t) Then fScroll := t; t += 0.2;
            End;
            t -= 0.2;
-           If (nMenu = nServerCount - 1) Then fScroll := t;
+           If (nMenu = nServerCount + 1) Then fScroll := t;
         End;
         bUp := True;
      End Else Begin
@@ -163,15 +133,15 @@ Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
            
-           nMenu := nMenu - 1;
-           If ( nMenu = -2 ) Then Begin
-              nMenu := nServerCount - 1;
+           nMenu := nMenu + 1;
+           If ( nMenu = nServerCount + 2 ) Then Begin
+              nMenu := 1;
            End;
 
            t := 0.0;
-           If nMenu = -1 Then fScroll := 0.0;
+           If nMenu = 1 Then fScroll := t;
            t += 0.2;
-           For i := 1 To nServerCount - 1 Do Begin
+           For i := 8 To nServerCount + 1 Do Begin
                If (nMenu = i) And (fScroll < t) Then fScroll := t; t += 0.2;
            End;
         End;
@@ -185,7 +155,7 @@ Begin
      If GetKey( KEY_ENTER ) Then Begin
         If Not bEnter Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           If (nMenu = -1) Then Begin
+           If (nMenu = 1) Then Begin
                nState := PHASE_MULTI;
            End
            Else Begin
@@ -209,21 +179,35 @@ Var nIndex : DWord;
     sData : String;
 Var k, l : Integer;
 Begin
+     l := 20;
+     For k := 1 To l Do Begin
+         sServerName[k+1] := 'Server ' + IntToStr(k);
+         SetString( STRING_SETUP_MENU(k+1), sServerName[k+1], 0.2, 1.0, 600 );
+     End;
+     nServerCount := l;
+     nState := STATE_ONLINE;
+     fScroll := 0.0;
+     
+{
+     ClientLoop();
+
      While GetPacket( nIndex, nHeader, sData ) Do Begin
           Case nHeader Of
                HEADER_SERVER :
                Begin
                     l := 1;
                     nServerCount := StrToInt( GetString( sData, l ) ); l += 1;
-                    For k := 0 To nServerCount - 1 Do Begin
+                    For k := 2 To nServerCount + 1 Do Begin
                         sServerName[k] := GetString( sData, l ); l += 1;
                         sServerIP[k] := GetString( sData, l ); l += 1;
                         SetString( STRING_SETUP_MENU(k), sServerName[k], 0.2, 1.0, 600 );
                     End;
                     nState := STATE_ONLINE;
+                    fScroll := 0.0;
                End;
           End;
      End;
+}
 End;
 
 

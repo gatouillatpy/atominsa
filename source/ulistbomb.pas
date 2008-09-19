@@ -20,7 +20,8 @@ Type LPBombItem = ^BombItem;
               end;
 
 
-    procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
+    procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid;
+              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; bToSend : Boolean);
     procedure RemoveBombByCount(i : integer);
     procedure RemoveBombByGridCoo(aX,aY : integer);
     procedure RemoveThisBomb(wBomb: CBomb);
@@ -51,7 +52,8 @@ Procedure UpdateCountList();Forward;                                 // pour lui
 { Ajout / Suppression                                                           }
 {*******************************************************************************}
 // ajout
-procedure AddBomb(aX, aY: Single; aIndex, aBombSize : integer; aBombTime : Single; aJelly : boolean; aTrigger : boolean; aGrid: CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
+procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid;
+              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; bToSend : Boolean);
 var pTemp : LPBombItem;
     sData : String;
 begin
@@ -79,7 +81,7 @@ begin
    else pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID);
  end;
  
- If ( bMulti = true ) Then Begin
+ If ( bMulti = true ) And ( bToSend ) Then Begin
     sData := IntToStr(aIndex) + #31;
     sData := sData + IntToStr(_nNetID) + #31;
     sData := sData + FloatToStr(aX) + #31;

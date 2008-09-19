@@ -408,7 +408,7 @@ Var nIndex : DWord;
     pBomb : CBomb;
     fX, fY : Single;
     dt : Single;
-    nBombSize : Integer;
+    nBombSize, nDirection : Integer;
     fBombTime : Single;
     _nNetID : Integer;
     aX, aY, dX, dY : Integer;
@@ -595,9 +595,7 @@ Begin
                     fY := StrToFloat( GetString( sData, l ) ); l += 1;
                     nBombSize := StrToInt( GetString( sData, l ) ); l += 1;
                     fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
-                    If ( Trunc( fX ) in [1..GRIDWIDTH] )
-                    And ( Trunc( fY ) in [1..GRIDHEIGHT] )
-                    And Not ( pGrid.GetBlock( Trunc( fX ), Trunc( fY ) ) Is CBomb ) Then Begin
+                    If Not ( GetBombByNetID( _nNetId ) Is CBomb ) Then Begin
                         pBomberman.CreateBombMulti( fX, fY, nBombSize, fBombTime, _nNetID );
                     End;
                End;
@@ -618,6 +616,26 @@ Begin
                     dt := StrToFloat( GetString( sData, 6 ) );
                     pBomberman.MoveBomb(aX,aY,aX,aY,dX,dY,dt);
                End;
+               HEADER_CHECK_BONUS :
+               Begin
+                    l := 1;
+                    k := StrToInt( GetString( sData, l ) ); l += 1;
+                    pBomberman := GetBombermanByIndex( k );
+                    fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                    fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                    pBomberman.Position.x := fX;
+                    pBomberman.Position.y := fY;
+                    dX := StrToInt( GetString( sData, l ) ); l += 1;
+                    dY := StrToInt( GetString( sData, l ) ); l += 1;
+                    pBomberman.LastDirN.x := dX;
+                    pBomberman.LastDirN.y := dY;
+                    nDirection := StrToInt( GetString( sData, l ) ); l += 1;
+                    If ( nDirection = 0 ) Then pBomberman.Direction := 0
+                    Else If ( nDirection = 1 ) Then pBomberman.Direction := 90
+                    Else If ( nDirection = 2 ) Then pBomberman.Direction := 180
+                    Else If ( nDirection = 3 ) Then pBomberman.Direction := -90;
+                    pBomberman.CheckBonus();
+               End;
                HEADER_SWITCH :
                Begin
                     k := StrToInt( GetString( sData, 1 ) );
@@ -629,10 +647,34 @@ Begin
                     pSecondBomberman := GetBombermanByIndex( l );
                     fX := StrToFloat( GetString( sData, 5 ) );
                     fY := StrToFloat( GetString( sData, 6 ) );
-                    pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ).Destroy();
+                    If ( pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) <> Nil ) Then
+                       pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ).Destroy();
                     pGrid.aBlock[ Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ] := Nil;
                     pSecondBomberman.Position.X := fX;
                     pSecondBomberman.Position.Y := fY;
+               End;
+               HEADER_GRAB_SERVER :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    dX := StrToInt( GetString( sData, 2 ) );
+                    dY := StrToInt( GetString( sData, 3 ) );
+                    If ( ( pGrid.GetBlock( dX, dY ) <> Nil ) And ( pGrid.GetBlock( dX, dY ) Is CBomb ) ) Then Begin
+                        pBomberman.GrabBombMulti( dX, dY );
+                        sData := IntToStr( k ) + #31;
+                        sData := sData + IntToStr( dX ) + #31;
+                        sData := sData + IntToStr( dY ) + #31;
+                        Send( nLocalIndex, HEADER_GRAB_CLIENT, sData );
+                    End;
+               End;
+               HEADER_DROP_SERVER :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    dt := StrToFloat( GetString( sData, 2 ) );
+                    pBomberman.DropBombMulti( dt );
+                    sData := IntToStr( k ) + #31;
+                    Send( nLocalIndex, HEADER_DROP_CLIENT, sData );
                End;
           End;
      End;
@@ -646,6 +688,12 @@ Begin
                sData := sData + FormatFloat('0.000',pBomberman.Position.y) + #31;
                sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
                sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
+               If (pBomberman.Direction = 0) Then nDirection := 0
+               Else If (pBomberman.Direction = 90) Then nDirection := 1
+               Else If (pBomberman.Direction = 180) Then nDirection := 2
+               Else If (pBomberman.Direction = -90) Then nDirection := 3
+               Else nDirection := -1;
+               sData := sData + IntToStr(nDirection) + #31;
             End;
         End;
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
@@ -657,6 +705,7 @@ Begin
                sData := sData + IntToStr(pBomb.nNetID) + #31;
                sData := sData + FormatFloat('0.000',pBomb.Position.x) + #31;
                sData := sData + FormatFloat('0.000',pBomb.Position.y) + #31;
+               sData := sData + FormatFloat('0.000',pBomb.Position.z) + #31;
            End;
            Send( nLocalIndex, HEADER_BOMB, sData );
         End;
@@ -672,9 +721,11 @@ Var nIndex : DWord;
     sBuffer : String;
     pBomberman, pSecondBomberman : CBomberman;
     pBomb : CBomb;
-    fX, fY : Single;
+    pBlock : CBlock;
+    pDisease : CDisease;
+    fX, fY, fZ : Single;
     nX, nY : Integer;
-    nBombSize : Integer;
+    nBombSize, nDirection : Integer;
     fBombTime : Single;
     isBomb : Boolean;
     nBonus : Integer;
@@ -779,10 +830,14 @@ Begin
                     m := 1;
                     For k := 1 To GRIDWIDTH Do Begin
                         For l := 1 To GRIDHEIGHT Do Begin
-                            If ( pGrid.GetBlock(k, l) Is CItem ) Then Begin
+                            If ( pGrid.GetBlock(k, l) Is CBlock ) And ( pGrid.GetBlock(k, l).IsExplosive() = True ) Then Begin
                                nBonus := StrToInt( GetString( sData, m ) );
                                m := m + 1;
                                Case nBonus Of
+                                    POWERUP_NONE            : Begin
+                                                                   pGrid.GetBlock(k, l).Destroy();
+                                                                   pGrid.aBlock[k,l] := CBlock.Create(k,l,True);
+                                                              End;
                                     POWERUP_EXTRABOMB       : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
                                                                    pGrid.aBlock[k,l] := CExtraBomb.Create(k,l);
@@ -853,16 +908,18 @@ Begin
                               pBomberman.Position.y := fY;
                               nX := StrToInt( GetString( sData, l ) ); l += 1;
                               nY := StrToInt( GetString( sData, l ) ); l += 1;
-                              If nX = 1 Then pBomberman.Direction := -90
-                              Else If nX = -1 Then pBomberman.Direction := 90
-                              Else If nY = 1 Then pBomberman.Direction := 0
-                              Else If nY = -1 Then pBomberman.Direction := 180;
                               pBomberman.LastDirN.x := nX;
                               pBomberman.LastDirN.y := nY;
+                              nDirection := StrToInt( GetString( sData, l ) ); l += 1;
+                              If ( nDirection = 0 ) Then pBomberman.Direction := 0
+                              Else If ( nDirection = 1 ) Then pBomberman.Direction := 90
+                              Else If ( nDirection = 2 ) Then pBomberman.Direction := 180
+                              Else If ( nDirection = 3 ) Then pBomberman.Direction := -90;
                            End
                            Else Begin
-                                l += 4;
+                                l += 5;
                            End;
+                           pBomberman.CheckBonus();
                         End;
                     End;
                End;
@@ -876,9 +933,7 @@ Begin
                     fY := StrToFloat( GetString( sData, l ) ); l += 1;
                     nBombSize := StrToInt( GetString( sData, l ) ); l += 1;
                     fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
-                    If ( Trunc( fX ) in [1..GRIDWIDTH] )
-                    And ( Trunc( fY ) in [1..GRIDHEIGHT] )
-                    And Not ( pGrid.GetBlock( Trunc( fX ), Trunc( fY ) ) Is CBomb ) Then Begin
+                    If Not ( GetBombByNetID( _nNetId ) Is CBomb ) Then Begin
                         pBomberman.CreateBombMulti( fX, fY, nBombSize, fBombTime, _nNetID );
                     End;
                End;
@@ -888,12 +943,32 @@ Begin
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DoIgnition();
                End;
-               HEADER_EXPLOSE :
+               HEADER_EXPLOSE_BOMB :
                Begin
                     _nNetID := StrToInt( GetString( sData, 1 ) );
                     pBomb := GetBombByNetID( _nNetID );
                     If ( pBomb <> Nil ) Then
                        pBomb.Explose();
+               End;
+               HEADER_EXPLOSE_BLOCK :
+               Begin
+                    nX := StrToInt( GetString( sData, 1 ) );
+                    nY := StrToInt( GetString( sData, 2 ) );
+                    pBlock := pGrid.GetBlock( nX, nY );
+                    If ( pBlock <> Nil ) Then Begin
+                       pBlock.ExploseMulti();
+                       pGrid.DelBlock( nX, nY );
+                    End;
+               End;
+               HEADER_ISEXPLOSED_ITEM :
+               Begin
+                    nX := StrToInt( GetString( sData, 1 ) );
+                    nY := StrToInt( GetString( sData, 2 ) );
+                    pBlock := pGrid.GetBlock( nX, nY );
+                    If ( pBlock <> Nil ) And ( pBlock Is CItem ) And ( (pBlock As CItem).IsExplosed() = False) Then Begin
+                       (pBlock As CItem).bIsExplosed := True;
+                       (pBlock As CItem).bIsExplosedMulti := True;
+                    End;
                End;
                HEADER_SWITCH :
                Begin
@@ -906,10 +981,47 @@ Begin
                     pSecondBomberman := GetBombermanByIndex( l );
                     fX := StrToFloat( GetString( sData, 5 ) );
                     fY := StrToFloat( GetString( sData, 6 ) );
-                    pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ).Destroy();
-                    pGrid.aBlock[ Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ] := Nil;
+                    If ( pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) <> Nil ) Then
+                       pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ).ExploseMulti();
+                    pGrid.DelBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) );
                     pSecondBomberman.Position.X := fX;
                     pSecondBomberman.Position.Y := fY;
+               End;
+               HEADER_GRAB_CLIENT :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    nX := StrToInt( GetString( sData, 2 ) );
+                    nY := StrToInt( GetString( sData, 3 ) );
+                    If ( ( pGrid.GetBlock( nX, nY ) <> Nil ) And ( pGrid.GetBlock( nX, nY ) Is CBomb ) ) Then Begin
+                        pBomberman.GrabBombMulti( nX, nY );
+                    End;
+               End;
+               HEADER_DROP_CLIENT :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    If ( pBomberman.uGrabbedBomb <> Nil ) Then Begin
+                        pBomberman.uGrabbedBomb.Position.X := pBomberman.Position.X;
+                        pBomberman.uGrabbedBomb.Position.Y := pBomberman.Position.Y;
+                        pBomberman.uGrabbedBomb.StartTime();
+                        pBomberman.uGrabbedBomb.Position.Z := 0;
+                        pBomberman.uGrabbedBomb.JumpMovement := True;
+                        pBomberman.uGrabbedBomb := Nil;
+                    End;
+               End;
+               HEADER_CONTAMINATE :
+               Begin
+                    k := StrToInt( GetString( sData, 1 ) );
+                    pBomberman := GetBombermanByIndex( k );
+                    l := StrToInt( GetString( sData, 2 ) );
+                    pSecondBomberman := GetBombermanByIndex( l );
+                    If ( pSecondBomberman <> Nil ) And ( pBomberman <> Nil )
+                    And ( pSecondBomberman.DiseaseNumber = 0 ) Then Begin
+                       SetString( STRING_NOTIFICATION, pSecondBomberman.Name + ' has been stephaned by ' + pBomberman.sName, 0.0, 0.2, 5 );
+                       pDisease := CDisease.Create(1,1);
+                       pDisease.BonusForced( pSecondBomberman, pBomberman.nDisease );
+                    End;
                End;
                HEADER_WAIT :
                Begin
@@ -947,10 +1059,14 @@ Begin
                         If pBomb <> Nil Then Begin
                            fX := StrToFloat( GetString( sData, l ) ); l += 1;
                            fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                           fZ := StrToFloat( GetString( sData, l ) ); l += 1;
                            pBomb.Position.x := fX;
                            pBomb.Position.y := fY;
+                           pBomb.Position.z := fZ;
+                           pBomb.xGrid := Trunc( fX );
+                           pBomb.yGrid := Trunc( fY );
                         End Else Begin
-                            l += 2;
+                            l += 3;
                         End;
                     End;
                End;
