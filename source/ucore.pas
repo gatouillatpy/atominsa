@@ -78,8 +78,10 @@ Const KEY_UP = -GLUT_KEY_UP;
       KEY_F10 = -GLUT_KEY_F10;
       KEY_F11 = -GLUT_KEY_F11;
 
+
 Const KEY_TAB = 9;
       KEY_ESC = 27;
+      KEY_SPACE = 32;
       KEY_ENTER = 13;
       KEY_SQUARE = 178;
       KEY_N = 110;
@@ -2952,7 +2954,10 @@ End;
 
 Function KeyToStr( nKey : Integer ) : String ;
 Begin
-     KeyToStr := sKeyToString[ abs( nKey ) ];
+     If ( nKey = 8 ) Then
+        KeyToStr := 'RETURN'
+     Else
+        KeyToStr := sKeyToString[ abs( nKey ) ];
 End;
 
 

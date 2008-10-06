@@ -351,8 +351,8 @@ Begin
         vCamera.z := vPointer.z;
      End Else If nCamera = CAMERA_FLY Then Begin
      // gestion de la souris et du clavier pour le mode caméra libre
-        vAngle.x -= GetMouseDX() * 2000.0 * GetDelta();
-        vAngle.y += GetMouseDY() * 2000.0 * GetDelta();
+        vAngle.x -= GetMouseDX() * 200.0 * GetDelta();
+        vAngle.y += GetMouseDY() * 200.0 * GetDelta();
         If vAngle.x < 0.0 Then vAngle.x += PI2;
         If vAngle.x > PI2 Then vAngle.x -= PI2;
         If vAngle.y < -PI*0.5 Then vAngle.y := -PI*0.5;
@@ -403,12 +403,12 @@ Begin
      End;
      
      // déplacement progressif de la camera vers son pointeur pour rendre plus fluide le mouvement
-     If vCamera.x > vPointer.x Then vCamera.x -= vPointer.x * GetDelta() * 1.0;
-     If vCamera.x < vPointer.x Then vCamera.x += vPointer.x * GetDelta() * 1.0;
-     If vCamera.y > vPointer.y Then vCamera.y -= vPointer.y * GetDelta() * 1.0;
-     If vCamera.y < vPointer.y Then vCamera.y += vPointer.y * GetDelta() * 1.0;
-     If vCamera.z > vPointer.z Then vCamera.z -= vPointer.z * GetDelta() * 1.0;
-     If vCamera.z < vPointer.z Then vCamera.z += vPointer.z * GetDelta() * 1.0;
+     If vCamera.x > vPointer.x Then vCamera.x -= vPointer.x * GetDelta() * 0.2;
+     If vCamera.x < vPointer.x Then vCamera.x += vPointer.x * GetDelta() * 0.2;
+     If vCamera.y > vPointer.y Then vCamera.y -= vPointer.y * GetDelta() * 0.2;
+     If vCamera.y < vPointer.y Then vCamera.y += vPointer.y * GetDelta() * 0.2;
+     If vCamera.z > vPointer.z Then vCamera.z -= vPointer.z * GetDelta() * 0.2;
+     If vCamera.z < vPointer.z Then vCamera.z += vPointer.z * GetDelta() * 0.2;
 
      // envoi des données au moteur graphique
      SetProjectionMatrix ( 90.0, 1.0, 0.1, 2048.0 ) ;
@@ -1457,6 +1457,7 @@ Begin
      // initialisation de la camera
      nCamera := CAMERA_OVERALL;
 
+
      // chargement du scheme
      If nScheme = -1 Then Begin
         If (bMulti = True) Then
@@ -1477,7 +1478,7 @@ Begin
        If ((bMulti = True) And (nLocalIndex = nPlayerClient[k])) Or (bMulti = False) Then Begin
            Case nPlayerType[k] Of
                 PLAYER_KB1 :
-                     If ( pPlayer1 = NIL ) Then      // TODO : A vérifier en multi.
+                     If ( pPlayer1 = NIL ) Then      // TODO: A vérifier en multi.
                         pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_KB2 :
                      If ( pPlayer2 = NIL ) Then
@@ -1638,6 +1639,7 @@ Procedure ProcessGame () ;
          End;
     End;
 Var k : Integer;
+    bFound : Boolean;
     sData : String;
     w, h : Single; // taille de la fenêtre
 Begin
@@ -1770,9 +1772,34 @@ Begin
             // retour au menu multi et envoi d'un paquet serveur -> client signalant la fin forcée du jeu
         End Else Begin
             // TODO
-            // retour au menu principal et envoi d'un paquet client -> serveur signalant la déconnexion du joueur
+            // retour au menu principal et envoi d'un paquet client -> serveur signalant la déconnexion du joueur = HEADER_DISCONNECT
         End;
      End;
+     
+     // Possibilité de changer de vue avec la barre espace quand nos personnages sont morts.
+     If ( ( pPlayer1 = Nil ) Or ( pPlayer1.Alive = False ) )
+     And ( ( pPlayer2 = Nil ) Or ( pPlayer2.Alive = False ) )
+     And GetKey( KEY_SPACE ) And ( GetTime > fKey ) Then Begin
+         If ( nCamera = CAMERA_OVERALL ) Then nCamera := CAMERA_FLY
+         Else Begin
+              If ( nCamera > 0 ) Or ( nCamera = CAMERA_FLY ) Then Begin
+                 If ( nCamera = CAMERA_FLY ) Then k := 1 Else k := nCamera + 1;
+                 bFound := False;
+                 While ( bFound = False ) And ( k <= 8 ) Do Begin
+                       If ( GetBombermanByIndex(k) Is CBomberman )
+                       And ( GetBombermanByIndex(k).Alive = True ) Then Begin
+                           nCamera := k;
+                           bFound := True;
+                       End;
+                       k := k + 1;
+                 End;
+                 If ( bFound = False ) Then nCamera := CAMERA_OVERALL;
+              End;
+         End;
+         fKey := GetTime + 0.5;
+         ClearInput();
+     End;
+
  End;
 
 
