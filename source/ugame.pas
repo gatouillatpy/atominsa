@@ -1478,10 +1478,8 @@ Begin
        If ((bMulti = True) And (nLocalIndex = nPlayerClient[k])) Or (bMulti = False) Then Begin
            Case nPlayerType[k] Of
                 PLAYER_KB1 :
-                     If ( pPlayer1 = NIL ) Then      // TODO: A vérifier en multi.
                         pPlayer1 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_KB2 :
-                     If ( pPlayer2 = NIL ) Then
                         pPlayer2 := AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_COM :
                      AddBomberman( sPlayerName[k], k, k, nPlayerSkill[k], pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
@@ -1489,10 +1487,8 @@ Begin
        End Else Begin
            Case nPlayerType[k] Of
                 PLAYER_KB1 :
-                     If ( pPlayer1 = NIL ) Then
                            AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_KB2 :
-                     If ( pPlayer2 = NIL ) Then
                         AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
                 PLAYER_COM :
                      AddBomberman( sPlayerName[k], k, k, SKILL_PLAYER, pGrid, pScheme.Spawn(k).X, pScheme.Spawn(k).Y );
@@ -2064,23 +2060,28 @@ Begin
                 Begin
                      If nPlayerType[nPlayer] = PLAYER_KB1 Then Begin
                         bPlayer1 := False;
+                        bBlockedPlayer1 := False;
                         nPlayerType[nPlayer] := PLAYER_NIL;
                      End;
                      If nPlayerType[nPlayer] = PLAYER_KB2 Then Begin
                         bPlayer2 := False;
-                        If ( bPlayer1 = False ) Then Begin
+                        bBlockedPlayer2 := False;
+                        If ( bBlockedPlayer1 = False ) Then Begin
                            nPlayerType[nPlayer] := PLAYER_KB1;
                            bPlayer1 := True;
+                           bBlockedPlayer1 := True;
                         End
                         Else nPlayerType[nPlayer] := PLAYER_NIL;
                      End;
                      If nPlayerType[nPlayer] = PLAYER_COM Then Begin
-                        If ( bPlayer2 = False ) Then Begin
+                        If ( bBlockedPlayer2 = False ) Then Begin
                            bPlayer2 := True;
+                           bBlockedPlayer2 := True;
                            nPlayerType[nPlayer] := PLAYER_KB2;
                         End
-                        Else Begin If ( bPlayer1 = False ) Then Begin
+                        Else Begin If ( bBlockedPlayer1 = False ) Then Begin
                              bPlayer1 := True;
+                             bBlockedPlayer1 := True;
                              nPlayerType[nPlayer] := PLAYER_KB1;
                            End
                            Else nPlayerType[nPlayer] := PLAYER_NIL;
@@ -2121,23 +2122,28 @@ Begin
                      If nPlayerType[nPlayer] = PLAYER_KB2 Then Begin
                         nPlayerType[nPlayer] := PLAYER_COM;
                         bPlayer2 := False;
+                        bBlockedPlayer2 := False;
                      End;
                      If nPlayerType[nPlayer] = PLAYER_KB1 Then Begin
                         bPlayer1 := False;
-                        If ( bPlayer2 = False ) Then Begin
+                        bBlockedPlayer1 := False;
+                        If ( bBlockedPlayer2 = False ) Then Begin
                            nPlayerType[nPlayer] := PLAYER_KB2;
                            bPlayer2 := True;
+                           bBlockedPlayer2 := True;
                         End
                         Else nPlayerType[nPlayer] := PLAYER_COM;
                      End;
                      If nPlayerType[nPlayer] = PLAYER_NIL Then Begin
-                        If ( bPlayer1 = False ) Then Begin
+                        If ( bBlockedPlayer1 = False ) Then Begin
                            nPlayerType[nPlayer] := PLAYER_KB1;
                            bPlayer1 := True;
+                           bBlockedPlayer1 := True;
                         End
-                        Else Begin If ( bPlayer2 = False ) Then Begin
+                        Else Begin If ( bBlockedPlayer2 = False ) Then Begin
                              nPlayerType[nPlayer] := PLAYER_KB2;
                              bPlayer2 := True;
+                             bBlockedPlayer2 := True;
                            End
                            Else nPlayerType[nPlayer] := PLAYER_COM;
                         End;
@@ -2296,6 +2302,7 @@ End;
 
 
 Procedure InitMenu () ;
+Var i : Integer;
 Begin
      ClearInput();
      
@@ -2304,6 +2311,16 @@ Begin
           SetString( STRING_GAME_MENU(1), '   multi', 0.2, 0.2, 600 );
      End Else Begin
           SetString( STRING_GAME_MENU(1), 'practice', 0.2, 0.2, 600 );
+     End;
+     
+     // Mise à jour des BlockedPlayer
+     bBlockedPlayer1 := False;
+     bBlockedPlayer2 := False;
+     For i := 1 To 8 Do Begin
+         If (bMulti = False) Or (nPlayerClient[i] = nLocalIndex) Then Begin
+            If (nPlayerType[i] = PLAYER_KB1) Then bBlockedPlayer1 := True;
+            If (nPlayerType[i] = PLAYER_KB2) Then bBlockedPlayer2 := True;
+         End;
      End;
 
      // ajout de la liste de joueurs

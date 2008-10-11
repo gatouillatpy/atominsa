@@ -35,6 +35,8 @@ Var bIntro : Boolean;
 
 Var bPlayer1 : Boolean;
 Var bPlayer2 : Boolean;
+Var bBlockedPlayer1 : Boolean;
+Var bBlockedPlayer2 : Boolean;
 
 Var nRoundCount : Integer;
 Var fRoundDuration : Single; // a sauvegarder et afficher

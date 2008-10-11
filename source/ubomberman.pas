@@ -30,8 +30,7 @@ type
     fMoveTime,                   // temps de référence du dernier mouvement
     fSpeed,                      // vitesse du bomberman
     fBombTime : Single;          // temps avant explosion des bombes
-
-    fSumFixGetDelta : Single;    // temps depuis lequel le bomberman est fixe.
+    fSumDirGetDelta : Single;    // temps depuis lequel le bomberman n'a pas changé de direction.
     fSumBombGetDelta : Single;   // temps depuis lequel le bomberman n'a pas posé de bombes.
     fSumGrabGetDelta : Single;   // temps depuis lequel la bombe est portée.
     fSumIgnitionGetDelta: Single;// temps depuis lequel la TriggerBomb a été posée.
@@ -162,7 +161,7 @@ type
   Property DangerUp : Integer Read nDangerUp Write nDangerUp;
   Property DangerDown : Integer Read nDangerDown Write nDangerDown;
   Property IATime : Single Read fIATime Write fIATime;
-  Property SumFixGetDelta : Single Read fSumFixGetDelta Write fSumFixGetDelta;
+  Property SumDirGetDelta : Single Read fSumDirGetDelta Write fSumDirGetDelta;
   Property SumBombGetDelta : Single Read fSumBombGetDelta Write fSumBombGetDelta;
   Property SumGrabGetDelta : Single Read fSumGrabGetDelta Write fSumGrabGetDelta;
   Property SumIgnitionGetDelta : Single Read fSumIgnitionGetDelta Write fSumIgnitionGetDelta;
@@ -1266,7 +1265,7 @@ begin
   bGrabbed           := False;
   fCX                := aX;
   fCY                := aY;
-  fSumFixGetDelta    := 1 + Random * 1;
+  fSumDirGetDelta    := 0.125;
   fSumBombGetDelta   := 2 + Random * 2;
   fSumIgnitionGetDelta:=0;
   uGrabbedBomb       := Nil;
@@ -1301,7 +1300,7 @@ begin
   nDirection         := 0;
   lastDir.x          := 0;
   lastDir.y          := 0;
-  fSumFixGetDelta    := 1 + Random * 1;
+  fSumDirGetDelta    := 0.125;
   fSumBombGetDelta   := 2 + Random * 2;
   fSumIgnitionGetDelta:=0;
   uTriggerBomb       := nil;

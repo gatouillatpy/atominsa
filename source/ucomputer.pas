@@ -71,8 +71,7 @@ Begin
    dangerMin := 10000;
    isBombermanFound := false;
    
-   If ( pBomberman.SumFixGetDelta >= 8 )
-   Or ( ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.DiseaseNumber <> DISEASE_NONE )
+   If ( ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.DiseaseNumber <> DISEASE_NONE )
    Or ( pBomberman.uTriggerBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) ) Then
       afraid := false
    Else
@@ -191,7 +190,17 @@ Begin
           End;
       End;
    End;
-
+   
+   
+   
+   // Minimiser les changements de directions.
+   If ( pBomberman.SumDirGetDelta <> 0 ) Then Begin
+       If ( pBomberman.Direction = 180 ) Then pBomberman.DangerUp := pBomberman.DangerUp - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction = 0 ) Then pBomberman.DangerDown := pBomberman.DangerDown - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction = -90 ) Then pBomberman.DangerRight := pBomberman.DangerRight - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction = 90 ) Then pBomberman.DangerLeft := pBomberman.DangerLeft - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+   End;
+   pBomberman.SumDirGetDelta := pBomberman.SumDirGetDelta + dt;
 
 
 // Si les touches sont inversées et que le niveau est godlike, alors les préférences sont inversées.
@@ -344,43 +353,36 @@ If ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.uGrabbedBomb <> Nil ) Or ( pBom
         pBomberman.PrimaryKeyUp( dt );
      End;
 End;
-
-
-// Si le bomberman ne bouge pas depuis trop longtemps, alors il a plus de chances de bouger.
-   If ( pBomberman.SumFixGetDelta >= 8 ) Then
-      pBomberman.Danger := pBomberman.Danger + 32;
       
       
 
 // Si les dernières coordonnées ne sont pas les mêmes que les actuelles, alors déterminer pX et pY.
    If ( pBomberman.Position.X <> pBomberman.LX )
    Or ( pBomberman.Position.Y <> pBomberman.LY ) Then Begin
-      // Mise à jour de lX et lY et de SumFixGetDelta;
+      // Mise à jour de lX et lY
       pBomberman.LX := pBomberman.Position.X;
       pBomberman.LY := pBomberman.Position.Y;
-      If ( pBomberman.SumFixGetDelta >= 8 ) And ( pBomberman.SumFixGetDelta - dt <= 8 ) Then
-         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta - 4;
-      If ( pBomberman.SumFixGetDelta - dt >= 0 ) Then
-         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta - dt
-      Else
-          pBomberman.SumFixGetDelta := 0;
 
       // Comparaison des dangers.
       If ( pBomberman.DangerLeft < pBomberman.Danger ) And ( pBomberman.DangerLeft <= pBomberman.DangerRight )
       And ( pBomberman.DangerLeft <= pBomberman.DangerUp ) And ( pBomberman.DangerLeft <= pBomberman.DangerDown ) Then Begin
+         If ( pBomberman.Direction <> 90 ) Then pBomberman.SumDirGetDelta := 0.125;
          pBomberman.MoveLeft( dt );
          pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerRight < pBomberman.Danger ) And ( pBomberman.DangerRight <= pBomberman.DangerUp )
       And ( pBomberman.DangerRight <= pBomberman.DangerDown ) Then Begin
+         If ( pBomberman.Direction <> -90 ) Then pBomberman.SumDirGetDelta := 0.125;
          pBomberman.MoveRight( dt );
          pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerUp < pBomberman.Danger ) And ( pBomberman.DangerUp <= pBomberman.DangerDown ) Then Begin
+           If ( pBomberman.Direction <> 180 ) Then pBomberman.SumDirGetDelta := 0.125;
            pBomberman.MoveUp( dt );
            pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerDown < pBomberman.Danger ) Then Begin
+           If ( pBomberman.Direction <> 0 ) Then pBomberman.SumDirGetDelta := 0.125;
            pBomberman.MoveDown( dt );
            pBomberman.CanCalculate := false;
       End
@@ -398,13 +400,9 @@ End;
 
 // Si les dernières coordonnées sont les mêmes que les actuelles alors prendre le plus bas danger possible.
    Else Begin
-      // Mise à jour de lX et lY et de SumFixGetDelta;
+      // Mise à jour de lX et lY
       pBomberman.LX := pBomberman.Position.X;
       pBomberman.LY := pBomberman.Position.Y;
-      If ( pBomberman.SumFixGetDelta <= 8 ) And ( pBomberman.SumFixGetDelta + dt >= 8 ) Then
-         pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + dt + 4
-      Else
-          pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + dt;
 
       // Si le bomberman ne bouge pas, alors tout recommence.
       // Sinon, il y a des problèmes...
@@ -426,21 +424,25 @@ End;
            And ( ( pBomberman.DangerLeft <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
            And ( ( pBomberman.DangerLeft <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheLeft = true ) Then Begin
+               If ( pBomberman.Direction <> 90 ) Then pBomberman.SumDirGetDelta := 0.125;
                pBomberman.MoveLeft( dt );
                pBomberman.CanGoToTheLeft := false;
            End
            Else If ( ( pBomberman.DangerRight <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
            And ( ( pBomberman.DangerRight <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheRight = true ) Then Begin
+               If ( pBomberman.Direction <> -90 ) Then pBomberman.SumDirGetDelta := 0.125;
                pBomberman.MoveRight( dt );
                pBomberman.CanGoToTheRight := false;
            End
            Else If ( ( pBomberman.DangerUp <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheUp = true ) Then Begin
+               If ( pBomberman.Direction <> 180 ) Then pBomberman.SumDirGetDelta := 0.125;
                pBomberman.MoveUp( dt );
                pBomberman.CanGoToTheUp := false;
            End
            Else Begin
+                If ( pBomberman.Direction <> 0 ) Then pBomberman.SumDirGetDelta := 0.125;
                 pBomberman.MoveDown( dt );
                 pBomberman.CanGoToTheDown := false;
            End;
@@ -470,11 +472,9 @@ End;
 
    // Si le bomberman vient de bouger et qu'il n'y a pas trop de danger autour, alors il peut créer une bombe.
    // Si le bomberman est malade et que le niveau est godlike, alors il ne pose pas la bombe.
-   If ( ( pBomberman.Position.X <> pBomberman.LX ) Or ( pBomberman.Position.Y <> pBomberman.LY ) )
-   And ( sum < 1024 )
-   And ( ( nSkill <> SKILL_GODLIKE ) Or ( pBomberman.ExploseBombTime >= 3 ) )
+   If ( sum < 1024 ) And ( ( nSkill <> SKILL_GODLIKE ) Or ( pBomberman.ExploseBombTime >= 3 ) )
    And ( PutBomb( Trunc( pBomberman.Position.X + 0.5), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill,
-   pBomberman.SumBombGetDelta > 16 ) ) Then Begin
+   pBomberman.SumBombGetDelta > 8 ) ) Then Begin
        pBomberman.CreateBomb( dt, Random( 1000000000 ) );
        If ( pBomberman.bCanGrabBomb ) And ( nSkill = SKILL_GODLIKE ) Then Begin
           pBomberman.PrimaryKeyDown( dt );

@@ -1,10 +1,10 @@
 object Window: TWindow
-  Left = 487
-  Height = 271
-  Top = 320
+  Left = 514
+  Height = 291
+  Top = 293
   Width = 673
   HorzScrollBar.Page = 672
-  VertScrollBar.Page = 270
+  VertScrollBar.Page = 290
   ActiveControl = Memo
   Caption = 'atominsa - Console'
   object Image: TImage
