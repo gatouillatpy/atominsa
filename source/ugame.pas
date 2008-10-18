@@ -1773,14 +1773,14 @@ Begin
            InitMenu();
            ClearInput();
         End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+            PlaySound( SOUND_MENU_BACK );
             sData := '';
             Send( nLocalIndex, HEADER_QUIT_GAME, sData );
             InitMenu();
             ClearInput();
         End Else Begin
-            //Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
-            InitMenu();
-            ClearInput();
+            PlaySound( SOUND_MENU_BACK );
+            nState := PHASE_MENU;
         End;
      End;
      

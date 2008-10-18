@@ -479,7 +479,7 @@ Begin
                         sData := sData + IntToStr(nPlayerType[k]) + #31;
                     End;
                     Send( nIndex, nHeader, sData );
-                    If ( nCame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then UpdateMenu();
+                    If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then UpdateMenu();
                End;
                HEADER_MESSAGE :
                Begin
@@ -1086,6 +1086,7 @@ Begin
                End;
                HEADER_QUIT_GAME :
                Begin
+                    PlaySound( SOUND_MENU_BACK );
                     InitMenu();
                     ClearInput();
                End;
