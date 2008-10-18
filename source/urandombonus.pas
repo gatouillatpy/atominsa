@@ -50,7 +50,7 @@ Begin
     end;
     aBonus.Bonus(nPlayer);
 
-    Destroy();
+     Destroy();
 End;
 
 

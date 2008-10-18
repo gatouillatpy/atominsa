@@ -32,6 +32,7 @@ Begin
         Application.Terminate;
      
         Halt(0);
+        
      End Else If GetKey(KEY_N) Then Begin
          SetString( STRING_MENU_MAIN, ' ', 0.5, 0.1, 20 );
 
