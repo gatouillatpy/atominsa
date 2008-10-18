@@ -544,6 +544,7 @@ Begin
                     pBomberman.Direction := 180;
                     pBomberman.LastDirN.x := 0;
                     pBomberman.LastDirN.y := -1;
+                    pBomberman.fMoveTime := GetTime();
                End;
                HEADER_MOVEDOWN :
                Begin
@@ -556,6 +557,7 @@ Begin
                     pBomberman.Direction := 0;
                     pBomberman.LastDirN.x := 0;
                     pBomberman.LastDirN.y := 1;
+                    pBomberman.fMoveTime := GetTime();
                End;
                HEADER_MOVELEFT :
                Begin
@@ -568,6 +570,7 @@ Begin
                     pBomberman.Direction := 90;
                     pBomberman.LastDirN.x := -1;
                     pBomberman.LastDirN.y := 0;
+                    pBomberman.fMoveTime := GetTime();
                End;
                HEADER_MOVERIGHT :
                Begin
@@ -580,6 +583,7 @@ Begin
                     pBomberman.Direction := -90;
                     pBomberman.LastDirN.x := 1;
                     pBomberman.LastDirN.y := 0;
+                    pBomberman.fMoveTime := GetTime();
                End;
                HEADER_ACTION0 :
                Begin
@@ -690,6 +694,10 @@ Begin
                Else If (pBomberman.Direction = -90) Then nDirection := 3
                Else nDirection := -1;
                sData := sData + IntToStr(nDirection) + #31;
+               If pBomberman.IsMoving() Then
+                  sData := sData + 'M' + #31
+               Else
+                  sData := sData + 'I' + #31;
             End;
         End;
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
@@ -724,6 +732,7 @@ Var nIndex : DWord;
     nBombSize, nDirection : Integer;
     fBombTime : Single;
     isBomb : Boolean;
+    sState : String;
     nBonus : Integer;
     _nNetID : Integer;
     sTemp : String;
@@ -911,6 +920,8 @@ Begin
                               Else If ( nDirection = 1 ) Then pBomberman.Direction := 90
                               Else If ( nDirection = 2 ) Then pBomberman.Direction := 180
                               Else If ( nDirection = 3 ) Then pBomberman.Direction := -90;
+                              sState := GetString( sData, l ); l += 1;
+                              If ( sState = 'M' ) Then pBomberman.fMoveTime := GetTime();
                            End
                            Else Begin
                                 l += 5;

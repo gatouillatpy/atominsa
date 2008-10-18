@@ -301,6 +301,7 @@ End;
 
 
 Procedure SetCamera () ;
+Var bFound : Boolean ; k : Integer;
 Begin
      If GetTime - fGameTime < 3.0 Then Begin
      // on fait le tour du plateau durant les trois premières secondes de jeu
@@ -388,6 +389,21 @@ Begin
         vCenter.z := vCamera.z + sin(vAngle.x);
      End Else Begin
      // caméra en mode suivi de bomberman
+        If GetBombermanByCount(nCamera) = NIL Then Begin
+            If ( nCamera > 0 ) Or ( nCamera = CAMERA_FLY ) Then Begin
+               If ( nCamera = CAMERA_FLY ) Then k := 1 Else k := nCamera + 1;
+               bFound := False;
+               While ( bFound = False ) And ( k <= 8 ) Do Begin
+                     If ( GetBombermanByIndex(k) Is CBomberman )
+                     And ( GetBombermanByIndex(k).Alive = True ) Then Begin
+                         nCamera := k;
+                         bFound := True;
+                     End;
+                     k := k + 1;
+               End;
+               If ( bFound = False ) Then nCamera := CAMERA_OVERALL;
+            End;
+        End;
         vCenter.x := GetBombermanByCount(nCamera).Position.X;
         vCenter.y := 0.0;
         vCenter.z := GetBombermanByCount(nCamera).Position.Y;
