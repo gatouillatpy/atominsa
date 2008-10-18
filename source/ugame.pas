@@ -975,7 +975,7 @@ Begin
                End;
                SetString( STRING_MESSAGE, 'say : ' + sMessage, 0.0, 0.02, 600 );
             End;
-            fKey := GetTime + 0.2;
+            fKey := GetTime + 0.1;
             ClearInput();
          End Else Begin
             fKey := 0.0;
@@ -1773,11 +1773,14 @@ Begin
            InitMenu();
            ClearInput();
         End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
-            // TODO
-            // retour au menu multi et envoi d'un paquet serveur -> client signalant la fin forcée du jeu
+            sData := '';
+            Send( nLocalIndex, HEADER_QUIT_GAME, sData );
+            InitMenu();
+            ClearInput();
         End Else Begin
-            // TODO
-            // retour au menu principal et envoi d'un paquet client -> serveur signalant la déconnexion du joueur = HEADER_DISCONNECT
+            //Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
+            InitMenu();
+            ClearInput();
         End;
      End;
      
@@ -2224,7 +2227,7 @@ Begin
                 End;
            End;
         End;
-        fKey := GetTime + 0.2;
+        fKey := GetTime + 0.1;
         ClearInput();
      End Else Begin
         fKey := 0.0;

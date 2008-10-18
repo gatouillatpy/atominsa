@@ -479,7 +479,7 @@ Begin
                         sData := sData + IntToStr(nPlayerType[k]) + #31;
                     End;
                     Send( nIndex, nHeader, sData );
-                    UpdateMenu();
+                    If ( nCame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then UpdateMenu();
                End;
                HEADER_MESSAGE :
                Begin
@@ -1083,6 +1083,11 @@ Begin
                     pBomberman := GetBombermanByIndex( k );
                     If ( pBomberman Is CBomberman ) Then
                        pBomberman.Alive := false;
+               End;
+               HEADER_QUIT_GAME :
+               Begin
+                    InitMenu();
+                    ClearInput();
                End;
           End;
      End;
