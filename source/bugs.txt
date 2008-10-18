@@ -1,0 +1,2 @@
+- impossible de passer en runtime du mode plein écran au mode fenêtre et inversement
+- lorsque le client fait echap dans une partie réseau il se deconnecte mais reste présent dans la liste des joueurs sur le serveur, à corriger

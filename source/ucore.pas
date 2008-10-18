@@ -582,6 +582,8 @@ Begin
         For p := q To nSocket - 1 Do
             aSocket[p] := aSocket[p+1];
         nSocket -= 1;
+     End Else Begin
+         nState := PHASE_MENU; // ???
      End;
      AddLineToConsole('Connection lost.');
 End;
