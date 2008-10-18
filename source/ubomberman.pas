@@ -1380,7 +1380,11 @@ begin
                  Else If (pBomberman.Direction = -90) Then mDirection := 3
                  Else mDirection := -1;
                  sData := sData + IntToStr(mDirection) + #31;
-              End;
+                 If pBomberman.IsMoving() Then
+                    sData := sData + 'M' + #31
+                 Else
+                    sData := sData + 'I' + #31;
+                 End;
             End;
             Send( nLocalIndex, HEADER_BOMBERMAN, sData );
          End;

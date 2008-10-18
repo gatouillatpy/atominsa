@@ -924,7 +924,7 @@ Begin
                               If ( sState = 'M' ) Then pBomberman.fMoveTime := GetTime();
                            End
                            Else Begin
-                                l += 5;
+                                l += 6;
                            End;
                            pBomberman.CheckBonus();
                         End;

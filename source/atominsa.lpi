@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="1"/>
+      <ActiveEditorIndexAtStart Value="12"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -172,8 +172,8 @@
       <Unit17>
         <Filename Value="ubomberman.pas"/>
         <UnitName Value="UBomberman"/>
-        <CursorPos X="28" Y="628"/>
-        <TopLine Value="597"/>
+        <CursorPos X="54" Y="1379"/>
+        <TopLine Value="1364"/>
         <EditorIndex Value="12"/>
         <UsageCount Value="50"/>
         <Loaded Value="True"/>
@@ -271,8 +271,8 @@
       <Unit30>
         <Filename Value="umulti.pas"/>
         <UnitName Value="UMulti"/>
-        <CursorPos X="44" Y="916"/>
-        <TopLine Value="896"/>
+        <CursorPos X="1" Y="697"/>
+        <TopLine Value="677"/>
         <EditorIndex Value="1"/>
         <UsageCount Value="18"/>
         <Loaded Value="True"/>
@@ -355,7 +355,7 @@
         <Loaded Value="True"/>
       </Unit39>
     </Units>
-    <JumpHistory Count="16" HistoryIndex="15">
+    <JumpHistory Count="19" HistoryIndex="18">
       <Position1>
         <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
         <Caret Line="106" Column="10" TopLine="85"/>
@@ -420,6 +420,18 @@
         <Filename Value="umulti.pas"/>
         <Caret Line="698" Column="45" TopLine="678"/>
       </Position16>
+      <Position17>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="628" Column="28" TopLine="597"/>
+      </Position17>
+      <Position18>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="903" Column="32" TopLine="896"/>
+      </Position18>
+      <Position19>
+        <Filename Value="ubomberman.pas"/>
+        <Caret Line="1385" Column="48" TopLine="1359"/>
+      </Position19>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
