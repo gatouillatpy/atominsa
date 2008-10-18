@@ -41,12 +41,12 @@ Var sData : String;
 Begin
      If (bIsExplosedMulti = False) And ((bMulti = False) Or (nLocalIndex = nClientIndex[0]))  Then Begin
          If (bIsExplosed) Then Begin
-            Self.Destroy;                                         // detruit le bloc si il a deja explose (on voyait alors un bonus)
             If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
                sData := IntToStr( nX ) + #31;
                sData := sData + IntToStr( nY ) + #31;
                Send( nLocalIndex, HEADER_EXPLOSE_BLOCK, sData );
             End;
+            Self.Destroy;                                         // detruit le bloc si il a deja explose (on voyait alors un bonus)
          End
          Else Begin
               bIsExplosed := true;                                  // sinon on voit le bonus

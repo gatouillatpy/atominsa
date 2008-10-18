@@ -82,8 +82,10 @@ End;
 
 
 
-Var k : Integer;
+Var k : Integer; p : ^Integer;
 Begin
+     New(p);
+
      // initialisation de l'application
      Application.Initialize;
      Application.CreateForm( TWindow, Window );

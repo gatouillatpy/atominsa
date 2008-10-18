@@ -50,12 +50,12 @@ Procedure CBlock.Explose();
 Var sData : String;
 Begin
      If (bMulti = False) Or (nLocalIndex = nClientIndex[0]) Then Begin
-         Self.Destroy;                                                              // supprime le bloc
          If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
             sData := IntToStr( nX ) + #31;
             sData := sData + IntToStr( nY ) + #31;
             Send( nLocalIndex, HEADER_EXPLOSE_BLOCK, sData );
          End;
+         Self.Destroy;                                                              // supprime le bloc
      End;
 End;
 
