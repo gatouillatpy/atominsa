@@ -224,8 +224,7 @@ BEGIN
      End;
      
      uPlayer.DiseaseNumber := DISEASE_NONE;
-     Self.destroy();                    // on peut detruire le bonus
-     
+
      If ( bMulti = true ) And ( nPlayerClient[uPlayer.nIndex] = nLocalIndex ) Then Begin
          sData := IntToStr( uPlayer.nIndex ) + #31;
          sData := sData + FormatFloat( '0.000', uPlayer.Position.X ) + #31;
@@ -235,6 +234,8 @@ BEGIN
          sData := sData + FormatFloat( '0.000', uSecondPlayer.Position.Y ) + #31;
          Send( nLocalIndex, HEADER_SWITCH, sData );
      End;
+
+     Self.destroy();                    // on peut detruire le bonus
 END;
 
 procedure CDisease.FastBomb(); cdecl;

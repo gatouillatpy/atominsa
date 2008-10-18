@@ -27,6 +27,7 @@ Const GAME_ROUND        = 4;
 Const GAME_WAIT         = 5;
 Const GAME_SCORE        = 6;
 Const GAME_MENU_PLAYER  = 11;
+Const GAME_MENU_MULTI   = 12;
 
 Var nGame  : Integer;
 
@@ -148,6 +149,8 @@ Procedure ProcessMenu () ;
 Procedure InitMenuPlayer ( n : Integer ) ;
 Procedure ProcessMenuPlayer () ;
 
+Function GetMultiState () : Integer ;
+
 
 
 Implementation
@@ -177,6 +180,11 @@ Uses UMulti;
 
 
 
+
+Function GetMultiState () : Integer ;
+Begin
+     GetMultiState := nGame;
+End;
 
 
 

@@ -45,10 +45,6 @@ Var nMulti : Integer;
 
 
 
-Const GAME_MENU_MULTI = 12;
-
-
-
 Const MENU_MULTI_NAME         = 81;
 Const MENU_MULTI_ADDRESS      = 82;
 Const MENU_MULTI_TYPE         = 83;

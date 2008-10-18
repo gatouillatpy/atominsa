@@ -375,7 +375,7 @@ Var FragmentShader : GLenum;
 
 Implementation
 
-Uses UMulti;
+Uses UMulti, UGame;
 
 
 
@@ -560,10 +560,14 @@ End;
 
 Procedure TLEvents.OnConnect ( tSocket : TLSocket ) ;
 Begin
-     nSocket += 1;
-     aSocket[nSocket] := tSocket;
+     If (nGame <> GAME_MENU) Or (nGame <> GAME_MENU_PLAYER) Or (nGame <> GAME_MENU_MULTI) Then Begin
+        tSocket.Disconnect;
+     End Else Begin
+         nSocket += 1;
+         aSocket[nSocket] := tSocket;
 
-     If bDebug Then AddLineToConsole( tSocket.PeerAddress + ' connected.' );
+         If bDebug Then AddLineToConsole( tSocket.PeerAddress + ' connected.' );
+     End;
 End;
 
 
@@ -3460,6 +3464,10 @@ Begin
      nWindowTop := glutGet( GLUT_WINDOW_Y );
      nWindowWidth := glutGet( GLUT_WINDOW_WIDTH );
      nWindowHeight := glutGet( GLUT_WINDOW_HEIGHT );
+     
+     If bDisplayFullscreen Then Begin
+        glutLeaveGameMode();
+     End;
 End;
 
 
