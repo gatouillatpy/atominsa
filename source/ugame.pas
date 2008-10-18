@@ -411,12 +411,12 @@ Begin
      End;
      
      // déplacement progressif de la camera vers son pointeur pour rendre plus fluide le mouvement
-     If vCamera.x > vPointer.x Then vCamera.x -= vPointer.x * GetDelta() * 0.2;
-     If vCamera.x < vPointer.x Then vCamera.x += vPointer.x * GetDelta() * 0.2;
-     If vCamera.y > vPointer.y Then vCamera.y -= vPointer.y * GetDelta() * 0.2;
-     If vCamera.y < vPointer.y Then vCamera.y += vPointer.y * GetDelta() * 0.2;
-     If vCamera.z > vPointer.z Then vCamera.z -= vPointer.z * GetDelta() * 0.2;
-     If vCamera.z < vPointer.z Then vCamera.z += vPointer.z * GetDelta() * 0.2;
+     If vCamera.x > vPointer.x Then vCamera.x -= vPointer.x * GetDelta() * 1.0;
+     If vCamera.x < vPointer.x Then vCamera.x += vPointer.x * GetDelta() * 1.0;
+     If vCamera.y > vPointer.y Then vCamera.y -= vPointer.y * GetDelta() * 1.0;
+     If vCamera.y < vPointer.y Then vCamera.y += vPointer.y * GetDelta() * 1.0;
+     If vCamera.z > vPointer.z Then vCamera.z -= vPointer.z * GetDelta() * 1.0;
+     If vCamera.z < vPointer.z Then vCamera.z += vPointer.z * GetDelta() * 1.0;
 
      // envoi des données au moteur graphique
      SetProjectionMatrix ( 90.0, 1.0, 0.1, 2048.0 ) ;

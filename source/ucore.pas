@@ -2967,10 +2967,31 @@ End;
 
 Function KeyToStr( nKey : Integer ) : String ;
 Begin
-     If ( nKey = 8 ) Then
-        KeyToStr := 'RETURN'
+     Case nKey Of
+          -1 : KeyToStr := 'F1';
+          -2 : KeyToStr := 'F2';
+          -3 : KeyToStr := 'F3';
+          -4 : KeyToStr := 'F4';
+          -5 : KeyToStr := 'F5';
+          -6 : KeyToStr := 'F6';
+          -7 : KeyToStr := 'F7';
+          -8 : KeyToStr := 'F8';
+          -9 : KeyToStr := 'F9';
+         -10 : KeyToStr := 'F10';
+         -11 : KeyToStr := 'F11';
+         -12 : KeyToStr := 'F12';
+        -100 : KeyToStr := 'LEFT';
+        -101 : KeyToStr := 'UP';
+        -102 : KeyToStr := 'RIGHT';
+        -103 : KeyToStr := 'DOWN';
+        -104 : KeyToStr := 'PAGE UP';
+        -105 : KeyToStr := 'PAGE DOWN';
+        -106 : KeyToStr := 'HOME';
+        -107 : KeyToStr := 'END';
+        -108 : KeyToStr := 'INSERT';
      Else
         KeyToStr := sKeyToString[ abs( nKey ) ];
+     End;
 End;
 
 

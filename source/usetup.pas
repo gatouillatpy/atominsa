@@ -170,11 +170,9 @@ Var bEscape : Boolean;
 Procedure InitKeyToStr();
 Var i : Integer;
 Begin
-     sKeyToString[ 0 ] := chr( 0 );
-     For i := 1 To 12 Do
-         sKeyToString[ i ] := 'F' + IntToStr( i );
-     For i := 13 To 99 Do
+     For i := 0 To 255 Do
          sKeyToString[ i ] := chr( i );
+     sKeyToString[ 8 ] := 'RETURN';
      sKeyToString[ 34 ] := 'DOUBLE QUOTE';
      sKeyToString[ 35 ] := 'SHARP';
      sKeyToString[ 36 ] := 'DOLLAR';
@@ -191,17 +189,6 @@ Begin
      sKeyToString[ 94 ] := 'POWER';
      sKeyToString[ 95 ] := 'UNDERSCORE';
      sKeyToString[ 96 ] := 'PRIME';
-     sKeyToString[ 100 ] := 'LEFT';
-     sKeyToString[ 101 ] := 'UP';
-     sKeyToString[ 102 ] := 'RIGHT';
-     sKeyToString[ 103 ] := 'DOWN';
-     sKeyToString[ 104 ] := 'PAGE UP';
-     sKeyToString[ 105 ] := 'PAGE DOWN';
-     sKeyToString[ 106 ] := 'HOME';
-     sKeyToString[ 107 ] := 'END';
-     sKeyToString[ 108 ] := 'INSERT';
-     For i := 109 To 255 Do
-         sKeyToString[ i ] := chr( i );
      sKeyToString[ 123 ] := 'LEFT BRACE';
      sKeyToString[ 124 ] := 'BROKEN BAR';
      sKeyToString[ 125 ] := 'RIGHT BRACE';

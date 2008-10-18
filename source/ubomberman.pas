@@ -1041,7 +1041,7 @@ procedure CBomberman.CreateBombMulti(fX, fY : Single; nBombSize : Integer; fExpl
 Var bTrigger : Boolean;
 Begin
      bTrigger := nTriggerBomb > 0;
-     AddBomb(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,_nNetID,False);
+     AddBomb(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,_nNetID,(nLocalIndex=nClientIndex[0]));
      Dec(nBombCount);
      if bTrigger then
      begin
