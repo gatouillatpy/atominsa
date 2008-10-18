@@ -495,14 +495,14 @@ Begin
                End;
                HEADER_LOCK :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     nPlayerClient[k] := nIndex;
                     Send( nIndex, nHeader, sData );
                     UpdateMenu();
                End;
                HEADER_UNLOCK :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     nPlayerClient[k] := -1;
                     nPlayerType[k] := PLAYER_NIL;
                     Send( nIndex, nHeader, sData );
@@ -515,7 +515,7 @@ Begin
                End;
                HEADER_PINGRES :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     fPlayerPing[k] := StrToFloat( GetString( sData, 2 ) );
                     sData := '';
                     For k := 1 To 8 Do Begin
@@ -525,17 +525,17 @@ Begin
                End;
                HEADER_UPDATE :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
-                    nPlayerType[k] := StrToInt( GetString( sData, 2 ) );
-                    nPlayerSkill[k] := StrToInt( GetString( sData, 3 ) );
-                    nPlayerCharacter[k] := StrToInt( GetString( sData, 4 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
+                    TryStrToInt( GetString( sData, 2 ), nPlayerType[k] );
+                    TryStrToInt( GetString( sData, 3 ), nPlayerSkill[k] );
+                    TryStrToInt( GetString( sData, 4 ), nPlayerCharacter[k] );
                     sPlayerName[k] := GetString( sData, 5 );
                     Send( nIndex, nHeader, sData );
                     UpdateMenu();
                End;
                HEADER_MOVEUP :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, 2 ) );
                     fY := StrToFloat( GetString( sData, 3 ) );
@@ -547,7 +547,7 @@ Begin
                End;
                HEADER_MOVEDOWN :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, 2 ) );
                     fY := StrToFloat( GetString( sData, 3 ) );
@@ -559,7 +559,7 @@ Begin
                End;
                HEADER_MOVELEFT :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, 2 ) );
                     fY := StrToFloat( GetString( sData, 3 ) );
@@ -571,7 +571,7 @@ Begin
                End;
                HEADER_MOVERIGHT :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, 2 ) );
                     fY := StrToFloat( GetString( sData, 3 ) );
@@ -584,12 +584,12 @@ Begin
                HEADER_ACTION0 :
                Begin
                     l := 1;
-                    k := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), k ); l += 1;
                     pBomberman := GetBombermanByIndex( k );
-                    _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), _nNetID ); l += 1;
                     fX := StrToFloat( GetString( sData, l ) ); l += 1;
                     fY := StrToFloat( GetString( sData, l ) ); l += 1;
-                    nBombSize := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), nBombSize ); l += 1;
                     fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
                     If Not ( GetBombByNetID( _nNetId ) Is CBomb ) Then Begin
                         pBomberman.CreateBombMulti( fX, fY, nBombSize, fBombTime, _nNetID );
@@ -597,35 +597,35 @@ Begin
                End;
                HEADER_ACTION1 :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DoIgnition();
                End;
                HEADER_MOVEBOMB :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
-                    aX := StrToInt( GetString( sData, 2 ) );
-                    aY := StrToInt( GetString( sData, 3 ) );
-                    dX := StrToInt( GetString( sData, 4 ) );
-                    dY := StrToInt( GetString( sData, 5 ) );
+                    TryStrToInt( GetString( sData, 2 ), aX );
+                    TryStrToInt( GetString( sData, 3 ), aY );
+                    TryStrToInt( GetString( sData, 4 ), dX );
+                    TryStrToInt( GetString( sData, 5 ), dY );
                     dt := StrToFloat( GetString( sData, 6 ) );
                     pBomberman.MoveBomb(aX,aY,aX,aY,dX,dY,dt);
                End;
                HEADER_CHECK_BONUS :
                Begin
                     l := 1;
-                    k := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), k ); l += 1;
                     pBomberman := GetBombermanByIndex( k );
                     fX := StrToFloat( GetString( sData, l ) ); l += 1;
                     fY := StrToFloat( GetString( sData, l ) ); l += 1;
                     pBomberman.Position.x := fX;
                     pBomberman.Position.y := fY;
-                    dX := StrToInt( GetString( sData, l ) ); l += 1;
-                    dY := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), dX ); l += 1;
+                    TryStrToInt( GetString( sData, l ), dY ); l += 1;
                     pBomberman.LastDirN.x := dX;
                     pBomberman.LastDirN.y := dY;
-                    nDirection := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), nDirection ); l += 1;
                     If ( nDirection = 0 ) Then pBomberman.Direction := 0
                     Else If ( nDirection = 1 ) Then pBomberman.Direction := 90
                     Else If ( nDirection = 2 ) Then pBomberman.Direction := 180
@@ -634,12 +634,12 @@ Begin
                End;
                HEADER_SWITCH :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DiseaseNumber := DISEASE_NONE;
                     pBomberman.Position.X := StrToFloat( GetString( sData, 2 ) );
                     pBomberman.Position.Y := StrToFloat( GetString( sData, 3 ) );
-                    l := StrToInt( GetString( sData, 4 ) );
+                    TryStrToInt( GetString( sData, 4 ), l );
                     pSecondBomberman := GetBombermanByIndex( l );
                     fX := StrToFloat( GetString( sData, 5 ) );
                     fY := StrToFloat( GetString( sData, 6 ) );
@@ -651,10 +651,10 @@ Begin
                End;
                HEADER_GRAB_SERVER :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
-                    dX := StrToInt( GetString( sData, 2 ) );
-                    dY := StrToInt( GetString( sData, 3 ) );
+                    TryStrToInt( GetString( sData, 2 ), dX );
+                    TryStrToInt( GetString( sData, 3 ), dY );
                     If ( ( pGrid.GetBlock( dX, dY ) <> Nil ) And ( pGrid.GetBlock( dX, dY ) Is CBomb ) ) Then Begin
                         pBomberman.GrabBombMulti( dX, dY );
                         sData := IntToStr( k ) + #31;
@@ -665,7 +665,7 @@ Begin
                End;
                HEADER_DROP_SERVER :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     dt := StrToFloat( GetString( sData, 2 ) );
                     pBomberman.DropBombMulti( dt );
@@ -739,9 +739,9 @@ Begin
                HEADER_LIST_CLIENT :
                Begin
                     l := 1;
-                    nClientCount := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), nClientCount ); l += 1;
                     For k := 0 To nClientCount - 1 Do Begin
-                        nClientIndex[k] := StrToInt( GetString( sData, l ) ); l += 1;
+                        TryStrToInt( GetString( sData, l ), nClientIndex[k] ); l += 1;
                         sClientName[k] := GetString( sData, l ); l += 1;
                     End;
                End;
@@ -749,43 +749,43 @@ Begin
                Begin
                     l := 1;
                     For k := 1 To 8 Do Begin
-                        nPlayerClient[k] := StrToInt( GetString( sData, l ) ); l += 1;
+                        TryStrToInt( GetString( sData, l ), nPlayerClient[k] ); l += 1;
                         sPlayerName[k] := GetString( sData, l ); l += 1;
                         nPlayerCharacter[k] := -1;
                         For m := 0 To nCharacterCount - 1 Do
                             If aCharacterList[m].Name = GetString( sData, l ) Then nPlayerCharacter[k] := m;
                         LoadCharacter( k ); l += 1;
-                        nPlayerType[k] := StrToInt( GetString( sData, l ) ); l += 1;
+                        TryStrToInt( GetString( sData, l ), nPlayerType[k] ); l += 1;
                     End;
                End;
                HEADER_LOCK :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     nPlayerClient[k] := nIndex;
                     UpdateMenu();
                End;
                HEADER_UNLOCK :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     nPlayerClient[k] := -1;
                     nPlayerType[k] := PLAYER_NIL;
                     UpdateMenu();
                End;
                HEADER_UPDATE :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
-                    nPlayerType[k] := StrToInt( GetString( sData, 2 ) );
-                    nPlayerSkill[k] := StrToInt( GetString( sData, 3 ) );
-                    nPlayerCharacter[k] := StrToInt( GetString( sData, 4 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
+                    TryStrToInt( GetString( sData, 2 ), nPlayerType[k] );
+                    TryStrToInt( GetString( sData, 3 ), nPlayerSkill[k] );
+                    TryStrToInt( GetString( sData, 4 ), nPlayerCharacter[k] );
                     sPlayerName[k] := GetString( sData, 5 );
                     UpdateMenu();
                End;
                HEADER_SETUP :
                Begin
-                    nScheme := StrToInt( GetString( sData, 1 ) );
-                    nSchemeMulti := StrToInt( GetString( sData, 2 ) );
-                    nMap := StrToInt( GetString( sData, 3 ) );
-                    nRoundCount := StrToInt( GetString( sData, 4 ) );
+                    TryStrToInt( GetString( sData, 1 ), nScheme );
+                    TryStrToInt( GetString( sData, 2 ), nSchemeMulti );
+                    TryStrToInt( GetString( sData, 3 ), nMap );
+                    TryStrToInt( GetString( sData, 4 ), nRoundCount );
                     UpdateMenu();
                End;
                HEADER_FIGHT :
@@ -827,7 +827,7 @@ Begin
                     For k := 1 To GRIDWIDTH Do Begin
                         For l := 1 To GRIDHEIGHT Do Begin
                             If ( pGrid.GetBlock(k, l) Is CBlock ) And ( pGrid.GetBlock(k, l).IsExplosive() = True ) Then Begin
-                               nBonus := StrToInt( GetString( sData, m ) );
+                               TryStrToInt( GetString( sData, m ), nBonus );
                                m := m + 1;
                                Case nBonus Of
                                     POWERUP_NONE            : Begin
@@ -845,7 +845,7 @@ Begin
                                     POWERUP_DISEASE         : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
                                                                    pGrid.aBlock[k,l] := CDisease.Create(k,l);
-                                                                   numDisease[k,l] := StrToInt( GetString( sData, m ) );
+                                                                   TryStrToInt( GetString( sData, m ), numDisease[k,l] );
                                                                    m += 1;
                                                               End;
                                     POWERUP_KICK            : Begin
@@ -883,7 +883,7 @@ Begin
                                     POWERUP_SUPERDISEASE    : Begin
                                                                    pGrid.GetBlock(k, l).Destroy();
                                                                    pGrid.aBlock[k,l] := CSuperDisease.Create(k,l);
-                                                                   numDisease[k,l] := StrToInt( GetString( sData, m ) );
+                                                                   TryStrToInt( GetString( sData, m ), numDisease[k,l] );
                                                                    m += 1;
                                                               End;
                                End;
@@ -902,11 +902,11 @@ Begin
                               fY := StrToFloat( GetString( sData, l ) ); l += 1;
                               pBomberman.Position.x := fX;
                               pBomberman.Position.y := fY;
-                              nX := StrToInt( GetString( sData, l ) ); l += 1;
-                              nY := StrToInt( GetString( sData, l ) ); l += 1;
+                              TryStrToInt( GetString( sData, l ), nX ); l += 1;
+                              TryStrToInt( GetString( sData, l ), nY ); l += 1;
                               pBomberman.LastDirN.x := nX;
                               pBomberman.LastDirN.y := nY;
-                              nDirection := StrToInt( GetString( sData, l ) ); l += 1;
+                              TryStrToInt( GetString( sData, l ), nDirection ); l += 1;
                               If ( nDirection = 0 ) Then pBomberman.Direction := 0
                               Else If ( nDirection = 1 ) Then pBomberman.Direction := 90
                               Else If ( nDirection = 2 ) Then pBomberman.Direction := 180
@@ -922,12 +922,12 @@ Begin
                HEADER_ACTION0 :
                Begin
                     l := 1;
-                    k := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), k ); l += 1;
                     pBomberman := GetBombermanByIndex( k );
-                    _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), _nNetID ); l += 1;
                     fX := StrToFloat( GetString( sData, l ) ); l += 1;
                     fY := StrToFloat( GetString( sData, l ) ); l += 1;
-                    nBombSize := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), nBombSize ); l += 1;
                     fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
                     If Not ( GetBombByNetID( _nNetId ) Is CBomb ) Then Begin
                         pBomberman.CreateBombMulti( fX, fY, nBombSize, fBombTime, _nNetID );
@@ -935,21 +935,21 @@ Begin
                End;
                HEADER_ACTION1 :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DoIgnition();
                End;
                HEADER_EXPLOSE_BOMB :
                Begin
-                    _nNetID := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), _nNetID );
                     pBomb := GetBombByNetID( _nNetID );
                     If ( pBomb <> Nil ) Then
                        pBomb.Explose();
                End;
                HEADER_EXPLOSE_BLOCK :
                Begin
-                    nX := StrToInt( GetString( sData, 1 ) );
-                    nY := StrToInt( GetString( sData, 2 ) );
+                    TryStrToInt( GetString( sData, 1 ), nX );
+                    TryStrToInt( GetString( sData, 2 ), nY );
                     pBlock := pGrid.GetBlock( nX, nY );
                     If ( pBlock <> Nil ) Then Begin
                        pBlock.ExploseMulti();
@@ -958,8 +958,8 @@ Begin
                End;
                HEADER_ISEXPLOSED_ITEM :
                Begin
-                    nX := StrToInt( GetString( sData, 1 ) );
-                    nY := StrToInt( GetString( sData, 2 ) );
+                    TryStrToInt( GetString( sData, 1 ), nX );
+                    TryStrToInt( GetString( sData, 2 ), nY );
                     pBlock := pGrid.GetBlock( nX, nY );
                     If ( pBlock <> Nil ) And ( pBlock Is CItem ) And ( (pBlock As CItem).IsExplosed() = False) Then Begin
                        (pBlock As CItem).bIsExplosed := True;
@@ -968,12 +968,12 @@ Begin
                End;
                HEADER_SWITCH :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DiseaseNumber := DISEASE_NONE;
                     pBomberman.Position.X := StrToFloat( GetString( sData, 2 ) );
                     pBomberman.Position.Y := StrToFloat( GetString( sData, 3 ) );
-                    l := StrToInt( GetString( sData, 4 ) );
+                    TryStrToInt( GetString( sData, 4 ), l );
                     pSecondBomberman := GetBombermanByIndex( l );
                     fX := StrToFloat( GetString( sData, 5 ) );
                     fY := StrToFloat( GetString( sData, 6 ) );
@@ -985,17 +985,17 @@ Begin
                End;
                HEADER_GRAB_CLIENT :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
-                    nX := StrToInt( GetString( sData, 2 ) );
-                    nY := StrToInt( GetString( sData, 3 ) );
+                    TryStrToInt( GetString( sData, 2 ), nX );
+                    TryStrToInt( GetString( sData, 3 ), nY );
                     If ( ( pGrid.GetBlock( nX, nY ) <> Nil ) And ( pGrid.GetBlock( nX, nY ) Is CBomb ) ) Then Begin
                         pBomberman.GrabBombMulti( nX, nY );
                     End;
                End;
                HEADER_DROP_CLIENT :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     If ( pBomberman.uGrabbedBomb <> Nil ) Then Begin
                         pBomberman.uGrabbedBomb.Position.X := pBomberman.Position.X;
@@ -1008,9 +1008,9 @@ Begin
                End;
                HEADER_CONTAMINATE :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
-                    l := StrToInt( GetString( sData, 2 ) );
+                    TryStrToInt( GetString( sData, 2 ), l );
                     pSecondBomberman := GetBombermanByIndex( l );
                     If ( pSecondBomberman <> Nil ) And ( pBomberman <> Nil )
                     And ( pSecondBomberman.DiseaseNumber = 0 ) Then Begin
@@ -1022,7 +1022,7 @@ Begin
                HEADER_WAIT :
                Begin
                     l := 1;
-                    k := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), k ); l += 1;
                     If k <= 0 Then Begin
                        If GetBombermanCount() <> 0 Then Begin
                           For i := 1 To GetBombermanCount() Do Begin
@@ -1039,9 +1039,9 @@ Begin
                     End;
                     If GetBombermanCount() <> 0 Then Begin
                        For i := 1 To GetBombermanCount() Do Begin
-                           GetBombermanByCount(i).Score := StrToInt( GetString( sData, l ) ); l += 1;
-                           GetBombermanByCount(i).Kills := StrToInt( GetString( sData, l ) ); l += 1;
-                           GetBombermanByCount(i).Deaths := StrToInt( GetString( sData, l ) ); l += 1;
+                           TryStrToInt( GetString( sData, l ), GetBombermanByCount(i).Score ); l += 1;
+                           TryStrToInt( GetString( sData, l ), GetBombermanByCount(i).Kills ); l += 1;
+                           TryStrToInt( GetString( sData, l ), GetBombermanByCount(i).Deaths ); l += 1;
                        End;
                     End;
                     InitWait();
@@ -1050,7 +1050,7 @@ Begin
                Begin
                     l := 1;
                     While ( GetString( sData, l ) <> 'NULL' ) Do Begin
-                        _nNetID := StrToInt( GetString( sData, l ) ); l += 1;
+                        TryStrToInt( GetString( sData, l ), _nNetID ); l += 1;
                         pBomb := GetBombByNetID( _nNetID );
                         If pBomb <> Nil Then Begin
                            fX := StrToFloat( GetString( sData, l ) ); l += 1;
@@ -1068,7 +1068,7 @@ Begin
                End;
                HEADER_DEAD :
                Begin
-                    k := StrToInt( GetString( sData, 1 ) );
+                    TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     If ( pBomberman Is CBomberman ) Then
                        pBomberman.Alive := false;

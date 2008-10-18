@@ -591,7 +591,7 @@ Procedure TLEvents.OnReceive ( tSocket : TLSocket ) ;
 Var sBuffer : String;
 Var sMessage : String;
     nMessage : Integer;
-Var nIndex : DWord;
+Var nIndex : Integer;
     nHeader : Integer;
     sData : String;
 Begin
@@ -600,13 +600,15 @@ Begin
         sMessage := GetMessage( sBuffer, nMessage );
         While sMessage <> 'NULL' Do Begin
            If bDebug Then AddLineToConsole( 'Reception :' );
-           nIndex := StrToInt( GetPart( sMessage, 1 ) );
-           If bDebug Then AddLineToConsole( '    Index : ' + IntToStr(nIndex) );
-           nHeader := StrToInt( GetPart( sMessage, 2 ) );
-           If bDebug Then AddLineToConsole( '    Header : ' + IntToStr(nHeader) );
-           sData := GetPart( sMessage, 3 );
-           If bDebug Then AddLineToConsole( '    Data : ' + sData );
-           AddPacket( nIndex, nHeader, sData );
+           If TryStrToInt( GetPart( sMessage, 1 ), nIndex ) Then Begin
+              If bDebug Then AddLineToConsole( '    Index : ' + IntToStr(nIndex) );
+              If TryStrToInt( GetPart( sMessage, 2 ), nHeader ) Then Begin
+                 If bDebug Then AddLineToConsole( '    Header : ' + IntToStr(nHeader) );
+                 sData := GetPart( sMessage, 3 );
+                 If bDebug Then AddLineToConsole( '    Data : ' + sData );
+                 AddPacket( nIndex, nHeader, sData );
+              End;
+           End;
            nMessage += 1;
            sMessage := GetMessage( sBuffer, nMessage );
         End;

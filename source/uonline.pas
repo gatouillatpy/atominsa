@@ -196,7 +196,7 @@ Begin
                HEADER_SERVER :
                Begin
                     l := 1;
-                    nServerCount := StrToInt( GetString( sData, l ) ); l += 1;
+                    TryStrToInt( GetString( sData, l ), nServerCount ); l += 1;
                     For k := 2 To nServerCount + 1 Do Begin
                         sServerName[k] := GetString( sData, l ); l += 1;
                         sServerIP[k] := GetString( sData, l ); l += 1;
