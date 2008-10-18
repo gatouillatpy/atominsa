@@ -519,7 +519,7 @@ Begin
                     fPlayerPing[k] := StrToFloat( GetString( sData, 2 ) );
                     sData := '';
                     For k := 1 To 8 Do Begin
-                        sData := sData + FloatToStr(fPlayerPing[k]) + #31;
+                        sData := sData + FormatFloat('0.000',fPlayerPing[k]) + #31;
                     End;
                     Send( nIndex, HEADER_PINGARY, sData );
                End;
@@ -804,7 +804,7 @@ Begin
                Begin
                     fPing := (GetTime - fPingTime) * 500;
                     sData := IntToStr(nPlayer) + #31;
-                    sData := sData + FloatToStr(fPing) + #31;
+                    sData := sData + FormatFloat('0.000',fPing) + #31;
                     Send( nLocalIndex, HEADER_PINGRES, sData );
                End;
                HEADER_PINGARY :

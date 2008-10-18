@@ -560,7 +560,7 @@ End;
 
 Procedure TLEvents.OnConnect ( tSocket : TLSocket ) ;
 Begin
-     If (nGame <> GAME_MENU) Or (nGame <> GAME_MENU_PLAYER) Or (nGame <> GAME_MENU_MULTI) Then Begin
+     If (nGame <> GAME_MENU) And (nGame <> GAME_MENU_PLAYER) And (nGame <> GAME_MENU_MULTI) Then Begin
         tSocket.Disconnect;
      End Else Begin
          nSocket += 1;

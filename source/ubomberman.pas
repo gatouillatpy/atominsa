@@ -1076,7 +1076,7 @@ begin
        sData := sData + IntToStr( aY ) + #31;
        sData := sData + IntToStr( dX ) + #31;
        sData := sData + IntToStr( dY ) + #31;
-       sData := sData + FloatToStr( dt ) + #31;
+       sData := sData + FormatFloat('0.000', dt ) + #31;
        Send( nLocalIndex, HEADER_MOVEBOMB, sData );
     End;
   End;
@@ -1156,7 +1156,7 @@ begin
        Else Begin
             bGrabbed := False;
             sData := IntToStr( nIndex ) + #31;
-            sData := sData + FloatToStr( dt ) + #31;
+            sData := sData + FormatFloat('0.000', dt ) + #31;
             Send( nLocalIndex, HEADER_DROP_SERVER, sData );
        End;
   end;
