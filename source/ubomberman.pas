@@ -44,6 +44,10 @@ type
     nDangerRight,                // danger à droite du personnage
     nDangerUp,                   // danger au-dessus du personnage
     nDangerDown : Integer;       // danger au-dessous du personnage
+    nDangerUL,
+    nDangerUR,
+    nDangerDL,
+    nDangerDR : Integer;         // dangers en diagonales
     nAISkill,
     nTriggerBomb,                // stock le nombre de bombe TRIGGER qu'il peut encore poser
     nDisease,                    // stock le numero d'identification de la maladie
@@ -54,7 +58,8 @@ type
     nScore,                      // score
     nBombCount,                  // nombre de bombes dispo
     nFlameSize,                  // taille de la flamme
-    nDirection  : integer;       // derniere direction de mouvement du bomberman
+    nDirection,                  // derniere direction de mouvement du bomberman
+    nDirection2  : integer;      // deuxième direction pour que l'IA se déplace en diagonale
 
 
 
@@ -148,6 +153,7 @@ type
 
   property Position : Vector Read fPosition Write fPosition;
   property Direction : integer Read nDirection Write nDirection;
+  property Direction2 : Integer Read nDirection2 Write nDirection2;
   property LastDirN : VectorN Read lastDir Write lastDir;
 
   Property LX : Single Read fLX Write fLX;
@@ -160,6 +166,10 @@ type
   Property DangerRight : Integer Read nDangerRight Write nDangerRight;
   Property DangerUp : Integer Read nDangerUp Write nDangerUp;
   Property DangerDown : Integer Read nDangerDown Write nDangerDown;
+  Property DangerUL : Integer Read nDangerUL Write nDangerUL;
+  Property DangerUR : Integer Read nDangerUR Write nDangerUR;
+  Property DangerDL : Integer Read nDangerDL Write nDangerDL;
+  Property DangerDR : Integer Read nDangerDR Write nDangerDR;
   Property IATime : Single Read fIATime Write fIATime;
   Property SumDirGetDelta : Single Read fSumDirGetDelta Write fSumDirGetDelta;
   Property SumBombGetDelta : Single Read fSumBombGetDelta Write fSumBombGetDelta;
@@ -1156,7 +1166,7 @@ begin
        Else Begin
             bGrabbed := False;
             sData := IntToStr( nIndex ) + #31;
-            sData := sData + FormatFloat('0.000', dt ) + #31;
+            sData := sData + FormatFloat( '0.000', dt ) + #31;
             Send( nLocalIndex, HEADER_DROP_SERVER, sData );
        End;
   end;
@@ -1199,7 +1209,7 @@ begin
 
   case nDirection of
     0    : begin  //bas
-             dY := Trunc(fPosition.y)+1;;
+             dY := Trunc(fPosition.y)+1;
            end;
     90   : begin  //gauche
              dX := Trunc(fPosition.x-delta);

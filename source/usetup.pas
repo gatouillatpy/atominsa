@@ -109,7 +109,7 @@ Implementation
 
 
 
-Uses UCore;
+Uses UCore, UGame;
 
 
 
@@ -386,7 +386,7 @@ Begin
 
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
-        nState := PHASE_MENU;
+        If (bMulti = True) Then bGoToPhaseMenu := True Else nState := PHASE_MENU;
         ClearInput();
      End;
      

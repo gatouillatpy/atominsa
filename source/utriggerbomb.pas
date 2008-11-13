@@ -11,9 +11,8 @@ type
 {CTriggerBomb}
 
         CTriggerBomb = class(CBomb)
-        private
-          bIgnition : boolean;
         public
+          bIgnition : boolean;
           Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);OverRide;
           function UpdateBomb():boolean;override;
           procedure Ignition();

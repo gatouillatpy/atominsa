@@ -291,6 +291,7 @@ end;
 
 procedure CBomb.Jump(dt : Single);
 var dX, dY : integer;
+    sData : String;
 begin
   dX := 0;
   dY := 0;
@@ -333,6 +334,10 @@ begin
                         bJumping     := false;
                         bMoveJump    := false;
                         bMoving      := false;
+                        If ( bMulti = True ) And ( nLocalIndex = nClientIndex[ 0 ] ) Then Begin
+                           sData := IntToStr( nNetID ) + #31;
+                           Send( nLocalIndex, HEADER_END_OF_JUMP, sData );
+                        End;
                       end
                       else bJumping:=false;
                     end;
@@ -343,17 +348,21 @@ begin
                       begin
                         if (uGrid.GetBlock(Trunc(fPosition.x),Trunc(fPosition.y))=nil)  and Not(pIsBomberman(Trunc(fPosition.x),Trunc(fPosition.y))) then
                         begin
-                        fPosition.z  := 0;
-                        nX           := Trunc(fPosition.x);
-                        nY           := Trunc(fPosition.y);
-                        fPosition.y  := nY;
-                        fPosition.x  := nX;
-                        nOriginX     := nX;
-                        nOriginY     := nY;
-                        uGrid.AddBlock(nX,nY,Self);
-                        bJumping     := false;
-                        bMoveJump    := false;
-                        bMoving      := false;
+                            fPosition.z  := 0;
+                            nX           := Trunc(fPosition.x);
+                            nY           := Trunc(fPosition.y);
+                            fPosition.y  := nY;
+                            fPosition.x  := nX;
+                            nOriginX     := nX;
+                            nOriginY     := nY;
+                            uGrid.AddBlock(nX,nY,Self);
+                            bJumping     := false;
+                            bMoveJump    := false;
+                            bMoving      := false;
+                            If ( bMulti = True ) And ( nLocalIndex = nClientIndex[ 0 ] ) Then Begin
+                               sData := IntToStr( nNetID ) + #31;
+                               Send( nLocalIndex, HEADER_END_OF_JUMP, sData );
+                            End;
                         end
                         else bJumping:=false;
                       end;
@@ -498,7 +507,8 @@ Procedure CBomb.Explose();
                            if (tempBlock.IsExplosive()) then
                             begin
                              (tempBlock.Explose());
-                             uGrid.DelBlock(nX+Size*dx,nY+Size*dy);
+                             If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then
+                                uGrid.DelBlock(nX+Size*dx,nY+Size*dy);
                             end;
                   end;                                                          // sinon c'est que c'est un mur ... ca pete pas ...
                end

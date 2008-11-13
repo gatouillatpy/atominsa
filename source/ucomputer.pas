@@ -28,7 +28,7 @@ Procedure DangerWay( aX, aY, bX, bY, n : Integer; m_aState : Table; Var p_nDange
 
 Implementation
 
-Uses UGame, UItem, UDisease, USuperDisease, UBomb, UBlock;
+Uses UGame, UItem, UDisease, USuperDisease, UBomb, UBlock, UTriggerBomb;
 
 
 Const SKILL_NOVICE         = 1;
@@ -94,7 +94,11 @@ Begin
 
      // On ajoute 2 à chaque case qui contient une bombe.
      For k := 1 To GetBombCount() Do Begin
-         aState[Trunc(GetBombByCount(k).Position.X + 0.5), Trunc(GetBombByCount(k).Position.Y + 0.5)] += 2;
+      {   If ( GetBombByCount(k).BIndex = pBomberman.BIndex ) And ( GetBombByCount(k) Is CTriggerBomb )
+         And ( ( GetBombByCount(k) As CTriggerBomb ).bIgnition = False ) Then
+             aState[Trunc(GetBombByCount(k).Position.X + 0.5), Trunc(GetBombByCount(k).Position.Y + 0.5)] += 8
+         Else } // A améliorer.
+             aState[Trunc(GetBombByCount(k).Position.X + 0.5), Trunc(GetBombByCount(k).Position.Y + 0.5)] += 2;
      End;
      
      // On ajoute 4 à chaque case qui contient un personnage autre que l'IA
@@ -151,13 +155,33 @@ Begin
          pBomberman.DangerDown := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
       Else
           pBomberman.DangerDown := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      // Bas + Gauche
+      If ( pY >= 3 ) And ( pX >= 3 ) And ( aState[pX - 1, pY - 1] mod 4 >= 2 ) And ( aState[pX, pY + 2] mod 16 = 0 ) Then
+         pBomberman.DangerDL := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX - 1, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+      Else
+          pBomberman.DangerDL := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX - 1, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      // Bas + Droite
+      If ( pY >= 3 ) And ( pX <= GRIDWIDTH - 2 ) And ( aState[pX + 1, pY - 1] mod 4 >= 2 ) And ( aState[pX, pY + 2] mod 16 = 0 ) Then
+         pBomberman.DangerDR := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX + 1, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+      Else
+          pBomberman.DangerDR := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX + 1, pY - 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      // Haut + Gauche
+      If ( pY <= GRIDHEIGHT - 2 ) And ( pX >= 3 ) And ( aState[pX - 1, pY + 1] mod 4 >= 2 ) And ( aState[pX, pY + 2] mod 16 = 0 ) Then
+         pBomberman.DangerUL := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX - 1, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+      Else
+          pBomberman.DangerUL := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX - 1, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
+      // Haut + Droite
+      If ( pY <= GRIDHEIGHT - 2 ) And ( pX <= GRIDWIDTH - 2 ) And ( aState[pX + 1, pY + 1] mod 4 >= 2 ) And ( aState[pX, pY + 2] mod 16 = 0 ) Then
+         pBomberman.DangerUR := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX + 1, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, canPush, afraid)
+      Else
+          pBomberman.DangerUR := CalculateDanger(pBomberman.Position.X, pBomberman.Position.Y, pX + 1, pY + 1, 1, GRIDWIDTH, 1, GRIDHEIGHT, aState, nSkill, false, afraid);
    End;
 
 
 
 // Calcul des coordonnées cibles.
    If ( pBomberman.CanCalculate = true ) Or ( pBomberman.Position.X <> pBomberman.LX )
-   Or ( pBomberman.Position.Y <> pBomberman.LY )Then Begin
+   Or ( pBomberman.Position.Y <> pBomberman.LY ) Then Begin
                
    // On fixe les limites du rectangle dans lequel on va calculer les dangers.
       If ( pX - ( nSkill + 2 ) < 1 ) Then bLeft := 1 Else bLeft := pX - ( nSkill + 2 );
@@ -195,12 +219,26 @@ Begin
    
    // Minimiser les changements de directions.
    If ( pBomberman.SumDirGetDelta <> 0 ) Then Begin
-       If ( pBomberman.Direction = 180 ) Then pBomberman.DangerUp := pBomberman.DangerUp - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
-       If ( pBomberman.Direction = 0 ) Then pBomberman.DangerDown := pBomberman.DangerDown - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
-       If ( pBomberman.Direction = -90 ) Then pBomberman.DangerRight := pBomberman.DangerRight - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
-       If ( pBomberman.Direction = 90 ) Then pBomberman.DangerLeft := pBomberman.DangerLeft - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction2 = 180 ) Then pBomberman.DangerUp := pBomberman.DangerUp - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction2 = 0 ) Then pBomberman.DangerDown := pBomberman.DangerDown - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction2 = -90 ) Then pBomberman.DangerRight := pBomberman.DangerRight - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction2 = 90 ) Then pBomberman.DangerLeft := pBomberman.DangerLeft - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction2 = 135 ) Then pBomberman.DangerUL := pBomberman.DangerUL - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction2 = -135 ) Then pBomberman.DangerUR := pBomberman.DangerUR - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction2 = 45 ) Then pBomberman.DangerDL := pBomberman.DangerDL - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       If ( pBomberman.Direction2 = -45 ) Then pBomberman.DangerDR := pBomberman.DangerDR - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
+       pBomberman.Danger := pBomberman.Danger - 64 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
    End;
    pBomberman.SumDirGetDelta := pBomberman.SumDirGetDelta + dt;
+   
+
+
+   // Risques de passer par les cases autour pour les diagonales.
+   pBomberman.DangerUL := ( pBomberman.DangerUp + pBomberman.DangerLeft + 2 * pBomberman.DangerUL ) div 4;
+   pBomberman.DangerUR := ( pBomberman.DangerUp + pBomberman.DangerRight + 2 * pBomberman.DangerUR ) div 4;
+   pBomberman.DangerDL := ( pBomberman.DangerDown + pBomberman.DangerLeft + 2 * pBomberman.DangerDL ) div 4;
+   pBomberman.DangerDR := ( pBomberman.DangerDown + pBomberman.DangerRight + 2 * pBomberman.DangerDR ) div 4;
+
 
 
 // Si les touches sont inversées et que le niveau est godlike, alors les préférences sont inversées.
@@ -211,6 +249,12 @@ Begin
        dangerMin := pBomberman.DangerUp;
        pBomberman.DangerUp := pBomberman.DangerDown;
        pBomberman.DangerDown := dangerMin;
+       dangerMin := pBomberman.DangerUL;
+       pBomberman.DangerUL := pBomberman.DangerDR;
+       pBomberman.DangerDR := dangerMin;
+       dangerMin := pBomberman.DangerUR;
+       pBomberman.DangerUR := pBomberman.DangerDL;
+       pBomberman.DangerDL := dangerMin;
    End;
 
 
@@ -364,25 +408,83 @@ End;
       pBomberman.LY := pBomberman.Position.Y;
 
       // Comparaison des dangers.
-      If ( pBomberman.DangerLeft < pBomberman.Danger ) And ( pBomberman.DangerLeft <= pBomberman.DangerRight )
+      If ( pBomberman.DangerUL <= pBomberman.DangerUR ) And ( pBomberman.DangerUL <= pBomberman.DangerDL )
+      And ( pBomberman.DangerUL <= pBomberman.DangerDR ) And ( pBomberman.DangerUL <= pBomberman.DangerLeft )
+      And ( pBomberman.DangerUL < pBomberman.Danger ) And ( pBomberman.DangerUL <= pBomberman.DangerRight )
+      And ( pBomberman.DangerUL <= pBomberman.DangerUp ) And ( pBomberman.DangerUL <= pBomberman.DangerDown ) Then Begin
+          If ( pBomberman.Direction2 <> 135 ) Then Begin
+             pBomberman.SumDirGetDelta := 0.125;
+             pBomberman.Direction2 := 135;
+          End;
+          pBomberman.MoveLeft( GetDelta() );
+          pBomberman.MoveUp( GetDelta() );
+          pBomberman.CanCalculate := false;
+      End
+      Else  If ( pBomberman.DangerUR <= pBomberman.DangerDL )
+      And ( pBomberman.DangerUR <= pBomberman.DangerDR ) And ( pBomberman.DangerUR <= pBomberman.DangerLeft )
+      And ( pBomberman.DangerUR < pBomberman.Danger ) And ( pBomberman.DangerUR <= pBomberman.DangerRight )
+      And ( pBomberman.DangerUR <= pBomberman.DangerUp ) And ( pBomberman.DangerUR <= pBomberman.DangerDown ) Then Begin
+          If ( pBomberman.Direction2 <> -135 ) Then Begin
+             pBomberman.SumDirGetDelta := 0.125;
+             pBomberman.Direction2 := -135;
+          End;
+          pBomberman.MoveUp( GetDelta() );
+          pBomberman.MoveRight( GetDelta() );
+          pBomberman.CanCalculate := false;
+      End
+      Else If ( pBomberman.DangerDL <= pBomberman.DangerDR ) And ( pBomberman.DangerDL <= pBomberman.DangerLeft )
+      And ( pBomberman.DangerDL < pBomberman.Danger ) And ( pBomberman.DangerDL <= pBomberman.DangerRight )
+      And ( pBomberman.DangerDL <= pBomberman.DangerUp ) And ( pBomberman.DangerDL <= pBomberman.DangerDown ) Then Begin
+          If ( pBomberman.Direction2 <> 45 ) Then Begin
+              pBomberman.SumDirGetDelta := 0.125;
+              pBomberman.Direction2 := 45;
+          End;
+          pBomberman.MoveDown( GetDelta() );
+          pBomberman.MoveLeft( GetDelta() );
+          pBomberman.CanCalculate := false;
+      End
+      Else If ( pBomberman.DangerDR <= pBomberman.DangerLeft )
+      And ( pBomberman.DangerDR < pBomberman.Danger ) And ( pBomberman.DangerDR <= pBomberman.DangerRight )
+      And ( pBomberman.DangerDR <= pBomberman.DangerUp ) And ( pBomberman.DangerDR <= pBomberman.DangerDown ) Then Begin
+          If ( pBomberman.Direction2 <> -45 ) Then Begin
+              pBomberman.SumDirGetDelta := 0.125;
+              pBomberman.Direction2 := -45;
+          End;
+          pBomberman.MoveRight( GetDelta() );
+          pBomberman.MoveDown( GetDelta() );
+          pBomberman.CanCalculate := false;
+      End
+      Else If ( pBomberman.DangerLeft < pBomberman.Danger ) And ( pBomberman.DangerLeft <= pBomberman.DangerRight )
       And ( pBomberman.DangerLeft <= pBomberman.DangerUp ) And ( pBomberman.DangerLeft <= pBomberman.DangerDown ) Then Begin
-         If ( pBomberman.Direction <> 90 ) Then pBomberman.SumDirGetDelta := 0.125;
+         If ( pBomberman.Direction2 <> 90 ) Then Begin
+            pBomberman.SumDirGetDelta := 0.125;
+            pBomberman.Direction2 := 90;
+         End;
          pBomberman.MoveLeft( dt );
          pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerRight < pBomberman.Danger ) And ( pBomberman.DangerRight <= pBomberman.DangerUp )
       And ( pBomberman.DangerRight <= pBomberman.DangerDown ) Then Begin
-         If ( pBomberman.Direction <> -90 ) Then pBomberman.SumDirGetDelta := 0.125;
+         If ( pBomberman.Direction2 <> -90 ) Then Begin
+            pBomberman.SumDirGetDelta := 0.125;
+            pBomberman.Direction2 := -90;
+         End;
          pBomberman.MoveRight( dt );
          pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerUp < pBomberman.Danger ) And ( pBomberman.DangerUp <= pBomberman.DangerDown ) Then Begin
-           If ( pBomberman.Direction <> 180 ) Then pBomberman.SumDirGetDelta := 0.125;
+           If ( pBomberman.Direction2 <> 180 ) Then Begin
+            pBomberman.SumDirGetDelta := 0.125;
+            pBomberman.Direction2 := 180;
+         End;
            pBomberman.MoveUp( dt );
            pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerDown < pBomberman.Danger ) Then Begin
-           If ( pBomberman.Direction <> 0 ) Then pBomberman.SumDirGetDelta := 0.125;
+           If ( pBomberman.Direction2 <> 0 ) Then Begin
+            pBomberman.SumDirGetDelta := 0.125;
+            pBomberman.Direction2 := 0;
+         End;
            pBomberman.MoveDown( dt );
            pBomberman.CanCalculate := false;
       End
@@ -424,25 +526,42 @@ End;
            And ( ( pBomberman.DangerLeft <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
            And ( ( pBomberman.DangerLeft <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheLeft = true ) Then Begin
-               If ( pBomberman.Direction <> 90 ) Then pBomberman.SumDirGetDelta := 0.125;
+               If ( pBomberman.Direction2 <> 90 ) Then Begin
+                  If ( pBomberman.SumDirGetDelta > 1.0 ) Then
+                     pBomberman.SumDirGetDelta := 1.0;
+                  pBomberman.Direction2 := 90;
+               End;
                pBomberman.MoveLeft( dt );
                pBomberman.CanGoToTheLeft := false;
            End
            Else If ( ( pBomberman.DangerRight <= pBomberman.DangerUp ) Or ( pBomberman.CanGoToTheUp = false ) )
            And ( ( pBomberman.DangerRight <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheRight = true ) Then Begin
-               If ( pBomberman.Direction <> -90 ) Then pBomberman.SumDirGetDelta := 0.125;
+               If ( pBomberman.Direction2 <> -90 ) Then Begin
+                  If ( pBomberman.SumDirGetDelta > 1.0 ) Then
+                     pBomberman.SumDirGetDelta := 1.0;
+                  pBomberman.Direction2 := -90;
+               End;
                pBomberman.MoveRight( dt );
                pBomberman.CanGoToTheRight := false;
            End
            Else If ( ( pBomberman.DangerUp <= pBomberman.DangerDown ) Or ( pBomberman.CanGoToTheDown = false ) )
            And ( pBomberman.CanGoToTheUp = true ) Then Begin
-               If ( pBomberman.Direction <> 180 ) Then pBomberman.SumDirGetDelta := 0.125;
+               If ( pBomberman.Direction2 <> 180 ) Then Begin
+                  If ( pBomberman.SumDirGetDelta > 1.0 ) Then
+                     pBomberman.SumDirGetDelta := 1.0;
+                  pBomberman.Direction2 := 180;
+               End;
                pBomberman.MoveUp( dt );
                pBomberman.CanGoToTheUp := false;
            End
            Else Begin
-                If ( pBomberman.Direction <> 0 ) Then pBomberman.SumDirGetDelta := 0.125;
+                If ( pBomberman.Direction2 <> 90 ) Then pBomberman.SumDirGetDelta := 1.0;
+                If ( pBomberman.Direction2 <> 0 ) Then Begin
+                  If ( pBomberman.SumDirGetDelta > 1.0 ) Then
+                     pBomberman.SumDirGetDelta := 1.0;
+                  pBomberman.Direction2 := 0;
+               End;
                 pBomberman.MoveDown( dt );
                 pBomberman.CanGoToTheDown := false;
            End;
@@ -597,7 +716,6 @@ Begin
                  And ( GetBombByGridCoo(i, j) Is CBomb ) And ( GetBombByGridCoo(i, j).Time + 1 < GetBombByGridCoo(i, j).ExploseTime ) Then
                     result2 := result2 - 64
                  Else Begin
-                     result2 := result2 + 2048;
                      If ( GetBombByGridCoo(i, j) Is CBomb ) And ( GetBombByGridCoo(i, j).Time + 1 >= GetBombByGridCoo(i, j).ExploseTime ) Then
                         result2 := result2 + 2048;
                      End;
@@ -719,8 +837,8 @@ Begin
       // De même pour les autres directions.
       If ( ( fX + 0.5 < pBomb.Position.X ) And ( x = Trunc( fX + 0.5 ) - 1 ) )
       Or ( ( fX + 0.5 > pBomb.Position.X ) And ( x = Trunc( fX + 0.5 ) + 1 ) )
-      Or ( ( fY + 0.5 < pBomb.Position.Y ) And ( y = Trunc( fX + 0.5 ) - 1 ) )
-      Or ( ( fY + 0.5 > pBomb.Position.Y ) And ( y = Trunc( fX + 0.5 ) + 1 ) ) Then Begin
+      Or ( ( fY + 0.5 < pBomb.Position.Y ) And ( y = Trunc( fY + 0.5 ) - 1 ) )
+      Or ( ( fY + 0.5 > pBomb.Position.Y ) And ( y = Trunc( fY + 0.5 ) + 1 ) ) Then Begin
          result2 := result2 - 512;
          If ( pBomb.Time + 1 >= pBomb.ExploseTime ) Then
             result2 := result2 - 512;

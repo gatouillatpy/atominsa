@@ -44,7 +44,6 @@ Const MULTI_ERROR      = 3;
 Var nMulti : Integer;
 
 
-
 Const MENU_MULTI_NAME         = 81;
 Const MENU_MULTI_ADDRESS      = 82;
 Const MENU_MULTI_TYPE         = 83;
@@ -453,12 +452,13 @@ Begin
                     For k := ClientIndex(nIndex) To nClientCount - 2 Do
                         nClientIndex[k] := nClientIndex[k+1];
                     nClientCount -= 1;
+                    SendTo( nIndex, HEADER_QUIT_MENU, sData );
                     AddLineToConsole( sData + ' leaved the game.' );
                     // supression des joueurs attribués s'il y en avait
                     For k := 1 To 8 Do Begin
                         If nPlayerClient[k] = nIndex Then Begin
                            nPlayerClient[k] := -1;
-                           sPlayerName[k] := '';
+                           nPlayerType[k] := PLAYER_NIL;
                         End;
                     End;
                     // renvoi de la liste des clients
@@ -479,7 +479,8 @@ Begin
                         sData := sData + IntToStr(nPlayerType[k]) + #31;
                     End;
                     Send( nIndex, nHeader, sData );
-                    If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then UpdateMenu();
+                    If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then
+                       UpdateMenu();
                End;
                HEADER_MESSAGE :
                Begin
@@ -1017,6 +1018,12 @@ Begin
                         pBomberman.uGrabbedBomb := Nil;
                     End;
                End;
+               HEADER_END_OF_JUMP :
+               Begin
+                    TryStrToInt( GetString( sData, 1 ), _nNetID );
+                    pBomb := GetBombByNetID( _nNetID );
+                    pBomb.JumpMovement := False;
+               End;
                HEADER_CONTAMINATE :
                Begin
                     TryStrToInt( GetString( sData, 1 ), k );
@@ -1067,11 +1074,20 @@ Begin
                            fX := StrToFloat( GetString( sData, l ) ); l += 1;
                            fY := StrToFloat( GetString( sData, l ) ); l += 1;
                            fZ := StrToFloat( GetString( sData, l ) ); l += 1;
-                           pBomb.Position.x := fX;
-                           pBomb.Position.y := fY;
+                           If ( abs( pBomb.Position.x - fX ) > 0.001 ) Or ( abs( pBomb.Position.y - fY ) > 0.001 ) Then Begin
+                              If ( ( pBomb.JumpMovement = False )
+                              Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) )
+                              And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
+                                 pGrid.DelBlock( pBomb.xGrid, pBomb.yGrid );
+                              pBomb.Position.x := fX;
+                              pBomb.Position.y := fY;
+                              pBomb.xGrid := Trunc( fX );
+                              pBomb.yGrid := Trunc( fY );
+                              If ( pBomb.JumpMovement = False )
+                              And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
+                                 pGrid.AddBlock( pBomb.xGrid, pBomb.yGrid, pBomb );
+                           End;
                            pBomb.Position.z := fZ;
-                           pBomb.xGrid := Trunc( fX );
-                           pBomb.yGrid := Trunc( fY );
                         End Else Begin
                             l += 3;
                         End;
@@ -1089,6 +1105,10 @@ Begin
                     PlaySound( SOUND_MENU_BACK );
                     InitMenu();
                     ClearInput();
+               End;
+               HEADER_QUIT_MENU :
+               Begin
+                    nState := PHASE_MENU;
                End;
           End;
      End;
@@ -1142,6 +1162,7 @@ Begin
 
      // activation du mode multi
      bMulti := True;
+     bGoToPhaseMenu := False;
 
      // initialisation du compteur de clients
      nClientCount := 0;
@@ -1170,11 +1191,20 @@ Begin
 
      If nMulti = MULTI_SERVER Then Begin
         ProcessServer();
-        If nState = PHASE_MENU Then ServerTerminate() Else ServerLoop();
+        If (nState = PHASE_MENU) Or (bGoToPhaseMenu) Then Begin
+           ServerTerminate();
+           nState := PHASE_MENU;
+        End
+        Else ServerLoop();
      End Else If nMulti = MULTI_CLIENT Then Begin
-        If nState = PHASE_MENU Then Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
+        If (nState = PHASE_MENU) Or (bGoToPhaseMenu) Then Begin
+           Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
+        End;
         ProcessClient();
-        If nState = PHASE_MENU Then ClientTerminate() Else ClientLoop();
+        If (nState = PHASE_MENU) Then Begin
+           ClientTerminate();
+        End
+        Else ClientLoop();
      End;
 End;
 

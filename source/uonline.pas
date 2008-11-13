@@ -26,7 +26,7 @@ Implementation
 
 
 
-Uses UCore, USetup, UMulti;
+Uses UCore, USetup, UMulti, UGame;
 
 
 

@@ -17,6 +17,7 @@ Uses Classes, SysUtils, GLext, GL,
 
 
 Var bMulti : Boolean;
+    bGoToPhaseMenu : Boolean;
 
 
 
@@ -301,8 +302,9 @@ End;
 
 
 Procedure SetCamera () ;
-Var bFound : Boolean ; k : Integer;
+Var bFollow, bReturn : Boolean;
 Begin
+     bFollow := False;
      If GetTime - fGameTime < 3.0 Then Begin
      // on fait le tour du plateau durant les trois premières secondes de jeu
         vPointer.x := 8.0 + (fGameTime - GetTime + 3.0) * 24.0 * cos((GetTime - fGameTime) / 3.0 * PI + PI * 3 / 2);
@@ -389,35 +391,106 @@ Begin
         vCenter.z := vCamera.z + sin(vAngle.x);
      End Else Begin
      // caméra en mode suivi de bomberman
-        vCenter.x := GetBombermanByCount(nCamera).Position.X;
-        vCenter.y := 0.0;
-        vCenter.z := GetBombermanByCount(nCamera).Position.Y;
+        bFollow := True;
+        bReturn := False;
+        vCenter.y -= GetDelta() * vCenter.y;
+        If ( GetBombermanByCount(nCamera).Direction mod 180 = 0 ) Then Begin
+           vCenter.x += GetDelta() * ( GetBombermanByCount(nCamera).Position.X - vCenter.x ) * abs( vCamera.z - vCenter.z );
+           vCenter.z += GetDelta() * ( GetBombermanByCount(nCamera).Position.Y - vCenter.z ) * 4.0;
+        End
+        Else Begin
+             vCenter.x += GetDelta() * ( GetBombermanByCount(nCamera).Position.X - vCenter.x ) * 4.0;
+             vCenter.z += GetDelta() * ( GetBombermanByCount(nCamera).Position.Y - vCenter.z ) * abs ( vCamera.x - vCenter.x );
+        End;
+
         If GetBombermanByCount(nCamera).Direction = 0 Then Begin
-           vPointer.x := vCenter.x;
-           vPointer.y := 3.0;
-           vPointer.z := vCenter.z - 3.0;
+           vPointer.y := 1.0;
+           vPointer.z := vCenter.z - 2.0;
+           If ( vCamera.z <= vCenter.z - 1.0 ) Then Begin
+              vPointer.x := vCenter.x;
+           End
+           Else Begin
+                bReturn := True;
+                If ( vCamera.x >= vCenter.x ) Then Begin
+                   vPointer.x := vCenter.x + 2.0;
+                End
+                Else Begin
+                     vPointer.x := vCenter.x - 2.0;
+                End;
+           End;
         End Else If GetBombermanByCount(nCamera).Direction = 90 Then Begin
-           vPointer.x := vCenter.x + 3.0;
-           vPointer.y := 3.0;
-           vPointer.z := vCenter.z;
+            vPointer.y := 1.0;
+            vPointer.x := vCenter.x + 2.0;
+            If ( vCamera.x >= vCenter.x + 1.0 ) Then Begin
+               vPointer.z := vCenter.z;
+            End
+            Else Begin
+                 bReturn := True;
+                 If ( vCamera.z >= vCenter.z ) Then Begin
+                    vPointer.z := vCenter.z + 2.0;
+                 End
+                 Else Begin
+                      vPointer.z := vCenter.z - 2.0;
+                 End;
+            End;
         End Else If GetBombermanByCount(nCamera).Direction = 180 Then Begin
-           vPointer.x := vCenter.x;
-           vPointer.y := 3.0;
-           vPointer.z := vCenter.z + 3.0;
+           vPointer.y := 1.0;
+           vPointer.z := vCenter.z + 2.0;
+           If ( vCamera.z >= vCenter.z + 1.0 ) Then Begin
+              vPointer.x := vCenter.x;
+           End
+           Else Begin
+                bReturn := True;
+                If ( vCamera.x <= vCenter.x ) Then Begin
+                   vPointer.x := vCenter.x - 2.0;
+                End
+                Else Begin
+                     vPointer.x := vCenter.x + 2.0;
+                End;
+           End;
         End Else If GetBombermanByCount(nCamera).Direction = -90 Then Begin
-           vPointer.x := vCenter.x - 3.0;
-           vPointer.y := 3.0;
-           vPointer.z := vCenter.z;
+           vPointer.y := 1.0;
+           vPointer.x := vCenter.x - 2.0;
+            If ( vCamera.x <= vCenter.x - 1.0 ) Then Begin
+               vPointer.z := vCenter.z;
+            End
+            Else Begin
+                 bReturn := True;
+                 If ( vCamera.z <= vCenter.z ) Then Begin
+                    vPointer.z := vCenter.z - 2.0;
+                 End
+                 Else Begin
+                      vPointer.z := vCenter.z + 2.0;
+                 End;
+            End;
         End;
      End;
      
      // déplacement progressif de la camera vers son pointeur pour rendre plus fluide le mouvement
-     If vCamera.x > vPointer.x Then vCamera.x -= vPointer.x * GetDelta() * 1.0;
-     If vCamera.x < vPointer.x Then vCamera.x += vPointer.x * GetDelta() * 1.0;
-     If vCamera.y > vPointer.y Then vCamera.y -= vPointer.y * GetDelta() * 1.0;
-     If vCamera.y < vPointer.y Then vCamera.y += vPointer.y * GetDelta() * 1.0;
-     If vCamera.z > vPointer.z Then vCamera.z -= vPointer.z * GetDelta() * 1.0;
-     If vCamera.z < vPointer.z Then vCamera.z += vPointer.z * GetDelta() * 1.0;
+     If ( bFollow = False ) Then Begin
+         vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x );
+         vCamera.y -= GetDelta() * ( vCamera.y - vPointer.y );
+         vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z );
+     End
+     Else Begin
+         If ( GetBombermanByCount(nCamera).Direction = -90 ) Or  ( GetBombermanByCount(nCamera).Direction = 90 ) Then Begin
+            If ( bReturn ) Then vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x )
+            Else vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x ) * 4.0;
+         End
+         Else Begin
+              If ( bReturn ) Then vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x ) * 4.0
+              Else vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x );
+         End;
+         If ( vCamera.y <> vPointer.y ) Then vCamera.y -= GetDelta() * ( vCamera.y - vPointer.y );
+         If ( GetBombermanByCount(nCamera).Direction = 0 ) Or  ( GetBombermanByCount(nCamera).Direction = 180 ) Then Begin
+             If ( bReturn ) Then vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z )
+             Else vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z ) * 4.0;
+         End
+         Else Begin
+              If ( bReturn ) Then vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z ) * 4.0
+              Else vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z );
+         End;
+     End;
 
      // envoi des données au moteur graphique
      SetProjectionMatrix ( 90.0, 1.0, 0.1, 2048.0 ) ;
@@ -1773,14 +1846,19 @@ Begin
            InitMenu();
            ClearInput();
         End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
-            PlaySound( SOUND_MENU_BACK );
             sData := '';
             Send( nLocalIndex, HEADER_QUIT_GAME, sData );
+            PlaySound( SOUND_MENU_BACK );
             InitMenu();
             ClearInput();
         End Else Begin
             PlaySound( SOUND_MENU_BACK );
-            nState := PHASE_MENU;
+            //TODO : Mettre une temporisation.
+            If ( GetTime > fKey ) Then Begin
+               If ( bGoToPhaseMenu = False ) Then bGoToPhaseMenu := True Else nState := PHASE_MENU;
+               fKey := GetTime + 8.0;
+               ClearInput();
+            End;
         End;
      End;
      
@@ -2025,6 +2103,21 @@ Begin
         nGame := GAME_MENU;
         SetString( STRING_GAME_MENU(10 + nPlayer), PlayerInfo(nPlayer), 0.0, 0.02, 600 );
         nMenu := MENU_PLAYER1 + nPlayer - 1;
+        If bMulti = True Then Begin
+            If nPlayerType[nPlayer] = PLAYER_NIL Then Begin
+               nPlayerClient[nPlayer] := -1;
+
+               sData := IntToStr(nPlayer) + #31;
+               Send( nLocalIndex, HEADER_UNLOCK, sData );
+            End Else Begin
+                sData := IntToStr(nPlayer) + #31;
+                sData := sData + IntToStr(nPlayerType[nPlayer]) + #31;
+                sData := sData + IntToStr(nPlayerSkill[nPlayer]) + #31;
+                sData := sData + IntToStr(nPlayerCharacter[nPlayer]) + #31;
+                sData := sData + sPlayerName[nPlayer] + #31;
+                Send( nLocalIndex, HEADER_UPDATE, sData );
+            End;
+         End;
         ClearInput();
      End;
 
@@ -2393,6 +2486,7 @@ Var w, h : Single;
     t : Single;
     k : Integer;
     bSend : Boolean;
+    nbrPlayers : Integer;
     sData : String;
 Begin
      w := GetRenderWidth();
@@ -2431,7 +2525,7 @@ Begin
 
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
-        nState := PHASE_MENU;
+        If (bMulti = True) Then bGoToPhaseMenu := True Else nState := PHASE_MENU;
         ClearInput();
      End;
 
@@ -2600,35 +2694,43 @@ Begin
                 MENU_PLAYER8 :
                      InitMenuPlayer(8);
                 MENU_FIGHT :
-                If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
-                    // Si un client est en train de choisir un personnage,
-                    // le serveur n'a pas le droit de lancer la partie.
-                    bSend := True;
+                Begin
+                    nbrPlayers := 0;
                     For k := 1 To 8 Do Begin
-                        If ( nPlayerClient[k] <> -1 ) And ( nPlayerType[k] = PLAYER_NIL ) Then
-                           bSend := False;
+                        If ( nPlayerType[k] <> PLAYER_NIL ) Then nbrPlayers += 1;
                     End;
-                    If ( bSend = True ) Then Begin
-                       For k := 0 To 255 Do Begin
-                           bClientReady[k] := False;
-                       End;
-                       If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
-                          If ( nScheme = - 1 ) Then
-                             nSchemeMulti := Random(nSchemeCount)
-                          Else
-                              nSchemeMulti := -1;
-                          sData := IntToStr(nScheme) + #31;
-                          sData := sData + IntToStr(nSchemeMulti) + #31;
-                          sData := sData + IntToStr(nMap) + #31;
-                          sData := sData + IntToStr(nRoundCount) + #31;
-                          Send( nLocalIndex, HEADER_SETUP, sData );
-                       End;
-                       nGame := GAME_INIT;
-                       sData := '';
-                       Send( nLocalIndex, HEADER_FIGHT, sData );
+                    If (nbrPlayers >= 2 ) Then Begin
+                        If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
+                            // Si un client est en train de choisir un personnage,
+                            // le serveur n'a pas le droit de lancer la partie.
+                            bSend := True;
+                            For k := 1 To 8 Do Begin
+                                If ( nPlayerClient[k] <> -1 ) And ( nPlayerType[k] = PLAYER_NIL ) Then
+                                   bSend := False;
+                            End;
+                            If ( bSend = True ) Then Begin
+                               For k := 0 To 255 Do Begin
+                                   bClientReady[k] := False;
+                               End;
+                               If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
+                                  If ( nScheme = - 1 ) Then
+                                     nSchemeMulti := Random(nSchemeCount)
+                                  Else
+                                      nSchemeMulti := -1;
+                                  sData := IntToStr(nScheme) + #31;
+                                  sData := sData + IntToStr(nSchemeMulti) + #31;
+                                  sData := sData + IntToStr(nMap) + #31;
+                                  sData := sData + IntToStr(nRoundCount) + #31;
+                                  Send( nLocalIndex, HEADER_SETUP, sData );
+                               End;
+                               nGame := GAME_INIT;
+                               sData := '';
+                               Send( nLocalIndex, HEADER_FIGHT, sData );
+                            End;
+                        End Else If (bMulti = False) Then Begin
+                            nGame := GAME_INIT;
+                        End;
                     End;
-                End Else If (bMulti = False) Then Begin
-                    nGame := GAME_INIT;
                 End;
            End;
        End;

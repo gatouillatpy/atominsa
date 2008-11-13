@@ -32,6 +32,7 @@ Const HEADER_PINGRES           = 1308;
 Const HEADER_PINGARY           = 1309;
 Const HEADER_WAIT              = 1310;
 Const HEADER_QUIT_GAME         = 1311;
+Const HEADER_QUIT_MENU         = 1312;
 
 Const HEADER_MOVEUP            = 1401;
 Const HEADER_MOVEDOWN          = 1402;
@@ -50,6 +51,7 @@ Const HEADER_EXPLOSE_BOMB      = 1414;
 Const HEADER_EXPLOSE_BLOCK     = 1415;
 Const HEADER_ISEXPLOSED_ITEM   = 1416;
 Const HEADER_CONTAMINATE       = 1417;
+Const HEADER_END_OF_JUMP       = 1418;
 
 Const HEADER_BOMBERMAN         = 1501;
 Const HEADER_BOMB              = 1502;
@@ -583,7 +585,7 @@ Begin
             aSocket[p] := aSocket[p+1];
         nSocket -= 1;
      End Else Begin
-         nState := PHASE_MENU; // ???
+         nState := PHASE_MENU;
      End;
      AddLineToConsole('Connection lost.');
 End;
