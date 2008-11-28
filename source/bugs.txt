@@ -1,4 +1,3 @@
 - impossible de passer en runtime du mode plein écran au mode fenêtre et inversement
 - la résolution de l'écran n'est pas changeable depuis le jeu.
 - bombes punchées fonctionnent mal.
-- en multi, quand tu appuies comme un porc sur entrée, tu peux changer le statut du premier joueur même s'il est censé être bloqué.

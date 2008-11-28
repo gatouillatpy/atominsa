@@ -62,6 +62,8 @@ Const HEADER_READY             = 1701;
 
 Const HEADER_SERVER            = 2001;
 
+Const HEADER_ONLINE_HOST       = 2101;
+
 
 
 Type LPPacketItem = ^PacketItem;
@@ -87,8 +89,10 @@ Const KEY_TAB = 9;
       KEY_SPACE = 32;
       KEY_ENTER = 13;
       KEY_SQUARE = 178;
-      KEY_N = 110;
-      KEY_Y = 121;
+      KEY_N_UPPER = 78;
+      KEY_Y_UPPER = 89;
+      KEY_N_LOWER = 110;
+      KEY_Y_LOWER = 121;
 
 
 
@@ -359,6 +363,7 @@ Function GetPacket ( Var nIndex : DWord ; Var nHeader : Integer ; Var sData : St
 Procedure Send ( nIndex : DWord ; nHeader : Integer ; sData : String );
 Procedure SendEx ( nIndex : DWord ; nHeader : Integer ; sData : String );
 Procedure SendTo ( nIndex : DWord ; nHeader : Integer ; sData : String );
+Procedure SendOnline ( nIndex : DWord ; nHeader : Integer ; sData : String );
 
 Function ServerInit ( Const nPort : Word ) : Boolean ;
 Procedure ServerTerminate () ;
@@ -367,6 +372,10 @@ Procedure ServerLoop () ;
 Function ClientInit ( Const sAddress : String ; Const nPort : Word ) : Boolean ;
 Procedure ClientTerminate () ;
 Procedure ClientLoop () ;
+
+Function ClientInitOnline ( Const sAddress : String ; Const nPort : Word ) : Boolean ;
+Procedure ClientTerminateOnline () ;
+Procedure ClientLoopOnline () ;
 
 
 
@@ -425,7 +434,8 @@ Type TLEvents = Class
            Procedure OnDisconnect( tSocket : TLSocket );
 End;
 
-Var pTCP : TLTcp;
+Var pTCP,
+    pTCPOnline : TLTcp;
 Var pEvent: TLEvents;
 
 
@@ -507,6 +517,11 @@ Begin
             If aSocket[k].Connected And (nIndex = nClientIndex[k+1]) Then
                aSocket[k].SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
      End;
+End;
+
+Procedure SendOnline ( nIndex : DWord ; nHeader : Integer ; sData : String );
+Begin
+     If pTCPOnline.Connected Then pTCPOnline.SendMessage( IntToStr(nIndex) + #30 + IntToStr(nHeader) + #30 + sData + #4 );
 End;
 
 
@@ -677,6 +692,58 @@ End;
 Procedure ClientLoop () ;
 Begin
      pTCP.Callaction;
+End;
+
+
+
+Function ClientInitOnline ( Const sAddress : String ; Const nPort : Word ) : Boolean ;
+Var t : Single;
+Begin
+     nSocket := -1;
+
+     bConnected := False;
+
+     pEvent := TLEvents.Create;
+     pTCPOnline := TLTcp.Create( NIL );
+     pTCPOnline.OnReceive := @pEvent.OnReceive;
+     pTCPOnline.OnDisconnect := @pEvent.OnDisconnect;
+     pTCPOnline.OnError := @pEvent.OnError;
+     If pTCPOnline.Connect( sAddress, nPort ) Then Begin
+        AddLineToConsole('Connecting...');
+        t := GetTime;
+        Repeat
+           pTCPOnline.CallAction;
+           Sleep(1);
+           If GetTime > t + 4.0 Then Break;
+        Until pTCPOnline.Connected;
+        If pTCPOnline.Connected Then Begin
+           AddStringToConsole('success.');
+           ClientInitOnline := True;
+        End Else Begin
+           AddStringToConsole('failed.');
+           ClientInitOnline := False;
+        End;
+     End Else Begin
+        AddLineToConsole('Can''t connect to server.');
+        ClientInitOnline := False;
+     End;
+End;
+
+
+
+Procedure ClientTerminateOnline () ;
+Begin
+     pTCPOnline.Disconnect;
+     pTCPOnline.Free;
+     pEvent.Free;
+     AddLineToConsole('Disconnected.');
+End;
+
+
+
+Procedure ClientLoopOnline () ;
+Begin
+     pTCPOnline.Callaction;
 End;
 
 
@@ -2803,7 +2870,10 @@ Begin
      If pSound = NIL Then Exit;
      
      // lecture du son
-     FSOUND_PlaySound( 1, pSound );
+     If (nIndex <> SOUND_MENU) Then
+        FSOUND_PlaySound( 1, pSound )
+     Else
+         FSOUND_PlaySound( 0, pSound );
 End;
 
 
@@ -2814,7 +2884,10 @@ End;
 Procedure StopSound ( nIndex : LongInt ) ;
 Begin
      // arrêt du son
-     FSOUND_StopSound( 1 );
+     If (nIndex <> SOUND_MENU) Then
+        FSOUND_StopSound( 1 )
+     Else
+         FSOUND_StopSound( 0 );
 End;
 
 

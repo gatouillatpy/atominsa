@@ -1523,6 +1523,9 @@ Var  k: Integer;
 Begin
      // enregistrement des paramètres
      WriteSettings( 'atominsa.cfg' );
+     
+     // on coupe la musique du menu
+     StopSound( SOUND_MENU );
 
      // initialisation de l'invite de messages
      bMessage := False;
@@ -2083,7 +2086,9 @@ Begin
      SetTexture( 1, TEXTURE_BOMBERMAN(nPlayer) );
      PushObjectMatrix( 8.0, 0.0, 5.5, 0.5, 0.5, 0.5, 80.0, GetTime * 60.0, 0.0 );
      DrawMesh( MESH_BOMBERMAN(nPlayer), False );
+     //DrawAnimation( ANIMATION_BOMBERMAN(nPlayer), False, 1 );
      PopObjectMatrix();
+
 
      // affichage du menu
      DrawString( STRING_GAME_MENU(2), -w / h * 0.4,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );

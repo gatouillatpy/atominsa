@@ -45,6 +45,8 @@ Begin
      PutRenderTexture();
      Clear( 1, 1, 1, 1 );
      GetRenderTexture();
+     
+     PlaySound( SOUND_MENU );
 
      // mise à jour de la machine d'état
      nState := STATE_MENU;

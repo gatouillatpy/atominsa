@@ -14,11 +14,20 @@ Uses Classes, SysUtils, UJellyBomb, UPunch, USpoog, UGoldFLame, UTrigger, UTrigg
 
 
 
+Const MULTI_NONE       = 0;
+Const MULTI_SERVER     = 1;
+Const MULTI_CLIENT     = 2;
+Const MULTI_ERROR      = 3;
+
 Var nClientCount : Integer;
 Var nClientIndex : Array [0..255] Of Integer;
 Var sClientName : Array [0..255] Of String;
 Var bClientReady : Array [0..255] Of Boolean;
 Var fPingTime, fPing : Single;
+
+
+
+Var nMulti : Integer;
 
 
 
@@ -36,12 +45,6 @@ Uses UBomberman, UListBomb, UBomb, UBlock, UItem, UGrid;
 
 
 
-Const MULTI_NONE       = 0;
-Const MULTI_SERVER     = 1;
-Const MULTI_CLIENT     = 2;
-Const MULTI_ERROR      = 3;
-
-Var nMulti : Integer;
 
 
 Const MENU_MULTI_NAME         = 81;
@@ -197,7 +200,7 @@ Begin
                         nMulti := MULTI_CLIENT;
                         For k := 1 To 8 Do Begin
                             nPlayerType[k] := PLAYER_NIL;
-                            nPlayerClient[k] := -1;
+                            nPlayerClient[k] := -2;      // Pour empêcher le choix de personnage avant d'avoir reçu la liste.
                         End;
                         InitMenu();
                         Send( nLocalIndex, HEADER_CONNECT, sLocalName );

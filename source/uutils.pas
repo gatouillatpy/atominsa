@@ -138,6 +138,8 @@ Const SOUND_MENU_MOVE    = 101;
       SOUND_MESSAGE      = 201;
 
       SOUND_BOMB_NULL    = 300;
+      
+      SOUND_MENU         = 400;
 
 Function SOUND_BOMB( k : Integer ) : Integer ;
 

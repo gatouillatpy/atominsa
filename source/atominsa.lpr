@@ -15,7 +15,7 @@ Procedure Exit () ;
 Begin
      DrawBox( 0.7, 0.4, 0.2, -0.4 );
 
-     If GetKey(KEY_Y) Then Begin
+     If GetKey(KEY_Y_LOWER) Or GetKey(KEY_Y_UPPER) Then Begin
         StopSound( SOUND_MENU_SELECT );
 
         FreeBomberman();
@@ -33,7 +33,7 @@ Begin
      
         Halt(0);
         
-     End Else If GetKey(KEY_N) Then Begin
+     End Else If GetKey(KEY_N_LOWER) Or GetKey(KEY_N_UPPER) Then Begin
          SetString( STRING_MENU_MAIN, ' ', 0.5, 0.1, 20 );
 
          PlaySound( SOUND_MENU_BACK );
@@ -47,6 +47,8 @@ End;
 Procedure AskExit () ;
 Begin
      InitBox( 'do you really want to quit ?', 'yes - no' );
+     
+     StopSound( SOUND_MENU );
 
      // désactivation de la souris
      BindButton( BUTTON_LEFT, NIL );
@@ -147,6 +149,9 @@ Begin
 
      // chargement du son de l'invite de messages
      AddSound( './sounds/message.wav', SOUND_MESSAGE );
+     
+     // chargement de la musique du menu
+     AddSound( './musics/menu.mp3', SOUND_MENU );
 
      // chargement des bombermen
      For k := 1 To 8 Do Begin
