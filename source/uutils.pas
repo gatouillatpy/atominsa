@@ -67,6 +67,8 @@ Const STATE_MULTI         = 16;
 Const PHASE_ONLINE        =  7;
 Const STATE_ONLINE        = 17;
 Const REFRESH_ONLINE      = 27;
+Const PHASE_NETWORK       =  8;
+Const STATE_NETWORK       = 18;
 
 Var nState : Integer;
 
@@ -79,7 +81,7 @@ Const GRIDWIDTH         = 15;           // largeur de la grille
       DEFAULTBOMBCOUNT  = 1;     // nombre initial de bombes
       DEFAULTSPEED      = 4;         // vitesse initiale des joueurs
       SPAWNCOUNT        = 256;         // nombre maximum de points d'apparitions
-      POWERUPCOUNT      = 13;        // nombre de powerups différents
+      POWERUPCOUNT      = 12;        // nombre de powerups différents
       TIMEDISEASE       = 10;         // duree d'action des maladies
       SPEEDCHANGE       = 0.5;          // valeur d'augmentation de la vitesse
       SPEEDLIMIT        = 7;           // vitesse maximale
@@ -181,6 +183,7 @@ Const TEXTURE_NONE              = 0;
       SPRITE_MENU_MAIN_BUTTON4  = 1006;
       SPRITE_MENU_MAIN_BUTTON5  = 1007;
       SPRITE_MENU_CROSS         = 1008;
+      SPRITE_BACK               = 1009;
       SPRITE_CHARSET_TERMINAL   = 1101;
       SPRITE_CHARSET_TERMINALX  = 1111;
       SPRITE_CHARSET_DIGITAL    = 1102;

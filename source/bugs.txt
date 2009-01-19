@@ -1,3 +1,2 @@
 - impossible de passer en runtime du mode plein écran au mode fenêtre et inversement
-- la résolution de l'écran n'est pas changeable depuis le jeu.
-- bombes punchées fonctionnent mal.
+- problème pour le switch display avec le reloaddatastack

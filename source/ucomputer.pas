@@ -72,7 +72,7 @@ Begin
    isBombermanFound := false;
    
    If ( ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.DiseaseNumber <> DISEASE_NONE )
-   Or ( pBomberman.uTriggerBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) ) Then
+   Or ( pBomberman.uGrabbedBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) ) Then
       afraid := false
    Else
        afraid := true;
@@ -94,11 +94,10 @@ Begin
 
      // On ajoute 2 à chaque case qui contient une bombe.
      For k := 1 To GetBombCount() Do Begin
-      {   If ( GetBombByCount(k).BIndex = pBomberman.BIndex ) And ( GetBombByCount(k) Is CTriggerBomb )
+         If ( GetBombByCount(k).BIndex = pBomberman.BIndex ) And ( GetBombByCount(k) Is CTriggerBomb )
          And ( ( GetBombByCount(k) As CTriggerBomb ).bIgnition = False ) Then
-             aState[Trunc(GetBombByCount(k).Position.X + 0.5), Trunc(GetBombByCount(k).Position.Y + 0.5)] += 8
-         Else } // A améliorer.
-             aState[Trunc(GetBombByCount(k).Position.X + 0.5), Trunc(GetBombByCount(k).Position.Y + 0.5)] += 2;
+             aState[Trunc(GetBombByCount(k).Position.X + 0.5), Trunc(GetBombByCount(k).Position.Y + 0.5)] += 32;
+         aState[Trunc(GetBombByCount(k).Position.X + 0.5), Trunc(GetBombByCount(k).Position.Y + 0.5)] += 2;
      End;
      
      // On ajoute 4 à chaque case qui contient un personnage autre que l'IA
@@ -653,10 +652,12 @@ Var
    numFreeCase,                                  // Numéro de la case libre (1:gauche,2:droite,3:haut,4:bas)
    sumFreeCases,                                 // Nombres de cases libres.
    result2 : Integer;                            // Résultat renvoyé
-   i, j : Integer;
+   i, j, k : Integer;
    continue,                                     // Vrai si on doit continuer la boucle while
+   isDangerous,                                  // Vrai si la bombe est dangereuse
    freeCase,                                     // Vrai si une case est libre
    upBomb, downBomb,                             // Vrai s'il y a une bombe sur la ligne/colonne supérieure (resp. inférieure)
+   canPushThisBomb,                              // Vrai s'il peut pousser la bombe en question.
    blocked : Boolean;                            // Vrai si le bomberman est coincé ( avec au maximum une case de liberté ).
    pBomb : CBomb;
 Begin
@@ -678,10 +679,28 @@ Begin
            // Traitement des bombes qui ne sont pas sur la ligne/colonne du bomberman.
               If ( wState[i, j] mod 4 >= 2 ) Then Begin
               // Si le bomberman n'est pas sur la ligne/colonne de la bombe, le danger est relativement faible.
-                 If ( ( x <> i ) And ( y <> j ) ) Or ( continue = false ) Then Begin
-                     result2 := result2 + 128 div ( abs(x - i) + abs(y - j) );
+                 If ( x <> i ) And ( y <> j ) Then Begin
+                 // Traitement des propres triggers bombes.
+                    isDangerous := True;
+                    If ( wState[i, j] mod 64 >= 32 ) Then Begin
+                         isDangerous := False;
+                         For k := 1 To i - 1 Do Begin
+                             If ( wState[ k, j ] mod 4 >= 2 ) Then isDangerous := True;
+                         End;
+                         For k := i + 1 To GRIDWIDTH Do Begin
+                             If ( wState[ k, j ] mod 4 >= 2 ) Then isDangerous := True;
+                         End;
+                         For k := 1 To j - 1 Do Begin
+                             If ( wState[ i, k ] mod 4 >= 2 ) Then isDangerous := True;
+                         End;
+                         For k := j + 1 To GRIDHEIGHT Do Begin
+                             If ( wState[ i, k ] mod 4 >= 2 ) Then isDangerous := True;
+                         End;
+                     End;
+                     If ( isDangerous = True ) Then k := 32 Else k := 1;
+                     result2 := result2 + 4 * k div ( abs(x - i) + abs(y - j) );
                      If ( GetBombByGridCoo(i, j) Is CBomb ) And ( GetBombByGridCoo(i, j).Time + 1 >= GetBombByGridCoo(i, j).ExploseTime ) Then Begin
-                        result2 := result2 + 128 div ( abs(x - i) + abs(y - j) );
+                        result2 := result2 + 4 * k div ( abs(x - i) + abs(y - j) );
                      End;
                  End;
               End;
@@ -695,7 +714,7 @@ Begin
                     result2 := result2 - 32 + 2 * ( abs(x - i) + abs(y - j) );
               End;
            // Traitement des bonus pour le niveau godlike.
-              If ( wSkill = SKILL_GODLIKE ) And ( wState[i, j] >= 16 ) Then Begin
+              If ( wSkill = SKILL_GODLIKE ) And ( wState[i, j] mod 32 >= 16 ) Then Begin
                  If ( pGrid.GetBlock(i,j) Is CDisease ) Or ( pGrid.GetBlock(i,j) Is CSuperDisease ) Then
                     result2 := result2 + 8 div ( abs(x - i) + abs(y - j) )
                  Else
@@ -712,12 +731,20 @@ Begin
            // Traitement des bombes.
               // Si le niveau est godlike est que le bomberman peut pousser la bombe, alors elle ne représente pas un danger.
               If ( wState[i, j] mod 4 >= 2 ) Then Begin
-                 If ( wSkill = SKILL_GODLIKE ) And ( canPush = true )
+                 canPushThisBomb := True;
+                 If  ( CanPush = False )
+                 Or ( ( x < i ) And ( ( i >= GRIDWIDTH ) Or ( wState[i+1, j] mod 16 >= 1 ) Or ( wState[i+1, j] mod 64 >= 32 ) ) )
+                 Or ( ( x > i ) And ( ( i <= 1 ) Or ( wState[i-1, j] mod 16 >= 1 ) Or ( wState[i-1, j] mod 64 >= 32 ) ) )
+                 Or ( ( y < j ) And ( ( j >= GRIDHEIGHT ) Or ( wState[i, j+1] mod 16 >= 1 ) Or ( wState[i, j+1] mod 64 >= 32 ) ) )
+                 Or ( ( y > j ) And ( ( j <= 1 ) Or ( wState[i, j-1] mod 16 >= 1 ) Or ( wState[i, j-1] mod 64 >= 32 ) ) ) Then
+                    canPushThisBomb := False;
+                 If ( wSkill = SKILL_GODLIKE ) And ( canPushThisBomb = true )
                  And ( GetBombByGridCoo(i, j) Is CBomb ) And ( GetBombByGridCoo(i, j).Time + 1 < GetBombByGridCoo(i, j).ExploseTime ) Then
                     result2 := result2 - 64
                  Else Begin
+                     result2 := result2 + 1024;
                      If ( GetBombByGridCoo(i, j) Is CBomb ) And ( GetBombByGridCoo(i, j).Time + 1 >= GetBombByGridCoo(i, j).ExploseTime ) Then
-                        result2 := result2 + 2048;
+                        result2 := result2 + 1024;
                      End;
               End;
            // Traitement des bombermans situés sur le même case.
@@ -727,7 +754,7 @@ Begin
               If ( wState[i, j] mod 16 >= 8 ) Then
                  result2 := result2 + 8192;
            // Traitement des bonus pour le niveau godlike.
-              If ( wSkill = SKILL_GODLIKE ) And ( wState[i, j] >= 16 ) Then Begin
+              If ( wSkill = SKILL_GODLIKE ) And ( wState[i, j] mod 32 >= 16 ) Then Begin
                  If ( pGrid.GetBlock(i,j) Is CDisease ) Or ( pGrid.GetBlock(i,j) Is CSuperDisease ) Then
                     result2 := result2 + 16
                  Else
@@ -741,6 +768,24 @@ Begin
    // Même colonne.
    For j := 1 To GRIDHEIGHT Do Begin
       If ( wState[x, j] mod 4 >= 2 ) Then Begin
+          // Triggers Bombs.
+          isDangerous := True;
+          If ( wState[x, j] mod 64 >= 32 ) Then Begin
+               isDangerous := False;
+               For k := 1 To x - 1 Do Begin
+                   If ( wState[ k, j ] mod 4 >= 2 ) Then isDangerous := True;
+               End;
+               For k := x + 1 To GRIDWIDTH Do Begin
+                   If ( wState[ k, j ] mod 4 >= 2 ) Then isDangerous := True;
+               End;
+               For k := 1 To j - 1 Do Begin
+                   If ( wState[ x, k ] mod 4 >= 2 ) Then isDangerous := True;
+               End;
+               For k := j + 1 To GRIDHEIGHT Do Begin
+                   If ( wState[ x, k ] mod 4 >= 2 ) Then isDangerous := True;
+               End;
+          End;
+          If ( isDangerous = True ) Then k := 32 Else k := 1;
           continue := true;
           If ( y > j ) Then iBomb := j + 1 Else iBomb := j - 1;
           While ( continue = true ) And ( iBomb <> y ) Do Begin
@@ -753,32 +798,32 @@ Begin
              If ( abs(y - j) <= 2 ) Then Begin
                 If ( GetBombByGridCoo(x, j) Is CBomb ) And ( GetBombermanByIndex( GetBombByGridCoo(x, j).BIndex ) Is CBomberman )
                 And ( abs(y - j) <= GetBombermanByIndex( GetBombByGridCoo(x, j).BIndex ).FlameSize ) Then
-                   result2 := result2 + 1024
+                   result2 := result2 + 32 * k
                 Else
-                    result2 := result2 + 128;
+                    result2 := result2 + 4 * k;
              End
              Else Begin
                   If ( GetBombByGridCoo(x, j) Is CBomb ) And ( GetBombermanByIndex( GetBombByGridCoo(x, j).BIndex ) Is CBomberman )
                   And ( abs(y - j) <= GetBombermanByIndex( GetBombByGridCoo(x, j).BIndex ).FlameSize ) Then
-                     result2 := result2 + 2048 div abs(y - j)
+                     result2 := result2 + 64 * k div abs(y - j)
                   Else
-                      result2 := result2 + 256 div abs(y - j);
+                      result2 := result2 + 8 * k div abs(y - j);
              End;
              If ( GetBombByGridCoo(x, j) Is CBomb )
              And ( GetBombByGridCoo(x, j).Time + 1 >= GetBombByGridCoo(x, j).ExploseTime ) Then Begin
                  If ( abs(y - j) <= 2 ) Then Begin
                     If ( GetBombByGridCoo(x, j) Is CBomb ) And ( GetBombermanByIndex( GetBombByGridCoo(x, j).BIndex ) Is CBomberman )
                     And ( abs(y - j) <= GetBombermanByIndex( GetBombByGridCoo(x, j).BIndex ).FlameSize ) Then
-                       result2 := result2 + 1024
+                       result2 := result2 + 32 * k
                     Else
-                        result2 := result2 + 128;
+                        result2 := result2 + 4 * k;
                  End
                  Else Begin
                       If ( GetBombByGridCoo(x, j) Is CBomb ) And ( GetBombermanByIndex( GetBombByGridCoo(x, j).BIndex ) Is CBomberman )
                       And ( abs(y - j) <= GetBombermanByIndex( GetBombByGridCoo(x, j).BIndex ).FlameSize ) Then
-                         result2 := result2 + 2048 div abs(y - j)
+                         result2 := result2 + 64 * k div abs(y - j)
                       Else
-                          result2 := result2 + 256 div abs(y - j);
+                          result2 := result2 + 8 * k div abs(y - j);
                  End;
              End;
           End;
@@ -787,6 +832,24 @@ Begin
    // Même ligne.
    For i := 1 To GRIDWIDTH Do Begin
        If ( wState[i, y] mod 4 >= 2 ) Then Begin
+          // Triggers Bombs
+          isDangerous := True;
+          If ( wState[i, y] mod 64 >= 32 ) Then Begin
+               isDangerous := False;
+               For k := 1 To i - 1 Do Begin
+                   If ( wState[ k, y ] mod 4 >= 2 ) Then isDangerous := True;
+               End;
+               For k := i + 1 To GRIDWIDTH Do Begin
+                   If ( wState[ k, y ] mod 4 >= 2 ) Then isDangerous := True;
+               End;
+               For k := 1 To y - 1 Do Begin
+                   If ( wState[ i, k ] mod 4 >= 2 ) Then isDangerous := True;
+               End;
+               For k := y + 1 To GRIDHEIGHT Do Begin
+                   If ( wState[ i, k ] mod 4 >= 2 ) Then isDangerous := True;
+               End;
+          End;
+          If ( isDangerous = True ) Then k := 32 Else k := 1;
           continue := true;
           If ( x > i ) Then iBomb := i + 1 Else iBomb := i - 1;
           While ( continue = true ) And ( iBomb <> x ) Do Begin
@@ -798,32 +861,32 @@ Begin
              If ( abs(x - i) <= 2 ) Then Begin
                 If ( GetBombByGridCoo(i, y) Is CBomb ) And ( GetBombermanByIndex( GetBombByGridCoo(i, y).BIndex ) Is CBomberman )
                 And( abs(x - i) <= GetBombermanByIndex( GetBombByGridCoo(i, y).BIndex ).FlameSize ) Then
-                   result2 := result2 + 1024
+                   result2 := result2 + 32 * k
                 Else
-                    result2 := result2 + 128;
+                    result2 := result2 + 4 * k;
              End
              Else Begin
                   If ( GetBombByGridCoo(i, y) Is CBomb ) And ( GetBombermanByIndex( GetBombByGridCoo(i, y).BIndex ) Is CBomberman )
                   And( abs(x - i) <= GetBombermanByIndex( GetBombByGridCoo(i, y).BIndex ).FlameSize ) Then
-                     result2 := result2 + 2048 div abs(x - i)
+                     result2 := result2 + 64 * k div abs(x - i)
                   Else
-                      result2 := result2 + 256 div abs(x - i);
+                      result2 := result2 + 8 * k div abs(x - i);
              End;
              If ( GetBombByGridCoo(i, y) Is CBomb )
              And ( GetBombByGridCoo(i, y).Time + 1 >= GetBombByGridCoo(i, y).ExploseTime ) Then Begin
                  If ( abs(x - i) <= 2 ) Then Begin
                     If ( GetBombByGridCoo(i, y) Is CBomb ) And ( GetBombermanByIndex( GetBombByGridCoo(i, y).BIndex ) Is CBomberman )
                     And( abs(x - i) <= GetBombermanByIndex( GetBombByGridCoo(i, y).BIndex ).FlameSize ) Then
-                       result2 := result2 + 1024
+                       result2 := result2 + 32 * k
                     Else
-                        result2 := result2 + 128;
+                        result2 := result2 + 4 * k;
                  End
                  Else Begin
                       If ( GetBombByGridCoo(i, y) Is CBomb ) And ( GetBombermanByIndex( GetBombByGridCoo(i, y).BIndex ) Is CBomberman )
                       And( abs(x - i) <= GetBombermanByIndex( GetBombByGridCoo(i, y).BIndex ).FlameSize ) Then
-                         result2 := result2 + 2048 div abs(x - i)
+                         result2 := result2 + 64 * k div abs(x - i)
                       Else
-                          result2 := result2 + 256 div abs(x - i);
+                          result2 := result2 + 8 * k div abs(x - i);
                  End;
              End;
           End;

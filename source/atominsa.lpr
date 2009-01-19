@@ -7,7 +7,7 @@ Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
      UPractice, UMenu, UIntro, UEditor, UMulti, UGrab, uJelly, UJellyBomb,
      UListBomb, UPunch, USpoog, UGoldFlame, UTriggerBomb, UTrigger,
-     USuperDisease, URandomBonus, UExplosion, UOnline;
+     USuperDisease, URandomBonus, UExplosion, UOnline, UNetwork;
 
 
 
@@ -78,6 +78,8 @@ Begin
           PHASE_ONLINE    : InitMenuOnline();
           STATE_ONLINE    : ProcessMenuOnline();
           REFRESH_ONLINE  : ProcessClientOnline();
+          PHASE_NETWORK   : InitMenuNetwork();
+          STATE_NETWORK   : ProcessMenuNetwork();
      End;
 End;
 
@@ -129,6 +131,7 @@ Begin
      AddTexture( './textures/mainbt4.jpg', SPRITE_MENU_MAIN_BUTTON4 );
      AddTexture( './textures/mainbt5.jpg', SPRITE_MENU_MAIN_BUTTON5 );
      AddTexture( './textures/cross.jpg', SPRITE_MENU_CROSS );
+     AddTexture( './maps/night/sb-front.jpg', SPRITE_BACK );
 
      // chargement des polices de caractères
      AddTexture( './textures/charset0.jpg', SPRITE_CHARSET_TERMINAL );
@@ -181,7 +184,7 @@ Begin
      End;
 
      // définition de la touche pour le passage en plein écran
-     BindKeyStd( KEY_F11, True, True, @SwitchDisplay );
+     BindKeyStd( nKeyScreen, True, True, @SwitchDisplay );
 
      ExecGlut();
 

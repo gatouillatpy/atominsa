@@ -1140,7 +1140,7 @@ Begin
      uGrabbedBomb:=CBomb(uGrid.GetBlock(dX,dY));
      uGrid.DelBlock(dX,dY);
      uGrabbedBomb.StopTime();
-     uGrabbedBomb.Position.z:=0.75;
+     uGrabbedBomb.Position.z:=0.85;
 End;
 
 
@@ -1202,6 +1202,7 @@ end;
 procedure CBomberman.PunchBomb(dt: Single);
 var dX, dY : integer;
     delta : single;
+    sData : String;
 begin
   delta := 0.5;
   dX := Trunc(fPosition.x);
@@ -1224,13 +1225,24 @@ begin
 
  if CheckCoordinates(dX,dY) then
   if ((uGrid.GetBlock(dX,dY)<>nil) AND (uGrid.GetBlock(dX,dY) is CBomb)) then
+  // TODO : Tester la condition reseau
   begin
-    case nDirection of
-      0    :  CBomb(uGrid.GetBlock(dX,dY)).Punch(DOWN,dt);
-      90   :  CBomb(uGrid.GetBlock(dX,dY)).Punch(LEFT,dt);
-      180  :  CBomb(uGrid.GetBlock(dX,dY)).Punch(UP,dt);
-      -90  :  CBomb(uGrid.GetBlock(dX,dY)).Punch(RIGHT,dt);
-    end;
+       If ( (bMulti = false) Or (nLocalIndex = nClientIndex[0]) ) Then Begin
+          case nDirection of
+            0    :  CBomb(uGrid.GetBlock(dX,dY)).Punch(DOWN,dt);
+            90   :  CBomb(uGrid.GetBlock(dX,dY)).Punch(LEFT,dt);
+            180  :  CBomb(uGrid.GetBlock(dX,dY)).Punch(UP,dt);
+            -90  :  CBomb(uGrid.GetBlock(dX,dY)).Punch(RIGHT,dt);
+          end;
+       End
+       Else Begin
+             sData := sData + IntToStr( nIndex ) + #31;
+             sData := sData + IntToStr( nDirection ) + #31;
+             sData := sData + IntToStr( dX ) + #31;
+             sData := sData + IntToStr( dY ) + #31;
+             sData := sData + FormatFloat('0.000', dt ) + #31;
+             Send( nLocalIndex, HEADER_PUNCH, sData );
+       End;
   end;
 end;
 
@@ -1342,8 +1354,8 @@ begin
      CreateBomb(dt, Random(1000000000));
   if (uGrabbedBomb<>nil) then
   begin
-    uGrabbedBomb.Position.x:=fPosition.x;
-    uGrabbedBomb.Position.y:=fPosition.y;
+    uGrabbedBomb.Position.x:=fPosition.x-0.1;
+    uGrabbedBomb.Position.y:=fPosition.y-0.1;
   end;
 end;
 

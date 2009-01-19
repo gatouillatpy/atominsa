@@ -200,6 +200,7 @@ Begin
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
         nState := PHASE_MENU;
+        ClearInput();
      End;
 End;
 

@@ -17,6 +17,7 @@ Uses Classes, SysUtils, GLext, GL,
 
 
 Var bMulti : Boolean;
+    bOnline : Boolean;
     bGoToPhaseMenu : Boolean;
 
 
@@ -94,6 +95,7 @@ Var nCamera  : Integer;
     vCenter  : Vector;
     vAngle   : Vector;
     vPointer : Vector;
+    vSpeed : Vector;
 
 
 
@@ -302,7 +304,8 @@ End;
 
 
 Procedure SetCamera () ;
-Var bFollow, bReturn : Boolean;
+Var bFollow, bReturn, bGrabbed : Boolean;
+    i : Integer;
 Begin
      bFollow := False;
      If GetTime - fGameTime < 3.0 Then Begin
@@ -316,6 +319,9 @@ Begin
         vCamera.x := vPointer.x;
         vCamera.y := vPointer.y;
         vCamera.z := vPointer.z;
+        vSpeed.x := 0;
+        vSpeed.y := 0;
+        vSpeed.z := 0;
      End Else If GetTime - fWaitTime < 1.0 Then Begin
      // on s'éloigne du plateau la dernière seconde d'un round
         vPointer.x := 8.0;
@@ -384,7 +390,9 @@ Begin
            vPointer.z -= GetDelta() * 1.0 * sin(vAngle.x + PI*0.5);
         End;
         vCamera.x := vPointer.x;
-        vCamera.y := vPointer.y;
+        If ( vPointer.y >= 0.05 ) Then
+           vCamera.y := vPointer.y
+        Else vCamera.y := 0.05;
         vCamera.z := vPointer.z;
         vCenter.x := vCamera.x + cos(vAngle.x);
         vCenter.y := vCamera.y + sin(vAngle.y);
@@ -403,8 +411,16 @@ Begin
              vCenter.z += GetDelta() * ( GetBombermanByCount(nCamera).Position.Y - vCenter.z ) * abs ( vCamera.x - vCenter.x );
         End;
 
+        bGrabbed := False;
+        For i := 1 To GetBombermanCount() Do Begin
+            If ( GetBombermanByCount(i) Is CBomberman )
+            And ( ( GetBombermanByCount(i).uGrabbedBomb <> Nil ) Or ( GetBombermanByCount(i).bGrabbed = True )
+            Or ( GetBombermanByCount(i).bCanGrabBomb = True ) ) Then Begin
+               bGrabbed := True;
+            End;
+        End;
+        If ( bGrabbed ) Then vPointer.y := 1.6 Else vPointer.y := 1.0;
         If GetBombermanByCount(nCamera).Direction = 0 Then Begin
-           vPointer.y := 1.0;
            vPointer.z := vCenter.z - 2.0;
            If ( vCamera.z <= vCenter.z - 1.0 ) Then Begin
               vPointer.x := vCenter.x;
@@ -419,7 +435,6 @@ Begin
                 End;
            End;
         End Else If GetBombermanByCount(nCamera).Direction = 90 Then Begin
-            vPointer.y := 1.0;
             vPointer.x := vCenter.x + 2.0;
             If ( vCamera.x >= vCenter.x + 1.0 ) Then Begin
                vPointer.z := vCenter.z;
@@ -434,7 +449,6 @@ Begin
                  End;
             End;
         End Else If GetBombermanByCount(nCamera).Direction = 180 Then Begin
-           vPointer.y := 1.0;
            vPointer.z := vCenter.z + 2.0;
            If ( vCamera.z >= vCenter.z + 1.0 ) Then Begin
               vPointer.x := vCenter.x;
@@ -449,7 +463,6 @@ Begin
                 End;
            End;
         End Else If GetBombermanByCount(nCamera).Direction = -90 Then Begin
-           vPointer.y := 1.0;
            vPointer.x := vCenter.x - 2.0;
             If ( vCamera.x <= vCenter.x - 1.0 ) Then Begin
                vPointer.z := vCenter.z;
@@ -468,30 +481,158 @@ Begin
      
      // déplacement progressif de la camera vers son pointeur pour rendre plus fluide le mouvement
      If ( bFollow = False ) Then Begin
-         vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x );
-         vCamera.y -= GetDelta() * ( vCamera.y - vPointer.y );
-         vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z );
+        If ( nCamera <> CAMERA_FLY ) Then Begin
+            If ( abs ( vCamera.x - vPointer.x - vSpeed.x ) > GetDelta() )
+            And ( ( ( 0 < vSpeed.x ) And ( vSpeed.x < vCamera.x - vPointer.x ) )
+            Or ( ( vSpeed.x < 0 ) And ( vCamera.x - vPointer.x < vSpeed.x ) ) ) Then Begin
+               vCamera.x -= GetDelta() * ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) + vSpeed.x );
+               vSpeed.x := ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) + vSpeed.x );
+            End
+            Else Begin
+                vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x );
+                vSpeed.x := ( vCamera.x - vPointer.x );
+            End;
+            If ( abs ( vCamera.y - vPointer.y - vSpeed.y ) > GetDelta() )
+            And ( ( ( 0 < vSpeed.y ) And ( vSpeed.y < vCamera.y - vPointer.y ) )
+            Or ( ( vSpeed.y < 0 ) And ( vCamera.y - vPointer.y < vSpeed.y ) ) ) Then Begin
+               vCamera.y -= GetDelta() * ( GetDelta() * abs ( vCamera.y - vPointer.y ) / ( vCamera.y - vPointer.y ) + vSpeed.y );
+               vSpeed.y := ( GetDelta() * abs ( vCamera.y - vPointer.y ) / ( vCamera.y - vPointer.y ) + vSpeed.y );
+            End
+            Else Begin
+                vCamera.y -= GetDelta() * ( vCamera.y - vPointer.y );
+                vSpeed.y := ( vCamera.y - vPointer.y );
+            End;
+            If ( abs ( vCamera.z - vPointer.z - vSpeed.z ) > GetDelta() )
+            And ( ( ( 0 < vSpeed.z ) And ( vSpeed.z < vCamera.z - vPointer.z ) )
+            Or ( ( vSpeed.z < 0 ) And ( vCamera.z - vPointer.z < vSpeed.z ) ) ) Then Begin
+               vCamera.z -= GetDelta() * ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) + vSpeed.z );
+               vSpeed.z := ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) + vSpeed.z );
+            End
+            Else Begin
+                vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z );
+                vSpeed.z := ( vCamera.z - vPointer.z );
+            End;
+        End;
      End
      Else Begin
          If ( GetBombermanByCount(nCamera).Direction = -90 ) Or  ( GetBombermanByCount(nCamera).Direction = 90 ) Then Begin
-            If ( bReturn ) Then vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x )
-            Else vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x ) * 4.0;
+            If ( bReturn ) Then Begin
+                If ( abs ( vCamera.x - vPointer.x - vSpeed.x ) > GetDelta() )
+                And ( ( ( 0 < vSpeed.x ) And ( vSpeed.x < vCamera.x - vPointer.x ) )
+                Or ( ( vSpeed.x < 0 ) And ( vCamera.x - vPointer.x < vSpeed.x ) ) ) Then Begin
+                   vCamera.x -= GetDelta() * ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) + vSpeed.x );
+                   vSpeed.x := ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) + vSpeed.x );
+                End
+                Else Begin
+                    vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x );
+                    vSpeed.x := ( vCamera.x - vPointer.x );
+                End;
+            End
+            Else Begin
+                If ( abs ( vCamera.x - vPointer.x - vSpeed.x ) > GetDelta() )
+                And ( ( ( 0 < vSpeed.x ) And ( vSpeed.x < vCamera.x - vPointer.x ) )
+                Or ( ( vSpeed.x < 0 ) And ( vCamera.x - vPointer.x < vSpeed.x ) ) ) Then Begin
+                   vCamera.x -= GetDelta() * ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) * 4.0 + vSpeed.x );
+                   vSpeed.x := ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) * 4.0 + vSpeed.x );
+                End
+                Else Begin
+                    vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x ) * 4.0;
+                    vSpeed.x := ( vCamera.x - vPointer.x ) * 4.0;
+                End;
+            End;
          End
          Else Begin
-              If ( bReturn ) Then vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x ) * 4.0
-              Else vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x );
+              If ( bReturn ) Then Begin
+                If ( abs ( vCamera.x - vPointer.x - vSpeed.x ) > GetDelta() )
+                And ( ( ( 0 < vSpeed.x ) And ( vSpeed.x < vCamera.x - vPointer.x ) )
+                Or ( ( vSpeed.x < 0 ) And ( vCamera.x - vPointer.x < vSpeed.x ) ) ) Then Begin
+                   vCamera.x -= GetDelta() * ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) * 4.0 + vSpeed.x );
+                   vSpeed.x := ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) * 4.0 + vSpeed.x );
+                End
+                Else Begin
+                    vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x ) * 4.0;
+                    vSpeed.x := ( vCamera.x - vPointer.x ) * 4.0;
+                End;
+              End
+              Else Begin
+                  If ( abs ( vCamera.x - vPointer.x - vSpeed.x ) > GetDelta() )
+                  And ( ( ( 0 < vSpeed.x ) And ( vSpeed.x < vCamera.x - vPointer.x ) )
+                  Or ( ( vSpeed.x < 0 ) And ( vCamera.x - vPointer.x < vSpeed.x ) ) ) Then Begin
+                     vCamera.x -= GetDelta() * ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) + vSpeed.x );
+                     vSpeed.x := ( GetDelta() * abs ( vCamera.x - vPointer.x ) / ( vCamera.x - vPointer.x ) + vSpeed.x );
+                  End
+                  Else Begin
+                      vCamera.x -= GetDelta() * ( vCamera.x - vPointer.x );
+                      vSpeed.x := ( vCamera.x - vPointer.x );
+                  End;
+              End;
          End;
-         If ( vCamera.y <> vPointer.y ) Then vCamera.y -= GetDelta() * ( vCamera.y - vPointer.y );
+         If ( vCamera.y <> vPointer.y ) Then Begin
+               If ( abs ( vCamera.y - vPointer.y - vSpeed.y ) > GetDelta() )
+               And ( ( ( 0 < vSpeed.y ) And ( vSpeed.y < vCamera.y - vPointer.y ) )
+               Or ( ( vSpeed.y < 0 ) And ( vCamera.y - vPointer.y < vSpeed.y ) ) ) Then Begin
+                   vCamera.y -= GetDelta() * ( GetDelta() * abs ( vCamera.y - vPointer.y ) / ( vCamera.y - vPointer.y ) + vSpeed.y );
+                   vSpeed.y := ( GetDelta() * abs ( vCamera.y - vPointer.y ) / ( vCamera.y - vPointer.y ) + vSpeed.y );
+              End
+              Else Begin
+                  vCamera.y -= GetDelta() * ( vCamera.y - vPointer.y );
+                  vSpeed.y := ( vCamera.y - vPointer.y );
+              End;
+         End;
          If ( GetBombermanByCount(nCamera).Direction = 0 ) Or  ( GetBombermanByCount(nCamera).Direction = 180 ) Then Begin
-             If ( bReturn ) Then vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z )
-             Else vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z ) * 4.0;
+             If ( bReturn ) Then Begin
+                If ( abs ( vCamera.z - vPointer.z - vSpeed.z ) > GetDelta() )
+                And ( ( ( 0 < vSpeed.z ) And ( vSpeed.z < vCamera.z - vPointer.z ) )
+                Or ( ( vSpeed.z < 0 ) And ( vCamera.z - vPointer.z < vSpeed.z ) ) ) Then Begin
+                   vCamera.z -= GetDelta() * ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) + vSpeed.z );
+                   vSpeed.z := ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) + vSpeed.z );
+                End
+                Else Begin
+                    vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z );
+                    vSpeed.z := ( vCamera.z - vPointer.z );
+                End;
+            End
+            Else Begin
+                If ( abs ( vCamera.z - vPointer.z - vSpeed.z ) > GetDelta() )
+                And ( ( ( 0 < vSpeed.z ) And ( vSpeed.z < vCamera.z - vPointer.z ) )
+                Or ( ( vSpeed.z < 0 ) And ( vCamera.z - vPointer.z < vSpeed.z ) ) ) Then Begin
+                   vCamera.z -= GetDelta() * ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) * 4.0 + vSpeed.z );
+                   vSpeed.z := ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) * 4.0 + vSpeed.z );
+                End
+                Else Begin
+                    vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z ) * 4.0;
+                    vSpeed.z := ( vCamera.z - vPointer.z ) * 4.0;
+                End;
+            End;
          End
          Else Begin
-              If ( bReturn ) Then vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z ) * 4.0
-              Else vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z );
+              If ( bReturn ) Then Begin
+                If ( abs ( vCamera.z - vPointer.z - vSpeed.z ) > GetDelta() )
+                And ( ( ( 0 < vSpeed.z ) And ( vSpeed.z < vCamera.z - vPointer.z ) )
+                Or ( ( vSpeed.z < 0 ) And ( vCamera.z - vPointer.z < vSpeed.z ) ) ) Then Begin
+                   vCamera.z -= GetDelta() * ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) * 4.0 + vSpeed.z );
+                   vSpeed.z := ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) * 4.0 + vSpeed.z );
+                End
+                Else Begin
+                    vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z ) * 4.0;
+                    vSpeed.z := ( vCamera.z - vPointer.z ) * 4.0;
+                End;
+              End
+              Else Begin
+                  If ( abs ( vCamera.z - vPointer.z - vSpeed.z ) > GetDelta() )
+                  And ( ( ( 0 < vSpeed.z ) And ( vSpeed.z < vCamera.z - vPointer.z ) )
+                  Or ( ( vSpeed.z < 0 ) And ( vCamera.z - vPointer.z < vSpeed.z ) ) ) Then Begin
+                     vCamera.z -= GetDelta() * ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) + vSpeed.z );
+                     vSpeed.z := ( GetDelta() * abs ( vCamera.z - vPointer.z ) / ( vCamera.z - vPointer.z ) + vSpeed.z );
+                  End
+                  Else Begin
+                      vCamera.z -= GetDelta() * ( vCamera.z - vPointer.z );
+                      vSpeed.z := ( vCamera.z - vPointer.z );
+                  End;
+              End;
          End;
      End;
-
+     
      // envoi des données au moteur graphique
      SetProjectionMatrix ( 90.0, 1.0, 0.1, 2048.0 ) ;
      SetCameraMatrix ( vCamera.x, vCamera.y, vCamera.z, vCenter.x, vCenter.y, vCenter.z, 0, 1, 0 ) ;
@@ -985,7 +1126,8 @@ Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
 
-     If GetKey(KEY_TAB) Then Begin
+     If ( ( nKeyPing < 0 ) And GetKeyS( nKeyPing ) )
+     Or ( ( nKeyPing >= 0 ) And GetKey( nKeyPing ) ) Then Begin
         If Not bScoreTable Then Begin
            If GetBombermanCount() <> 0 Then
               For i := 1 To GetBombermanCount() Do
@@ -1011,7 +1153,8 @@ Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
 
-     If GetKey(KEY_SQUARE) Then Begin
+     If ( ( nKeyChat < 0 ) And GetKeyS( nKeyChat ) )
+     Or ( ( nKeyChat >= 0 ) And GetKey( nKeyChat ) ) Then Begin
         If GetTime > fKey Then Begin
            SetString( STRING_MESSAGE, 'say : ' + sMessage, 0.0, 0.02, 600 );
            bMessage := Not bMessage;
@@ -1026,11 +1169,7 @@ Begin
          If GetKey( KEY_ENTER ) Then Begin
             If Not bEnter Then Begin
                PlaySound( SOUND_MESSAGE );
-               If ( bMulti = False ) Then Begin
-                    AddLineToConsole( sClientName[ClientIndex(nLocalIndex)] + ' says : ' + sMessage );
-                    AddStringToScreen( sClientName[ClientIndex(nLocalIndex)] + ' says : ' + sMessage );
-               End
-               Else Send( nLocalIndex, HEADER_MESSAGE, sMessage );
+               Send( nLocalIndex, HEADER_MESSAGE, sMessage );
                bMessage := False;
                sMessage := '';
             End;
@@ -1104,8 +1243,22 @@ End;
 Procedure InitScore () ;
 Var i : Integer;
     aBomberman : CBomberman;
+    sData : String;
 Begin
      ClearInput();
+     
+     // envoi au master serveur des résultats.
+     If ( bOnline ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
+         sData := IntToStr( GetBombermanCount() ) + #31;
+         For i := 1 To GetBombermanCount() Do Begin
+             aBomberman := GetBombermanByCount(i);
+             sData := sData + IntToStr( aBomberman.BIndex ) + #31;
+             sData := sData + IntToStr( aBomberman.Score ) + #31;
+             sData := sData + IntToStr( aBomberman.Kills ) + #31;
+             sData := sData + IntToStr( aBomberman.Deaths ) + #31;
+         End;
+         SendOnline( nLocalIndex, HEADER_ONLINE_SCORE, sData );
+     End;
      
      // suppression des touches des joueurs
      BindKeyObj( nKey1MoveUp, True, False, NIL );
@@ -1652,8 +1805,7 @@ Procedure ProcessGame () ;
         DrawSkybox( p * 1.0, p * 1.0, p * 1.0, p * 1.0, TEXTURE_MAP_SKYBOX(0) );
 
         // affichage de l'invite de messages
-        //If bMulti Then DrawMessage( p * 1.0 );
-        DrawMessage( p * 1.0 );
+        If bMulti Then DrawMessage( p * 1.0 );
 
         // affichage des informations
         DrawNotification( p * 1.0 );
@@ -1819,7 +1971,8 @@ Begin
      CheckTimer();
 
      // force l'arrêt du round par la minuterie
-     If GetKeyS( KEY_F10 ) Then Begin
+     If ( ( nKeyDrawGame < 0 ) And GetKeyS( nKeyDrawGame ) )
+     Or ( ( nKeyDrawGame >= 0 ) And GetKey( nKeyDrawGame ) ) Then Begin
         If (bMulti = False) Or ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
            fRoundTime := fRoundTime - fRoundDuration - 3.0;
         End;
@@ -1845,6 +1998,25 @@ Begin
 
      // force l'abandon du jeu
      If GetKey( KEY_ESC ) Then Begin
+        // suppression des touches des joueurs
+        BindKeyObj( nKey1MoveUp, True, False, NIL );
+        BindKeyObj( nKey1MoveDown, True, False, NIL );
+        BindKeyObj( nKey1MoveLeft, True, False, NIL );
+        BindKeyObj( nKey1MoveRight, True, False, NIL );
+        BindKeyObj( nKey1Primary, True, False, NIL );
+        BindKeyObj( nKey1Secondary, True, False, NIL );
+        BindKeyObj( nKey1Primary, False, False, NIL );
+        BindKeyObj( nKey1Secondary, False, False, NIL );
+
+        BindKeyObj( nKey2MoveUp, True, False, NIL );
+        BindKeyObj( nKey2MoveDown, True, False, NIL );
+        BindKeyObj( nKey2MoveLeft, True, False, NIL );
+        BindKeyObj( nKey2MoveRight, True, False, NIL );
+        BindKeyObj( nKey2Primary, True, False, NIL );
+        BindKeyObj( nKey2Secondary, True, False, NIL );
+        BindKeyObj( nKey2Primary, False, False, NIL );
+        BindKeyObj( nKey2Secondary, False, False, NIL );
+        
         If (bMulti = False) Then Begin
            InitMenu();
            ClearInput();
@@ -1856,7 +2028,6 @@ Begin
             ClearInput();
         End Else Begin
             PlaySound( SOUND_MENU_BACK );
-            //TODO : Mettre une temporisation.
             If ( GetTime > fKey ) Then Begin
                If ( bGoToPhaseMenu = False ) Then bGoToPhaseMenu := True Else nState := PHASE_MENU;
                fKey := GetTime + 8.0;
@@ -1868,7 +2039,9 @@ Begin
      // Possibilité de changer de vue avec la barre espace quand nos personnages sont morts.
      If ( ( pPlayer1 = Nil ) Or ( pPlayer1.Alive = False ) )
      And ( ( pPlayer2 = Nil ) Or ( pPlayer2.Alive = False ) )
-     And GetKey( KEY_SPACE ) And ( GetTime > fKey ) Then Begin
+     And ( ( ( nKeyCamera < 0 ) And GetKeyS( nKeyCamera ) )
+     Or ( ( nKeyCamera >= 0 ) And GetKey( nKeyCamera ) ) )
+     And ( GetTime > fKey ) Then Begin
          If ( nCamera = CAMERA_OVERALL ) Then nCamera := CAMERA_FLY
          Else Begin
               If ( nCamera > 0 ) Or ( nCamera = CAMERA_FLY ) Then Begin
@@ -2108,6 +2281,14 @@ Begin
         nGame := GAME_MENU;
         SetString( STRING_GAME_MENU(10 + nPlayer), PlayerInfo(nPlayer), 0.0, 0.02, 600 );
         nMenu := MENU_PLAYER1 + nPlayer - 1;
+        If ( bOnline ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
+           sData := IntToStr( nPlayer ) + #31;
+           sData := sData + IntToStr( nPlayerType[nPlayer] ) + #31;
+           sData := sData + sPlayerName[nPlayer] + #31;
+           sData := sData + sUserName + #31;
+           sData := sData + sUserPassword + #31;
+           SendOnline( nLocalIndex, HEADER_ONLINE_PLAYER, sData );
+        End;
         If bMulti = True Then Begin
             If nPlayerType[nPlayer] = PLAYER_NIL Then Begin
                nPlayerClient[nPlayer] := -1;
@@ -2287,6 +2468,14 @@ Begin
                      nGame := GAME_MENU;
                      SetString( STRING_GAME_MENU(10 + nPlayer), PlayerInfo(nPlayer), 0.0, 0.02, 600 );
                      nMenu := MENU_PLAYER1 + nPlayer - 1;
+                     If ( bOnline ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
+                         sData := IntToStr( nPlayer ) + #31;
+                         sData := sData + IntToStr( nPlayerType[nPlayer] ) + #31;
+                         sData := sData + sPlayerName[nPlayer] + #31;
+                         sData := sData + sUserName + #31;
+                         sData := sData + sUserPassword + #31;
+                         SendOnline( nLocalIndex, HEADER_ONLINE_PLAYER, sData );
+                     End;
                      If bMulti = True Then Begin
                         If nPlayerType[nPlayer] = PLAYER_NIL Then Begin
                            nPlayerClient[nPlayer] := -1;
@@ -2443,6 +2632,16 @@ Begin
      SetString( STRING_GAME_MENU(17), PlayerInfo(7), 0.2, 1.0, 600 );
      SetString( STRING_GAME_MENU(18), PlayerInfo(8), 0.2, 1.0, 600 );
 
+     // Ajout de la couleur
+     SetString( STRING_GAME_MENU(111), '*', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(112), '*', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(113), '*', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(114), '*', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(115), '*', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(116), '*', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(117), '*', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(118), '*', 0.2, 1.0, 600 );
+
      // chargement et ajout du scheme
      LoadScheme();
      If nScheme = -1 Then Begin
@@ -2527,6 +2726,16 @@ Begin
      t += 0.12;
      DrawString( STRING_GAME_MENU(41), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_ROUNDCOUNT), IsActive(MENU_ROUNDCOUNT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
      DrawString( STRING_GAME_MENU(51), -w / h * -0.6, -0.8, -1, 0.024 * w / h, 0.036, 1.0, IsActive(MENU_FIGHT), IsActive(MENU_FIGHT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     t := 0.0;
+     DrawString( STRING_GAME_MENU(111), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 1, 0, 0, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
+     DrawString( STRING_GAME_MENU(112), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 0, 0, 1, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
+     DrawString( STRING_GAME_MENU(113), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 0, 1, 0, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
+     DrawString( STRING_GAME_MENU(114), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 1, 1, 0, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
+     DrawString( STRING_GAME_MENU(115), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 0, 1, 1, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
+     DrawString( STRING_GAME_MENU(116), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 1, 0, 1, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
+     DrawString( STRING_GAME_MENU(117), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 1, 1, 1, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
+     DrawString( STRING_GAME_MENU(118), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 0, 0, 0, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
+
 
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );

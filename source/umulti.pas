@@ -22,6 +22,8 @@ Const MULTI_ERROR      = 3;
 Var nClientCount : Integer;
 Var nClientIndex : Array [0..255] Of Integer;
 Var sClientName : Array [0..255] Of String;
+Var sClientUserName : Array [0..255] Of String;
+Var sClientUserPassword : Array [0..255] Of String;
 Var bClientReady : Array [0..255] Of Boolean;
 Var fPingTime, fPing : Single;
 
@@ -138,9 +140,31 @@ Procedure ProcessMenuMulti () ;
 Var w, h : Single;
     t : Single;
     k : Integer;
+    sData : String;
 Begin
+     // appel d'une texture de rendu
+     PutRenderTexture();
+
+     // affichage du rendu précédent en transparence pour l'effet de flou
+     SetRenderTexture();
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.9, True );
+
+     // récupération de la texture de rendu
+     GetRenderTexture();
+
+     // remplissage noir de l'écran
+     Clear( 0, 0, 0, 0 );
+
      w := GetRenderWidth();
      h := GetRenderHeight();
+
+     // affichage du fond
+     SetTexture( 1, SPRITE_BACK );
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+
+     // affichage final du rendu en transparence
+     SetRenderTexture();
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, True );
 
      // affichage du menu
      DrawString( STRING_GAME_MENU(3), -w / h * 0.4,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
@@ -203,7 +227,10 @@ Begin
                             nPlayerClient[k] := -2;      // Pour empêcher le choix de personnage avant d'avoir reçu la liste.
                         End;
                         InitMenu();
-                        Send( nLocalIndex, HEADER_CONNECT, sLocalName );
+                        sData := sLocalName + #31;
+                        sData := sData + sUserName + #31;
+                        sData := sData + sUserPassword + #31;
+                        Send( nLocalIndex, HEADER_CONNECT, sData );
                      End Else Begin
                         nMulti := MULTI_ERROR;
                      End;
@@ -306,7 +333,7 @@ Begin
                      SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
                 End;
            End;
-           fKey := GetTime + 0.2;
+           fKey := GetTime + 0.1;
            ClearInput();
         End;
      End Else Begin
@@ -419,7 +446,9 @@ Begin
                     // ajout du client à la liste
                     If ClientIndex(nIndex) = -1 Then Begin
                        nClientIndex[nClientCount] := nIndex;
-                       sClientName[nClientCount] := sData;
+                       sClientName[nClientCount] := GetString( sData, 1 );
+                       sClientUserName[nClientCount] := GetString( sData, 2 );
+                       sClientUserPassword[nClientCount] := GetString( sData, 3 );
                        nClientCount += 1;
                        AddLineToConsole( sData + ' entered the game.' );
                     End;
@@ -535,6 +564,14 @@ Begin
                     TryStrToInt( GetString( sData, 4 ), nPlayerCharacter[k] );
                     sPlayerName[k] := GetString( sData, 5 );
                     Send( nIndex, nHeader, sData );
+                    If ( bOnline ) Then Begin
+                       sData := IntToStr( k ) + #31;
+                       sData := sData + IntToStr( nPlayerType[k] ) + #31;
+                       sData := sData + sPlayerName[k] + #31;
+                       sData := sData + sClientUserName[ClientIndex(nIndex)] + #31;
+                       sData := sData + sClientUserPassword[ClientIndex(nIndex)] + #31;
+                       SendOnline( nLocalIndex, HEADER_ONLINE_PLAYER, sData );
+                    End;
                     UpdateMenu();
                End;
                HEADER_MOVEUP :
@@ -608,6 +645,21 @@ Begin
                     TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
                     pBomberman.DoIgnition();
+               End;
+               HEADER_PUNCH :
+               Begin
+                    TryStrToInt( GetString( sData, 1 ), k );
+                    pBomberman := GetBombermanByIndex( k );
+                    TryStrToInt( GetString( sData, 2 ), nDirection );
+                    TryStrToInt( GetString( sData, 3 ), dX );
+                    TryStrToInt( GetString( sData, 4 ), dY );
+                    dt := StrToFloat( GetString( sData, 5 ) );
+                    Case nDirection of
+                              0    :  CBomb(pGrid.GetBlock(dX,dY)).Punch(DOWN,dt);
+                              90   :  CBomb(pGrid.GetBlock(dX,dY)).Punch(LEFT,dt);
+                              180  :  CBomb(pGrid.GetBlock(dX,dY)).Punch(UP,dt);
+                              -90  :  CBomb(pGrid.GetBlock(dX,dY)).Punch(RIGHT,dt);
+                            End;
                End;
                HEADER_MOVEBOMB :
                Begin

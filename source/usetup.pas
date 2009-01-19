@@ -17,11 +17,11 @@ Const SERVER_UNKNOWN = 0;
 Const SERVER_STANDARD = 1;
 Const SERVER_EXTENDED = 2;
 
-Var sLocalName : String; // a sauvegarder
+Var sLocalName : String;
 Var nLocalIndex : DWord;
-Var sServerAddress : String; // a sauvegarder
-Var nServerPort : Word; // a sauvegarder
-Var nServerType : Integer; // a sauvegarder
+Var sServerAddress : String;
+Var nServerPort : Word;
+Var nServerType : Integer;
 Var sMasterAddress : String;
 Var nMasterPort : Word;
 
@@ -97,6 +97,14 @@ Var nKey2MoveDown : Integer;
 Var nKey2MoveLeft : Integer;
 Var nKey2MoveRight : Integer;
 
+Var nKeyCamera : Integer;
+Var nKeyDrawGame : Integer;
+Var nKeyScreen : Integer;
+Var nKeyChat : Integer;
+Var nKeyPing : Integer;
+
+Var sUserName, sUserPassword, sHiddenPassword : String;
+
 Procedure ReadSettings ( sFile : String ) ;
 Procedure WriteSettings ( sFile : String ) ;
 
@@ -154,6 +162,12 @@ Const MENU_P2MOVERIGHT   = 54;
 Const MENU_P2PRIMARY     = 55;
 Const MENU_P2SECONDARY   = 56;
 
+Const MENU_CHANGECAMERA  = 61;
+Const MENU_DRAWGAME      = 62;
+Const MENU_CHANGESCREEN  = 63;
+Const MENU_SPEAK         = 64;
+Const MENU_SHOWPING      = 65;
+
 Var nMenu  : Integer;
 
 
@@ -173,6 +187,8 @@ Begin
      For i := 0 To 255 Do
          sKeyToString[ i ] := chr( i );
      sKeyToString[ 8 ] := 'RETURN';
+     sKeyToString[ 9 ] := 'TAB';
+     sKeyToString[ 32 ] := 'SPACE';
      sKeyToString[ 34 ] := 'DOUBLE QUOTE';
      sKeyToString[ 35 ] := 'SHARP';
      sKeyToString[ 36 ] := 'DOLLAR';
@@ -199,7 +215,7 @@ Begin
      sKeyToString[ 167 ] := 'SECTION';
      sKeyToString[ 168 ] := 'UMLAUT';
      sKeyToString[ 176 ] := 'DEGRE';
-     sKeyToString[ 178 ] := 'SQAURE';
+     sKeyToString[ 178 ] := 'SQUARE';
      sKeyToString[ 181 ] := 'MICRO';
      sKeyToString[ 224 ] := 'ACCENTED A';
      sKeyToString[ 231 ] := 'C CEDILLA';
@@ -243,6 +259,12 @@ Begin
      SetString( STRING_SETUP_MENU(54), 'p2 move right : ' + KeyToStr(nKey2MoveRight), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(55), 'p2 primary    : ' + KeyToStr(nKey2Primary), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(56), 'p2 secondary  : ' + KeyToStr(nKey2Secondary), 0.2, 1.0, 600 );
+     
+     SetString( STRING_SETUP_MENU(61), 'change camera : ' + KeyToStr(nKeyCamera), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(62), 'draw game     : ' + KeyToStr(nKeyDrawGame), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(63), 'switch display: ' + KeyToStr(nKeyScreen), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(64), 'speak (chat)  : ' + KeyToStr(nKeyChat), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(65), 'show ping     : ' + KeyToStr(nKeyPing), 0.2, 1.0, 600 );
 
      fScroll := 0.0;
      
@@ -284,6 +306,11 @@ Begin
                        MENU_P2MOVERIGHT : nKey2MoveRight := k;
                        MENU_P2PRIMARY : nKey2Primary := k;
                        MENU_P2SECONDARY : nKey2Secondary := k;
+                       MENU_CHANGECAMERA : nKeyCamera := k;
+                       MENU_DRAWGAME : nKeyDrawGame := k;
+                       MENU_CHANGESCREEN : nKeyScreen := k;
+                       MENU_SPEAK : nKeyChat := k;
+                       MENU_SHOWPING : nKeyPing := k;
                   End;
                   nSetup := SETUP_MENU;
                End;
@@ -301,6 +328,11 @@ Begin
                        MENU_P2MOVERIGHT : nKey2MoveRight := -k;
                        MENU_P2PRIMARY : nKey2Primary := -k;
                        MENU_P2SECONDARY : nKey2Secondary := -k;
+                       MENU_CHANGECAMERA : nKeyCamera := -k;
+                       MENU_DRAWGAME : nKeyDrawGame := -k;
+                       MENU_CHANGESCREEN : nKeyScreen := -k;
+                       MENU_SPEAK : nKeyChat := -k;
+                       MENU_SHOWPING : nKeyPing := -k;
                   End;
                   nSetup := SETUP_MENU;
                End;
@@ -308,18 +340,23 @@ Begin
            If nSetup = SETUP_MENU Then Begin
               PlaySound( SOUND_MENU_CLICK );
               Case nMenu Of
-                   MENU_P1MOVEUP    : SetString( STRING_SETUP_MENU(41), 'p1 move up    : ' + KeyToStr(nKey1MoveUp), 0.0, 0.02, 600 );
-                   MENU_P1MOVEDOWN  : SetString( STRING_SETUP_MENU(42), 'p1 move down  : ' + KeyToStr(nKey1MoveDown), 0.0, 0.02, 600 );
-                   MENU_P1MOVELEFT  : SetString( STRING_SETUP_MENU(43), 'p1 move left  : ' + KeyToStr(nKey1MoveLeft), 0.0, 0.02, 600 );
-                   MENU_P1MOVERIGHT : SetString( STRING_SETUP_MENU(44), 'p1 move right : ' + KeyToStr(nKey1MoveRight), 0.0, 0.02, 600 );
-                   MENU_P1PRIMARY   : SetString( STRING_SETUP_MENU(45), 'p1 primary    : ' + KeyToStr(nKey1Primary), 0.0, 0.02, 600 );
-                   MENU_P1SECONDARY : SetString( STRING_SETUP_MENU(46), 'p1 secondary  : ' + KeyToStr(nKey1Secondary), 0.0, 0.02, 600 );
-                   MENU_P2MOVEUP    : SetString( STRING_SETUP_MENU(51), 'p2 move up    : ' + KeyToStr(nKey2MoveUp), 0.0, 0.02, 600 );
-                   MENU_P2MOVEDOWN  : SetString( STRING_SETUP_MENU(52), 'p2 move down  : ' + KeyToStr(nKey2MoveDown), 0.0, 0.02, 600 );
-                   MENU_P2MOVELEFT  : SetString( STRING_SETUP_MENU(53), 'p2 move left  : ' + KeyToStr(nKey2MoveLeft), 0.0, 0.02, 600 );
-                   MENU_P2MOVERIGHT : SetString( STRING_SETUP_MENU(54), 'p2 move right : ' + KeyToStr(nKey2MoveRight), 0.0, 0.02, 600 );
-                   MENU_P2PRIMARY   : SetString( STRING_SETUP_MENU(55), 'p2 primary    : ' + KeyToStr(nKey2Primary), 0.0, 0.02, 600 );
-                   MENU_P2SECONDARY : SetString( STRING_SETUP_MENU(56), 'p2 secondary  : ' + KeyToStr(nKey2Secondary), 0.0, 0.02, 600 );
+                   MENU_P1MOVEUP     : SetString( STRING_SETUP_MENU(41), 'p1 move up    : ' + KeyToStr(nKey1MoveUp), 0.0, 0.02, 600 );
+                   MENU_P1MOVEDOWN   : SetString( STRING_SETUP_MENU(42), 'p1 move down  : ' + KeyToStr(nKey1MoveDown), 0.0, 0.02, 600 );
+                   MENU_P1MOVELEFT   : SetString( STRING_SETUP_MENU(43), 'p1 move left  : ' + KeyToStr(nKey1MoveLeft), 0.0, 0.02, 600 );
+                   MENU_P1MOVERIGHT  : SetString( STRING_SETUP_MENU(44), 'p1 move right : ' + KeyToStr(nKey1MoveRight), 0.0, 0.02, 600 );
+                   MENU_P1PRIMARY    : SetString( STRING_SETUP_MENU(45), 'p1 primary    : ' + KeyToStr(nKey1Primary), 0.0, 0.02, 600 );
+                   MENU_P1SECONDARY  : SetString( STRING_SETUP_MENU(46), 'p1 secondary  : ' + KeyToStr(nKey1Secondary), 0.0, 0.02, 600 );
+                   MENU_P2MOVEUP     : SetString( STRING_SETUP_MENU(51), 'p2 move up    : ' + KeyToStr(nKey2MoveUp), 0.0, 0.02, 600 );
+                   MENU_P2MOVEDOWN   : SetString( STRING_SETUP_MENU(52), 'p2 move down  : ' + KeyToStr(nKey2MoveDown), 0.0, 0.02, 600 );
+                   MENU_P2MOVELEFT   : SetString( STRING_SETUP_MENU(53), 'p2 move left  : ' + KeyToStr(nKey2MoveLeft), 0.0, 0.02, 600 );
+                   MENU_P2MOVERIGHT  : SetString( STRING_SETUP_MENU(54), 'p2 move right : ' + KeyToStr(nKey2MoveRight), 0.0, 0.02, 600 );
+                   MENU_P2PRIMARY    : SetString( STRING_SETUP_MENU(55), 'p2 primary    : ' + KeyToStr(nKey2Primary), 0.0, 0.02, 600 );
+                   MENU_P2SECONDARY  : SetString( STRING_SETUP_MENU(56), 'p2 secondary  : ' + KeyToStr(nKey2Secondary), 0.0, 0.02, 600 );
+                   MENU_CHANGECAMERA : SetString( STRING_SETUP_MENU(61), 'change camera : ' + KeyToStr(nKeyCamera), 0.0, 0.02, 600 );
+                   MENU_DRAWGAME     : SetString( STRING_SETUP_MENU(62), 'draw game     : ' + KeyToStr(nKeyDrawGame), 0.0, 0.02, 600 );
+                   MENU_CHANGESCREEN : SetString( STRING_SETUP_MENU(63), 'switch display: ' + KeyToStr(nKeyScreen), 0.0, 0.02, 600 );
+                   MENU_SPEAK        : SetString( STRING_SETUP_MENU(64), 'speak (chat)  : ' + KeyToStr(nKeyChat), 0.0, 0.02, 600 );
+                   MENU_SHOWPING     : SetString( STRING_SETUP_MENU(65), 'show ping     : ' + KeyToStr(nKeyPing), 0.0, 0.02, 600 );
               End;
               ClearInput();
               SetString( STRING_SETUP_MENU(1), 'setup', 0.0, 0.02, 600 );
@@ -383,6 +420,14 @@ Begin
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(54), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2MOVERIGHT), IsActive(MENU_P2MOVERIGHT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(55), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2PRIMARY), IsActive(MENU_P2PRIMARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(56), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_P2SECONDARY), IsActive(MENU_P2SECONDARY), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     
+     t += 0.2;
+
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(61), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_CHANGECAMERA), IsActive(MENU_CHANGECAMERA), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(62), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_DRAWGAME), IsActive(MENU_DRAWGAME), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(63), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_CHANGESCREEN), IsActive(MENU_CHANGESCREEN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(64), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_SPEAK), IsActive(MENU_SPEAK), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(65), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_SHOWPING), IsActive(MENU_SHOWPING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
 
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
@@ -417,7 +462,12 @@ Begin
            If nMenu = MENU_P2MOVERIGHT Then nMenu := MENU_P2MOVELEFT Else
            If nMenu = MENU_P2PRIMARY Then nMenu := MENU_P2MOVERIGHT Else
            If nMenu = MENU_P2SECONDARY Then nMenu := MENU_P2PRIMARY Else
-           If nMenu = MENU_INTRO Then nMenu := MENU_P2SECONDARY;
+           If nMenu = MENU_CHANGECAMERA Then nMenu := MENU_P2SECONDARY Else
+           If nMenu = MENU_DRAWGAME Then nMenu := MENU_CHANGECAMERA Else
+           If nMenu = MENU_CHANGESCREEN Then nMenu := MENU_DRAWGAME Else
+           If nMenu = MENU_SPEAK Then nMenu := MENU_CHANGESCREEN Else
+           If nMenu = MENU_SHOWPING Then nMenu := MENU_SPEAK Else
+           If nMenu = MENU_INTRO Then nMenu := MENU_SHOWPING;
 
            t := 0.0;
            If (nMenu = MENU_INTRO) And (fScroll > t) Then fScroll := t; t += 0.2;
@@ -442,8 +492,12 @@ Begin
            If (nMenu = MENU_P1MOVERIGHT) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_P1PRIMARY) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_P1SECONDARY) And (fScroll > t) Then fScroll := t; t += 0.2;
-           t -= 0.2;
-           If nMenu = MENU_P2SECONDARY Then fScroll := t;
+           t += 0.2;
+           If (nMenu = MENU_P2MOVEUP) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P2MOVEDOWN) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P2MOVELEFT) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_P2MOVERIGHT) And (fScroll > t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_SHOWPING) Then fScroll := t;
         End;
         bUp := True;
      End Else Begin
@@ -453,7 +507,12 @@ Begin
      If GetKeyS( KEY_DOWN ) Then Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           If nMenu = MENU_P2SECONDARY Then nMenu := MENU_INTRO Else
+           If nMenu = MENU_SHOWPING Then nMenu := MENU_INTRO Else
+           If nMenu = MENU_SPEAK Then nMenu := MENU_SHOWPING Else
+           If nMenu = MENU_CHANGESCREEN Then nMenu := MENU_SPEAK Else
+           If nMenu = MENU_DRAWGAME Then nMenu := MENU_CHANGESCREEN Else
+           If nMenu = MENU_CHANGECAMERA Then nMenu := MENU_DRAWGAME Else
+           If nMenu = MENU_P2SECONDARY Then nMenu := MENU_CHANGECAMERA Else
            If nMenu = MENU_P2PRIMARY Then nMenu := MENU_P2SECONDARY Else
            If nMenu = MENU_P2MOVERIGHT Then nMenu := MENU_P2PRIMARY Else
            If nMenu = MENU_P2MOVELEFT Then nMenu := MENU_P2MOVERIGHT Else
@@ -503,6 +562,12 @@ Begin
            If (nMenu = MENU_P2MOVERIGHT) And (fScroll < t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_P2PRIMARY) And (fScroll < t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_P2SECONDARY) And (fScroll < t) Then fScroll := t; t += 0.2;
+           t += 0.2;
+           If (nMenu = MENU_CHANGECAMERA) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_DRAWGAME) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_CHANGESCREEN) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_SPEAK) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If (nMenu = MENU_SHOWPING) And (fScroll < t) Then fScroll := t; t += 0.2;
         End;
         bDown := True;
      End Else Begin
@@ -730,8 +795,13 @@ Begin
                 MENU_P2MOVERIGHT : InitBox( 'player 2 move right', 'press any key' );
                 MENU_P2PRIMARY : InitBox( 'player 2 primary', 'press any key' );
                 MENU_P2SECONDARY : InitBox( 'player 2 secondary', 'press any key' );
+                MENU_CHANGECAMERA : InitBox( 'change camera', 'press any key' );
+                MENU_DRAWGAME : InitBox( 'draw game', 'press any key' );
+                MENU_CHANGESCREEN : InitBox( 'switch display', 'press any key' );
+                MENU_SPEAK : InitBox( 'speak (chat)', 'press any key' );
+                MENU_SHOWPING : InitBox( 'show ping', 'press any key' );
            Else
-                nSetup := SETUP_MENU;
+               nSetup := SETUP_MENU;
            End;
         End;
         bEnter := True;
@@ -793,7 +863,7 @@ Begin
          FindNext( tFile );
      End;
      nCharacterCount := k;
-
+     
      // désactivation de la souris
      BindButton( BUTTON_LEFT, NIL );
 
@@ -807,7 +877,32 @@ End;
 
 
 Procedure ProcessSetup () ;
+Var w, h : Integer;
 Begin
+     // appel d'une texture de rendu
+     PutRenderTexture();
+
+     // affichage du rendu précédent en transparence pour l'effet de flou
+     SetRenderTexture();
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.9, True );
+
+     // récupération de la texture de rendu
+     GetRenderTexture();
+
+     // remplissage noir de l'écran
+     Clear( 0, 0, 0, 0 );
+
+     w := GetRenderWidth();
+     h := GetRenderHeight();
+
+     // affichage du fond
+     SetTexture( 1, SPRITE_BACK );
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+
+     // affichage final du rendu en transparence
+     SetRenderTexture();
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, True );
+
      Case nSetup Of
           SETUP_MENU : ProcessMenu();
           SETUP_KEY : ProcessKey();
@@ -829,6 +924,8 @@ Const STEP_DISPLAY         =  9;
 Const STEP_QUALITY         = 10;
 Const STEP_WINDOW          = 11;
 Const STEP_DEBUG           = 12;
+Const STEP_ACCOUNT         = 13;
+Const STEP_NETWORK         = 14;
 
 Function GetStep ( sCommand : String ) : Integer ;
 Var i : Integer;
@@ -850,6 +947,8 @@ Begin
           If (sCommand[i] = '-') And (sCommand[i+1] = 'Q') Then nStep := STEP_QUALITY;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'W') Then nStep := STEP_WINDOW;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'X') Then nStep := STEP_DEBUG;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'A') Then nStep := STEP_ACCOUNT;
+          If (sCommand[i] = '-') And (sCommand[i+1] = 'N') Then nStep := STEP_NETWORK;
 
           If nStep > STEP_NONE Then Break;
      End;
@@ -923,8 +1022,10 @@ Begin
      sServerAddress := '192.168.0.2';
      nServerPort := 7070;
      nServerType := SERVER_STANDARD;
-     sMasterAddress := '192.168.0.2';
+     sMasterAddress :=  '192.168.0.2';
      nMasterPort := 7070;
+     sUserName := 'myname';
+     sUserPassword := 'mypassword';
 
      bIntro := True;
      
@@ -988,6 +1089,12 @@ Begin
      nKey2MoveDown := 115;
      nKey2MoveLeft := 113;
      nKey2MoveRight := 100;
+     
+     nKeyCamera := 32;
+     nKeyDrawGame := -10;
+     nKeyScreen := -11;
+     nKeyChat := 178;
+     nKeyPing := 9;
 
      Assign( ioLine, sFile );
      {$I-}
@@ -1096,6 +1203,13 @@ Begin
                        If LowerCase(GetString(sLine, 2)) = 'moveleft' Then nKey2MoveLeft := GetInteger(sLine, 3);
                        If LowerCase(GetString(sLine, 2)) = 'moveright' Then nKey2MoveRight := GetInteger(sLine, 3);
                     End;
+                    If GetInteger(sLine, 1) = 3 Then Begin
+                       If LowerCase(GetString(sLine, 2)) = 'camera' Then nKeyCamera := GetInteger(sLine, 3);
+                       If LowerCase(GetString(sLine, 2)) = 'drawgame' Then nKeyDrawGame := GetInteger(sLine, 3);
+                       If LowerCase(GetString(sLine, 2)) = 'screen' Then nKeyScreen := GetInteger(sLine, 3);
+                       If LowerCase(GetString(sLine, 2)) = 'chat' Then nKeyChat := GetInteger(sLine, 3);
+                       If LowerCase(GetString(sLine, 2)) = 'ping' Then nKeyPing := GetInteger(sLine, 3);
+                    End;
                End;
                STEP_PACKAGE :
                Begin
@@ -1170,6 +1284,25 @@ Begin
                     If LowerCase(GetString(sLine, 1)) = 'true' Then bDebug := True;
                     If LowerCase(GetString(sLine, 1)) = 'false' Then bDebug := False;
                     If bIntro Then AddLineToConsole( 'Debug : Enabled' ) Else AddLineToConsole( 'Debug : Disabled' );
+               End;
+               STEP_ACCOUNT :
+               Begin
+                    k := GetInteger(sLine,1);
+                    If ( k = 1 ) Then
+                       sUserName := GetString(sLine, 2);
+                    If ( k = 2 ) Then
+                       sUserPassword := GetString(sLine, 2);
+               End;
+               STEP_NETWORK :
+               Begin
+                    k := GetInteger(sLine,1);
+                    If ( k = 1 ) Then
+                       sLocalName := GetString(sLine, 2);
+                    If ( k = 2 ) Then Begin
+                       sServerAddress := GetString(sLine, 2);
+                       nServerPort := GetInteger(sLine, 3);
+                       nServerType := GetInteger(sLine, 4);
+                    End;
                End;
           End;
      End;
@@ -1255,7 +1388,13 @@ Begin
      WriteLn( ioLine , '-K,2,movedown,' + IntToStr(nKey2MoveDown) );
      WriteLn( ioLine , '-K,2,moveleft,' + IntToStr(nKey2MoveLeft) );
      WriteLn( ioLine , '-K,2,moveright,' + IntToStr(nKey2MoveRight) );
-
+     
+     WriteLn( ioLine , '-K,3,camera,' + IntToStr(nKeyCamera) );
+     WriteLn( ioLine , '-K,3,drawgame,' + IntToStr(nKeyDrawGame) );
+     WriteLn( ioLine , '-K,3,screen,' + IntToStr(nKeyScreen) );
+     WriteLn( ioLine , '-K,3,chat,' + IntToStr(nKeyChat) );
+     WriteLn( ioLine , '-K,3,ping,' + IntToStr(nKeyPing) );
+     
      WriteLn( ioLine );
      WriteLn( ioLine , '; is the intro enabled ?' );
      If bIntro Then WriteLn( ioLine , '-I,true' ) Else WriteLn( ioLine , '-I,false' );
@@ -1292,7 +1431,20 @@ Begin
      s := s + IntToStr(nWindowWidth) + ',';
      s := s + IntToStr(nWindowHeight);
      WriteLn( ioLine, s );
-
+     
+     WriteLn( ioLine );
+     WriteLn( ioLine , '; user identity (name, password)' );
+     WriteLn( ioLine , '-A,1,' + sUserName );
+     WriteLn( ioLine , '-A,2,' + sUserPassword );
+     
+     WriteLn( ioLine );
+     WriteLn( ioLine , '; network settings (name, address, port, type)' );
+     WriteLn( ioLine , '-N,1,' + sLocalName );
+     s := '-N,2,' + sServerAddress;
+     s := s + ',' + IntToStr(nServerPort);
+     s := s + ',' + IntToStr(nServerType);
+     WriteLn( ioLine , s );
+     
      Close(ioLine);
 End;
 

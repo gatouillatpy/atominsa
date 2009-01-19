@@ -52,6 +52,7 @@ Const HEADER_EXPLOSE_BLOCK     = 1415;
 Const HEADER_ISEXPLOSED_ITEM   = 1416;
 Const HEADER_CONTAMINATE       = 1417;
 Const HEADER_END_OF_JUMP       = 1418;
+Const HEADER_PUNCH             = 1419;
 
 Const HEADER_BOMBERMAN         = 1501;
 Const HEADER_BOMB              = 1502;
@@ -63,6 +64,11 @@ Const HEADER_READY             = 1701;
 Const HEADER_SERVER            = 2001;
 
 Const HEADER_ONLINE_HOST       = 2101;
+Const HEADER_ONLINE_QUIT       = 2102;
+
+Const HEADER_ONLINE_PLAYER     = 2201;
+
+Const HEADER_ONLINE_SCORE      = 2301;
 
 
 
@@ -436,7 +442,8 @@ End;
 
 Var pTCP,
     pTCPOnline : TLTcp;
-Var pEvent: TLEvents;
+Var pEvent,
+    pEventOnline : TLEvents;
 
 
 
@@ -668,7 +675,7 @@ Begin
            AddStringToConsole('success.');
            ClientInit := True;
         End Else Begin
-           AddStringToConsole('failed.');
+           //AddStringToConsole('failed.');
            ClientInit := False;
         End;
      End Else Begin
@@ -703,11 +710,11 @@ Begin
 
      bConnected := False;
 
-     pEvent := TLEvents.Create;
+     pEventOnline := TLEvents.Create;
      pTCPOnline := TLTcp.Create( NIL );
-     pTCPOnline.OnReceive := @pEvent.OnReceive;
-     pTCPOnline.OnDisconnect := @pEvent.OnDisconnect;
-     pTCPOnline.OnError := @pEvent.OnError;
+     pTCPOnline.OnReceive := @pEventOnline.OnReceive;
+     pTCPOnline.OnDisconnect := @pEventOnline.OnDisconnect;
+     pTCPOnline.OnError := @pEventOnline.OnError;
      If pTCPOnline.Connect( sAddress, nPort ) Then Begin
         AddLineToConsole('Connecting...');
         t := GetTime;
@@ -720,7 +727,7 @@ Begin
            AddStringToConsole('success.');
            ClientInitOnline := True;
         End Else Begin
-           AddStringToConsole('failed.');
+           //AddStringToConsole('failed.');
            ClientInitOnline := False;
         End;
      End Else Begin
@@ -735,7 +742,7 @@ Procedure ClientTerminateOnline () ;
 Begin
      pTCPOnline.Disconnect;
      pTCPOnline.Free;
-     pEvent.Free;
+     pEventOnline.Free;
      AddLineToConsole('Disconnected.');
 End;
 
@@ -771,6 +778,9 @@ End;
 
 Procedure ServerTerminate () ;
 Begin
+     If ( bOnline ) Then Begin
+        SendOnline( nLocalIndex, HEADER_ONLINE_QUIT, '' );
+     End;
      pTCP.Disconnect;
      pTCP.Free;
      pEvent.Free;
@@ -1539,7 +1549,7 @@ Begin
 
      // appel au manager de ressources pour éviter de charger un mesh déjà chargé
      pMesh := FindItemByPath( DATA_MESH, sFile );
-   { If pMesh <> NIL Then Begin
+    { If pMesh <> NIL Then Begin
         AddLineToConsole( 'Reloading mesh ' + sFile + '.' );
         AddItem( DATA_MESH, nIndex, pMesh, sFile, True );
         AddMesh := pMesh;
@@ -2369,8 +2379,10 @@ Begin
      glMatrixMode(GL_MODELVIEW);
      glLoadIdentity;
 
-     glDisable( GL_DEPTH_TEST );
-     glDisable( GL_LIGHTING );
+     If ( r <> 0.0 ) Or ( g <> 0.0 ) Or ( b <> 0.0 ) Then Begin
+        glDisable( GL_DEPTH_TEST );
+        glDisable( GL_LIGHTING );
+     End;
 
      If t Then Begin
         glEnable( GL_BLEND );
@@ -3202,7 +3214,7 @@ Begin
      pKeyItem := pKeyStack;
      While pKeyItem <> Nil do
      begin
-       if (pKeyItem^.Key = nKey) AND (pKeyItem^.special = bSpecial) then
+       if (pKeyItem^.Key = nKey) And (pKeyItem^.special = bSpecial) then
        begin
          If (pKeyItem^.callbackstdup = NIL) And (pKeyItem^.callbackobjup <> NIL) Then pKeyItem^.callbackobjup( GetDelta() );
          If (pKeyItem^.callbackobjup = NIL) And (pKeyItem^.callbackstdup <> NIL) Then pKeyItem^.callbackstdup();
@@ -3328,7 +3340,7 @@ End;
 
 Procedure OGLKeyUpS( k : LongInt ; x, y : LongInt ); cdecl; overload;
 Begin
-     If bKey[k] then ExecKey( k, False, True, True);
+     If bKeyS[k] then ExecKey( k, False, True, True);
      bKeyS[k] := False;
 End;
 

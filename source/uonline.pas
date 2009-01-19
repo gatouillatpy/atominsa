@@ -52,15 +52,15 @@ Begin
 
 
      SetString( STRING_SETUP_MENU(0), 'online', 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(1), 'lan connection', 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(2), 'host : ' + sLocalName, 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(1), 'host', 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(2), sLocalName, 0.2, 1.0, 600 );
 
      If Not ClientInitOnline( sMasterAddress, nMasterPort ) Then Begin
         nState := PHASE_MULTI;
         Exit;
      End;
 
-     
+     bOnline := True;
      nMenu := 1;
 
      bUp := False;
@@ -87,9 +87,29 @@ Var w, h : Single;
     nIndex, nHeader : Integer;
     sData : String;
 Begin
+     // appel d'une texture de rendu
+     PutRenderTexture();
+
+     // affichage du rendu précédent en transparence pour l'effet de flou
+     SetRenderTexture();
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.9, True );
+
+     // récupération de la texture de rendu
+     GetRenderTexture();
+
+     // remplissage noir de l'écran
+     Clear( 0, 0, 0, 0 );
 
      w := GetRenderWidth();
      h := GetRenderHeight();
+
+     // affichage du fond
+     SetTexture( 1, SPRITE_BACK );
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+
+     // affichage final du rendu en transparence
+     SetRenderTexture();
+     DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, True );
 
      DrawString( STRING_SETUP_MENU(0), -w / h * 0.5,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
      t := 0.0;
@@ -159,10 +179,7 @@ Begin
      If GetKey( KEY_ENTER ) Then Begin
         If Not bEnter Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           If (nMenu = 1) Then Begin
-               nState := PHASE_MULTI;
-           End
-           Else If (nMenu = 2) Then Begin
+           If (nMenu = 1) Or (nMenu = 2) Then Begin
                 nIndex := nLocalIndex;
                 nHeader := HEADER_ONLINE_HOST;
                 sData := sLocalName + #31;
@@ -172,6 +189,7 @@ Begin
                 BindButton( BUTTON_LEFT, NIL );
                 // activation du mode multi
                 bMulti := True;
+                bOnline := True;
                 bGoToPhaseMenu := False;
                 If ServerInit( nServerPort ) Then Begin
                     nMulti := MULTI_SERVER;
@@ -191,6 +209,7 @@ Begin
                 BindButton( BUTTON_LEFT, NIL );
                 // activation du mode multi
                 bMulti := True;
+                bOnline := True;
                 bGoToPhaseMenu := False;
                 // initialisation du compteur de clients
                 nClientCount := 0;
@@ -198,10 +217,13 @@ Begin
                   nMulti := MULTI_CLIENT;
                   For k := 1 To 8 Do Begin
                       nPlayerType[k] := PLAYER_NIL;
-                      nPlayerClient[k] := -1;
+                      nPlayerClient[k] := -2;
                   End;
                   InitMenu();
-                  Send( nLocalIndex, HEADER_CONNECT, sLocalName );
+                  sData := sLocalName + #31;
+                  sData := sData + sUserName + #31;
+                  sData := sData + sUserPassword + #31;
+                  Send( nLocalIndex, HEADER_CONNECT, sData );
                 End Else Begin
                   nMulti := MULTI_ERROR;
                 End;
@@ -227,7 +249,7 @@ Begin
                      SetString( STRING_SETUP_MENU(2), 'host : ' + sLocalName, 0.0, 0.02, 600 );
                 End;
            End;
-           fKey := GetTime + 0.2;
+           fKey := GetTime + 0.1;
            ClearInput();
         End;
      End Else Begin
@@ -256,7 +278,7 @@ Begin
      fScroll := 0.0;
 }
      ClientLoopOnline();
-
+     // On peut essayer un wait.
      While GetPacket( nIndex, nHeader, sData ) Do Begin
           Case nHeader Of
                HEADER_SERVER :
