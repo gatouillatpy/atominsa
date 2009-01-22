@@ -21,8 +21,11 @@ public class AtominsaPlayer
 	public int nRegion;
 	public int nDepartment;
 	
-	public float fScore;
+	public int nScore; // nb de parties gagnées
+	public int nTotal; // nb de parties jouées
 	
+	public float fPoints;
+
 	public int nKills;
 	public int nDeaths;
 	

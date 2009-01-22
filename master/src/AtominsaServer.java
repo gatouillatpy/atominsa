@@ -23,6 +23,22 @@ public class AtominsaServer
 		aPlayer.remove( tPlayer );
 	}
 
+	synchronized public void updatePlayers()
+	{
+		for ( int k = 0 ; k < aPlayer.size() ; k++ )
+		{
+			AtominsaPlayer tPlayer = aPlayer.get(k);
+			
+			if ( tPlayer != null )
+			{
+				if ( AtominsaDatabase.CheckConnection( tPlayer.sUsername, tPlayer.sPassword ) )
+				{
+					AtominsaDatabase.UpdatePlayer( tPlayer );
+				}
+			}
+		}
+	}
+
 	synchronized public void addPlayer( AtominsaPlayer tPlayer )
 	{
 		aPlayer.add( tPlayer );

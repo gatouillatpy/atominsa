@@ -1,11 +1,10 @@
 
 import java.net.*;
-import java.io.*;
 import java.util.*;
 
 public class AtominsaMaster
 {
-	static int ATOMINSA_PORT = 443;
+	static int ATOMINSA_PORT = 7070;
 	
 	private ArrayList<AtominsaThread> aThread = new ArrayList<AtominsaThread>();
 	
@@ -16,6 +15,23 @@ public class AtominsaMaster
 	public static void main( String args[] )
 	{
 		AtominsaMaster tMaster = new AtominsaMaster();
+		
+		// DEBUT : JEU D'ESSAI TEMPORAIRE
+		/*AtominsaServer tServer0 = new AtominsaServer();
+		tServer0.sAddress = "192.168.0.5";
+		tServer0.sName = "serveur de test 0";
+		tMaster.addServer(tServer0);
+		
+		AtominsaServer tServer1 = new AtominsaServer();
+		tServer1.sAddress = "121.44.12.97";
+		tServer1.sName = "serveur de test 1";
+		tMaster.addServer(tServer1);
+		
+		AtominsaServer tServer2 = new AtominsaServer();
+		tServer2.sAddress = "84.214.29.117";
+		tServer2.sName = "serveur de test 2";
+		tMaster.addServer(tServer2);*/
+		// FIN : JEU D'ESSAI TEMPORAIRE
 		
 	    try
 	    {
@@ -43,7 +59,7 @@ public class AtominsaMaster
 		System.out.println("ษออออออออออออออออออออออออออออออออออออออออออออออออออป");
 		System.out.println("บ            Atominsa Master Server                บ");
 		System.out.println("ฬออออออออออออออออออออออออออออออออออออออออออออออออออน");
-		System.out.println("บ Latest update : 13/12/2008                       บ");
+		System.out.println("บ Latest update : 15/01/2009                       บ");
 		System.out.println("ศออออออออออออออออออออออออออออออออออออออออออออออออออผ");
 	}
 

@@ -71,7 +71,7 @@ public class AtominsaDatabase
 	        tPlayer.nRegion = result.getInt("region");
 	        tPlayer.nDepartment = result.getInt("department");
 	        
-	        tPlayer.fScore = result.getFloat("score");
+	        tPlayer.fPoints = result.getFloat("points");
 
 	        tPlayer.sEmail = result.getString("email");
 	        
@@ -79,6 +79,9 @@ public class AtominsaDatabase
 	        
 	        tPlayer.nKills = result.getInt("kill");
 	        tPlayer.nDeaths = result.getInt("death");
+
+	        tPlayer.nScore = result.getInt("score");
+	        tPlayer.nTotal = result.getInt("total");
 
 	        result.close();
 	        statement.close();
@@ -161,7 +164,7 @@ public class AtominsaDatabase
         tPlayer.nRegion = 0;
         tPlayer.nDepartment = 0;
         
-        tPlayer.fScore = 0.0f;
+        tPlayer.fPoints = 999.999f;
 
         tPlayer.sEmail = "player@atominsa.com";
         
@@ -170,7 +173,10 @@ public class AtominsaDatabase
         tPlayer.nKills = 0;
         tPlayer.nDeaths = 0;
 
-        String query = "INSERT INTO player (id, nickname, username, password, country, region, department, score, email, state, kill, death) VALUES (";
+        tPlayer.nScore = 0;
+        tPlayer.nTotal = 0;
+
+        String query = "INSERT INTO player (id, nickname, username, password, country, region, department, points, email, state, kill, death, score, total) VALUES (";
         query += String.valueOf(tPlayer.nID) + ", ";
         query += "'" + String.valueOf(tPlayer.sNickname) + "', ";
         query += "'" + String.valueOf(tPlayer.sUsername) + "', ";
@@ -178,11 +184,13 @@ public class AtominsaDatabase
         query += String.valueOf(tPlayer.nCountry) + ", ";
         query += String.valueOf(tPlayer.nRegion) + ", ";
         query += String.valueOf(tPlayer.nDepartment) + ", ";
-        query += String.valueOf(tPlayer.fScore) + ", ";
+        query += String.valueOf(tPlayer.fPoints) + ", ";
         query += "'" + String.valueOf(tPlayer.sEmail) + "', ";
         query += String.valueOf(tPlayer.nState) + ", ";
         query += String.valueOf(tPlayer.nKills) + ", ";
-        query += String.valueOf(tPlayer.nDeaths) + ")";
+        query += String.valueOf(tPlayer.nDeaths) + ", ";
+        query += String.valueOf(tPlayer.nScore) + ", ";
+        query += String.valueOf(tPlayer.nTotal) + ")";
         
 		try
 		{
@@ -202,12 +210,14 @@ public class AtominsaDatabase
     static public boolean UpdatePlayer( AtominsaPlayer _tPlayer )
     {
         String query = "UPDATE player SET ";
-        query += "nickname='" + String.valueOf(_tPlayer.sNickname) + "', ";
-        query += "score=" + String.valueOf(_tPlayer.fScore) + ", ";
-        query += "state=" + String.valueOf(_tPlayer.nState) + ", ";
-        query += "kill=" + String.valueOf(_tPlayer.nKills) + ", ";
-        query += "death=" + String.valueOf(_tPlayer.nDeaths) + " ";
-        query += "WHERE id=" + String.valueOf(_tPlayer.nID);
+        query += "`nickname`='" + String.valueOf(_tPlayer.sNickname) + "', ";
+        query += "`points`='" + String.valueOf(_tPlayer.fPoints) + "', ";
+        query += "`state`=" + String.valueOf(_tPlayer.nState) + ", ";
+        query += "`kill`=" + String.valueOf(_tPlayer.nKills) + ", ";
+        query += "`death`=" + String.valueOf(_tPlayer.nDeaths) + ", ";
+        query += "`score`=" + String.valueOf(_tPlayer.nScore) + ", ";
+        query += "`total`=" + String.valueOf(_tPlayer.nTotal) + " ";
+        query += "WHERE `id`=" + String.valueOf(_tPlayer.nID) + "";
         
 		try
 		{

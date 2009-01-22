@@ -170,6 +170,8 @@ public class AtominsaThread extends Thread
 		}
 		else if ( nHeader == HEADER_ONLINE_QUIT )
 		{
+			tServer.updatePlayers();
+			
 			tMaster.delServer(tServer);
 			
 			System.out.println( ">> #" + String.valueOf(nThreadID) + " quitted its hosted game called '" + tServer.sName + "'." );
@@ -237,22 +239,68 @@ public class AtominsaThread extends Thread
 			
 			int l = 1;
 			
+			int nPlayerPosition[] = new int[nPlayerCount];
+			int nPlayerScore[] = new int[nPlayerCount];
+			int nPlayerKills[] = new int[nPlayerCount];
+			int nPlayerDeaths[] = new int[nPlayerCount];
+
 			for ( int n = 0 ; n < nPlayerCount ; n++ )
 			{
-				int nPlayerPosition = getIntFromData( sData, l++ );
-				int nPlayerScore = getIntFromData( sData, l++ );
-				int nPlayerKills = getIntFromData( sData, l++ );
-				int nPlayerDeaths = getIntFromData( sData, l++ );
-				
+				nPlayerPosition[n] = getIntFromData( sData, l++ );
+				nPlayerScore[n] = getIntFromData( sData, l++ );
+				nPlayerKills[n] = getIntFromData( sData, l++ );
+				nPlayerDeaths[n] = getIntFromData( sData, l++ );
+			}
+			
+			// calcul du nombre de points gagnés
+			
+			for ( int n = 0 ; n < nPlayerCount ; n++ )
+			{
 				for ( int k = 0 ; k < tServer.getPlayerCount() ; k++ )
 				{
-					AtominsaPlayer tTemp = tServer.getPlayer(k);
+					AtominsaPlayer tPlayer = tServer.getPlayer(k);
 					
-					if ( tTemp.nPosition == nPlayerPosition )
+					if ( tPlayer.nState != AtominsaPlayer.STATE_SOLDIER ) continue;
+					
+					if ( tPlayer.nPosition == nPlayerPosition[n] )
 					{
-						tTemp.fScore += (float)nPlayerScore;
-						tTemp.nKills += (float)nPlayerKills;
-						tTemp.nDeaths += (float)nPlayerDeaths;
+						tPlayer.nScore += nPlayerScore[n];
+						tPlayer.nTotal += 1;
+						tPlayer.nKills += nPlayerKills[n];
+						tPlayer.nDeaths += nPlayerDeaths[n];
+
+						// calcul du nombre de points gagnés
+
+						for ( int m = 0 ; m < tServer.getPlayerCount() ; m++ )
+						{
+							AtominsaPlayer tOther = tServer.getPlayer(m);
+							
+							if ( tOther.nState != AtominsaPlayer.STATE_SOLDIER ) continue;
+
+							if ( tOther != tPlayer )
+							{
+								float ratio = tOther.fPoints / tPlayer.fPoints;
+								
+								if ( ratio <= 8.0f )
+								{
+									tPlayer.fPoints += 4.0f * nPlayerScore[n] * Math.pow( ratio, 2.0 );
+									
+									int count = nPlayerKills[n] - nPlayerDeaths[n];
+									
+									if ( count > 0 )
+										tPlayer.fPoints += count * Math.pow( ratio, 2.0 );
+								}
+								else
+								{
+									tPlayer.fPoints += 4.0f * nPlayerScore[n] * 8.0f * ratio;
+									
+									int count = nPlayerKills[n] - nPlayerDeaths[n];
+									
+									if ( count > 0 )
+										tPlayer.fPoints += count * 8.0f * ratio;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -332,6 +380,9 @@ public class AtominsaThread extends Thread
 			try
 			{
 			    System.out.println( ">> #" + String.valueOf(nThreadID) + " disconnected." );
+			    
+			    if ( tServer != null )
+			    	tServer.updatePlayers();
 			    
 			    tMaster.delServer( tServer );
 			    
