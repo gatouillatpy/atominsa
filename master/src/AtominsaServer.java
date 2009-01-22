@@ -3,14 +3,34 @@ import java.util.ArrayList;
 
 public class AtominsaServer
 {
+	public static int PLAYER_LIMIT = 8;
+	
 	public String sAddress;
 	
 	public String sName;
 	
 	public ArrayList<AtominsaPlayer> aPlayer = new ArrayList<AtominsaPlayer>();
 	
+	public Boolean bPlaying;
+	
 	public AtominsaServer()
 	{
+		bPlaying = false;
+	}
+
+	synchronized public void beginGame()
+	{
+		bPlaying = true;
+	}
+
+	synchronized public void endGame()
+	{
+		bPlaying = false;
+	}
+
+	synchronized public Boolean isPlaying()
+	{
+		return bPlaying;
 	}
 
 	synchronized public void delPlayer( AtominsaPlayer tPlayer )

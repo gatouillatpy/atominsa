@@ -35,13 +35,13 @@ public class AtominsaMaster
 		
 	    try
 	    {
+			AtominsaDatabase.Connect();
+
 			new AtominsaConsole( tMaster );
 			
 			ServerSocket ss = new ServerSocket( ATOMINSA_PORT );
 			  
 			printWelcome();
-			
-			AtominsaDatabase.Connect();
 			  
 			while ( true )
 			{
@@ -59,7 +59,7 @@ public class AtominsaMaster
 		System.out.println("ษออออออออออออออออออออออออออออออออออออออออออออออออออป");
 		System.out.println("บ            Atominsa Master Server                บ");
 		System.out.println("ฬออออออออออออออออออออออออออออออออออออออออออออออออออน");
-		System.out.println("บ Latest update : 15/01/2009                       บ");
+		System.out.println("บ Latest update : 22/01/2009                       บ");
 		System.out.println("ศออออออออออออออออออออออออออออออออออออออออออออออออออผ");
 	}
 
@@ -95,6 +95,46 @@ public class AtominsaMaster
 		return aServer.size();
 	}
 	
+	synchronized public ArrayList<AtominsaServer> getPlayableServerList()
+	{
+		ArrayList<AtominsaServer> list = new ArrayList<AtominsaServer>();
+		
+		for ( int n = AtominsaServer.PLAYER_LIMIT ; n >= 0 ; n-- )
+		{
+			for ( int k = 0 ; k < aServer.size() ; k++ )
+			{
+				AtominsaServer tServer = aServer.get(k);
+
+				if ( tServer.isPlaying() == false && tServer.getPlayerCount() == n )
+				{
+					list.add( tServer );
+				}
+			}
+		}
+		
+		return list;
+	}
+
+	synchronized public ArrayList<AtominsaServer> getUnplayableServerList()
+	{
+		ArrayList<AtominsaServer> list = new ArrayList<AtominsaServer>();
+		
+		for ( int n = AtominsaServer.PLAYER_LIMIT ; n >= 0 ; n-- )
+		{
+			for ( int k = 0 ; k < aServer.size() ; k++ )
+			{
+				AtominsaServer tServer = aServer.get(k);
+
+				if ( tServer.isPlaying() == true && tServer.getPlayerCount() == n )
+				{
+					list.add( tServer );
+				}
+			}
+		}
+		
+		return list;
+	}
+
 	synchronized public void delThread( AtominsaThread tThread )
 	{
 		aThread.remove( tThread );

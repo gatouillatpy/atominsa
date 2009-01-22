@@ -1,5 +1,6 @@
 
 import java.net.*;
+import java.util.ArrayList;
 import java.io.*;
 
 public class AtominsaThread extends Thread
@@ -9,6 +10,8 @@ public class AtominsaThread extends Thread
 	static int HEADER_ONLINE_QUIT = 2102;
 	static int HEADER_ONLINE_PLAYER = 2201;
 	static int HEADER_ONLINE_SCORE = 2301;
+	static int HEADER_ONLINE_BEGIN_GAME = 2401;
+	static int HEADER_ONLINE_END_GAME = 2402;
 
 	private Socket tSocket;
 	
@@ -62,17 +65,39 @@ public class AtominsaThread extends Thread
 		String sMessage = "0" + '\36';
 
 		sMessage += String.valueOf( HEADER_SERVER ) + '\36';
-
-		sMessage += String.valueOf( tMaster.getServerCount() ) + '\37';
 		
-		for ( int k = 0 ; k < tMaster.getServerCount() ; k++ )
+		// envoi de la liste des serveurs dont la partie n'est pas encore commencée
 		{
-			AtominsaServer tServer = tMaster.getServer( k );
-			
-			sMessage += tServer.sName + ' ' + '[' + String.valueOf(tServer.getPlayerCount()) + ']' + '\37';
-			sMessage += tServer.sAddress + '\37';
+			ArrayList<AtominsaServer> list = tMaster.getPlayableServerList();
+	
+			sMessage += String.valueOf( list.size() ) + '\37';
+
+			for ( int k = 0 ; k < list.size() ; k++ )
+			{
+				AtominsaServer tServer = list.get(k);
+				
+				sMessage += tServer.sName + '\37';
+				sMessage += tServer.sAddress + '\37';
+				sMessage += String.valueOf(tServer.getPlayerCount()) + '\37';
+			}
 		}
-		
+
+		// envoi de la liste des serveurs dont la partie est pas commencée
+		{
+			ArrayList<AtominsaServer> list = tMaster.getUnplayableServerList();
+	
+			sMessage += String.valueOf( list.size() ) + '\37';
+
+			for ( int k = 0 ; k < list.size() ; k++ )
+			{
+				AtominsaServer tServer = list.get(k);
+				
+				sMessage += tServer.sName + '\37';
+				sMessage += tServer.sAddress + '\37';
+				sMessage += String.valueOf(tServer.getPlayerCount()) + '\37';
+			}
+		}
+
 		sMessage += '\4';
 
 		send( sMessage );
@@ -304,6 +329,19 @@ public class AtominsaThread extends Thread
 					}
 				}
 			}
+		}
+		else if ( nHeader == HEADER_ONLINE_BEGIN_GAME )
+		{
+			System.out.println( ">> #" + String.valueOf(nThreadID) + " begun its game." );
+			
+			tServer.beginGame();
+		}
+		else if ( nHeader == HEADER_ONLINE_END_GAME )
+		{
+			if ( tServer.isPlaying() )
+				System.out.println( ">> #" + String.valueOf(nThreadID) + " ended its game." );
+			
+			tServer.endGame();
 		}
 	}
 	
