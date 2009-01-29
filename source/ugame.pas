@@ -1340,7 +1340,11 @@ Begin
         For i := 1 To GetBombermanCount() Do
             DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.7 - 0.2 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
-     If GetKey(KEY_ENTER) Then InitMenu();
+     If GetKey(KEY_ENTER) Then Begin
+        InitMenu();
+        If bOnline Then
+           SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
+     End;
 End;
 
 
@@ -2023,6 +2027,7 @@ Begin
         End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
             sData := '';
             Send( nLocalIndex, HEADER_QUIT_GAME, sData );
+            If bOnline Then SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
             PlaySound( SOUND_MENU_BACK );
             InitMenu();
             ClearInput();
@@ -2940,6 +2945,8 @@ Begin
                                nGame := GAME_INIT;
                                sData := '';
                                Send( nLocalIndex, HEADER_FIGHT, sData );
+                               If bOnline Then
+                                  SendOnline( nLocalIndex, HEADER_BEGIN_MATCH, '' );
                             End;
                         End Else If (bMulti = False) Then Begin
                             nGame := GAME_INIT;

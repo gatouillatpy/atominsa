@@ -70,6 +70,9 @@ Const HEADER_ONLINE_PLAYER     = 2201;
 
 Const HEADER_ONLINE_SCORE      = 2301;
 
+Const HEADER_BEGIN_MATCH       = 2401;
+Const HEADER_END_MATCH         = 2402;
+
 
 
 Type LPPacketItem = ^PacketItem;

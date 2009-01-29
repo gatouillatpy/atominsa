@@ -11,8 +11,10 @@ Uses Classes, SysUtils, UUtils, UMap, UScheme, UCharacter, UForm, UMulti;
 
 
 Var nServerCount : Integer;
+    nPlayableCount : Integer;
     sServerIP : Array [2..255] Of String;
     sServerName : Array[2..255] Of String;
+    nNbrPlayers : Array[2..255] Of Integer;
 
 
 
@@ -52,7 +54,7 @@ Begin
 
 
      SetString( STRING_SETUP_MENU(0), 'online', 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(1), 'host', 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(1), 'host (name):', 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(2), sLocalName, 0.2, 1.0, 600 );
 
      If Not ClientInitOnline( sMasterAddress, nMasterPort ) Then Begin
@@ -83,7 +85,7 @@ Procedure ProcessMenuOnline () ;
 Var w, h : Single;
     k, x, y, z : Integer;
     t : Single;
-    i : Integer;
+    i, j : Integer;
     nIndex, nHeader : Integer;
     sData : String;
 Begin
@@ -116,10 +118,14 @@ Begin
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(1), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(1), IsActive(1), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(2), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(2), IsActive(2), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      t += 0.2;
-     For i := 3 To nServerCount + 2 Do Begin
+     For i := 3 To nPlayableCount + 2 Do Begin
          If fScroll <= t Then DrawString( STRING_SETUP_MENU(i), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(i), IsActive(i), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
-
      End;
+     If ( nPlayableCount < nServerCount ) And ( nPlayableCount <> 0 ) Then t += 0.2;
+     For i := nPlayableCount + 3 To nServerCount + 2 Do Begin
+         If fScroll <= t Then DrawString( STRING_SETUP_MENU(i), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 0.5, IsActive(i), IsActive(i), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     End;
+
      
      
      If GetKey( KEY_ESC ) Then Begin
@@ -129,7 +135,7 @@ Begin
      End;
 
 
-     If GetKeyS( KEY_UP ) Then Begin
+     If GetKeyS( KEY_UP ) Then Begin  // TODO : A vérifier, surtout pour 6 serveurs dispo
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
 
@@ -139,11 +145,33 @@ Begin
            End;
 
            t := 0.0;
-           If (nMenu = 1) And (fScroll > t) Then fScroll := t; t += 0.2;
+           {If (nMenu = 1) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = 2) And (fScroll > t) Then fScroll := t; t += 0.2;
            t += 0.2;
-           For i := 3 To nServerCount - 6 Do Begin
+           If ( ( nServerCount - nPlayableCount ) >= 9 ) Then j := nServerCount - 6 Else j := nServerCount - 5;
+           For i := 3 To j Do Begin
+               If ( i = nPlayableCount + 2 ) And ( nPlayableCount > 0 ) And ( nPlayableCount < nServerCount ) Then
+                  t += 0.2;
                If (nMenu = i) And (fScroll > t) Then fScroll := t; t += 0.2;
+           End;
+           If (nMenu = nServerCount + 2)
+           And ( ( ( nServerCount >= 5 ) And ( nPlayableCount > 0 ) And ( nPlayableCount < nServerCount ) )
+           Or ( ( nServerCount >= 6 ) And ( ( nPlayableCount = 0 ) Or ( nPlayableCount = nServerCount ) ) ) ) Then
+              fScroll := t;   }
+           If (nMenu = 1) And (fScroll > t) Then fScroll := t;
+           j := nServerCount - 6;
+           If (nServerCount - nPlayableCount <= 7)
+           And (nPlayableCount > 0) And (nPlayableCount < nServerCount) Then j := j + 1;
+           If (j >= 0) And (j <= 2) Then j := j + 1;
+           If (j >= 0) Then t += 0.2;
+           For i := 2 To j Do Begin
+               If ((i = 3) And (nServerCount > 0))
+               Or ((i = nPlayableCount + 3) And (nPlayableCount > 0) And (nPlayableCount < nServerCount))  Then Begin
+                  t += 0.2;
+                  If ( nServerCount = 8 ) And ( i = 3 ) Then j := j - 1;
+               End;
+               If (nMenu = i) And (fScroll > t) Then fScroll := t;
+               If (i <= j) Then t += 0.2;
            End;
            If (nMenu = nServerCount + 2) Then fScroll := t;
         End;
@@ -165,7 +193,30 @@ Begin
            t := 0.0;
            If nMenu = 1 Then fScroll := t;
            t += 0.2;
-           For i := 8 To nServerCount + 2 Do Begin
+           {
+           If ( ( nServerCount - nPlayableCount ) >= 9 ) Then j := 8 Else j := 8;
+           For i := j To nServerCount + 2 Do Begin
+               If (i = nPlayableCount + 2 ) And ( nPlayableCount > 0 ) And ( nPlayableCount < nServerCount ) Then t += 0.2;
+               If (nMenu = i) And (fScroll < t) Then fScroll := t; t += 0.2;
+           End;
+           }
+           
+           {
+               If ((i = 3) And (nServerCount > 0))
+               Or ((i = nPlayableCount + 3) And (nPlayableCount > 0) And (nPlayableCount < nServerCount))  Then Begin
+                  t += 0.2;
+                  j := j - 1;
+               End;
+           }
+           j := 8;
+           If (nPlayableCount > 0) And (nPlayableCount < nServerCount) Then Begin
+              If (nPlayableCount < 5) Then j -= 1;
+              If (nPlayableCount = 5) Then t += 0.2;
+           End;
+           For i := j To nServerCount + 2 Do Begin
+               If ((i = nPlayableCount + 3) And (nPlayableCount > 0) And (nPlayableCount < nServerCount))  Then Begin
+                  t += 0.2;
+               End;
                If (nMenu = i) And (fScroll < t) Then fScroll := t; t += 0.2;
            End;
         End;
@@ -183,7 +234,8 @@ Begin
                 nIndex := nLocalIndex;
                 nHeader := HEADER_ONLINE_HOST;
                 sData := sLocalName + #31;
-                SendOnline( nIndex, nHeader, sData );
+                If bOnline Then
+                   SendOnline( nIndex, nHeader, sData );
                 nState := STATE_MULTI;
                 // désactivation de la souris
                 BindButton( BUTTON_LEFT, NIL );
@@ -267,16 +319,19 @@ Var nIndex : DWord;
     sData : String;
 Var k, l : Integer;
 Begin
-{
-     l := 20;
+
+     l := Random(11);
      For k := 1 To l Do Begin
          sServerName[k+2] := 'Server ' + IntToStr(k);
          SetString( STRING_SETUP_MENU(k+2), sServerName[k+2], 0.2, 1.0, 600 );
      End;
      nServerCount := l;
+     Repeat
+           nPlayableCount := Random(11);
+     Until ( nPlayableCount <= nServerCount );
      nState := STATE_ONLINE;
      fScroll := 0.0;
-}
+
      ClientLoopOnline();
      // On peut essayer un wait.
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -284,11 +339,20 @@ Begin
                HEADER_SERVER :
                Begin
                     l := 1;
-                    TryStrToInt( GetString( sData, l ), nServerCount ); l += 1;
-                    For k := 3 To nServerCount + 2 Do Begin
+                    TryStrToInt( GetString( sData, l ), nPlayableCount ); l += 1;
+                    For k := 3 To nPlayableCount + 2 Do Begin
                         sServerName[k] := GetString( sData, l ); l += 1;
                         sServerIP[k] := GetString( sData, l ); l += 1;
-                        SetString( STRING_SETUP_MENU(k), sServerName[k], 0.2, 1.0, 600 );
+                        TryStrToInt( GetString( sData, 1 ), nNbrPlayers[k] ); l += 1;
+                        SetString( STRING_SETUP_MENU(k), sServerName[k] + ' [' + IntToStr( nNbrPlayers[k] ) + ']', 0.2, 1.0, 600 );
+                    End;
+                    TryStrToInt( GetString( sData, l ), k ); l += 1;
+                    nServerCount := k + nPlayableCount;
+                    For k := nPlayableCount + 3 To nServerCount + 2 Do Begin
+                        sServerName[k] := GetString( sData, l ); l += 1;
+                        sServerIP[k] := GetString( sData, l ); l += 1;
+                        TryStrToInt( GetString( sData, 1 ), nNbrPlayers[k] ); l += 1;
+                        SetString( STRING_SETUP_MENU(k), sServerName[k] + ' [' + IntToStr( nNbrPlayers[k] ) + ']', 0.2, 1.0, 600 );
                     End;
                     nState := STATE_ONLINE;
                     fScroll := 0.0;

@@ -988,8 +988,8 @@ Function GetInteger ( sCommand : String; nArg : Integer ) : Integer ;
 Var sResult : String;
 Begin
      sResult := GetString( sCommand, nArg );
-     
-     If sResult <> 'NULL' Then GetInteger := StrToInt( sResult ) Else GetInteger := 0;
+
+     If Not( (sResult <> 'NULL') And TryStrToInt( sResult, GetInteger ) ) Then GetInteger := 0;
 End;
 
 Function GetSingle ( sCommand : String; nArg : Integer ) : Single ;
