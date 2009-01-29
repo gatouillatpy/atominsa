@@ -319,7 +319,7 @@ Var nIndex : DWord;
     sData : String;
 Var k, l : Integer;
 Begin
-
+  {
      l := Random(11);
      For k := 1 To l Do Begin
          sServerName[k+2] := 'Server ' + IntToStr(k);
@@ -331,7 +331,7 @@ Begin
      Until ( nPlayableCount <= nServerCount );
      nState := STATE_ONLINE;
      fScroll := 0.0;
-
+ }
      ClientLoopOnline();
      // On peut essayer un wait.
      While GetPacket( nIndex, nHeader, sData ) Do Begin

@@ -1,6 +1,6 @@
 - impossible de passer en runtime du mode plein écran au mode fenêtre et inversement
 - problème pour le switch display avec le reloaddatastack
-- cases bloquées en réseau (pour le serveur et le client)
+- cases bloquées en réseau (pour le serveur et le client) à cause des delblock non faits
 - bombes trigger qui bougent en réseau (au moins pour les IA du serveur)
 - bug (access violation) en réseau lorsque d'explosions de bombes (tobject_free)
 - trigger traversé par le client tant qu'elle n'est pas bougée.

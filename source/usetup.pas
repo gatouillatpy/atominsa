@@ -1022,7 +1022,7 @@ Begin
      sServerAddress := '192.168.0.2';
      nServerPort := 7070;
      nServerType := SERVER_STANDARD;
-     sMasterAddress :=  '192.168.0.2';
+     sMasterAddress := '82.230.144.231';
      nMasterPort := 7070;
      sUserName := 'myname';
      sUserPassword := 'mypassword';
