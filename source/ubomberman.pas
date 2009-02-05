@@ -33,6 +33,7 @@ type
     fSumDirGetDelta : Single;    // temps depuis lequel le bomberman n'a pas changé de direction.
     fSumBombGetDelta : Single;   // temps depuis lequel le bomberman n'a pas posé de bombes.
     fSumGrabGetDelta : Single;   // temps depuis lequel la bombe est portée.
+    fSumFixGetDelta : Single;
     fSumIgnitionGetDelta: Single;// temps depuis lequel la TriggerBomb a été posée.
 
     lastDir   : vectorN;         // memorise la derniere direction de mouvement du bomberman
@@ -174,6 +175,7 @@ type
   Property SumDirGetDelta : Single Read fSumDirGetDelta Write fSumDirGetDelta;
   Property SumBombGetDelta : Single Read fSumBombGetDelta Write fSumBombGetDelta;
   Property SumGrabGetDelta : Single Read fSumGrabGetDelta Write fSumGrabGetDelta;
+  Property SumFixGetDelta : Single Read fSumFixGetDelta Write fSumFixGetDelta;
   Property SumIgnitionGetDelta : Single Read fSumIgnitionGetDelta Write fSumIgnitionGetDelta;
   property ExploseBombTime : Single Read fBombTime Write fBombTime;
 
@@ -942,7 +944,7 @@ begin
       aX := uTriggerBomb^.Bomb.XGrid;
       aY := uTriggerBomb^.Bomb.YGrid;
       _nNetID := uTriggerBomb^.Bomb.nNetID;
-    //  uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
+      uGrid.DelBlock(aX,aY);                                                    // pas necessaire mais plus propre
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
 
@@ -1225,7 +1227,6 @@ begin
 
  if CheckCoordinates(dX,dY) then
   if ((uGrid.GetBlock(dX,dY)<>nil) AND (uGrid.GetBlock(dX,dY) is CBomb)) then
-  // TODO : Tester la condition reseau
   begin
        If ( (bMulti = false) Or (nLocalIndex = nClientIndex[0]) ) Then Begin
           case nDirection of

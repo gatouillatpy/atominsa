@@ -15,7 +15,7 @@ Type
 
 CBomb = Class(CBlock)
 
-     Protected
+     public
        bUpdateTime,
        bMoving,                                               // defini si la bombe est en cours de mouvement ou non
        bJumping,                                              // definit si la bombe est en cours de saut ...
@@ -69,7 +69,7 @@ end;
 
 
 implementation
-uses UItem, UListBomb, UGame, USetup, UMulti;
+uses UItem, UListBomb, UGame, USetup, UMulti, UForm;
 
 
 
@@ -83,6 +83,8 @@ uses UItem, UListBomb, UGame, USetup, UMulti;
 {*******************************************************************************}
 procedure CBomb.DoMove(afX, afY : Single;aX,aY : integer);
 begin
+     If ( afX < 1 ) Or ( afY < 1 ) Or ( aX < 1 ) Or ( aY < 1 ) Then
+        AddLineToConsole( 'Bug in DoMove' );
    uGrid.DelBlock(nX,nY);
    if nPunch>0 then
      if ((aX<>nX) or (aY<>nY)) then
@@ -308,12 +310,10 @@ begin
 
   if Not(CheckCoordinates(Trunc(fPosition.x),Trunc(fPosition.y))) then
   begin
-    case nMoveDir of
-      RIGHT : fPosition.x := 1;
-      LEFT  : fPosition.x := GRIDWIDTH;
-      UP    : fPosition.y := GRIDHEIGHT;
-      DOWN  : fPosition.y := 1;
-    end;
+       If ( fPosition.x < 1 ) Then fPosition.x := 1;
+       If ( fPosition.x > GRIDWIDTH ) Then fPosition.x := GRIDWIDTH;
+       If ( fPosition.y > GRIDHEIGHT ) Then fPosition.y := GRIDHEIGHT;
+       If ( fPosition.y < 1 ) Then fPosition.y := 1;
   end;
   
   case nMoveDir of
@@ -336,10 +336,18 @@ begin
                         bMoving      := false;
                         If ( bMulti = True ) And ( nLocalIndex = nClientIndex[ 0 ] ) Then Begin
                            sData := IntToStr( nNetID ) + #31;
+                           sData := sData + IntToStr( nX ) + #31;
+                           sData := sData + IntToStr( nY ) + #31;
                            Send( nLocalIndex, HEADER_END_OF_JUMP, sData );
                         End;
                       end
-                      else bJumping:=false;
+                      else Begin
+                           bJumping:=false;
+                           If ( bMulti = True ) And ( nLocalIndex = nClientIndex[ 0 ] ) Then Begin
+                              sData := IntToStr( nNetID ) + #31;
+                              Send( nLocalIndex, HEADER_BJUMPING, sData );
+                           End;
+                      End;
                     end;
                   end;
     UP, DOWN    : begin
@@ -361,10 +369,18 @@ begin
                             bMoving      := false;
                             If ( bMulti = True ) And ( nLocalIndex = nClientIndex[ 0 ] ) Then Begin
                                sData := IntToStr( nNetID ) + #31;
+                               sData := sData + FloatToStr( fPosition.x ) + #31;
+                               sData := sData + FloatToStr( fPosition.y ) + #31;
                                Send( nLocalIndex, HEADER_END_OF_JUMP, sData );
                             End;
                         end
-                        else bJumping:=false;
+                        else Begin
+                             bJumping:=false;
+                             If ( bMulti = True ) And ( nLocalIndex = nClientIndex[ 0 ] ) Then Begin
+                                sData := IntToStr( nNetID ) + #31;
+                                Send( nLocalIndex, HEADER_BJUMPING, sData );
+                             End;
+                        End;
                       end;
                   end;
   end;
@@ -595,7 +611,7 @@ begin
   result := (fPosition.x-Trunc(fPosition.x))<0.2;
   result := result and ((fPosition.y-Trunc(fPosition.y))<0.2);
   result := result and (fTimeCreated >= fExploseTime);
-  if result then Explose;
+  if (fTimeCreated >= fExploseTime) then Explose;   // TODO : A tester.
 end;
 
 procedure CBomb.StartTime();

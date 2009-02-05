@@ -38,7 +38,7 @@ End;
 Implementation
 
 Uses UExtraBomb, UFlameUp, uFlame, UDisease, USpeedUp, UKick, uGrab, uJelly,
-     UPunch, USpoog, UGoldFLame, UTrigger, USuperDisease, URandomBonus;
+     UPunch, USpoog, UGoldFLame, UTrigger, USuperDisease, URandomBonus, UForm;
 
 
 { CGrid }
@@ -111,7 +111,10 @@ End;
 
 Function CGrid.GetBlock ( x, y : Integer) : CBlock ;
 Begin
-  result := aBlock[x,y];
+     If (x >= 1) And (x <= GRIDWIDTH) And (y >= 1) And (y <= GRIDHEIGHT) Then
+        result := aBlock[x,y]
+     Else
+         AddLineToConsole( 'JUST A BUG !' );
 End;
 
 Constructor CGrid.Create ( _uScheme : CScheme ) ;
@@ -134,12 +137,22 @@ end;
 
 procedure CGrid.AddBlock(aX,aY : integer;Block : CBlock);
 begin
-  aBlock[aX,aY]:=Block;
+      If (aX >= 1) And (aX <= GRIDWIDTH) And (aY >= 1) And (aY <= GRIDHEIGHT) Then
+         aBlock[aX,aY]:=Block
+      Else
+          AddLineToConsole( 'JUST A BUG !!' );
 end;
 
 Procedure CGrid.DelBlock ( x, y : Integer ) ;
 Begin
-     aBlock[x,y] := Nil; //on vide la case (x,y) du tableau
+     If (x >= 1) And (x <= GRIDWIDTH) And (y >= 1) And (y <= GRIDHEIGHT) Then
+        aBlock[x,y] := Nil //on vide la case (x,y) du tableau
+     Else Begin
+         AddLineToConsole( 'JUST A BUG !!!' );
+         AddLineToConsole( 'x = ' + IntToStr(x) );
+         AddLineToConsole( 'y = ' + IntToStr(y) );
+     End;
+
 End;
 
 

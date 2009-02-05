@@ -216,7 +216,7 @@ Begin
    
    
    
-   // Minimiser les changements de directions.
+   // Minimiser les changements de directions
    If ( pBomberman.SumDirGetDelta <> 0 ) Then Begin
        If ( pBomberman.Direction2 = 180 ) Then pBomberman.DangerUp := pBomberman.DangerUp - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
        If ( pBomberman.Direction2 = 0 ) Then pBomberman.DangerDown := pBomberman.DangerDown - 1024 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
@@ -229,6 +229,13 @@ Begin
        pBomberman.Danger := pBomberman.Danger - 64 div Trunc ( 64 * pBomberman.SumDirGetDelta * pBomberman.SumDirGetDelta + 0.5 );
    End;
    pBomberman.SumDirGetDelta := pBomberman.SumDirGetDelta + dt;
+   
+   
+   
+   // Empecher de rester fixe
+   pBomberman.Danger := pBomberman.Danger + Trunc( pBomberman.SumFixGetDelta * pBomberman.SumFixGetDelta * 16 );
+   If ( pBomberman.SumFixGetDelta < 8 ) Then
+      pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + dt;
    
 
 
@@ -256,6 +263,12 @@ Begin
        pBomberman.DangerDL := dangerMin;
    End;
 
+
+
+// PunchBomb
+   If ( nSkill = SKILL_GODLIKE ) And ( pBomberman.bCanPunch ) Then
+      pBomberman.PunchBomb( dt );
+      
 
 
 // Explosion des trigger bombes.
@@ -405,6 +418,7 @@ End;
       // Mise à jour de lX et lY
       pBomberman.LX := pBomberman.Position.X;
       pBomberman.LY := pBomberman.Position.Y;
+      pBomberman.SumFixGetDelta := 0;
 
       // Comparaison des dangers.
       If ( pBomberman.DangerUL <= pBomberman.DangerUR ) And ( pBomberman.DangerUL <= pBomberman.DangerDL )

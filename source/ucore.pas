@@ -53,6 +53,7 @@ Const HEADER_ISEXPLOSED_ITEM   = 1416;
 Const HEADER_CONTAMINATE       = 1417;
 Const HEADER_END_OF_JUMP       = 1418;
 Const HEADER_PUNCH             = 1419;
+Const HEADER_BJUMPING          = 1420;
 
 Const HEADER_BOMBERMAN         = 1501;
 Const HEADER_BOMB              = 1502;

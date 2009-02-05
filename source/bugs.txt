@@ -1,8 +1,12 @@
-- impossible de passer en runtime du mode plein écran au mode fenêtre et inversement
-- problème pour le switch display avec le reloaddatastack
-- cases bloquées en réseau (pour le serveur et le client) à cause des delblock non faits
-- bombes trigger qui bougent en réseau (au moins pour les IA du serveur)
-- bug (access violation) en réseau lorsque d'explosions de bombes (tobject_free)
++ bug (access violation) en réseau lors d'explosions de bombes pour le client à cause d'indices de tableaux faux!
++ impossible de passer en runtime du mode plein écran au mode fenêtre et inversement
++ problème pour le switch display avec le reloaddatastack
++ bombes qui n'explosent pas tant que pas touchés !
+= bombes qui apparaissent par magie après le bonus punch (à cause de triggerbombtonormal)
+= cases bloquées en réseau (pour le serveur et le client) à cause des delblock non faits
+- bombes trigger qui grossissent en réseau (au moins pour les IA du serveur)
 - trigger traversé par le client tant qu'elle n'est pas bougée.
-- bombes qui apparaissent par magie après le bonus punch
-- bombes qui n'explosent pas tant que pas touchés !
+
++ pour fréquent, = pour régulier, - pour rare
+
+

@@ -34,7 +34,7 @@ Type LPBombItem = ^BombItem;
 
 implementation
 
-Uses UGame, UCore, USetup, SysUtils;
+Uses UGame, UCore, USetup, SysUtils, UForm;
 
 {                                                                               }
 {                           Liste Bombes                                        }
@@ -81,6 +81,8 @@ begin
    else pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID);
  end;
  
+ If ( aX < 1 ) Or ( aY < 1 ) Then
+    AddLineToConsole( 'Bug in Add Bomb' );
  If ( bMulti = true ) And ( bToSend ) Then Begin
     sData := IntToStr(aIndex) + #31;
     sData := sData + IntToStr(_nNetID) + #31;
@@ -179,8 +181,6 @@ pPrev:=Nil;
       pPrev:=pTemp;
       pTemp:=pTemp^.Next;
       
-      // TODO
-      // il y a un bug a corriger lorsqu'une trigger bombe est supprimée
       If pTemp = NIL Then Exit;
       
       Find:= (pTemp^.Bomb.XGrid=wBomb.XGrid)

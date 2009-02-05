@@ -221,6 +221,7 @@ Begin
                 MENU_MULTI_JOIN :
                 Begin
                      If ClientInit( sServerAddress, nServerPort ) Then Begin
+                        bSendDisconnect := False;
                         nMulti := MULTI_CLIENT;
                         For k := 1 To 8 Do Begin
                             nPlayerType[k] := PLAYER_NIL;
@@ -449,8 +450,8 @@ Begin
                        sClientName[nClientCount] := GetString( sData, 1 );
                        sClientUserName[nClientCount] := GetString( sData, 2 );
                        sClientUserPassword[nClientCount] := GetString( sData, 3 );
+                       AddLineToConsole( sClientName[nClientCount] + ' entered the game.' );
                        nClientCount += 1;
-                       AddLineToConsole( sData + ' entered the game.' );
                     End;
                     // renvoi de la liste des clients
                     nIndex := nLocalIndex;
@@ -654,6 +655,7 @@ Begin
                     TryStrToInt( GetString( sData, 3 ), dX );
                     TryStrToInt( GetString( sData, 4 ), dY );
                     dt := StrToFloat( GetString( sData, 5 ) );
+                    If (pGrid.GetBlock(dX,dY) is CBomb) Then
                     Case nDirection of
                               0    :  CBomb(pGrid.GetBlock(dX,dY)).Punch(DOWN,dt);
                               90   :  CBomb(pGrid.GetBlock(dX,dY)).Punch(LEFT,dt);
@@ -766,6 +768,8 @@ Begin
                sData := sData + FormatFloat('0.000',pBomb.Position.x) + #31;
                sData := sData + FormatFloat('0.000',pBomb.Position.y) + #31;
                sData := sData + FormatFloat('0.000',pBomb.Position.z) + #31;
+               If ( pBomb.Position.x < 1 ) Or ( pBomb.Position.y < 1 ) Then
+                  AddLineToConsole( 'Paquet Bug!' );
            End;
            Send( nLocalIndex, HEADER_BOMB, sData );
         End;
@@ -1077,7 +1081,37 @@ Begin
                Begin
                     TryStrToInt( GetString( sData, 1 ), _nNetID );
                     pBomb := GetBombByNetID( _nNetID );
-                    pBomb.JumpMovement := False;
+                    If ( pBomb = Nil ) Then Begin
+                       pBomb := GetBombByGridCoo( nX, nY );
+                       AddLineToConsole( 'Bug corrected : Header_end_of_jump' );
+                    End;
+                    TryStrToInt( GetString( sData, 2 ), nX );
+                    TryStrToInt( GetString( sData, 3 ), nY );
+                    pGrid.DelBlock(nX,nY);
+                    If ( pBomb <> Nil ) Then Begin
+                        pBomb.Position.z   := 0.0;
+                        pBomb.xGrid        := nX;
+                        pBomb.yGrid        := nY;
+                        pBomb.nOriginX     := nX;
+                        pBomb.nOriginY     := nY;
+                        pBomb.Position.x   := nX;
+                        pBomb.Position.y   := nY;
+                        pGrid.AddBlock(nX,nY,pBomb);
+                        pBomb.bJumping     := false;
+                        pBomb.bMoveJump    := false;
+                        pBomb.bMoving      := false;
+                    End
+                    Else
+                        AddLineToConsole( 'Bug : Header_end_of_jump' );
+               End;
+               HEADER_BJUMPING :
+               Begin
+                    TryStrToInt( GetString( sData, 1 ), _nNetID );
+                    pBomb := GetBombByNetID( _nNetID );
+                    If ( pBomb <> Nil ) Then
+                       pBomb.bJumping := False
+                    Else
+                        AddLineToConsole( 'Bug : Header_bjumping' );
                End;
                HEADER_CONTAMINATE :
                Begin
@@ -1119,7 +1153,7 @@ Begin
                     End;
                     InitWait();
                End;
-               HEADER_BOMB :
+               HEADER_BOMB :  // TODO : xGrid = -1 ?? yGrid = 0 ??
                Begin
                     l := 1;
                     While ( GetString( sData, l ) <> 'NULL' ) Do Begin
@@ -1253,7 +1287,10 @@ Begin
         Else ServerLoop();
      End Else If nMulti = MULTI_CLIENT Then Begin
         If (nState = PHASE_MENU) Or (bGoToPhaseMenu) Then Begin
-           Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
+           If Not bSendDisconnect Then Begin
+              Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
+              bSendDisconnect := True;
+           End;
         End;
         ProcessClient();
         If (nState = PHASE_MENU) Then Begin

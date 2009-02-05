@@ -85,8 +85,9 @@ Procedure ProcessMenuOnline () ;
 Var w, h : Single;
     k, x, y, z : Integer;
     t : Single;
-    i, j : Integer;
+    i, j, l, m : Integer;
     nIndex, nHeader : Integer;
+    b1, b2 : Boolean;
     sData : String;
 Begin
      // appel d'une texture de rendu
@@ -135,7 +136,7 @@ Begin
      End;
 
 
-     If GetKeyS( KEY_UP ) Then Begin  // TODO : A vérifier, surtout pour 6 serveurs dispo
+     If GetKeyS( KEY_UP ) Then Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
 
@@ -144,34 +145,20 @@ Begin
               nMenu := nServerCount + 2;
            End;
 
+           b1 := nServerCount > 0;
+           b2 := (nServerCount - nPlayableCount > 0) And (nPlayableCount > 0);
            t := 0.0;
-           {If (nMenu = 1) And (fScroll > t) Then fScroll := t; t += 0.2;
-           If (nMenu = 2) And (fScroll > t) Then fScroll := t; t += 0.2;
-           t += 0.2;
-           If ( ( nServerCount - nPlayableCount ) >= 9 ) Then j := nServerCount - 6 Else j := nServerCount - 5;
-           For i := 3 To j Do Begin
-               If ( i = nPlayableCount + 2 ) And ( nPlayableCount > 0 ) And ( nPlayableCount < nServerCount ) Then
-                  t += 0.2;
-               If (nMenu = i) And (fScroll > t) Then fScroll := t; t += 0.2;
-           End;
-           If (nMenu = nServerCount + 2)
-           And ( ( ( nServerCount >= 5 ) And ( nPlayableCount > 0 ) And ( nPlayableCount < nServerCount ) )
-           Or ( ( nServerCount >= 6 ) And ( ( nPlayableCount = 0 ) Or ( nPlayableCount = nServerCount ) ) ) ) Then
-              fScroll := t;   }
            If (nMenu = 1) And (fScroll > t) Then fScroll := t;
            j := nServerCount - 6;
-           If (nServerCount - nPlayableCount <= 7)
-           And (nPlayableCount > 0) And (nPlayableCount < nServerCount) Then j := j + 1;
-           If (j >= 0) And (j <= 2) Then j := j + 1;
-           If (j >= 0) Then t += 0.2;
-           For i := 2 To j Do Begin
-               If ((i = 3) And (nServerCount > 0))
-               Or ((i = nPlayableCount + 3) And (nPlayableCount > 0) And (nPlayableCount < nServerCount))  Then Begin
-                  t += 0.2;
-                  If ( nServerCount = 8 ) And ( i = 3 ) Then j := j - 1;
+           If b1 Then j += 1;
+           If b2 Then j += 1;
+           l := 1;
+           For i := 1 To j Do Begin
+               If (b1 And (i = 3)) Or (b2 And (i = nPlayableCount + 4)) Then t += 0.2
+               Else Begin
+                    If (nMenu = l) And (fScroll > t) Then fScroll := t; t += 0.2;
+                    l += 1;
                End;
-               If (nMenu = i) And (fScroll > t) Then fScroll := t;
-               If (i <= j) Then t += 0.2;
            End;
            If (nMenu = nServerCount + 2) Then fScroll := t;
         End;
@@ -191,33 +178,23 @@ Begin
            End;
 
            t := 0.0;
+           b1 := nServerCount > 0;
+           b2 := (nServerCount - nPlayableCount > 0) And (nPlayableCount > 0);
+
            If nMenu = 1 Then fScroll := t;
            t += 0.2;
-           {
-           If ( ( nServerCount - nPlayableCount ) >= 9 ) Then j := 8 Else j := 8;
-           For i := j To nServerCount + 2 Do Begin
-               If (i = nPlayableCount + 2 ) And ( nPlayableCount > 0 ) And ( nPlayableCount < nServerCount ) Then t += 0.2;
-               If (nMenu = i) And (fScroll < t) Then fScroll := t; t += 0.2;
-           End;
-           }
-           
-           {
-               If ((i = 3) And (nServerCount > 0))
-               Or ((i = nPlayableCount + 3) And (nPlayableCount > 0) And (nPlayableCount < nServerCount))  Then Begin
-                  t += 0.2;
-                  j := j - 1;
+           j := 9;
+           m := nServerCount + 2;
+           If b1 Then j -= 1;
+           If b2 And (nPlayableCount + 4 < j) Then j -= 1;
+           If b2 And (nPlayableCount + 4 >= j) Then m += 1;
+           l := j;
+           For i := j To m Do Begin
+               If b2 And (i = nPlayableCount + 3) Then t += 0.2
+               Else Begin
+                    If (nMenu = l) And (fScroll < t) Then fScroll := t; t += 0.2;
+                    l += 1;
                End;
-           }
-           j := 8;
-           If (nPlayableCount > 0) And (nPlayableCount < nServerCount) Then Begin
-              If (nPlayableCount < 5) Then j -= 1;
-              If (nPlayableCount = 5) Then t += 0.2;
-           End;
-           For i := j To nServerCount + 2 Do Begin
-               If ((i = nPlayableCount + 3) And (nPlayableCount > 0) And (nPlayableCount < nServerCount))  Then Begin
-                  t += 0.2;
-               End;
-               If (nMenu = i) And (fScroll < t) Then fScroll := t; t += 0.2;
            End;
         End;
         bDown := True;
@@ -319,21 +296,20 @@ Var nIndex : DWord;
     sData : String;
 Var k, l : Integer;
 Begin
-  {
-     l := Random(11);
+   {
+     l := Random(19);
      For k := 1 To l Do Begin
          sServerName[k+2] := 'Server ' + IntToStr(k);
          SetString( STRING_SETUP_MENU(k+2), sServerName[k+2], 0.2, 1.0, 600 );
      End;
      nServerCount := l;
      Repeat
-           nPlayableCount := Random(11);
+           nPlayableCount := Random(19);
      Until ( nPlayableCount <= nServerCount );
      nState := STATE_ONLINE;
      fScroll := 0.0;
  }
      ClientLoopOnline();
-     // On peut essayer un wait.
      While GetPacket( nIndex, nHeader, sData ) Do Begin
           Case nHeader Of
                HEADER_SERVER :

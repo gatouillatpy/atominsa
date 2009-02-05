@@ -19,6 +19,7 @@ Uses Classes, SysUtils, GLext, GL,
 Var bMulti : Boolean;
     bOnline : Boolean;
     bGoToPhaseMenu : Boolean;
+    bSendDisconnect : Boolean;
 
 
 
@@ -2047,7 +2048,13 @@ Begin
      And ( ( ( nKeyCamera < 0 ) And GetKeyS( nKeyCamera ) )
      Or ( ( nKeyCamera >= 0 ) And GetKey( nKeyCamera ) ) )
      And ( GetTime > fKey ) Then Begin
-         If ( nCamera = CAMERA_OVERALL ) Then nCamera := CAMERA_FLY
+         If ( nCamera = CAMERA_OVERALL ) Then Begin
+            nCamera := CAMERA_FLY;
+            vCamera.x := GRIDWIDTH;
+            vCamera.z := GRIDHEIGHT;
+            vAngle.x := PI/6;
+            vAngle.y := -PI/8;
+         End
          Else Begin
               If ( nCamera > 0 ) Or ( nCamera = CAMERA_FLY ) Then Begin
                  If ( nCamera = CAMERA_FLY ) Then k := 1 Else k := nCamera + 1;
