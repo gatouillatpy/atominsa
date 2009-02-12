@@ -69,7 +69,7 @@ end;
 
 
 implementation
-uses UItem, UListBomb, UGame, USetup, UMulti, UForm;
+uses UItem, UListBomb, UGame, USetup, UMulti, UForm, UTriggerBomb;
 
 
 
@@ -83,17 +83,17 @@ uses UItem, UListBomb, UGame, USetup, UMulti, UForm;
 {*******************************************************************************}
 procedure CBomb.DoMove(afX, afY : Single;aX,aY : integer);
 begin
-     If ( afX < 1 ) Or ( afY < 1 ) Or ( aX < 1 ) Or ( aY < 1 ) Then
-        AddLineToConsole( 'Bug in DoMove' );
-   uGrid.DelBlock(nX,nY);
-   if nPunch>0 then
-     if ((aX<>nX) or (aY<>nY)) then
-       if (abs(afX-aX)<0.1) and (abs(afY-aY)<0.1) then nPunch -= 1;
-   nX:=aX;
-   nY:=aY;
-   fPosition.x:=afX;
-   fPosition.y:=afY;
-   uGrid.AddBlock(nX,nY,Self);
+   If CheckCoordinates(aX,aY) And CheckCoordinates(Trunc(afX),Trunc(afY)) Then Begin
+       uGrid.DelBlock(nX,nY);
+       if nPunch>0 then
+         if ((aX<>nX) or (aY<>nY)) then
+           if (abs(afX-aX)<0.1) and (abs(afY-aY)<0.1) then nPunch -= 1;
+       nX:=aX;
+       nY:=aY;
+       fPosition.x:=afX;
+       fPosition.y:=afY;
+       uGrid.AddBlock(nX,nY,Self);
+   End;
 end;
    
 procedure CBomb.Move(dt : single);
@@ -162,7 +162,7 @@ begin
  { En effet avec un deplacement dans ces directions, mes reperes se font avec le bord inferieur droit,    }
  { ainsi que tous les tests. Donc si on est dehors, la relle coordonne (haut a gauche) ne l'est pas       }
  { On force donc son dernier mouvement                                                                    }
-  if ((nMoveDir=RIGHT) or (nMoveDir=DOWN)) then DoMove(_X,_Y,_X,_Y);
+ // if ((nMoveDir=RIGHT) or (nMoveDir=DOWN)) then DoMove(_X,_Y,_X,_Y);
 
 end
 else
@@ -215,7 +215,7 @@ procedure CBomb.MoveRight(dt : Single);
 begin
   bMoving := True;
   nMoveDir := RIGHT;
-  If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
+  If ( bMoveJump ) Then
   begin
     bJumping:=true;
     Jump(dt);
@@ -227,7 +227,7 @@ procedure CBomb.MoveDown(dt : Single);
 begin
   bMoving := True;
   nMoveDir := DOWN;
-  If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
+  If ( bMoveJump ) Then
   begin
     bJumping:=true;
     Jump(dt);
@@ -239,7 +239,7 @@ procedure CBomb.MoveLeft(dt : Single);
 begin
   bMoving := True;
   nMoveDir := LEFT;
-  If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
+  If ( bMoveJump ) Then
   begin
     bJumping:=true;
     Jump(dt);
@@ -251,7 +251,7 @@ procedure CBomb.MoveUp(dt : Single);
 begin
   bMoving := True;
   nMoveDir := UP;
-  If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
+  If ( bMoveJump ) Then
   begin
     bJumping:=true;
     Jump(dt);
@@ -369,8 +369,8 @@ begin
                             bMoving      := false;
                             If ( bMulti = True ) And ( nLocalIndex = nClientIndex[ 0 ] ) Then Begin
                                sData := IntToStr( nNetID ) + #31;
-                               sData := sData + FloatToStr( fPosition.x ) + #31;
-                               sData := sData + FloatToStr( fPosition.y ) + #31;
+                               sData := sData + FormatFloat( '0.000', fPosition.x ) + #31;
+                               sData := sData + FormatFloat( '0.000', fPosition.y ) + #31;
                                Send( nLocalIndex, HEADER_END_OF_JUMP, sData );
                             End;
                         end
@@ -514,7 +514,7 @@ Procedure CBomb.Explose();
                           end
                  else if (tempBlock is CItem) then
                           begin
-                          if CItem(tempBlock).IsExplosed() And (CItem(tempBlock).bIsExplosedMulti = False) then
+                          if CItem(tempBlock).IsExplosed() And ((bMulti = False) Or (nLocalIndex = nClientIndex[0])) Then
                              uGrid.delBlock(nX+Size*dx,nY+Size*dy);
                            CItem(tempBlock).Explose;                            // si c'est un bonus on fait exploser
                           end
@@ -555,7 +555,7 @@ begin
   uGrid.DelBlock(nX,nY);                                                        //mise a nil de la case 
   uGrid.CreateFlame(nX,nY,nIndex);                                              //histoire de remplacer la bombe par une flame
   Destroy;                                                                      // bye-bye ...
-  If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+  If (bMulti = True) And (nLocalIndex = nClientIndex[0]) And Not(Self Is CTriggerBomb) Then Begin
      sData := IntToStr( nNetID ) + #31;
      Send( nLocalIndex, HEADER_EXPLOSE_BOMB, sData );
   End;
@@ -589,29 +589,36 @@ begin
   dt:=aLastTime - fLastTime;
   fLastTime:=aLastTime;
   if (Not(bMoveJump) and bUpdateTime) then fTimeCreated += dt;
-  if Not(bUpdateTime and bMoveJump) then
-  begin
-    nX:=Trunc(fPosition.x);
-    nY:=Trunc(fPosition.y);
-  end;
-  if bMoving then
-  begin
-     If ( bMoveJump ) And ( ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) ) Then
-    begin
-      if bJumping then begin Jump(dt); end  else MoveJump(dt);
-    end
-    else Move(dt);
-  end;
+  If ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+      if Not(bUpdateTime and bMoveJump) then
+      begin
+        nX:=Trunc(fPosition.x);
+        nY:=Trunc(fPosition.y);
+      end;
+      if bMoving then
+      begin
+         If bMoveJump Then Begin
+            if bJumping then begin
+               Jump(dt);
+            end
+            else
+                MoveJump(dt);
+         end
+         else
+             Move(dt);
+      end;
+  End;
 
   if (nPunch=0) AND bMoving then
   begin
     bMoving := false;
     nPunch  := -1;
   end;
-  result := (fPosition.x-Trunc(fPosition.x))<0.2;
-  result := result and ((fPosition.y-Trunc(fPosition.y))<0.2);
-  result := result and (fTimeCreated >= fExploseTime);
-  if (fTimeCreated >= fExploseTime) then Explose;   // TODO : A tester.
+ // result := (fPosition.x-Trunc(fPosition.x))<0.2;
+ // result := result and ((fPosition.y-Trunc(fPosition.y))<0.2);
+ // result := result and (fTimeCreated >= fExploseTime);
+    result := (fTimeCreated >= fExploseTime);
+    if result then Explose;
 end;
 
 procedure CBomb.StartTime();

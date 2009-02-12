@@ -89,6 +89,7 @@ begin
  Inc(FlameCount);                                        //on incremente notre nombre d'element
  if (pFlameItem=Nil) then                                //Si c'est la premiere ...
  begin
+   FlameCount:=1;
    New(pFlameItem);
    pFlameItem^.Next:=Nil;
    pFlameItem^.Flame:=CFlame.Create(aX,aY,aIndex);

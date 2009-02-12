@@ -19,7 +19,6 @@ CItem = Class (CBlock)
 
         
 
-              bIsExplosedMulti : Boolean;                                       // le package HEADER_ISEXPLOSED_ITEM a été reçu.
               Constructor Create (aX, aY : Integer);virtual;OverLoad;           // constructeur
               Procedure Bonus ( nPlayer : CBomberman ) ; virtual; abstract;     // procedure abstraite qui definira l'action du bonus
               Procedure Explose () ; override;                                  // detruit le bloc si c'est possible (appele apres une explosion)
@@ -39,7 +38,7 @@ Uses UGame, UMulti, USetup, UCore;
 Procedure CItem.Explose ();
 Var sData : String;
 Begin
-     If (bIsExplosedMulti = False) And ((bMulti = False) Or (nLocalIndex = nClientIndex[0]))  Then Begin
+     If ((bMulti = False) Or (nLocalIndex = nClientIndex[0]))  Then Begin
          If (bIsExplosed) Then Begin
             If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
                sData := IntToStr( nX ) + #31;
@@ -57,9 +56,6 @@ Begin
               End;
          End;
      End;
-     If (bIsExplosedMulti = True) Then Begin
-        bIsExplosedMulti := False;
-     End;
 End;
 
 Procedure CItem.ExploseMulti();
@@ -70,8 +66,7 @@ End;
 Constructor CItem.Create ( aX, aY : Integer);
 Begin
      Inherited Create(aX,aY,True);                                              // heritage du constructeur de UBlock
-     bIsExplosed:=False;                                                        //au debut notre item est sous forme de caisse
-     bIsExplosedMulti := False;
+     bIsExplosed:=False;
   
 End;
 

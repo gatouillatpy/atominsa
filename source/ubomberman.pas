@@ -925,11 +925,13 @@ procedure CBomberman.DoIgnition();
 var sData : String;
 begin
      if GetTargetTriggerBomb <> nil then begin
-        GetTargetTriggerBomb.Ignition();
-        DelTriggerBomb();
         If ( bMulti = true ) And ( nPlayerClient[nIndex] = nLocalIndex ) Then Begin
            sData := IntToStr( nIndex ) + #31;
-           SendEx( nLocalIndex, HEADER_ACTION1, sData );
+           Send( nLocalIndex, HEADER_ACTION1, sData );
+        End;
+        If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+           GetTargetTriggerBomb.Ignition();
+           DelTriggerBomb();
         End;
      end;
 end;
@@ -948,7 +950,7 @@ begin
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
 
-      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID,true);
+      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID);
       DelTriggerBomb();
     end;//while
   end;//if uTriggerBomb
@@ -987,7 +989,7 @@ begin
       if uGrid.GetBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil then
       begin
         bTrigger := nTriggerBomb>0;
-        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID,true);
+        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID);
         Dec(nBombCount);
         if bTrigger then
         begin
@@ -1033,7 +1035,7 @@ begin
               else
               begin
                 bTrigger := nTriggerBomb>0;
-                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000),true);
+                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
                 Dec(nBombCount);
                 if bTrigger then
                 begin
@@ -1053,7 +1055,7 @@ procedure CBomberman.CreateBombMulti(fX, fY : Single; nBombSize : Integer; fExpl
 Var bTrigger : Boolean;
 Begin
      bTrigger := nTriggerBomb > 0;
-     AddBomb(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,_nNetID,(nLocalIndex=nClientIndex[0]));
+     AddBombMulti(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,_nNetID);
      Dec(nBombCount);
      if bTrigger then
      begin
@@ -1088,7 +1090,7 @@ begin
        sData := sData + IntToStr( aY ) + #31;
        sData := sData + IntToStr( dX ) + #31;
        sData := sData + IntToStr( dY ) + #31;
-       sData := sData + FormatFloat('0.000', dt ) + #31;
+       sData := sData + FormatFloat('0.0000', dt ) + #31;
        Send( nLocalIndex, HEADER_MOVEBOMB, sData );
     End;
   End;
@@ -1162,13 +1164,15 @@ begin
           DropBombMulti( dt );
           If ( bMulti = True ) Then Begin
              sData := IntToStr( nIndex ) + #31;
+             sData := sData + FormatFloat( '0.000', fPosition.x ) + #31;
+             sData := sData + FormatFloat( '0.0000', fPosition.y )+ #31;
              Send( nLocalIndex, HEADER_DROP_CLIENT, sData );
           End;
        End
        Else Begin
             bGrabbed := False;
             sData := IntToStr( nIndex ) + #31;
-            sData := sData + FormatFloat( '0.000', dt ) + #31;
+            sData := sData + FormatFloat( '0.0000', dt ) + #31;
             Send( nLocalIndex, HEADER_DROP_SERVER, sData );
        End;
   end;
@@ -1241,7 +1245,7 @@ begin
              sData := sData + IntToStr( nDirection ) + #31;
              sData := sData + IntToStr( dX ) + #31;
              sData := sData + IntToStr( dY ) + #31;
-             sData := sData + FormatFloat('0.000', dt ) + #31;
+             sData := sData + FormatFloat('0.0000', dt ) + #31;
              Send( nLocalIndex, HEADER_PUNCH, sData );
        End;
   end;
@@ -1325,6 +1329,8 @@ begin
   lastDir.y          := 0;
   fSumDirGetDelta    := 0.125;
   fSumBombGetDelta   := 2 + Random * 2;
+  fSumGrabGetDelta   := 0;
+  fSumFixGetDelta    := 0;
   fSumIgnitionGetDelta:=0;
   uTriggerBomb       := nil;
   uGrabbedBomb       := nil;

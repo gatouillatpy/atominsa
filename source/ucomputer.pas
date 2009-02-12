@@ -57,7 +57,6 @@ Var
     fTime, dt : Single;                                              // Temps actuel et différence de temps.
     aState : Array [1..GRIDWIDTH,1..GRIDHEIGHT] Of Integer ;         // tableau du contenu de chaque case, 0 pour vide, 1 pour flamme, 2 pour bombe et 4 pour autre bomberman.
 Begin
-
 // Initialisation des variables
    fTime := GetTime();
    dt := fTime - pBomberman.IATime;
@@ -70,6 +69,8 @@ Begin
    lY := Trunc(pBomberman.LY + 0.5);
    dangerMin := 10000;
    isBombermanFound := false;
+   
+   pGrid.DelBlock(pX,pY);
    
    If ( ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.DiseaseNumber <> DISEASE_NONE )
    Or ( pBomberman.uGrabbedBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) ) Then
@@ -89,7 +90,12 @@ Begin
 
      // On ajoute 1 à chaque case qui contient une flamme.
      For k := 1 To GetFlameCount() Do Begin
-         aState[GetFlameByCount(k).X, GetFlameByCount(k).Y] += 1;
+         If ( GetFlameByCount(k) <> Nil ) And CheckCoordinates( GetFlameByCount(k).X, GetFlameByCount(k).Y ) Then
+            aState[GetFlameByCount(k).X, GetFlameByCount(k).Y] += 1
+         Else Begin
+             AddLineToConsole( 'Bug in GetFlame' );
+             FreeFlame();
+         End;
      End;
 
      // On ajoute 2 à chaque case qui contient une bombe.
@@ -233,7 +239,8 @@ Begin
    
    
    // Empecher de rester fixe
-   pBomberman.Danger := pBomberman.Danger + Trunc( pBomberman.SumFixGetDelta * pBomberman.SumFixGetDelta * 16 );
+   If ( pBomberman.SumFixGetDelta > 2 ) Then
+   pBomberman.Danger := pBomberman.Danger + Trunc( ( pBomberman.SumFixGetDelta - 2.0 ) * ( pBomberman.SumFixGetDelta - 2.0 ) * 16 );
    If ( pBomberman.SumFixGetDelta < 8 ) Then
       pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + dt;
    

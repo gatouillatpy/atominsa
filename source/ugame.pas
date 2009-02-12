@@ -1544,6 +1544,7 @@ Begin
      nRound += 1;
 
      fPingTime := GetTime();
+     fCheckTime := GetTime();
      
      // affectation des touches au joueur 1
      If pPlayer1 <> NIL Then Begin

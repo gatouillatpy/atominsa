@@ -25,7 +25,7 @@ Var sClientName : Array [0..255] Of String;
 Var sClientUserName : Array [0..255] Of String;
 Var sClientUserPassword : Array [0..255] Of String;
 Var bClientReady : Array [0..255] Of Boolean;
-Var fPingTime, fPing : Single;
+Var fPingTime, fPing, fCheckTime : Single;
 
 
 
@@ -72,8 +72,15 @@ Const MENU_MULTI_HOST         = 92;
 
 
 
-
-
+// Fonction puissance
+Function IntPower( n, p : Integer ) : Integer;
+Var i : Integer;
+Begin
+     IntPower := 1;
+     For i := 1 To p Do Begin
+         IntPower *= n;
+     End;
+End;
 
 
 
@@ -436,7 +443,7 @@ Var nIndex : DWord;
     dt : Single;
     nBombSize, nDirection : Integer;
     fBombTime : Single;
-    _nNetID : Integer;
+    _nNetID, nSum, nNbr : Integer;
     aX, aY, dX, dY : Integer;
 Var k, l : Integer;
 Begin
@@ -639,12 +646,15 @@ Begin
                     fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
                     If Not ( GetBombByNetID( _nNetId ) Is CBomb ) Then Begin
                         pBomberman.CreateBombMulti( fX, fY, nBombSize, fBombTime, _nNetID );
+                        Send( nLocalIndex, HEADER_ACTION0, sData );
                     End;
                End;
                HEADER_ACTION1 :
                Begin
                     TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
+                    sData := GetString( sData, 1 ) + #31;
+                    Send( nLocalIndex, HEADER_ACTION1, sData );
                     pBomberman.DoIgnition();
                End;
                HEADER_PUNCH :
@@ -732,6 +742,8 @@ Begin
                     dt := StrToFloat( GetString( sData, 2 ) );
                     pBomberman.DropBombMulti( dt );
                     sData := IntToStr( k ) + #31;
+                    sData := sData + FormatFloat('0.000',pBomberman.Position.x) + #31;
+                    sData := sData + FormatFloat('0.000',pBomberman.Position.y) + #31;
                     Send( nLocalIndex, HEADER_DROP_CLIENT, sData );
                End;
           End;
@@ -774,6 +786,46 @@ Begin
            Send( nLocalIndex, HEADER_BOMB, sData );
         End;
     End;
+    
+    If (nGame = GAME_ROUND) And (GetTime > fCheckTime + 5.0) Then Begin
+        // Vérifier les blocks.
+        sData := '';
+        For k := 1 To GRIDHEIGHT Do Begin
+            nSum := 0;
+            For l := 1 To GRIDWIDTH Do Begin  // 0 pour vide, 1 pour bonus, 2 pour block explosable.
+                If ( pGrid.GetBlock(l,k) <> Nil )
+                And ( pGrid.GetBlock(l,k).IsExplosive() ) And Not ( pGrid.GetBlock(l,k) Is CBomb ) Then Begin
+                    If ( pGrid.GetBlock(l,k) Is CItem ) And ( (pGrid.GetBlock(l,k) As CItem).IsExplosed() ) Then
+                       nNbr := 1
+                    Else
+                        nNbr := 2;
+                End
+                Else
+                    nNbr := 0;
+                nSum := nSum + nNbr * IntPower( 3, l );
+            End;
+            sData := sData + IntToStr( nSum ) + #31;
+        End;
+
+        Send( nLocalIndex, HEADER_CHECK_BLOCK, sData );
+        
+        // Vérifier les bombermans.
+        sData := '';
+        nSum := 0;
+        For k := 1 To 8 Do Begin  // 0 pour mort, 1 pour vivant.
+            pBomberman := GetBombermanByIndex( k );
+            If ( pBomberman <> Nil ) And ( pBomberman.Alive = True ) Then
+                nSum := nSum + IntPower( 2, k );
+        End;
+        sData := IntToStr( nSum ) + #31;
+        
+        Send( nLocalIndex, HEADER_CHECK_BOMBERMAN, sData );
+            
+
+        
+
+        fCheckTime := GetTime;
+    End;
 End;
 
 
@@ -794,7 +846,9 @@ Var nIndex : DWord;
     isBomb : Boolean;
     sState : String;
     nBonus : Integer;
-    _nNetID : Integer;
+    _nNetID, nSum, nNbr : Integer;
+    tNetID : Array [1..64] Of Integer;
+    nNbrNetId : Integer;
     sTemp : String;
 Var k, l, m, i : Integer;
 Begin
@@ -1008,7 +1062,10 @@ Begin
                Begin
                     TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
-                    pBomberman.DoIgnition();
+                    If pBomberman.GetTargetTriggerBomb <> Nil Then Begin
+                        pBomberman.GetTargetTriggerBomb.Ignition();
+                        pBomberman.DelTriggerBomb();
+                    End;
                End;
                HEADER_EXPLOSE_BOMB :
                Begin
@@ -1023,7 +1080,10 @@ Begin
                     TryStrToInt( GetString( sData, 2 ), nY );
                     pBlock := pGrid.GetBlock( nX, nY );
                     If ( pBlock <> Nil ) Then Begin
-                       pBlock.ExploseMulti();
+                       If ( pBlock Is CItem ) Then
+                          (pBlock As CItem).ExploseMulti()
+                       Else
+                           (pBlock As CBlock).ExploseMulti();
                        pGrid.DelBlock( nX, nY );
                     End;
                End;
@@ -1034,7 +1094,6 @@ Begin
                     pBlock := pGrid.GetBlock( nX, nY );
                     If ( pBlock <> Nil ) And ( pBlock Is CItem ) And ( (pBlock As CItem).IsExplosed() = False) Then Begin
                        (pBlock As CItem).bIsExplosed := True;
-                       (pBlock As CItem).bIsExplosedMulti := True;
                     End;
                End;
                HEADER_SWITCH :
@@ -1066,11 +1125,14 @@ Begin
                End;
                HEADER_DROP_CLIENT :
                Begin
-                    TryStrToInt( GetString( sData, 1 ), k );
+                    l := 1;
+                    TryStrToInt( GetString( sData, l ), k ); l += 1;
                     pBomberman := GetBombermanByIndex( k );
+                    fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                    fY := StrToFloat( GetString( sData, l ) ); l += 1;
                     If ( pBomberman.uGrabbedBomb <> Nil ) Then Begin
-                        pBomberman.uGrabbedBomb.Position.X := pBomberman.Position.X;
-                        pBomberman.uGrabbedBomb.Position.Y := pBomberman.Position.Y;
+                        pBomberman.uGrabbedBomb.Position.X := fX;
+                        pBomberman.uGrabbedBomb.Position.Y := fY;
                         pBomberman.uGrabbedBomb.StartTime();
                         pBomberman.uGrabbedBomb.Position.Z := 0;
                         pBomberman.uGrabbedBomb.JumpMovement := True;
@@ -1081,10 +1143,6 @@ Begin
                Begin
                     TryStrToInt( GetString( sData, 1 ), _nNetID );
                     pBomb := GetBombByNetID( _nNetID );
-                    If ( pBomb = Nil ) Then Begin
-                       pBomb := GetBombByGridCoo( nX, nY );
-                       AddLineToConsole( 'Bug corrected : Header_end_of_jump' );
-                    End;
                     TryStrToInt( GetString( sData, 2 ), nX );
                     TryStrToInt( GetString( sData, 3 ), nY );
                     pGrid.DelBlock(nX,nY);
@@ -1153,40 +1211,106 @@ Begin
                     End;
                     InitWait();
                End;
-               HEADER_BOMB :  // TODO : xGrid = -1 ?? yGrid = 0 ??
+               HEADER_BOMB :
                Begin
                     l := 1;
+                    nNbrNetId := 0;
                     While ( GetString( sData, l ) <> 'NULL' ) Do Begin
                         TryStrToInt( GetString( sData, l ), _nNetID ); l += 1;
+                        nNbrNetId += 1;
+                        If ( nNbrNetId <= 64 ) Then
+                           tNetId[ nNbrNetId ] := _nNetId;
                         pBomb := GetBombByNetID( _nNetID );
                         If pBomb <> Nil Then Begin
                            fX := StrToFloat( GetString( sData, l ) ); l += 1;
                            fY := StrToFloat( GetString( sData, l ) ); l += 1;
                            fZ := StrToFloat( GetString( sData, l ) ); l += 1;
                            If ( abs( pBomb.Position.x - fX ) > 0.001 ) Or ( abs( pBomb.Position.y - fY ) > 0.001 ) Then Begin
-                              If ( ( pBomb.JumpMovement = False )
-                              Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) )
-                              And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
+                            //  If ( ( pBomb.JumpMovement = False )
+                            //  Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) )
+                            //  And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
                                  pGrid.DelBlock( pBomb.xGrid, pBomb.yGrid );
                               pBomb.Position.x := fX;
                               pBomb.Position.y := fY;
                               pBomb.xGrid := Trunc( fX );
                               pBomb.yGrid := Trunc( fY );
-                              If ( pBomb.JumpMovement = False )
-                              And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
+                            //  If ( pBomb.JumpMovement = False )
+                            //  And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
                                  pGrid.AddBlock( pBomb.xGrid, pBomb.yGrid, pBomb );
                            End;
+                           pBomb.xGrid := Trunc( fX );
+                           pBomb.yGrid := Trunc( fY );
                            pBomb.Position.z := fZ;
                         End Else Begin
                             l += 3;
                         End;
+                    End;
+                    If ( nNbrNetId >= 0 ) And ( nNbrNetId <= 64 ) Then Begin
+                        For k := 1 To GetBombCount() Do Begin
+                            pBomb := GetBombByCount( k );
+                            If ( pBomb <> Nil ) Then
+                               isBomb := False;
+                               l := 1;
+                               While ( l <= nNbrNetId ) And ( isBomb = False ) Do Begin
+                                    If ( tNetId[ l ] = pBomb.nNetId ) Then
+                                       isBomb := True;
+                                    l += 1;
+                               End;
+                               If ( isBomb = False ) Then Begin
+                                  If ( pBomb Is CTriggerBomb ) Then Begin
+                                     (pBomb AS CTriggerBomb).Ignition();
+                                     pBomberman := GetBombermanByIndex( pBomb.nIndex );
+                                     If ( pBomberman <> Nil ) Then pBomberman.DelTriggerBomb();
+                                  End
+                                  Else
+                                      pBomb.Explose();
+                               End;
+                        End;
+                    End;
+               End;
+               HEADER_CHECK_BLOCK :
+               Begin
+                    l := 1;
+                    For k := 1 To GRIDHEIGHT Do Begin
+                        TryStrToInt( GetString( sData, l ), nSum ); l += 1;
+                        nSum := nSum div 3;
+                        For m := 1 To GRIDWIDTH Do Begin
+                            nNbr := nSum mod 3;
+                            nSum := nSum div 3;
+                            pBlock := pGrid.GetBlock(m,k);
+                            If ( nNbr = 0 ) And ( pBlock <> Nil )
+                            And ( pBlock.IsExplosive() ) And Not ( pBlock Is CBomb ) Then Begin
+                                If ( pBlock Is CItem ) Then
+                                   (pBlock As CItem).ExploseMulti()
+                                Else
+                                    (pBlock As CBlock).ExploseMulti();
+                                pGrid.DelBlock(m,k);
+                            End;
+                            If ( nNbr = 1 ) And ( pBlock <> Nil )
+                            And ( pBlock.IsExplosive() ) And Not ( pBlock Is CBomb )
+                            And ( pBlock Is CItem ) And ( (pBlock As CItem).IsExplosed() = False ) Then Begin
+                                (pBlock As CItem).bIsExplosed := True;
+                            End;
+                        End;
+                    End;
+               End;
+               HEADER_CHECK_BOMBERMAN :
+               Begin
+                    TryStrToInt( GetString( sData, 1 ), nSum );
+                    nSum := nSum div 2;
+                    For k := 1 To 8 Do Begin
+                        nNbr := nSum mod 2;
+                        nSum := nSum div 2;
+                        pBomberman := GetBombermanByIndex( k );
+                        If ( pBomberman <> Nil ) And ( pBomberman.Alive = True ) And ( nNbr = 0 ) Then
+                           pBomberman.Alive := False;
                     End;
                End;
                HEADER_DEAD :
                Begin
                     TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
-                    If ( pBomberman Is CBomberman ) Then
+                    If ( pBomberman <> Nil ) Then
                        pBomberman.Alive := false;
                End;
                HEADER_QUIT_GAME :

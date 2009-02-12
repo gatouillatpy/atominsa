@@ -57,6 +57,8 @@ Const HEADER_BJUMPING          = 1420;
 
 Const HEADER_BOMBERMAN         = 1501;
 Const HEADER_BOMB              = 1502;
+Const HEADER_CHECK_BLOCK       = 1503;
+Const HEADER_CHECK_BOMBERMAN   = 1504;
 
 Const HEADER_DEAD              = 1601;
 
