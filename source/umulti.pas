@@ -781,7 +781,7 @@ Begin
                sData := sData + FormatFloat('0.000',pBomb.Position.y) + #31;
                sData := sData + FormatFloat('0.000',pBomb.Position.z) + #31;
                If ( pBomb.Position.x < 1 ) Or ( pBomb.Position.y < 1 ) Then
-                  AddLineToConsole( 'Paquet Bug!' );
+                  AddLineToConsole( 'Paquet Bug!' );  // C'est normal si la bombe est porté avec un grab!
            End;
            Send( nLocalIndex, HEADER_BOMB, sData );
         End;
@@ -847,7 +847,7 @@ Var nIndex : DWord;
     sState : String;
     nBonus : Integer;
     _nNetID, nSum, nNbr : Integer;
-    tNetID : Array [1..64] Of Integer;
+   // tNetID : Array [1..64] Of Integer;
     nNbrNetId : Integer;
     sTemp : String;
 Var k, l, m, i : Integer;
@@ -1217,9 +1217,9 @@ Begin
                     nNbrNetId := 0;
                     While ( GetString( sData, l ) <> 'NULL' ) Do Begin
                         TryStrToInt( GetString( sData, l ), _nNetID ); l += 1;
-                        nNbrNetId += 1;
+                     {   nNbrNetId += 1;
                         If ( nNbrNetId <= 64 ) Then
-                           tNetId[ nNbrNetId ] := _nNetId;
+                           tNetId[ nNbrNetId ] := _nNetId; }
                         pBomb := GetBombByNetID( _nNetID );
                         If pBomb <> Nil Then Begin
                            fX := StrToFloat( GetString( sData, l ) ); l += 1;
@@ -1247,7 +1247,7 @@ Begin
                             l += 3;
                         End;
                     End;
-                    If ( nNbrNetId >= 0 ) And ( nNbrNetId <= 64 ) Then Begin
+                  {  If ( nNbrNetId >= 0 ) And ( nNbrNetId <= 64 ) Then Begin
                         For k := 1 To GetBombCount() Do Begin
                             pBomb := GetBombByCount( k );
                             If ( pBomb <> Nil ) Then
@@ -1268,7 +1268,7 @@ Begin
                                       pBomb.Explose();
                                End;
                         End;
-                    End;
+                    End;  }
                End;
                HEADER_CHECK_BLOCK :
                Begin

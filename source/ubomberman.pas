@@ -990,12 +990,14 @@ begin
       begin
         bTrigger := nTriggerBomb>0;
         AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID);
-        Dec(nBombCount);
-        if bTrigger then
-        begin
-          AddTriggerBomb();
-          Dec(nTriggerBomb);
-        end;
+        If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+            Dec(nBombCount);
+            if bTrigger then
+            begin
+              AddTriggerBomb();
+              Dec(nTriggerBomb);
+            end;
+        End;
       end
       else if bCanSpoog then
       begin
@@ -1036,12 +1038,14 @@ begin
               begin
                 bTrigger := nTriggerBomb>0;
                 AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
-                Dec(nBombCount);
-                if bTrigger then
-                begin
-                  AddTriggerBomb();
-                  Dec(nTriggerBomb);
-                end;
+                 If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+                    Dec(nBombCount);
+                    if bTrigger then
+                    begin
+                      AddTriggerBomb();
+                      Dec(nTriggerBomb);
+                    end;
+                 End;
               end;
             end;
           end;

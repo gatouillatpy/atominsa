@@ -3,7 +3,9 @@
 + problème pour le switch display avec le reloaddatastack
 + bombes qui n'explosent pas tant que pas touchés !
 = bombes qui apparaissent par magie après le bonus punch et les jelly bomb(à cause de triggerbombtonormal)
-= cases bloquées en réseau (pour le serveur et le client) à cause des delblock non faits
+= bombes non supprimées entre deux rounds
+= le client n'a pas la liste à jour qd qqn quitte
+= cases bloquées en réseau (pour le client) à cause des delblock non faits
 - bombes trigger qui grossissent en réseau (au moins pour les IA du serveur)
 = trigger traversé par le client tant qu'elle n'est pas bougée.
 
