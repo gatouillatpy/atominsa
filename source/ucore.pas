@@ -2651,15 +2651,21 @@ End;
 Var RenderTexture : GLUInt;
     RenderWidth : Integer;
     RenderHeight : Integer;
-    
+    SquareWidth : Integer;
+    SquareHeight : Integer;
     
 
 Procedure PutRenderTexture() ;
 Begin
      RenderWidth := GetRenderWidth;
      RenderHeight := GetRenderHeight;
+     SquareWidth := GetSquareWidth;
+     SquareHeight := GetSquareHeight;
 
-     glViewport( 0, 0, GetSquareWidth, GetSquareHeight );
+     If ( SquareWidth < SquareHeight ) Then SquareHeight := SquareWidth;
+     If ( SquareHeight < SquareWidth ) Then SquareWidth := SquareHeight;
+
+     glViewport( 0, 0, SquareWidth, SquareHeight );
 
      glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
@@ -2671,7 +2677,7 @@ Procedure GetRenderTexture() ;
 Begin
      glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
-     glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, GetSquareWidth, GetSquareHeight, 0 );
+     glCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 0, 0, SquareWidth, SquareHeight, 0 );
 
      glViewport( 0, 0, RenderWidth, RenderHeight );
 End;
