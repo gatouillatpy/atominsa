@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="16"/>
+      <ActiveEditorIndexAtStart Value="3"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -106,7 +106,7 @@
         <Filename Value="ugrid.pas"/>
         <UnitName Value="UGrid"/>
         <CursorPos X="6" Y="135"/>
-        <TopLine Value="133"/>
+        <TopLine Value="120"/>
         <EditorIndex Value="5"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
@@ -132,8 +132,8 @@
       <Unit12>
         <Filename Value="ubomb.pas"/>
         <UnitName Value="UBomb"/>
-        <CursorPos X="16" Y="556"/>
-        <TopLine Value="542"/>
+        <CursorPos X="52" Y="353"/>
+        <TopLine Value="368"/>
         <EditorIndex Value="17"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -141,8 +141,8 @@
       <Unit13>
         <Filename Value="uflame.pas"/>
         <UnitName Value="UFlame"/>
-        <CursorPos X="110" Y="102"/>
-        <TopLine Value="89"/>
+        <CursorPos X="21" Y="290"/>
+        <TopLine Value="286"/>
         <EditorIndex Value="6"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
@@ -159,8 +159,8 @@
       <Unit15>
         <Filename Value="umulti.pas"/>
         <UnitName Value="UMulti"/>
-        <CursorPos X="20" Y="1063"/>
-        <TopLine Value="1058"/>
+        <CursorPos X="58" Y="1236"/>
+        <TopLine Value="1212"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -233,8 +233,8 @@
       <Unit24>
         <Filename Value="ucomputer.pas"/>
         <UnitName Value="UComputer"/>
-        <CursorPos X="136" Y="243"/>
-        <TopLine Value="229"/>
+        <CursorPos X="26" Y="92"/>
+        <TopLine Value="84"/>
         <EditorIndex Value="16"/>
         <UsageCount Value="90"/>
         <Loaded Value="True"/>
@@ -278,7 +278,7 @@
         <CursorPos X="26" Y="144"/>
         <TopLine Value="24"/>
         <EditorIndex Value="22"/>
-        <UsageCount Value="137"/>
+        <UsageCount Value="139"/>
         <Loaded Value="True"/>
       </Unit29>
       <Unit30>
@@ -316,7 +316,7 @@
         <Loaded Value="True"/>
       </Unit33>
     </Units>
-    <JumpHistory Count="7" HistoryIndex="6">
+    <JumpHistory Count="18" HistoryIndex="17">
       <Position1>
         <Filename Value="ucomputer.pas"/>
         <Caret Line="68" Column="137" TopLine="65"/>
@@ -345,6 +345,50 @@
         <Filename Value="ugrid.pas"/>
         <Caret Line="135" Column="6" TopLine="133"/>
       </Position7>
+      <Position8>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="243" Column="136" TopLine="229"/>
+      </Position8>
+      <Position9>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="96" Column="40" TopLine="84"/>
+      </Position9>
+      <Position10>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="94" Column="27" TopLine="84"/>
+      </Position10>
+      <Position11>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="97" Column="1" TopLine="85"/>
+      </Position11>
+      <Position12>
+        <Filename Value="uflame.pas"/>
+        <Caret Line="227" Column="1" TopLine="215"/>
+      </Position12>
+      <Position13>
+        <Filename Value="uflame.pas"/>
+        <Caret Line="229" Column="1" TopLine="217"/>
+      </Position13>
+      <Position14>
+        <Filename Value="uflame.pas"/>
+        <Caret Line="207" Column="13" TopLine="176"/>
+      </Position14>
+      <Position15>
+        <Filename Value="uflame.pas"/>
+        <Caret Line="265" Column="23" TopLine="245"/>
+      </Position15>
+      <Position16>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="92" Column="26" TopLine="84"/>
+      </Position16>
+      <Position17>
+        <Filename Value="ubomb.pas"/>
+        <Caret Line="556" Column="16" TopLine="542"/>
+      </Position17>
+      <Position18>
+        <Filename Value="ubomb.pas"/>
+        <Caret Line="341" Column="47" TopLine="324"/>
+      </Position18>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -384,7 +428,7 @@
         <Line Value="117"/>
       </Item3>
     </BreakPoints>
-    <Watches Count="8">
+    <Watches Count="7">
       <Item1>
         <Expression Value="pBomberman.nDangerRight"/>
       </Item1>
@@ -404,7 +448,7 @@
         <Expression Value="pBomberman.fumDirGetDelta"/>
       </Item6>
       <Item7>
-        <Expression Value="GetFlameByCount(1).X"/>
+        <Expression Value="pFlameItem^.ount"/>
       </Item7>
     </Watches>
   </Debugging>

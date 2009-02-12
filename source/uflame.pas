@@ -241,17 +241,18 @@ end;
 function GetFlameByCount(i : integer):CFlame;
 var pTemp : LPFlameItem;
 begin
-result:=Nil;
-pTemp:=pFlameItem;
-if ((i<=FlameCount) AND (pTemp<>Nil)) then    //si le numero recherche est inferieur au nombre de flame
-begin                                         //en stock et que notre liste n'est pas vide
-   While (pTemp^.Count<>i) do begin
-       pTemp:=pTemp^.Next;
-       If pTemp = NIL Then Exit;                   //et bien tant que tu n'as pas la bonne ... tu passes a l'element suivant
-   End;
+    UpdateCountList();
+    result:=Nil;
+    pTemp:=pFlameItem;
+    if ((i<=FlameCount) AND (pTemp<>Nil)) then    //si le numero recherche est inferieur au nombre de flame
+    begin                                         //en stock et que notre liste n'est pas vide
+       While (pTemp^.Count<>i) do begin
+           pTemp:=pTemp^.Next;
+           If pTemp = NIL Then Exit;                   //et bien tant que tu n'as pas la bonne ... tu passes a l'element suivant
+       End;
 
-   result:=pTemp^.Flame;
-end;
+       result:=pTemp^.Flame;
+    end;
 end;
 
 
@@ -261,23 +262,24 @@ function GetFlameByCoo(aX,aY : integer): CFlame;
 var pTemp : LPFlameItem;
     Find, Last : Boolean;
 begin
-result:=Nil;
-if ((pFlameItem<>Nil) AND (CheckCoordinates(aX,aY))) then
-begin
- pTemp:=pFlameItem;
- Find:=((pTemp^.Flame.X=aX) AND (pTemp^.Flame.Y=aY));
- Last:=(pTemp^.Next=Nil);
- 
- While Not(Find or Last) do                                        //Idem a au dessus
- begin
-  pTemp:=pTemp^.Next;
-  Find:=((pTemp^.Flame.X=aX) AND (pTemp^.Flame.Y=aY));
-  Last:=(pTemp^.Next=Nil);
- end;
- 
- if Find then result:=pTemp^.Flame;
- 
-end;
+    UpdateCountList();
+    result:=Nil;
+    if ((pFlameItem<>Nil) AND (CheckCoordinates(aX,aY))) then
+    begin
+     pTemp:=pFlameItem;
+     Find:=((pTemp^.Flame.X=aX) AND (pTemp^.Flame.Y=aY));
+     Last:=(pTemp^.Next=Nil);
+
+     While Not(Find or Last) do                                        //Idem a au dessus
+     begin
+      pTemp:=pTemp^.Next;
+      Find:=((pTemp^.Flame.X=aX) AND (pTemp^.Flame.Y=aY));
+      Last:=(pTemp^.Next=Nil);
+     end;
+
+     if Find then result:=pTemp^.Flame;
+
+    end;
 end;
 
 
@@ -285,6 +287,7 @@ end;
 //Renvoi le nombre d'element dans la liste (= nombre de flame en stock)
 function GetFlameCount(): integer;
 begin
+  UpdateCountList();
   result:=FlameCount;
 end;
 

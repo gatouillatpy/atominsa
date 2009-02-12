@@ -1226,8 +1226,8 @@ Begin
                            fY := StrToFloat( GetString( sData, l ) ); l += 1;
                            fZ := StrToFloat( GetString( sData, l ) ); l += 1;
                            If ( abs( pBomb.Position.x - fX ) > 0.001 ) Or ( abs( pBomb.Position.y - fY ) > 0.001 ) Then Begin
-                            //  If ( ( pBomb.JumpMovement = False )
-                            //  Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) )
+                              If ( ( pBomb.JumpMovement = False )
+                              Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) ) Then
                             //  And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
                                  pGrid.DelBlock( pBomb.xGrid, pBomb.yGrid );
                               pBomb.Position.x := fX;
@@ -1236,6 +1236,8 @@ Begin
                               pBomb.yGrid := Trunc( fY );
                             //  If ( pBomb.JumpMovement = False )
                             //  And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
+                              If ( ( pBomb.JumpMovement = False )
+                              Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) ) Then
                                  pGrid.AddBlock( pBomb.xGrid, pBomb.yGrid, pBomb );
                            End;
                            pBomb.xGrid := Trunc( fX );

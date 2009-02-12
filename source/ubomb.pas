@@ -369,8 +369,8 @@ begin
                             bMoving      := false;
                             If ( bMulti = True ) And ( nLocalIndex = nClientIndex[ 0 ] ) Then Begin
                                sData := IntToStr( nNetID ) + #31;
-                               sData := sData + FormatFloat( '0.000', fPosition.x ) + #31;
-                               sData := sData + FormatFloat( '0.000', fPosition.y ) + #31;
+                               sData := sData + IntToStr( nX ) + #31;
+                               sData := sData + IntToStr( nY ) + #31;
                                Send( nLocalIndex, HEADER_END_OF_JUMP, sData );
                             End;
                         end
