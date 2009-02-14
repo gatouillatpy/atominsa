@@ -867,6 +867,9 @@ Var pDataStack : LPDataItem = NIL;
 ////////////////////////////////////////////////////////////////////////////////
 Procedure InitDataStack () ;
 Begin
+     AddLineToConsole('');
+     AddLineToConsole('New data pool.');
+
      New( pDataStack );
      pDataStack^.count := 0;
      pDataStack^.index := 0;
@@ -1388,13 +1391,13 @@ Begin
      // appel au manager de ressources pour éviter de charger une texture déjà chargée
      pTexture := FindItemByPath( DATA_TEXTURE, sFile );
      If pTexture <> NIL Then Begin
-        AddLineToConsole( 'Reloading texture ' + sFile + '.' );
+        AddLineToConsole( 'Reloading texture #' + IntToStr(nIndex) + ' ' + sFile + '.' );
         AddItem( DATA_TEXTURE, nIndex, 0, pTexture, sFile, True );
         AddTexture := pTexture;
         Exit;
      End;
 
-     AddLineToConsole( 'Loading texture ' + sFile + '...' );
+     AddLineToConsole( 'Loading texture #' + IntToStr(nIndex) + ' ' + sFile + '...' );
 
      // création du pointeur vers la nouvelle texture
      New( pTexture );
@@ -2698,6 +2701,21 @@ End;
 
 
 
+Procedure PutRenderTextureUnsquared() ;
+Begin
+     RenderWidth := GetRenderWidth;
+     RenderHeight := GetRenderHeight;
+     SquareWidth := GetSquareWidth;
+     SquareHeight := GetSquareHeight;
+
+     glViewport( 0, 0, SquareWidth, SquareHeight );
+
+     glEnable( GL_TEXTURE_2D );
+     glBindTexture( GL_TEXTURE_2D, RenderTexture );
+End;
+
+
+
 Procedure GetRenderTexture() ;
 Begin
      glEnable( GL_TEXTURE_2D );
@@ -2728,12 +2746,12 @@ End;
 Procedure InitBox ( s1, s2 : String ) ;
 Var u, v, w : Single;
 Begin
-     u := GetSquareWidth * 2 / GetRenderWidth;
-     v := GetSquareHeight * 2 / GetRenderHeight;
-     w := GetSquareWidth / GetSquareHeight;
-     
      // appel d'une texture de rendu
-     PutRenderTexture();
+     PutRenderTextureUnsquared();
+
+     u := SquareWidth * 2 / RenderWidth;
+     v := SquareHeight * 2 / RenderHeight;
+     w := SquareWidth / SquareHeight;
 
      glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, BackBuffer );
@@ -2757,8 +2775,8 @@ End;
 Procedure DrawBox ( x1, y1, x2, y2 : Single ) ;
 Var w, h : Single;
 Begin
-     w := GetRenderWidth;
-     h := GetRenderHeight;
+     w := RenderWidth;
+     h := RenderHeight;
 
      SetRenderTexture();
      DrawImage( 0.0, 0.0, -1.0, 1.0 * w / h, 1.0, 0.5, 0.5, 0.5, 0.5, True );
