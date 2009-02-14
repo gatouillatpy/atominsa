@@ -206,6 +206,7 @@ Type LPOGLAction = ^OGLAction;
                  END;
      OGLAnimation = RECORD
                       Mesh : LPOGLMesh;
+                      MeshIndex : Integer;
                       ActionCount : LongInt;
                       ActionArray : Array Of OGLAction;
                       FrameCount : LongInt;
@@ -238,7 +239,7 @@ Procedure InitDataStack () ;
 Procedure FreeDataStack () ;
 Procedure ReloadDataStack () ;
 
-Procedure AddItem( nData : Integer ; nIndex : Integer ; pItem : Pointer ; sPath : String; bRe : Boolean ) ;
+Procedure AddItem( nData : Integer ; nIndex : Integer ; nLinkIndex : Integer ; pItem : Pointer ; sPath : String ; bRe : Boolean ) ;
 Function FindItem( nData : Integer ; nIndex : Integer ) : Pointer ;
 Function FindItemByPath( nData : Integer ; sPath : String ) : Pointer ;
 Procedure DelItem( nData : Integer ; nIndex : Integer ) ;
@@ -362,6 +363,8 @@ Function GetWindowWidth : Integer;
 Function GetWindowHeight : Integer;
 
 
+
+Var DO_NOT_RENDER : Boolean;
 
 Var BackBuffer : GLUInt;
 
@@ -848,9 +851,11 @@ Type LPDataItem = ^DataItem;
                       count : Word;
                       re : Boolean;
                       index : Integer;
+                      linkid : Integer;
                       data : Integer;
                       item : Pointer;
                       path : String;
+                      prev : LPDataItem;
                       next : LPDataItem;
                 END;
 Var pDataStack : LPDataItem = NIL;
@@ -868,6 +873,7 @@ Begin
      pDataStack^.data := DATA_NONE;
      pDataStack^.item := NIL;
      pDataStack^.path := '';
+     pDataStack^.prev := NIL;
      pDataStack^.next := NIL;
      pDataStack^.re   := False;
 End;
@@ -880,6 +886,7 @@ End;
 Procedure FreeDataStack () ;
 Var pDataItem : LPDataItem;
     pMesh : LPOGLMesh;
+    pAnimation : LPOGLAnimation;
     pTexture : LPOGLTexture;
     pSound : PFSoundSample;
     pMusic : PFMusicModule;
@@ -893,6 +900,11 @@ Begin
                    Begin
                         pMesh := pDataStack^.item;
                         If pMesh <> NIL Then FreeMesh( pMesh );
+                   End;
+                   DATA_ANIMATION :
+                   Begin
+                        pAnimation := pDataStack^.item;
+                        If pAnimation <> NIL Then FreeAnimation( pAnimation );
                    End;
                    DATA_TEXTURE :
                    Begin
@@ -924,7 +936,9 @@ End;
 Procedure ReloadDataStack () ;
 Var pDataTemp : LPDataItem;
     pDataItem : LPDataItem;
+    pDataQueue : LPDataItem;
     pMesh : LPOGLMesh;
+    pAnimation : LPOGLAnimation;
     pTexture : LPOGLTexture;
     pSound : PFSoundSample;
     pMusic : PFMusicModule;
@@ -940,6 +954,11 @@ Begin
                    Begin
                         pMesh := pDataTemp^.item;
                         If pMesh <> NIL Then FreeMesh( pMesh );
+                   End;
+                   DATA_ANIMATION :
+                   Begin
+                        pAnimation := pDataTemp^.item;
+                        If pAnimation <> NIL Then FreeAnimation( pAnimation );
                    End;
                    DATA_TEXTURE :
                    Begin
@@ -958,19 +977,22 @@ Begin
                    End;
               End;
           End;
+          pDataQueue := pDataTemp;
           pDataTemp := pDataItem;
      End;
 
-     pDataTemp := pDataStack;
-
      InitDataStack();
+     
+     pDataTemp := pDataQueue;
 
      While pDataTemp <> NIL Do
      Begin
-          pDataItem := pDataTemp^.next;
+          pDataItem := pDataTemp^.prev;
           Case pDataTemp^.data Of
                DATA_MESH :
                     AddMesh( pDataTemp^.path, pDataTemp^.index );
+               DATA_ANIMATION :
+                    AddAnimation( pDataTemp^.path, pDataTemp^.index, pDataTemp^.linkid );
                DATA_TEXTURE :
                     AddTexture( pDataTemp^.path, pDataTemp^.index );
                DATA_SOUND :
@@ -985,18 +1007,21 @@ End;
 
 
 
-Procedure AddItem( nData : Integer ; nIndex : Integer ; pItem : Pointer ; sPath : String ; bRe : Boolean ) ;
+Procedure AddItem( nData : Integer ; nIndex : Integer ; nLinkIndex : Integer ; pItem : Pointer ; sPath : String ; bRe : Boolean ) ;
 Var pDataItem : LPDataItem;
 Begin
      pDataItem := pDataStack;
      New( pDataStack );
      pDataStack^.count := pDataItem^.count + 1;
      pDataStack^.index := nIndex;
+     pDataStack^.linkid := nLinkIndex;
      pDataStack^.data := nData;
      pDataStack^.item := pItem;
      pDataStack^.path := sPath;
      pDataStack^.next := pDataItem;
+     pDataStack^.prev := NIL;
      pDataStack^.re   := bRe;
+     pDataItem^.prev := pDataStack;
 End;
 
 
@@ -1364,7 +1389,7 @@ Begin
      pTexture := FindItemByPath( DATA_TEXTURE, sFile );
      If pTexture <> NIL Then Begin
         AddLineToConsole( 'Reloading texture ' + sFile + '.' );
-        AddItem( DATA_TEXTURE, nIndex, pTexture, sFile, True );
+        AddItem( DATA_TEXTURE, nIndex, 0, pTexture, sFile, True );
         AddTexture := pTexture;
         Exit;
      End;
@@ -1478,7 +1503,7 @@ Begin
      glTexImage2D( GL_TEXTURE_2D, 0, 3, (p + 1), (q + 1), 0, GL_RGB, GL_UNSIGNED_BYTE, @pTexture^.Data[0] );
 
      // ajout de la texture à la pile de données
-     AddItem( DATA_TEXTURE, nIndex, pTexture, sFile, False );
+     AddItem( DATA_TEXTURE, nIndex, 0, pTexture, sFile, False );
 
      AddStringToConsole( Format('OK. (%.0f bytes)', [3.0 * (p + 1) * (q + 1)]) );
 
@@ -1555,12 +1580,12 @@ Begin
 
      // appel au manager de ressources pour éviter de charger un mesh déjà chargé
      pMesh := FindItemByPath( DATA_MESH, sFile );
-    { If pMesh <> NIL Then Begin
+     If pMesh <> NIL Then Begin
         AddLineToConsole( 'Reloading mesh ' + sFile + '.' );
-        AddItem( DATA_MESH, nIndex, pMesh, sFile, True );
+        AddItem( DATA_MESH, nIndex, 0, pMesh, sFile, True );
         AddMesh := pMesh;
         Exit;
-     End; }
+     End;
 
      AddLineToConsole( 'Loading mesh ' + sFile + '...' );
 
@@ -1645,7 +1670,7 @@ Begin
      glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 8, @pMesh^.TextureArray[0], GL_STATIC_DRAW_ARB );
 
      // ajout du mesh à la pile de données
-     AddItem( DATA_MESH, nIndex, pMesh, sFile, False );
+     AddItem( DATA_MESH, nIndex, 0, pMesh, sFile, False );
 
      AddStringToConsole( Format('OK. (%d bytes)', [j*4]) );
 
@@ -1765,7 +1790,7 @@ Begin
 
      // appel au manager de ressources pour éviter de charger une animation déjà chargé
      pAnimation := FindItemByPath( DATA_ANIMATION, sFile );
-    { If pAnimation <> NIL Then Begin
+     If pAnimation <> NIL Then Begin
         AddLineToConsole( 'Reloading animation ' + sFile + '.' );
         New( tAnimation );
         tAnimation^.FrameArray := pAnimation^.FrameArray;
@@ -1774,10 +1799,10 @@ Begin
         tAnimation^.ActionCount := pAnimation^.ActionCount;
         tAnimation^.Mesh := pAnimation^.Mesh;
         SetLength( tAnimation^.VectorArray, pAnimation^.Mesh^.VertexCount );
-        AddItem( DATA_ANIMATION, nIndex, tAnimation, sFile, True );
+        AddItem( DATA_ANIMATION, nIndex, nMeshIndex, tAnimation, sFile, True );
         AddAnimation := tAnimation;
         Exit;
-     End; }
+     End;
 
      AddLineToConsole( 'Loading animation ' + sFile + '...' );
 
@@ -1855,7 +1880,7 @@ Begin
      glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 12, @pAnimation^.VectorArray[0], GL_STREAM_DRAW_ARB );
 
      // ajout de l'animation à la pile de données
-     AddItem( DATA_ANIMATION, nIndex, pAnimation, sFile, False );
+     AddItem( DATA_ANIMATION, nIndex, nMeshIndex, pAnimation, sFile, False );
 
      AddStringToConsole( Format('OK. (%d bytes)', [j*4]) );
 
@@ -2817,11 +2842,11 @@ Var pSound : PFSoundSample;
 Begin
      // appel au manager de ressources pour éviter de charger un son déjà chargé
      pSound := FindItemByPath( DATA_SOUND, sFile );
-    { If pSound <> NIL Then Begin
+     If pSound <> NIL Then Begin
         AddLineToConsole( 'Reloading sound ' + sFile + '.' );
-        AddItem( DATA_SOUND, nIndex, pSound, sFile, True );
+        AddItem( DATA_SOUND, nIndex, 0, pSound, sFile, True );
         Exit;
-     End; }
+     End;
 
      AddLineToConsole( 'Loading sound ' + sFile + '...' );
 
@@ -2833,7 +2858,7 @@ Begin
      End;
 
      // ajout du son à la pile de données
-     AddItem( DATA_SOUND, nIndex, pSound, sFile, False );
+     AddItem( DATA_SOUND, nIndex, 0, pSound, sFile, False );
      
      AddStringToConsole( Format('OK. (%d bytes)', [FSOUND_Sample_GetLength(pSound)*2]) );
 End;
@@ -2872,11 +2897,12 @@ Begin
      pMusic := FMUSIC_LoadSong( PChar(sFile) );
      If pMusic = NIL Then Begin
         AddStringToConsole( 'FAILED. ' + FMOD_ErrorString(FSOUND_GetError()) );
+        AddItem( DATA_MUSIC, nIndex, 0, pMusic, sFile, True );
         Exit;
      End;
 
      // ajout de la musique à la pile de données
-     AddItem( DATA_MUSIC, nIndex, pMusic, sFile, False );
+     AddItem( DATA_MUSIC, nIndex, 0, pMusic, sFile, False );
 
      AddStringToConsole( Format('OK. (%d bytes)', [FMUSIC_GetNumSamples(pMusic)]) );
 End;
@@ -3413,6 +3439,8 @@ Begin
      glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 
      OGLCallback();
+     
+     If DO_NOT_RENDER Then Exit;
 
      glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, BackBuffer );
@@ -3521,8 +3549,6 @@ Begin
      ReloadDataStack();
 End;
 
-
-
 Procedure InitGlut ( sTitle : String ; pCallback : GameCallback ) ;
 Begin
      OGLCallback := pCallback;
@@ -3592,6 +3618,8 @@ Begin
      
      If bDisplayFullscreen Then Begin
         glutLeaveGameMode();
+     End Else Begin
+        glutDestroyWindow( glutGetWindow() );
      End;
 End;
 
@@ -3599,6 +3627,9 @@ End;
 
 Procedure ExecGlut () ;
 Begin
+     //glutSetOption( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS );
+     //glutSetOption( 505, 1 );
+
      glutMainLoop();
 End;
 

@@ -2,7 +2,7 @@ Program atominsa;
 
 {$mode objfpc}{$H+}
 
-Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics,
+Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics, Glut,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
      UPractice, UMenu, UIntro, UEditor, UMulti, UGrab, uJelly, UJellyBomb,
@@ -17,6 +17,8 @@ Begin
 
      If GetKey(KEY_Y_LOWER) Or GetKey(KEY_Y_UPPER) Then Begin
         StopSound( SOUND_MENU_SELECT );
+        
+        DO_NOT_RENDER := True;
 
         FreeBomberman();
         FreeBomb();
@@ -28,11 +30,12 @@ Begin
         ExitGlut();
      
         WriteSettings( 'atominsa.cfg' );
+        
+        Window.Memo.Destroy();
 
         Application.Terminate;
-     
+
         Halt(0);
-        
      End Else If GetKey(KEY_N_LOWER) Or GetKey(KEY_N_UPPER) Then Begin
          SetString( STRING_MENU_MAIN, ' ', 0.5, 0.1, 20 );
 
@@ -86,9 +89,9 @@ End;
 
 
 
-Var k : Integer; p : ^Integer;
+Var k : Integer;
 Begin
-     New(p);
+     DO_NOT_RENDER := False;
 
      // initialisation de l'application
      Application.Initialize;
@@ -96,7 +99,7 @@ Begin
 
      // affichage de la console
      Window.Show();
-     
+
      // initialisation du générateur de nombres aléatoires
      Randomize();
      
