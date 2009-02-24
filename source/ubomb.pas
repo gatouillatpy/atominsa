@@ -69,7 +69,7 @@ end;
 
 
 implementation
-uses UItem, UListBomb, UGame, USetup, UMulti, UForm, UTriggerBomb;
+uses UItem, UListBomb, UGame, USetup, UMulti, UForm, UTriggerBomb, UBomberman;
 
 
 
@@ -82,6 +82,7 @@ uses UItem, UListBomb, UGame, USetup, UMulti, UForm, UTriggerBomb;
 { Deplacement normal des bombes                                                 }
 {*******************************************************************************}
 procedure CBomb.DoMove(afX, afY : Single;aX,aY : integer);
+Var sData : String;
 begin
    If CheckCoordinates(aX,aY) And CheckCoordinates(Trunc(afX),Trunc(afY)) Then Begin
        uGrid.DelBlock(nX,nY);
@@ -93,6 +94,12 @@ begin
        fPosition.x:=afX;
        fPosition.y:=afY;
        uGrid.AddBlock(nX,nY,Self);
+       If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
+          sData := IntToStr( nNetID ) + #31;
+          sData := sData + FormatFloat( '0.000', afX ) + #31;
+          sData := sData + FormatFloat( '0.000', afY ) + #31;
+          Send ( nLocalIndex, HEADER_BOMB_DOMOVE, sData );
+       End;
    End;
 end;
    
@@ -310,10 +317,10 @@ begin
 
   if Not(CheckCoordinates(Trunc(fPosition.x),Trunc(fPosition.y))) then
   begin
-       If ( fPosition.x < 1 ) Then fPosition.x := 1;
-       If ( fPosition.x > GRIDWIDTH ) Then fPosition.x := GRIDWIDTH;
-       If ( fPosition.y > GRIDHEIGHT ) Then fPosition.y := GRIDHEIGHT;
-       If ( fPosition.y < 1 ) Then fPosition.y := 1;
+       If ( fPosition.x < 1 ) Then fPosition.x := fPosition.x + GRIDWIDTH;
+       If ( fPosition.x >= GRIDWIDTH + 1 ) Then fPosition.x := fPosition.x - GRIDWIDTH;
+       If ( fPosition.y >= GRIDHEIGHT + 1 ) Then fPosition.y := fPosition.y - GRIDHEIGHT;
+       If ( fPosition.y < 1 ) Then fPosition.y := fPosition.y + GRIDHEIGHT;
   end;
   
   case nMoveDir of
@@ -496,6 +503,7 @@ Procedure CBomb.Explose();
            var Stop : boolean;
                Size : integer;
                tempBlock : CBlock;
+               pBomberman : CBomberman;
            begin
              Size := 1;
              Stop := False;
@@ -509,8 +517,14 @@ Procedure CBomb.Explose();
                  Stop:=True;
                  if (tempBlock is CBomb) then
                           begin
-                           if (CBomb(tempBlock).CanExplose) then
-                                 CBomb(tempBlock).Explose;                      // si c'est une bombe on la fait exploser
+                             if (CBomb(tempBlock).CanExplose) then begin
+                                If ( CBomb(tempBlock) Is CTriggerBomb ) Then Begin // mets la liste des triggerbomb a jour
+                                   pBomberman := GetBombermanByIndex( CBomb(tempBlock).BIndex );
+                                   If ( pBomberman <> Nil ) Then
+                                      pBomberman.DelTriggerBombByNetId( CBomb(tempBlock).nNetId );
+                                End;
+                                CBomb(tempBlock).Explose;                      // si c'est une bombe on la fait exploser
+                             end;
                           end
                  else if (tempBlock is CItem) then
                           begin

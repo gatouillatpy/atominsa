@@ -104,6 +104,7 @@ Var nRound : Integer;
     fRoundTime : Single;
     fGameTime : Single;
     fWaitTime : Single;
+    fCursorTime : Single;
 
 
 
@@ -150,6 +151,7 @@ Procedure InitMenu () ;
 Procedure UpdateMenu () ;
 Procedure ProcessMenu () ;
 
+Function PlayerInfo( nConst : Integer ) : String ;
 Procedure InitMenuPlayer ( n : Integer ) ;
 Procedure ProcessMenuPlayer () ;
 
@@ -205,15 +207,15 @@ Begin
      End Else Begin
         pPlayerCharacter[tPlayer] := aCharacterList[nPlayerCharacter[tPlayer]];
      End;
-     AddAnimation( './characters/' + pPlayerCharacter[tPlayer].PlayerAnim, ANIMATION_BOMBERMAN(tPlayer), MESH_BOMBERMAN(tPlayer) );
-     AddMesh( './characters/' + pPlayerCharacter[tPlayer].PlayerMesh, MESH_BOMBERMAN(tPlayer) );
-     AddMesh( './characters/' + pPlayerCharacter[tPlayer].BombMesh, MESH_BOMB(tPlayer) );
+     AddAnimation( './characters/' + pPlayerCharacter[tPlayer].PlayerAnim, ANIMATION_BOMBERMAN(tPlayer), MESH_BOMBERMAN(tPlayer), False );
+     AddMesh( './characters/' + pPlayerCharacter[tPlayer].PlayerMesh, MESH_BOMBERMAN(tPlayer), False );
+     AddMesh( './characters/' + pPlayerCharacter[tPlayer].BombMesh, MESH_BOMB(tPlayer), False );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].PlayerSkin[tPlayer], TEXTURE_BOMBERMAN(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].BombSkin, TEXTURE_BOMB(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].FlameTexture, TEXTURE_FLAME(tPlayer) );
-     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[1], SOUND_BOMB(10+tPlayer) );
-     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[2], SOUND_BOMB(20+tPlayer) );
-     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[3], SOUND_BOMB(30+tPlayer) );
+     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[1], SOUND_BOMB(10+tPlayer), False );
+     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[2], SOUND_BOMB(20+tPlayer), False );
+     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[3], SOUND_BOMB(30+tPlayer), False );
 End;
 
 
@@ -245,11 +247,11 @@ Begin
         pMap := aMapList[nMap];
      End;
      //DelMesh( MESH_BLOCK_SOLID );
-     AddMesh( './maps/' + pMap.SolidMesh, MESH_BLOCK_SOLID );
+     AddMesh( './maps/' + pMap.SolidMesh, MESH_BLOCK_SOLID, False );
      //DelMesh( MESH_BLOCK_BRICK );
-     AddMesh( './maps/' + pMap.BrickMesh, MESH_BLOCK_BRICK );
+     AddMesh( './maps/' + pMap.BrickMesh, MESH_BLOCK_BRICK, False );
      //DelMesh( MESH_PLANE );
-     AddMesh( './maps/' + pMap.PlaneMesh, MESH_PLANE );
+     AddMesh( './maps/' + pMap.PlaneMesh, MESH_PLANE, False );
      //DelTexture( TEXTURE_MAP_SOLID );
      AddTexture( './maps/' + pMap.SolidTexture, TEXTURE_MAP_SOLID );
      //DelTexture( TEXTURE_MAP_BRICK );
@@ -1150,6 +1152,8 @@ End;
 
 Procedure DrawMessage ( p : Single ) ;
 Var w, h : Single;
+    bCursor : Boolean;
+    fCTime : Single;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -1193,6 +1197,18 @@ Begin
          End Else Begin
             fKey := 0.0;
          End;
+
+          fCTime := GetTime();
+          If ( Trunc(fCTime*2) - Trunc(fCursorTime*2) = 1 ) Then
+             bCursor := True
+          Else
+              bCursor := False;
+          fCursorTime := fCTime;
+          If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+             SetString( STRING_MESSAGE, 'say : ' + sMessage, 0.0, 0.02, 600 );
+          If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+             SetString( STRING_MESSAGE, 'say : ' + sMessage + '*', 0.0, 0.02, 600 );
+          bCursor := False;
      End;
 End;
 
@@ -2035,11 +2051,8 @@ Begin
             ClearInput();
         End Else Begin
             PlaySound( SOUND_MENU_BACK );
-            If ( GetTime > fKey ) Then Begin
-               If ( bGoToPhaseMenu = False ) Then bGoToPhaseMenu := True Else nState := PHASE_MENU;
-               fKey := GetTime + 8.0;
-               ClearInput();
-            End;
+            bGoToPhaseMenu := True;
+            fKey := GetTime();
         End;
      End;
      
@@ -2248,6 +2261,8 @@ Var w, h : Single;
     t : Single;
     k : Integer;
     sData : String;
+    bCursor : Boolean;
+    fCTime : Single;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -2327,7 +2342,10 @@ Begin
            If nMenu = MENU_PLAYER_TYPE Then nMenu := MENU_PLAYER_CHARACTER Else
            If nMenu = MENU_PLAYER_SKILL Then nMenu := MENU_PLAYER_TYPE Else
            If nMenu = MENU_PLAYER_BACK Then nMenu := MENU_PLAYER_SKILL Else
-           If nMenu = MENU_PLAYER_NAME Then nMenu := MENU_PLAYER_BACK;
+           If nMenu = MENU_PLAYER_NAME Then Begin
+              nMenu := MENU_PLAYER_BACK;
+              SetString( STRING_GAME_MENU(61), 'name : ' + sPlayerName[nPlayer], 0.0, 0.02, 600 );
+           End;
            If (nPlayerType[nPlayer] <> PLAYER_COM) And (nMenu = MENU_PLAYER_SKILL) Then nMenu := MENU_PLAYER_TYPE;
         End;
         bUp := True;
@@ -2339,7 +2357,10 @@ Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
            If nMenu = MENU_PLAYER_BACK Then nMenu := MENU_PLAYER_NAME Else
-           If nMenu = MENU_PLAYER_NAME Then nMenu := MENU_PLAYER_CHARACTER Else
+           If nMenu = MENU_PLAYER_NAME Then Begin
+              nMenu := MENU_PLAYER_CHARACTER;
+              SetString( STRING_GAME_MENU(61), 'name : ' + sPlayerName[nPlayer], 0.0, 0.02, 600 );
+           End Else
            If nMenu = MENU_PLAYER_CHARACTER Then nMenu := MENU_PLAYER_TYPE Else
            If nMenu = MENU_PLAYER_TYPE Then nMenu := MENU_PLAYER_SKILL Else
            If nMenu = MENU_PLAYER_SKILL Then nMenu := MENU_PLAYER_BACK;
@@ -2532,6 +2553,23 @@ Begin
      End Else Begin
         fKey := 0.0;
      End;
+     
+     fCTime := GetTime();
+     If ( Trunc(fCTime*2) - Trunc(fCursorTime*2) = 1 ) Then
+        bCursor := True
+     Else
+         bCursor := False;
+     fCursorTime := fCTime;
+     Case nMenu Of
+                MENU_PLAYER_NAME :
+                Begin
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+                        SetString( STRING_GAME_MENU(61), 'name : ' + sPlayerName[nPlayer], 0.0, 0.02, 600 );
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+                        SetString( STRING_GAME_MENU(61), 'name : ' + sPlayerName[nPlayer] + '*', 0.0, 0.02, 600 );
+                     bCursor := False;
+                End;
+           End;
 
 End;
 
@@ -2752,7 +2790,11 @@ Begin
 
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
-        If (bMulti = True) Then bGoToPhaseMenu := True Else nState := PHASE_MENU;
+        If (bMulti = True) Then Begin
+           bGoToPhaseMenu := True;
+           fKey := GetTime();
+        End
+        Else nState := PHASE_MENU;
         ClearInput();
      End;
 

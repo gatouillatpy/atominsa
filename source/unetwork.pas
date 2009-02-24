@@ -17,6 +17,8 @@ Procedure ProcessMenuNetwork () ;
 
 Implementation
 
+Uses UForm;
+
 
 Var fScroll : Single;
 
@@ -70,6 +72,8 @@ Var w, h : Single;
     i : Integer;
     nIndex, nHeader : Integer;
     sData : String;
+    bCursor : Boolean;
+    fCTime : Single;
 Begin
      // appel d'une texture de rendu
      PutRenderTexture();
@@ -116,6 +120,8 @@ Begin
      If GetKeyS( KEY_UP ) Then Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
+           
+           If (nMenu = 4) Then SetString( STRING_SETUP_MENU(4), sUserName, 0.0, 0.02, 600 );
 
            nMenu := nMenu - 1;
            If ( nMenu = 0 ) Then Begin
@@ -139,6 +145,8 @@ Begin
      If GetKeyS( KEY_DOWN ) Then Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
+           
+           If (nMenu = 4) Then SetString( STRING_SETUP_MENU(4), sUserName, 0.0, 0.02, 600 );
 
            nMenu := nMenu + 1;
            If ( nMenu = 7 ) Then Begin
@@ -205,6 +213,31 @@ Begin
      End Else Begin
         fKey := 0.0;
      End;
+     
+     fCTime := GetTime();
+     If ( Trunc(fCTime*2) - Trunc(fCursorTime*2) = 1 ) Then
+        bCursor := True
+     Else
+         bCursor := False;
+     fCursorTime := fCTime;
+     Case nMenu Of
+                4 :
+                Begin
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+                        SetString( STRING_SETUP_MENU(4), sUserName, 0.0, 0.02, 600 );
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+                        SetString( STRING_SETUP_MENU(4), sUserName + '*', 0.0, 0.02, 600 );
+                     bCursor := False;
+                End;
+                6 :
+                Begin
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+                        SetString( STRING_SETUP_MENU(6), sUserPassword, 0.0, 0.02, 600 );
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+                        SetString( STRING_SETUP_MENU(6), sUserPassword + '*', 0.0, 0.02, 600 );
+                     bCursor := False;
+                End;
+           End;
 End;
 
 

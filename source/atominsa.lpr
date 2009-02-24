@@ -120,10 +120,10 @@ Begin
      MaskIntfImg.LoadFromBitmap( Window.Mask.Picture.Bitmap.Handle, Window.Mask.Picture.Bitmap.MaskHandle );
 
      // chargement des meshes relatifs aux blocs et bonus
-     AddMesh( './meshes/disease.m12', MESH_DISEASE );
-     AddMesh( './meshes/extrabomb.m12', MESH_EXTRABOMB );
-     AddMesh( './meshes/flameup.m12', MESH_FLAMEUP );
-     AddMesh( './meshes/speedup.m12', MESH_SPEEDUP );
+     AddMesh( './meshes/disease.m12', MESH_DISEASE, False );
+     AddMesh( './meshes/extrabomb.m12', MESH_EXTRABOMB, False );
+     AddMesh( './meshes/flameup.m12', MESH_FLAMEUP, False );
+     AddMesh( './meshes/speedup.m12', MESH_SPEEDUP, False );
 
      // chargement des sprites relatifs au menu
      AddTexture( './textures/back.jpg', SPRITE_MENU_BACK );
@@ -148,16 +148,16 @@ Begin
      End;
 
      // chargement des sons du menu
-     AddSound( './sounds/move.wav', SOUND_MENU_MOVE );
-     AddSound( './sounds/select.wav', SOUND_MENU_SELECT );
-     AddSound( './sounds/back.wav', SOUND_MENU_BACK );
-     AddSound( './sounds/click.wav', SOUND_MENU_CLICK );
+     AddSound( './sounds/move.wav', SOUND_MENU_MOVE, False );
+     AddSound( './sounds/select.wav', SOUND_MENU_SELECT, False );
+     AddSound( './sounds/back.wav', SOUND_MENU_BACK, False );
+     AddSound( './sounds/click.wav', SOUND_MENU_CLICK, False );
 
      // chargement du son de l'invite de messages
-     AddSound( './sounds/message.wav', SOUND_MESSAGE );
+     AddSound( './sounds/message.wav', SOUND_MESSAGE, False );
      
      // chargement de la musique du menu
-     AddSound( './musics/menu.mp3', SOUND_MENU );
+     AddSound( './musics/menu.mp3', SOUND_MENU, False );
 
      // chargement des bombermen
      For k := 1 To 8 Do Begin
@@ -166,15 +166,15 @@ Begin
          End Else Begin
              pPlayerCharacter[k] := aCharacterList[nPlayerCharacter[k]];
          End;
-         AddMesh( './characters/' + pPlayerCharacter[k].PlayerMesh, MESH_BOMBERMAN(k) );
-         AddMesh( './characters/' + pPlayerCharacter[k].BombMesh, MESH_BOMB(k) );
+         AddMesh( './characters/' + pPlayerCharacter[k].PlayerMesh, MESH_BOMBERMAN(k), False );
+         AddMesh( './characters/' + pPlayerCharacter[k].BombMesh, MESH_BOMB(k), False );
          AddTexture( './characters/' + pPlayerCharacter[k].PlayerSkin[k], TEXTURE_BOMBERMAN(k) );
          AddTexture( './characters/' + pPlayerCharacter[k].BombSkin, TEXTURE_BOMB(k) );
          AddTexture( './characters/' + pPlayerCharacter[k].FlameTexture, TEXTURE_FLAME(k) );
-         AddSound( './characters/' + pPlayerCharacter[k].BombSound[1], SOUND_BOMB(10+k) );
-         AddSound( './characters/' + pPlayerCharacter[k].BombSound[2], SOUND_BOMB(20+k) );
-         AddSound( './characters/' + pPlayerCharacter[k].BombSound[3], SOUND_BOMB(30+k) );
-         AddAnimation( './characters/' + pPlayerCharacter[k].PlayerAnim, ANIMATION_BOMBERMAN(k), MESH_BOMBERMAN(k) );
+         AddSound( './characters/' + pPlayerCharacter[k].BombSound[1], SOUND_BOMB(10+k), False );
+         AddSound( './characters/' + pPlayerCharacter[k].BombSound[2], SOUND_BOMB(20+k), False );
+         AddSound( './characters/' + pPlayerCharacter[k].BombSound[3], SOUND_BOMB(30+k), False );
+         AddAnimation( './characters/' + pPlayerCharacter[k].PlayerAnim, ANIMATION_BOMBERMAN(k), MESH_BOMBERMAN(k), False );
      End;
 
      InitShaderProgram();

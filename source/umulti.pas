@@ -148,6 +148,8 @@ Var w, h : Single;
     t : Single;
     k : Integer;
     sData : String;
+    bCursor : Boolean;
+    fCTime : Single;
 Begin
      // appel d'une texture de rendu
      PutRenderTexture();
@@ -196,11 +198,17 @@ Begin
      If GetKeyS( KEY_UP ) Then Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           If nMenu = MENU_MULTI_ADDRESS Then nMenu := MENU_MULTI_NAME Else
+           If nMenu = MENU_MULTI_ADDRESS Then Begin
+              nMenu := MENU_MULTI_NAME;
+              SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
+           End Else
            If nMenu = MENU_MULTI_TYPE Then nMenu := MENU_MULTI_ADDRESS Else
            If nMenu = MENU_MULTI_JOIN Then nMenu := MENU_MULTI_TYPE Else
            If nMenu = MENU_MULTI_HOST Then nMenu := MENU_MULTI_JOIN Else
-           If nMenu = MENU_MULTI_NAME Then nMenu := MENU_MULTI_HOST;
+           If nMenu = MENU_MULTI_NAME Then Begin
+              nMenu := MENU_MULTI_HOST;
+              SetString( STRING_GAME_MENU(81), 'name : ' + sLocalName, 0.0, 0.02, 600 );
+           End;
         End;
         bUp := True;
      End Else Begin
@@ -211,8 +219,14 @@ Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
            If nMenu = MENU_MULTI_HOST Then nMenu := MENU_MULTI_NAME Else
-           If nMenu = MENU_MULTI_NAME Then nMenu := MENU_MULTI_ADDRESS Else
-           If nMenu = MENU_MULTI_ADDRESS Then nMenu := MENU_MULTI_TYPE Else
+           If nMenu = MENU_MULTI_NAME Then Begin
+              nMenu := MENU_MULTI_ADDRESS;
+              SetString( STRING_GAME_MENU(81), 'name : ' + sLocalName, 0.0, 0.02, 600 );
+           End Else
+           If nMenu = MENU_MULTI_ADDRESS Then Begin
+              nMenu := MENU_MULTI_TYPE;
+              SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
+           End Else
            If nMenu = MENU_MULTI_TYPE Then nMenu := MENU_MULTI_JOIN Else
            If nMenu = MENU_MULTI_JOIN Then nMenu := MENU_MULTI_HOST;
         End;
@@ -347,7 +361,31 @@ Begin
      End Else Begin
         fKey := 0.0;
      End;
-
+     
+     fCTime := GetTime();
+     If ( Trunc(fCTime*2) - Trunc(fCursorTime*2) = 1 ) Then
+        bCursor := True
+     Else
+         bCursor := False;
+     fCursorTime := fCTime;
+     Case nMenu Of
+                MENU_MULTI_NAME :
+                Begin
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+                        SetString( STRING_GAME_MENU(81), 'name : ' + sLocalName, 0.0, 0.02, 600 );
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+                        SetString( STRING_GAME_MENU(81), 'name : ' + sLocalName + '*', 0.0, 0.02, 600 );
+                     bCursor := False;
+                End;
+                MENU_MULTI_ADDRESS :
+                Begin
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+                        SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+                        SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress + '*', 0.0, 0.02, 600 );
+                     bCursor := False;
+                End;
+           End;
 End;
 
 
@@ -492,8 +530,9 @@ Begin
                     For k := ClientIndex(nIndex) To nClientCount - 2 Do
                         nClientIndex[k] := nClientIndex[k+1];
                     nClientCount -= 1;
-                    SendTo( nIndex, HEADER_QUIT_MENU, sData );
                     AddLineToConsole( sData + ' leaved the game.' );
+                    sData := '';
+                    SendTo( nIndex, HEADER_QUIT_MENU, sData );
                     // supression des joueurs attribués s'il y en avait
                     For k := 1 To 8 Do Begin
                         If nPlayerClient[k] = nIndex Then Begin
@@ -539,7 +578,7 @@ Begin
                     TryStrToInt( GetString( sData, 1 ), k );
                     nPlayerClient[k] := nIndex;
                     Send( nIndex, nHeader, sData );
-                    UpdateMenu();
+                    //UpdateMenu();
                End;
                HEADER_UNLOCK :
                Begin
@@ -547,7 +586,7 @@ Begin
                     nPlayerClient[k] := -1;
                     nPlayerType[k] := PLAYER_NIL;
                     Send( nIndex, nHeader, sData );
-                    UpdateMenu();
+                    SetString( STRING_GAME_MENU(10 + k), PlayerInfo(k), 0.0, 0.02, 600 );
                End;
                HEADER_PINGREQ :
                Begin
@@ -580,7 +619,7 @@ Begin
                        sData := sData + sClientUserPassword[ClientIndex(nIndex)] + #31;
                        SendOnline( nLocalIndex, HEADER_ONLINE_PLAYER, sData );
                     End;
-                    UpdateMenu();
+                    SetString( STRING_GAME_MENU(10 + k), PlayerInfo(k), 0.0, 0.02, 600 );
                End;
                HEADER_MOVEUP :
                Begin
@@ -880,19 +919,21 @@ Begin
                         LoadCharacter( k ); l += 1;
                         TryStrToInt( GetString( sData, l ), nPlayerType[k] ); l += 1;
                     End;
+                    If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then
+                       UpdateMenu();
                End;
                HEADER_LOCK :
                Begin
                     TryStrToInt( GetString( sData, 1 ), k );
                     nPlayerClient[k] := nIndex;
-                    UpdateMenu();
+                   // UpdateMenu();
                End;
                HEADER_UNLOCK :
                Begin
                     TryStrToInt( GetString( sData, 1 ), k );
                     nPlayerClient[k] := -1;
                     nPlayerType[k] := PLAYER_NIL;
-                    UpdateMenu();
+                    SetString( STRING_GAME_MENU(10 + k), PlayerInfo(k), 0.0, 0.02, 600 );
                End;
                HEADER_UPDATE :
                Begin
@@ -901,7 +942,7 @@ Begin
                     TryStrToInt( GetString( sData, 3 ), nPlayerSkill[k] );
                     TryStrToInt( GetString( sData, 4 ), nPlayerCharacter[k] );
                     sPlayerName[k] := GetString( sData, 5 );
-                    UpdateMenu();
+                    SetString( STRING_GAME_MENU(10 + k), PlayerInfo(k), 0.0, 0.02, 600 );
                End;
                HEADER_SETUP :
                Begin
@@ -1121,6 +1162,7 @@ Begin
                     TryStrToInt( GetString( sData, 3 ), nY );
                     If ( ( pGrid.GetBlock( nX, nY ) <> Nil ) And ( pGrid.GetBlock( nX, nY ) Is CBomb ) ) Then Begin
                         pBomberman.GrabBombMulti( nX, nY );
+                        AddLineToConsole( 'No bug : GrabBombMulti' );
                     End;
                End;
                HEADER_DROP_CLIENT :
@@ -1226,19 +1268,21 @@ Begin
                            fY := StrToFloat( GetString( sData, l ) ); l += 1;
                            fZ := StrToFloat( GetString( sData, l ) ); l += 1;
                            If ( abs( pBomb.Position.x - fX ) > 0.001 ) Or ( abs( pBomb.Position.y - fY ) > 0.001 ) Then Begin
-                              If ( ( pBomb.JumpMovement = False )
-                              Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) ) Then
+                             { If ( pBomb.JumpMovement = False ) Then Begin
+                            //  Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) ) Then Begin
                             //  And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
                                  pGrid.DelBlock( pBomb.xGrid, pBomb.yGrid );
+                                 AddLineToConsole( 'Bug : delblock for dropped bomb' );
+                              End; }
                               pBomb.Position.x := fX;
                               pBomb.Position.y := fY;
                               pBomb.xGrid := Trunc( fX );
                               pBomb.yGrid := Trunc( fY );
                             //  If ( pBomb.JumpMovement = False )
                             //  And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
-                              If ( ( pBomb.JumpMovement = False )
-                              Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) ) Then
-                                 pGrid.AddBlock( pBomb.xGrid, pBomb.yGrid, pBomb );
+                             { If ( pBomb.JumpMovement = False ) Then
+                             // Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) ) Then
+                                 pGrid.AddBlock( pBomb.xGrid, pBomb.yGrid, pBomb ); }
                            End;
                            pBomb.xGrid := Trunc( fX );
                            pBomb.yGrid := Trunc( fY );
@@ -1269,6 +1313,33 @@ Begin
                                End;
                         End;
                     End;  }
+               End;
+               HEADER_BOMB_DOMOVE :
+               Begin
+                    {
+                      uGrid.DelBlock(nX,nY);
+                     if nPunch>0 then
+                       if ((aX<>nX) or (aY<>nY)) then
+                         if (abs(afX-aX)<0.1) and (abs(afY-aY)<0.1) then nPunch -= 1;
+                     nX:=aX;
+                     nY:=aY;
+                     fPosition.x:=afX;
+                     fPosition.y:=afY;
+                     uGrid.AddBlock(nX,nY,Self);
+                    }
+                    l := 1;
+                    TryStrToInt( GetString( sData, l ), _nNetID ); l += 1;
+                    pBomb := GetBombByNetID( _nNetID );
+                    fX := StrToFloat( GetString( sData, l ) ); l += 1;
+                    fY := StrToFloat( GetString( sData, l ) ); l += 1;
+                    If ( pBomb <> Nil ) Then Begin
+                       pGrid.DelBlock( pBomb.XGrid, pBomb.YGrid );
+                       pBomb.xGrid := Trunc( fX );
+                       pBomb.yGrid := Trunc( fY );
+                       pBomb.Position.X := fX;
+                       pBomb.Position.Y := fY;
+                       pGrid.AddBlock( pBomb.XGrid, pBomb.YGrid, pBomb );
+                    End;
                End;
                HEADER_CHECK_BLOCK :
                Begin
@@ -1417,6 +1488,7 @@ Begin
               Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
               bSendDisconnect := True;
            End;
+           If GetTime() > ( fKey + 8.0 ) Then nState := PHASE_MENU;
         End;
         ProcessClient();
         If (nState = PHASE_MENU) Then Begin

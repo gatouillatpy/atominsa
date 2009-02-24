@@ -59,6 +59,7 @@ Const HEADER_BOMBERMAN         = 1501;
 Const HEADER_BOMB              = 1502;
 Const HEADER_CHECK_BLOCK       = 1503;
 Const HEADER_CHECK_BOMBERMAN   = 1504;
+Const HEADER_BOMB_DOMOVE       = 1505;
 
 Const HEADER_DEAD              = 1601;
 
@@ -249,12 +250,12 @@ Procedure DelTexture ( nIndex : LongInt ) ;
 Procedure SetTexture( nStage : Integer ; nIndex : LongInt ) ;
 Procedure FreeTexture ( pTexture : LPOGLTexture ) ;
 
-Function AddMesh ( sFile : String ; nIndex : LongInt ) : LPOGLMesh ;
+Function AddMesh ( sFile : String ; nIndex : LongInt ; bRe : Boolean ) : LPOGLMesh ;
 Procedure DelMesh ( nIndex : LongInt ) ;
 Procedure DrawMesh ( nIndex : LongInt ; t : Boolean ) ;
 Procedure FreeMesh ( pMesh : LPOGLMesh ) ;
 
-Function AddAnimation ( sFile : String ; nIndex : LongInt ; nMeshIndex : LongInt ) : LPOGLAnimation ;
+Function AddAnimation ( sFile : String ; nIndex : LongInt ; nMeshIndex : LongInt ; bRe : Boolean ) : LPOGLAnimation ;
 Procedure DelAnimation ( nIndex : LongInt ) ;
 Procedure DrawAnimation ( nIndex : LongInt ; t : Boolean ; nAction : LongInt ) ;
 Procedure FreeAnimation ( pAnimation : LPOGLAnimation ) ;
@@ -334,7 +335,7 @@ Function GetKeyS( nKey : Integer ) : Boolean ;
 Procedure InitFMod () ;
 Procedure ExitFMod () ;
 
-Procedure AddSound ( sFile : String ; nIndex : LongInt ) ;
+Procedure AddSound ( sFile : String ; nIndex : LongInt ; bRe : Boolean ) ;
 Procedure DelSound ( nIndex : LongInt ) ;
 Procedure AddMusic ( sFile : String ; nIndex : LongInt ) ;
 Procedure PlaySound ( nIndex : LongInt ) ;
@@ -863,7 +864,7 @@ Var pDataStack : LPDataItem = NIL;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// InitDataStack : Crée le premier élément de la pile de données.             //
+// InitDataStack : Crï¿½e le premier ï¿½lï¿½ment de la pile de donnï¿½es.             //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure InitDataStack () ;
 Begin
@@ -884,7 +885,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FreeDataStack : Vide la pile de données et libère la mémoire.              //
+// FreeDataStack : Vide la pile de donnï¿½es et libï¿½re la mï¿½moire.              //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure FreeDataStack () ;
 Var pDataItem : LPDataItem;
@@ -934,7 +935,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// ReloadDataStack : Recharge les éléments de la pile de données.             //
+// ReloadDataStack : Recharge les ï¿½lï¿½ments de la pile de donnï¿½es.             //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure ReloadDataStack () ;
 Var pDataTemp : LPDataItem;
@@ -993,13 +994,13 @@ Begin
           pDataItem := pDataTemp^.prev;
           Case pDataTemp^.data Of
                DATA_MESH :
-                    AddMesh( pDataTemp^.path, pDataTemp^.index );
+                    AddMesh( pDataTemp^.path, pDataTemp^.index, False );
                DATA_ANIMATION :
-                    AddAnimation( pDataTemp^.path, pDataTemp^.index, pDataTemp^.linkid );
+                    AddAnimation( pDataTemp^.path, pDataTemp^.index, pDataTemp^.linkid, False );
                DATA_TEXTURE :
                     AddTexture( pDataTemp^.path, pDataTemp^.index );
                DATA_SOUND :
-                    AddSound( pDataTemp^.path, pDataTemp^.index );
+                    AddSound( pDataTemp^.path, pDataTemp^.index, False );
                DATA_MUSIC :
                     AddMusic( pDataTemp^.path, pDataTemp^.index );
           End;
@@ -1138,7 +1139,7 @@ Var nFrame : Integer;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// GetTime : Renvoie le temps passé (en secondes) depuis l'exécution du jeu.  //
+// GetTime : Renvoie le temps passï¿½ (en secondes) depuis l'exï¿½cution du jeu.  //
 ////////////////////////////////////////////////////////////////////////////////
 Function QueryPerformanceCounter( Var lpPerformanceCount : Int64 ) : Integer ; stdcall; external 'kernel32' name 'QueryPerformanceCounter';
 Function QueryPerformanceFrequency( Var lpFrequency : Int64 ) : Integer ; stdcall; external 'kernel32' name 'QueryPerformanceFrequency';
@@ -1160,7 +1161,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// GetFPS : Renvoie le framerate basé sur la dernière seconde de rendu.       //
+// GetFPS : Renvoie le framerate basï¿½ sur la derniï¿½re seconde de rendu.       //
 ////////////////////////////////////////////////////////////////////////////////
 Function GetFPS () : Single ;
 Begin
@@ -1170,7 +1171,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// GetDelta : Renvoie le temps passé (en secondes) entre les deux dernières   //
+// GetDelta : Renvoie le temps passï¿½ (en secondes) entre les deux derniï¿½res   //
 //            images rendues.                                                 //
 ////////////////////////////////////////////////////////////////////////////////
 Function GetDelta () : Single ;
@@ -1181,8 +1182,8 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// AddTimer : Ajoute une callback à la pile de la minuterie et définie un     //
-//            délai d'exécution.                                              //
+// AddTimer : Ajoute une callback ï¿½ la pile de la minuterie et dï¿½finie un     //
+//            dï¿½lai d'exï¿½cution.                                              //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure AddTimer ( fTime : Single ; pCallback : TimerCallback ) ;
 Var pTimerItem : LPTimerItem ;
@@ -1206,8 +1207,8 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// CheckTimer : Vérifie en fonction du temps s'il y a une callback à          //
-//              éxecuter.                                                     //
+// CheckTimer : Vï¿½rifie en fonction du temps s'il y a une callback ï¿½          //
+//              ï¿½xecuter.                                                     //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure CheckTimer () ;
 Var pTimerItem, pLastItem, pTempItem : LPTimerItem ;
@@ -1232,7 +1233,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FreeTimer : Libère la minuterie de toutes ses données.   	              //
+// FreeTimer : Libï¿½re la minuterie de toutes ses donnï¿½es.   	              //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure FreeTimer ();
      Procedure FreeTimerItem ( pTimerItem : LPTimerItem ) ;
@@ -1363,8 +1364,8 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// AddTexture : Charge une OGLTexture depuis un fichier bitmap, l'ajoute à la //
-//              pile de données, puis renvoie son pointeur.                   //
+// AddTexture : Charge une OGLTexture depuis un fichier bitmap, l'ajoute ï¿½ la //
+//              pile de donnï¿½es, puis renvoie son pointeur.                   //
 ////////////////////////////////////////////////////////////////////////////////
 Var w, h : Integer;
     u, v : Single;
@@ -1388,7 +1389,7 @@ Begin
      l := 4 * (Round(j * v) * (w + 1) + Round(i * u));
 End;
 Begin
-     // appel au manager de ressources pour éviter de charger une texture déjà chargée
+     // appel au manager de ressources pour ï¿½viter de charger une texture dï¿½jï¿½ chargï¿½e
      pTexture := FindItemByPath( DATA_TEXTURE, sFile );
      If pTexture <> NIL Then Begin
         AddLineToConsole( 'Reloading texture #' + IntToStr(nIndex) + ' ' + sFile + '.' );
@@ -1399,7 +1400,7 @@ Begin
 
      AddLineToConsole( 'Loading texture #' + IntToStr(nIndex) + ' ' + sFile + '...' );
 
-     // création du pointeur vers la nouvelle texture
+     // crï¿½ation du pointeur vers la nouvelle texture
      New( pTexture );
 
      // charge l'image dans un TImage
@@ -1412,7 +1413,7 @@ Begin
         ImageExt.Free;
      End;
      
-     // récupère l'adresse mémoire des pixels
+     // rï¿½cupï¿½re l'adresse mï¿½moire des pixels
      TempIntfImg := TLazIntfImage.Create(0,0);
      TempIntfImg.LoadFromBitmap( Window.Image.Picture.Bitmap.Handle, Window.Image.Picture.Bitmap.MaskHandle );
      src := TempIntfImg.PixelData;
@@ -1432,7 +1433,7 @@ Begin
      u := pTexture^.Width / (p + 1);
      v := pTexture^.Height / (q + 1);
 
-     // récupère les pixels du TImage et les attribue à la texture
+     // rï¿½cupï¿½re les pixels du TImage et les attribue ï¿½ la texture
      SetLength( pTexture^.Data, 3 * (p + 1) * (q + 1) );
      {For j := 0 To pTexture^.Height - 1 Do Begin
          For i := 0 To pTexture^.Width - 1 Do Begin
@@ -1498,14 +1499,14 @@ Begin
      
      TempIntfImg.Destroy();
      
-     // envoie la texture dans la mémoire vidéo
+     // envoie la texture dans la mï¿½moire vidï¿½o
      glEnable( GL_TEXTURE_2D );
      glGenTextures( 1, @pTexture^.ID );
      glBindTexture( GL_TEXTURE_2D, pTexture^.ID );
      glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
      glTexImage2D( GL_TEXTURE_2D, 0, 3, (p + 1), (q + 1), 0, GL_RGB, GL_UNSIGNED_BYTE, @pTexture^.Data[0] );
 
-     // ajout de la texture à la pile de données
+     // ajout de la texture ï¿½ la pile de donnï¿½es
      AddItem( DATA_TEXTURE, nIndex, 0, pTexture, sFile, False );
 
      AddStringToConsole( Format('OK. (%.0f bytes)', [3.0 * (p + 1) * (q + 1)]) );
@@ -1518,14 +1519,14 @@ End;
 Procedure DelTexture ( nIndex : LongInt ) ;
 Var pTexture : LPOGLTexture;
 Begin
-     // recherche de la texture à sélectionner en fonction de son indice
+     // recherche de la texture ï¿½ sï¿½lectionner en fonction de son indice
      pTexture := FindItem( DATA_TEXTURE, nIndex );
      If pTexture = NIL Then Exit;
 
      // destruction de la texture
      FreeTexture( pTexture );
 
-     // destruction de l'objet dans la pile de données
+     // destruction de l'objet dans la pile de donnï¿½es
      DelItem( DATA_TEXTURE, nIndex );
 End;
 
@@ -1541,7 +1542,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// SetTexture : Définie la texture active en fonction de son indice.          //
+// SetTexture : Dï¿½finie la texture active en fonction de son indice.          //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure SetTexture( nStage : Integer ; nIndex : LongInt ) ;
 Var pTexture : LPOGLTexture;
@@ -1551,17 +1552,17 @@ Begin
         Exit;
      End;
      
-     // recherche de la texture à sélectionner en fonction de son indice
+     // recherche de la texture ï¿½ sï¿½lectionner en fonction de son indice
      pTexture := FindItem( DATA_TEXTURE, nIndex );
      If pTexture = NIL Then Exit;
 
      // active le texturing
      glEnable( GL_TEXTURE_2D );
 
-     // appelle la texture désirée
+     // appelle la texture dï¿½sirï¿½e
      glBindTexture( GL_TEXTURE_2D, pTexture^.ID );
 
-     // définie les techniques de rendu
+     // dï¿½finie les techniques de rendu
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
      glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
@@ -1570,10 +1571,10 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// AddMesh : Charge un OGLMesh depuis un fichier (*.M12), l'ajoute à la pile  //
-//           de données, puis renvoie son pointeur.                           //
+// AddMesh : Charge un OGLMesh depuis un fichier (*.M12), l'ajoute ï¿½ la pile  //
+//           de donnï¿½es, puis renvoie son pointeur.                           //
 ////////////////////////////////////////////////////////////////////////////////
-Function AddMesh ( sFile : String ; nIndex : LongInt ) : LPOGLMesh ;
+Function AddMesh ( sFile : String ; nIndex : LongInt ; bRe : Boolean ) : LPOGLMesh ;
 Var ioLong : File Of LongInt ; ioPolygon : File Of OGLPolygon ; ioVertex : File Of OGLVertex ;
     pMesh : LPOGLMesh ;
     nSize : LongInt ;
@@ -1581,9 +1582,9 @@ Var ioLong : File Of LongInt ; ioPolygon : File Of OGLPolygon ; ioVertex : File 
 Begin
      j := 0;
 
-     // appel au manager de ressources pour éviter de charger un mesh déjà chargé
+     // appel au manager de ressources pour ï¿½viter de charger un mesh dï¿½jï¿½ chargï¿½
      pMesh := FindItemByPath( DATA_MESH, sFile );
-     If pMesh <> NIL Then Begin
+     If ( pMesh <> NIL ) And bRe Then Begin
         AddLineToConsole( 'Reloading mesh ' + sFile + '.' );
         AddItem( DATA_MESH, nIndex, 0, pMesh, sFile, True );
         AddMesh := pMesh;
@@ -1592,7 +1593,7 @@ Begin
 
      AddLineToConsole( 'Loading mesh ' + sFile + '...' );
 
-     // création du pointeur vers le nouveau mesh
+     // crï¿½ation du pointeur vers le nouveau mesh
      New( pMesh );
 
      // lecture du nombre de polygones
@@ -1602,7 +1603,7 @@ Begin
      Read( ioLong, nSize ); j += 1;
      Close( ioLong );
         
-     // allocation de la mémoire pour le tableau de polygones
+     // allocation de la mï¿½moire pour le tableau de polygones
      pMesh^.PolygonCount := nSize;
      SetLength( pMesh^.PolygonData, nSize );
      SetLength( pMesh^.IndexArray, nSize );
@@ -1628,7 +1629,7 @@ Begin
      Read( ioLong, nSize );
      Close( ioLong );
 
-     // allocation de la mémoire pour le tableau de vertices
+     // allocation de la mï¿½moire pour le tableau de vertices
      pMesh^.VertexCount := nSize;
      SetLength( pMesh^.VertexData, nSize );
      SetLength( pMesh^.VectorArray, nSize );
@@ -1658,7 +1659,7 @@ Begin
      End;
      Close( ioVertex );
 
-     // envoie la géométrie dans la mémoire vidéo
+     // envoie la gï¿½omï¿½trie dans la mï¿½moire vidï¿½o
      glGenBuffersARB( 1, @pMesh^.VectorID );
      glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.VectorID );
      glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 12, @pMesh^.VectorArray[0], GL_STATIC_DRAW_ARB );
@@ -1672,7 +1673,7 @@ Begin
      glBindBufferARB( GL_ARRAY_BUFFER_ARB, pMesh^.TextureID );
      glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 8, @pMesh^.TextureArray[0], GL_STATIC_DRAW_ARB );
 
-     // ajout du mesh à la pile de données
+     // ajout du mesh ï¿½ la pile de donnï¿½es
      AddItem( DATA_MESH, nIndex, 0, pMesh, sFile, False );
 
      AddStringToConsole( Format('OK. (%d bytes)', [j*4]) );
@@ -1683,12 +1684,12 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DrawMesh : Procède au rendu d'un OGLMesh en fonction de son indice.        //
+// DrawMesh : Procï¿½de au rendu d'un OGLMesh en fonction de son indice.        //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawMesh ( nIndex : LongInt ; t : Boolean ) ;
 Var pMesh : LPOGLMesh ;
 Begin
-     // recherche du mesh à afficher en fonction de son indice
+     // recherche du mesh ï¿½ afficher en fonction de son indice
      pMesh := FindItem( DATA_MESH, nIndex );
      If pMesh = NIL Then Exit;
 
@@ -1763,24 +1764,24 @@ End;
 Procedure DelMesh ( nIndex : LongInt ) ;
 Var pMesh : LPOGLMesh;
 Begin
-     // recherche du mesh à sélectionner en fonction de son indice
+     // recherche du mesh ï¿½ sï¿½lectionner en fonction de son indice
      pMesh := FindItem( DATA_MESH, nIndex );
      If pMesh = NIL Then Exit;
 
      // destruction de la texture
      FreeMesh( pMesh );
 
-     // destruction de l'objet dans la pile de données
+     // destruction de l'objet dans la pile de donnï¿½es
      DelItem( DATA_MESH, nIndex );
 End;
 
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// AddAnimation : Charge un OGLAnimation depuis un fichier (*.A12), l'ajoute à la pile  //
-//                de données, puis renvoie son pointeur.                                //
+// AddAnimation : Charge un OGLAnimation depuis un fichier (*.A12), l'ajoute ï¿½ la pile  //
+//                de donnï¿½es, puis renvoie son pointeur.                                //
 //////////////////////////////////////////////////////////////////////////////////////////
-Function AddAnimation ( sFile : String ; nIndex : LongInt ; nMeshIndex : LongInt ) : LPOGLAnimation ;
+Function AddAnimation ( sFile : String ; nIndex : LongInt ; nMeshIndex : LongInt ; bRe : Boolean ) : LPOGLAnimation ;
 Var ioLong : File Of LongInt ; ioAction : File Of OGLAction ; ioVector : File Of GLVector ;
     pAnimation : LPOGLAnimation ;
     tAnimation : LPOGLAnimation ;
@@ -1791,9 +1792,9 @@ Var ioLong : File Of LongInt ; ioAction : File Of OGLAction ; ioVector : File Of
 Begin
      j := 0;
 
-     // appel au manager de ressources pour éviter de charger une animation déjà chargé
+     // appel au manager de ressources pour ï¿½viter de charger une animation dï¿½jï¿½ chargï¿½
      pAnimation := FindItemByPath( DATA_ANIMATION, sFile );
-     If pAnimation <> NIL Then Begin
+     If ( pAnimation <> NIL ) And bRe Then Begin
         AddLineToConsole( 'Reloading animation ' + sFile + '.' );
         New( tAnimation );
         tAnimation^.FrameArray := pAnimation^.FrameArray;
@@ -1809,10 +1810,10 @@ Begin
 
      AddLineToConsole( 'Loading animation ' + sFile + '...' );
 
-     // création du pointeur vers la nouvelle animation
+     // crï¿½ation du pointeur vers la nouvelle animation
      New( pAnimation );
 
-     // appel au manager de ressources pour récupérer le mesh associé
+     // appel au manager de ressources pour rï¿½cupï¿½rer le mesh associï¿½
      pMesh := FindItem( DATA_MESH, nMeshIndex );
      pAnimation^.Mesh := pMesh;
 
@@ -1823,11 +1824,11 @@ Begin
      Read( ioLong, nSize ); j += 1;
      Close( ioLong );
 
-     // allocation de la mémoire pour le tableau d'actions
+     // allocation de la mï¿½moire pour le tableau d'actions
      pAnimation^.ActionCount := nSize;
      SetLength( pAnimation^.ActionArray, nSize );
 
-     // allocation de la mémoire pour le tableau de vecteurs temporaires
+     // allocation de la mï¿½moire pour le tableau de vecteurs temporaires
      SetLength( pAnimation^.VectorArray, pMesh^.VertexCount );
 
      // lecture de chaque action
@@ -1849,17 +1850,17 @@ Begin
      Read( ioLong, nSize );
      Close( ioLong );
 
-     // allocation de la mémoire pour le tableau de frames
+     // allocation de la mï¿½moire pour le tableau de frames
      pAnimation^.FrameCount := nSize;
      SetLength( pAnimation^.FrameArray, nSize );
 
      // lecture de chaque frame
      For i := 0 To nSize - 1 Do
      Begin
-          // allocation de la mémoire pour le tableau de vecteurs de la frame
+          // allocation de la mï¿½moire pour le tableau de vecteurs de la frame
           SetLength( pAnimation^.FrameArray[i].VectorArray, pMesh^.VertexCount );
 
-          // lecture de la durée de la frame
+          // lecture de la durï¿½e de la frame
           Assign( ioLong, sFile );
           Reset( ioLong, 4 );
           Seek( ioLong, j ); j += 1;
@@ -1877,12 +1878,12 @@ Begin
           Close( ioVector );
      End;
 
-     // envoie la géométrie dans la mémoire vidéo
+     // envoie la gï¿½omï¿½trie dans la mï¿½moire vidï¿½o
      glGenBuffersARB( 1, @pAnimation^.VectorID );
      glBindBufferARB( GL_ARRAY_BUFFER_ARB, pAnimation^.VectorID );
      glBufferDataARB( GL_ARRAY_BUFFER_ARB, nSize * 12, @pAnimation^.VectorArray[0], GL_STREAM_DRAW_ARB );
 
-     // ajout de l'animation à la pile de données
+     // ajout de l'animation ï¿½ la pile de donnï¿½es
      AddItem( DATA_ANIMATION, nIndex, nMeshIndex, pAnimation, sFile, False );
 
      AddStringToConsole( Format('OK. (%d bytes)', [j*4]) );
@@ -1893,7 +1894,7 @@ End;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-// DrawAnimation : Procède au rendu d'une OGLAnimation en fonction de son indice.        //
+// DrawAnimation : Procï¿½de au rendu d'une OGLAnimation en fonction de son indice.        //
 ///////////////////////////////////////////////////////////////////////////////////////////
 Procedure DrawAnimation ( nIndex : LongInt ; t : Boolean ; nAction : LongInt ) ;
 Var pAnimation : LPOGLAnimation ;
@@ -1912,7 +1913,7 @@ Var pAnimation : LPOGLAnimation ;
     pFrameB : LPOGLFrame ;
     p : QWord ;
 Begin
-     // recherche de l'animation à afficher en fonction de son indice
+     // recherche de l'animation ï¿½ afficher en fonction de son indice
      pAnimation := FindItem( DATA_ANIMATION, nIndex );
      If pAnimation = NIL Then Exit;
 
@@ -1928,14 +1929,14 @@ Begin
      nFrameStart := pAnimation^.ActionArray[nAction].framestart;
      nFrameCount := pAnimation^.ActionArray[nAction].framecount;
      
-     // calcul de la durée de l'animation
+     // calcul de la durï¿½e de l'animation
      nDuration := 0;
      For i := nFrameStart To nFrameStart + nFrameCount - 1 Do
      Begin
           nDuration += pAnimation^.FrameArray[i].Time;
      End;
 
-     // détermination de la frame en cours et de la suivante
+     // dï¿½termination de la frame en cours et de la suivante
      nTime := (nTime Mod nDuration);
      nDuration := 0;
      For i := nFrameStart To nFrameStart + nFrameCount - 1 Do
@@ -1956,7 +1957,7 @@ Begin
      End;
      fFactor := (fTime - fTick) / fDuration;
      
-     // interpolation linéaire entre deux frames
+     // interpolation linï¿½aire entre deux frames
      pFrameA := @pAnimation^.FrameArray[nFrameStart+nFrame];
      pFrameB := @pAnimation^.FrameArray[nFrameStart+nNextFrame];
      For i := 0 To pAnimation^.Mesh^.VertexCount - 1 Do
@@ -2012,21 +2013,21 @@ End;
 Procedure DelAnimation ( nIndex : LongInt ) ;
 Var pAnimation : LPOGLAnimation;
 Begin
-     // recherche de l'animation à sélectionner en fonction de son indice
+     // recherche de l'animation ï¿½ sï¿½lectionner en fonction de son indice
      pAnimation := FindItem( DATA_ANIMATION, nIndex );
      If pAnimation = NIL Then Exit;
 
      // destruction de l'animation
      FreeAnimation( pAnimation );
 
-     // destruction de l'objet dans la pile de données
+     // destruction de l'objet dans la pile de donnï¿½es
      DelItem( DATA_ANIMATION, nIndex );
 End;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// InitShaderProgram : Charge le shader en fonction du modèle.                //
+// InitShaderProgram : Charge le shader en fonction du modï¿½le.                //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure InitShaderProgram () ;
     Function GetShaderSource( sFile : String ) : PChar;
@@ -2097,7 +2098,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DrawText : Procède au rendu d'une ligne de texte à l'écran.                //
+// DrawText : Procï¿½de au rendu d'une ligne de texte ï¿½ l'ï¿½cran.                //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawText ( x, y : Single ; r, g, b : Single ; nFont : integer ;
 sText : String ) ;
@@ -2139,7 +2140,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DrawImage : Procède au rendu d'une image à l'écran.                       //
+// DrawImage : Procï¿½de au rendu d'une image ï¿½ l'ï¿½cran.                       //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawImage ( x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
 Begin
@@ -2184,7 +2185,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DrawSprite : Procède au rendu d'un sprite à l'écran.                       //
+// DrawSprite : Procï¿½de au rendu d'un sprite ï¿½ l'ï¿½cran.                       //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawSprite ( u, v : Single ; r, g, b, a : Single ; t : Boolean ) ;
 Begin
@@ -2220,7 +2221,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DrawSkybox : Procède au rendu d'une skybox à l'écran.                      //
+// DrawSkybox : Procï¿½de au rendu d'une skybox ï¿½ l'ï¿½cran.                      //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawSkybox ( r, g, b, a : Single ; nSkybox : Integer ) ;
 Begin
@@ -2323,7 +2324,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DrawChar : Procède au rendu d'un caractère graphique à l'écran.            //
+// DrawChar : Procï¿½de au rendu d'un caractï¿½re graphique ï¿½ l'ï¿½cran.            //
 ////////////////////////////////////////////////////////////////////////////////
 Var cx : Single =  0.0;
     cy : Single =  0.0;
@@ -2479,7 +2480,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DrawString : Procède au rendu d'une OGLString en avec un effet.            //
+// DrawString : Procï¿½de au rendu d'une OGLString en avec un effet.            //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DrawString ( id : Integer ; x, y, z : Single ; u, v : Single ; r, g, b, a : Single ; t : Boolean ; nCharsetStandard : Integer ; nCharsetExtended : Integer ; nEffect : Integer ) ;
 Var count : Integer;
@@ -2732,7 +2733,7 @@ Begin
      glEnable( GL_TEXTURE_2D );
      glBindTexture( GL_TEXTURE_2D, RenderTexture );
 
-     // définit les techniques de rendu
+     // dï¿½finit les techniques de rendu
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
      glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
@@ -2758,7 +2759,7 @@ Begin
 
      DrawImage( (u - 1.0) * w, v - 1.0, -1.0, u * w, v, 1.0, 1.0, 1.0, 1.0, False );
 
-     // récupération de la texture de rendu
+     // rï¿½cupï¿½ration de la texture de rendu
      GetRenderTexture();
 
      glDisable( GL_TEXTURE_2D );
@@ -2852,15 +2853,15 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// AddSound : Charge un son depuis un fichier (*.wav ; *.mp3), et l'ajoute à  //
-//            la pile de données.                                             //
+// AddSound : Charge un son depuis un fichier (*.wav ; *.mp3), et l'ajoute ï¿½  //
+//            la pile de donnï¿½es.                                             //
 ////////////////////////////////////////////////////////////////////////////////
-Procedure AddSound ( sFile : String ; nIndex : LongInt ) ;
+Procedure AddSound ( sFile : String ; nIndex : LongInt ; bRe : Boolean ) ;
 Var pSound : PFSoundSample;
 Begin
-     // appel au manager de ressources pour éviter de charger un son déjà chargé
+     // appel au manager de ressources pour ï¿½viter de charger un son dï¿½jï¿½ chargï¿½
      pSound := FindItemByPath( DATA_SOUND, sFile );
-     If pSound <> NIL Then Begin
+     If ( pSound <> NIL ) And bRe Then Begin
         AddLineToConsole( 'Reloading sound ' + sFile + '.' );
         AddItem( DATA_SOUND, nIndex, 0, pSound, sFile, True );
         Exit;
@@ -2875,7 +2876,7 @@ Begin
         Exit;
      End;
 
-     // ajout du son à la pile de données
+     // ajout du son ï¿½ la pile de donnï¿½es
      AddItem( DATA_SOUND, nIndex, 0, pSound, sFile, False );
      
      AddStringToConsole( Format('OK. (%d bytes)', [FSOUND_Sample_GetLength(pSound)*2]) );
@@ -2884,19 +2885,19 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DelSound : Supprime un son de la pile de données.                          //
+// DelSound : Supprime un son de la pile de donnï¿½es.                          //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure DelSound ( nIndex : LongInt ) ;
 Var pSound : PFSoundSample;
 Begin
-     // recherche du son à sélectionner en fonction de son indice
+     // recherche du son ï¿½ sï¿½lectionner en fonction de son indice
      pSound := FindItem( DATA_SOUND, nIndex );
      If pSound = NIL Then Exit;
 
      // destruction de lu son
      FSOUND_Sample_Free( pSound );
 
-     // destruction de l'objet dans la pile de données
+     // destruction de l'objet dans la pile de donnï¿½es
      DelItem( DATA_SOUND, nIndex );
 End;
 
@@ -2904,7 +2905,7 @@ End;
 
 ////////////////////////////////////////////////////////////////////////////////
 // AddMusic : Charge une musique depuis un fichier (*.mod ; *.s3m), et        //
-//            l'ajoute à la pile de données.                                  //
+//            l'ajoute ï¿½ la pile de donnï¿½es.                                  //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure AddMusic ( sFile : String ; nIndex : LongInt ) ;
 Var pMusic : PFMusicModule;
@@ -2919,7 +2920,7 @@ Begin
         Exit;
      End;
 
-     // ajout de la musique à la pile de données
+     // ajout de la musique ï¿½ la pile de donnï¿½es
      AddItem( DATA_MUSIC, nIndex, 0, pMusic, sFile, False );
 
      AddStringToConsole( Format('OK. (%d bytes)', [FMUSIC_GetNumSamples(pMusic)]) );
@@ -2928,12 +2929,12 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// PlaySound : Procède à la lecture d'un son en fonction de son indice.       //
+// PlaySound : Procï¿½de ï¿½ la lecture d'un son en fonction de son indice.       //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure PlaySound ( nIndex : LongInt ) ;
 Var pSound : PFSoundSample;
 Begin
-     // recherche du son à lire en fonction de son indice
+     // recherche du son ï¿½ lire en fonction de son indice
      pSound := FindItem( DATA_SOUND, nIndex );
      If pSound = NIL Then Exit;
      
@@ -2947,11 +2948,11 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// StopSound : Procède à l'arrêt d'un son en fonction de son indice.          //
+// StopSound : Procï¿½de ï¿½ l'arrï¿½t d'un son en fonction de son indice.          //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure StopSound ( nIndex : LongInt ) ;
 Begin
-     // arrêt du son
+     // arrï¿½t du son
      If (nIndex <> SOUND_MENU) Then
         FSOUND_StopSound( 1 )
      Else
@@ -2961,12 +2962,12 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// PlayMusic : Procède à la lecture d'une musique en fonction de son indice.  //
+// PlayMusic : Procï¿½de ï¿½ la lecture d'une musique en fonction de son indice.  //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure PlayMusic ( nIndex : LongInt ) ;
 Var pMusic : PFMusicModule;
 Begin
-     // recherche de la musique à lire en fonction de son indice
+     // recherche de la musique ï¿½ lire en fonction de son indice
      pMusic := FindItem( DATA_MUSIC, nIndex );
      If pMusic = NIL Then Exit;
 
@@ -2977,16 +2978,16 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// StopMusic : Procède à l'arrêt d'une musique en fonction de son indice.     //
+// StopMusic : Procï¿½de ï¿½ l'arrï¿½t d'une musique en fonction de son indice.     //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure StopMusic ( nIndex : LongInt ) ;
 Var pMusic : PFMusicModule;
 Begin
-     // recherche de la musique à lire en fonction de son indice
+     // recherche de la musique ï¿½ lire en fonction de son indice
      pMusic := FindItem( DATA_MUSIC, nIndex );
      If pMusic = NIL Then Exit;
 
-     // arrêt de la musique
+     // arrï¿½t de la musique
      FMUSIC_StopSong( pMusic );
 End;
 
@@ -3045,8 +3046,8 @@ Var bKeyS : Array [0..255] Of Boolean ;
 
 
 
-Var nX, nY : Integer; // coordonnées du pointeur de souris
-    dX, dY : Single; // dernière petite déviation du pointeur de souris
+Var nX, nY : Integer; // coordonnï¿½es du pointeur de souris
+    dX, dY : Single; // derniï¿½re petite dï¿½viation du pointeur de souris
     
 
 
@@ -3143,7 +3144,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// BindKey : Ajoute une callback à la pile de touches.                        //
+// BindKey : Ajoute une callback ï¿½ la pile de touches.                        //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure BindKeyStd ( nKey : Integer; bDown : boolean ; bInstant : Boolean ; pCallback : KeyCallbackStd ) ;
 Var pKeyItem : LPKeyItem ;
@@ -3247,14 +3248,14 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// ExecKey : Execute la callback correspondante à la touche enfoncée.         //
+// ExecKey : Execute la callback correspondante ï¿½ la touche enfoncï¿½e.         //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure ExecKey ( nKey : Integer ; bDown : boolean ;bInstant : Boolean ; bSpecial : Boolean ) ;
 Var pKeyItem : LPKeyItem ;
 Begin
    if bDown then
    begin
-      // regarde si la touche enfoncée a été définie et appelle la callback correspondante
+      // regarde si la touche enfoncï¿½e a ï¿½tï¿½ dï¿½finie et appelle la callback correspondante
      pKeyItem := pKeyStack;
      While pKeyItem <> NIL Do
      Begin
@@ -3283,7 +3284,7 @@ End;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// BindButton : Attribue une callback à un bouton de souris.                  //
+// BindButton : Attribue une callback ï¿½ un bouton de souris.                  //
 ////////////////////////////////////////////////////////////////////////////////
 Procedure BindButton ( nButton : Integer ; pCallback : ButtonCallback ) ;
 Begin

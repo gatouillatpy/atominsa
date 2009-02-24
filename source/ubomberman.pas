@@ -106,6 +106,7 @@ type
     procedure PunchBomb(dt : Single);
     procedure AddTriggerBomb();
     procedure DelTriggerBomb();
+    procedure DelTriggerBombByNetId( nNetId : Integer );
     procedure TriggerToNormalBomb();
     procedure DoIgnition();
 
@@ -907,6 +908,30 @@ begin
   Dispose(pTemp);
 end;
 
+
+
+procedure CBomberman.DelTriggerBombByNetID( nNetID : Integer );
+var pTemp, pPrev : LPBombItem;
+    bFound : Boolean;
+begin
+    bFound := False;
+    pPrev := Nil;
+    pTemp := uTriggerBomb;
+    While ( pTemp <> Nil ) And ( bFound = False ) Do Begin
+          If ( pTemp^.Bomb.nNetId = nNetId ) Then Begin
+             If ( pPrev = Nil ) Then Begin
+                  uTriggerBomb:=uTriggerBomb^.Next;
+             End
+             Else Begin
+                  pPrev^.Next := pTemp^.Next;
+             End;
+             Dispose(pTemp);
+             bFound := True;
+          End;
+          pPrev := pTemp;
+          pTemp := pTemp^.Next;
+    End;
+end;
 
 
 

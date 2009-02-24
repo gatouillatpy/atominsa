@@ -239,9 +239,9 @@ Begin
    
    
    // Empecher de rester fixe
-   If ( pBomberman.SumFixGetDelta > 2 ) Then
+   If ( pBomberman.SumFixGetDelta > 5 ) Then
    pBomberman.Danger := pBomberman.Danger + Trunc( ( pBomberman.SumFixGetDelta - 2.0 ) * ( pBomberman.SumFixGetDelta - 2.0 ) * 16 );
-   If ( pBomberman.SumFixGetDelta < 8 ) Then
+   If ( pBomberman.SumFixGetDelta < 12 ) Then
       pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + dt;
    
 

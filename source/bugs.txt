@@ -1,13 +1,6 @@
-+ bug (access violation) en réseau lors d'explosions de bombes pour le client à cause d'indices de tableaux faux!
-+ impossible de passer en runtime du mode plein écran au mode fenêtre et inversement
-+ problème pour le switch display avec le reloaddatastack
-+ bombes qui n'explosent pas tant que pas touchés !
-= bombes qui apparaissent par magie après le bonus punch et les jelly bomb(à cause de triggerbombtonormal)
-= bombes non supprimées entre deux rounds
-= le client n'a pas la liste à jour qd qqn quitte
-= cases bloquées en réseau (pour le client) à cause des delblock non faits
-- bombes trigger qui grossissent en réseau (au moins pour les IA du serveur)
-= trigger traversé par le client tant qu'elle n'est pas bougée.
++ en caméra 3D, les shaders des flammes peuvent traverser les caisses s'il y a au moins une case libre entre
+= bug avec échap lorqu'on a quitté le multi en tant que client (sans autorisation du serveur?, manque un clearkey)
+- penser à mettre un numéro de version à la connexion pour les prochaines versions + n° de version dans le jeu (pas 1.0C)
 
 + pour fréquent, = pour régulier, - pour rare
 
