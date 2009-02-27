@@ -2949,6 +2949,7 @@ Begin
         //   nMenu := MENU_FIGHT
         // Sinon
         //   nMenu := 0;
+        nMenu := 0;
      End;
      
      If GetKey( KEY_ENTER ) Or DEDICATED_SERVER Then Begin

@@ -87,6 +87,7 @@ Begin
           PHASE_NETWORK   : InitMenuNetwork();
           STATE_NETWORK   : ProcessMenuNetwork();
      End;
+     Application.ProcessMessages;
 End;
 
 
