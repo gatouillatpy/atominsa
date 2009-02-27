@@ -241,6 +241,8 @@ End;
 
 Procedure LoadMap () ;
 Begin
+     If DEDICATED_SERVER Then Exit;
+     
      If nMap = -1 Then Begin
         pMap := aMapList[Trunc(Random(nMapCount))];
      End Else Begin
@@ -2787,7 +2789,6 @@ Begin
      DrawString( STRING_GAME_MENU(117), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 1, 1, 1, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
      DrawString( STRING_GAME_MENU(118), -w / h * 0.9, 0.7 - t, -1, 0.012 * w / h, 0.024, 0, 0, 0, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.12;
 
-
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
         If (bMulti = True) Then Begin
@@ -2942,7 +2943,15 @@ Begin
        End;
      End;
      
-     If GetKey( KEY_ENTER ) Then Begin
+     If DEDICATED_SERVER Then Begin
+        // TODO : Tim
+        // Si tous les joueurs sont prêts Alors
+        //   nMenu := MENU_FIGHT
+        // Sinon
+        //   nMenu := 0;
+     End;
+     
+     If GetKey( KEY_ENTER ) Or DEDICATED_SERVER Then Begin
         If Not bEnter Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of

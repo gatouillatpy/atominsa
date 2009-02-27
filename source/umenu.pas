@@ -81,71 +81,74 @@ Var w, h : Single; // taille de la fenêtre
     k : LongInt;
     r, g, b : Byte;
 Begin
-     // ajout de la callback pour le bouton gauche de la souris
-     BindButton( BUTTON_LEFT, @CheckButton );
+     If Not DEDICATED_SERVER Then Begin
+         // ajout de la callback pour le bouton gauche de la souris
+         BindButton( BUTTON_LEFT, @CheckButton );
 
-     // vidage de la texture de rendu
-     PutRenderTexture();
-     
-     w := GetRenderWidth;
-     h := GetRenderHeight;
-     x := GetMouseX / GetWindowWidth * w;
-     y := GetMouseY / GetWindowHeight * h;
-     u := Round((2 * x / h - w / h) / (w / h / 9)) * (w / h / 9);
-     v := Round((1 - 2 * y / h) / (1 / 9)) * (1 / 9);
+         // vidage de la texture de rendu
+         PutRenderTexture();
 
-     // identification du bouton en surbrillance
-     i := Round(x / w * Window.Mask.Picture.Width);
-     j := Round(y / h * Window.Mask.Picture.Height);
-     k := 4 * (j * Window.Mask.Picture.Width + i);
-     b := MaskIntfImg.PixelData[k+0];
-     g := MaskIntfImg.PixelData[k+1];
-     r := MaskIntfImg.PixelData[k+2];
-     If (r = 0) And (g = 0) And (b = 0) Then nButton := BUTTON_NONE;
-     If (r = 0) And (g = 255) And (b = 255) Then nButton := BUTTON_EXIT;
-     If (r = 255) And (g = 0) And (b = 0) Then nButton := BUTTON_PRACTICE;
-     If (r = 0) And (g = 255) And (b = 0) Then nButton := BUTTON_MULTI;
-    // If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLO;
-     If (r = 255) And (g = 255) And (b = 0) Then nButton := BUTTON_SETUP;
-    // If (r = 255) And (g = 0) And (b = 255) Then nButton := BUTTON_EDITOR;
+         w := GetRenderWidth;
+         h := GetRenderHeight;
+         x := GetMouseX / GetWindowWidth * w;
+         y := GetMouseY / GetWindowHeight * h;
+         u := Round((2 * x / h - w / h) / (w / h / 9)) * (w / h / 9);
+         v := Round((1 - 2 * y / h) / (1 / 9)) * (1 / 9);
 
-     // affichage du bouton ainsi que du texte correspondant
-     If nButton <> BUTTON_NONE Then Begin
-        Case nButton Of
-             BUTTON_EXIT : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON0 );
-             BUTTON_MULTI : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON4 );
-             BUTTON_SOLO : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON1 );
-             BUTTON_SETUP : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON3 );
-             BUTTON_PRACTICE : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON2 );
-             BUTTON_EDITOR : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON5 );
-        End;
-        DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.1, True );
-        If (nButton <> BUTTON_NONE) Then Begin
-           PlaySound( SOUND_MENU_MOVE );
-           Case nButton Of
-                BUTTON_EXIT : SetString( STRING_MENU_MAIN, 'exit', 0.5, 0.4, 20 );
-                BUTTON_MULTI : SetString( STRING_MENU_MAIN, 'network', 0.5, 0.5, 20 );
-                BUTTON_SOLO : SetString( STRING_MENU_MAIN, 'solo', 0.5, 0.4, 20 );
-                BUTTON_SETUP : SetString( STRING_MENU_MAIN, 'setup', 0.5, 0.5, 20 );
-                BUTTON_PRACTICE : SetString( STRING_MENU_MAIN, 'practice', 0.5, 0.8, 20 );
-                BUTTON_EDITOR : SetString( STRING_MENU_MAIN, 'editor', 0.5, 0.6, 20 );
-           End;
-        End;
+         // identification du bouton en surbrillance
+         i := Round(x / w * Window.Mask.Picture.Width);
+         j := Round(y / h * Window.Mask.Picture.Height);
+         k := 4 * (j * Window.Mask.Picture.Width + i);
+         b := MaskIntfImg.PixelData[k+0];
+         g := MaskIntfImg.PixelData[k+1];
+         r := MaskIntfImg.PixelData[k+2];
+         If (r = 0) And (g = 0) And (b = 0) Then nButton := BUTTON_NONE;
+         If (r = 0) And (g = 255) And (b = 255) Then nButton := BUTTON_EXIT;
+         If (r = 255) And (g = 0) And (b = 0) Then nButton := BUTTON_PRACTICE;
+         If (r = 0) And (g = 255) And (b = 0) Then nButton := BUTTON_MULTI;
+        // If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLO;
+         If (r = 255) And (g = 255) And (b = 0) Then nButton := BUTTON_SETUP;
+        // If (r = 255) And (g = 0) And (b = 255) Then nButton := BUTTON_EDITOR;
+
+         // affichage du bouton ainsi que du texte correspondant
+         If nButton <> BUTTON_NONE Then Begin
+            Case nButton Of
+                 BUTTON_EXIT : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON0 );
+                 BUTTON_MULTI : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON4 );
+                 BUTTON_SOLO : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON1 );
+                 BUTTON_SETUP : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON3 );
+                 BUTTON_PRACTICE : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON2 );
+                 BUTTON_EDITOR : SetTexture( 1, SPRITE_MENU_MAIN_BUTTON5 );
+            End;
+            DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 0.1, True );
+            If (nButton <> BUTTON_NONE) Then Begin
+               PlaySound( SOUND_MENU_MOVE );
+               Case nButton Of
+                    BUTTON_EXIT : SetString( STRING_MENU_MAIN, 'exit', 0.5, 0.4, 20 );
+                    BUTTON_MULTI : SetString( STRING_MENU_MAIN, 'network', 0.5, 0.5, 20 );
+                    BUTTON_SOLO : SetString( STRING_MENU_MAIN, 'solo', 0.5, 0.4, 20 );
+                    BUTTON_SETUP : SetString( STRING_MENU_MAIN, 'setup', 0.5, 0.5, 20 );
+                    BUTTON_PRACTICE : SetString( STRING_MENU_MAIN, 'practice', 0.5, 0.8, 20 );
+                    BUTTON_EDITOR : SetString( STRING_MENU_MAIN, 'editor', 0.5, 0.6, 20 );
+               End;
+            End;
+         End;
+
+         Clear( 1, 1, 1, 1 );
+         GetRenderTexture();
+
+         bMulti := False;
+         If ( bOnline = True ) Then Begin
+            ClientTerminateOnline();
+         End;
+         bOnline := False;
+
+         PlaySound( SOUND_MENU );
+
+         nState := STATE_MENU;
+     End Else Begin
+         nState := PHASE_NETWORK;
      End;
-     
-     Clear( 1, 1, 1, 1 );
-     GetRenderTexture();
-
-     bMulti := False;
-     If ( bOnline = True ) Then Begin
-        ClientTerminateOnline();
-     End;
-     bOnline := False;
-     
-     PlaySound( SOUND_MENU );
-     
-     // mise à jour de la machine d'état
-     nState := STATE_MENU;
 End;
 
 

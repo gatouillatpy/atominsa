@@ -210,10 +210,10 @@ Begin
 
 
 
-     If GetKey( KEY_ENTER ) Then Begin
+     If GetKey( KEY_ENTER ) Or DEDICATED_SERVER Then Begin
         If Not bEnter Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           If (nMenu = 1) Or (nMenu = 2) Then Begin
+           If (nMenu = 1) Or (nMenu = 2) Or DEDICATED_SERVER Then Begin
                 nIndex := nLocalIndex;
                 nHeader := HEADER_ONLINE_HOST;
                 sData := sLocalName + #31;

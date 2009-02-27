@@ -11,26 +11,29 @@ Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics, Glut,
 
 
 
+
 Procedure Exit () ;
 Begin
      DrawBox( 0.7, 0.4, 0.2, -0.4 );
 
-     If GetKey(KEY_Y_LOWER) Or GetKey(KEY_Y_UPPER) Then Begin
-        StopSound( SOUND_MENU_SELECT );
+     If GetKey(KEY_Y_LOWER) Or GetKey(KEY_Y_UPPER) Or DEDICATED_SERVER Then Begin
+        If Not DEDICATED_SERVER Then Begin
+            StopSound( SOUND_MENU_SELECT );
+
+            FreeBomberman();
+            FreeBomb();
+            FreeFlame();
+            FreeDataStack();
+            FreeTimer();
+
+            ExitFMod();
+            ExitGlut();
+        End;
         
         DO_NOT_RENDER := True;
 
-        FreeBomberman();
-        FreeBomb();
-        FreeFlame();
-        FreeDataStack();
-        FreeTimer();
-     
-        ExitFMod();
-        ExitGlut();
-     
         WriteSettings( 'atominsa.cfg' );
-        
+
         Window.Memo.Destroy();
 
         Application.Terminate;
@@ -50,7 +53,7 @@ End;
 Procedure AskExit () ;
 Begin
      InitBox( 'do you really want to quit ?', 'yes - no' );
-     
+
      StopSound( SOUND_MENU );
 
      // désactivation de la souris
@@ -61,7 +64,7 @@ End;
 
 
 
-Procedure MainLoop () ; cdecl;
+Procedure MainLoop () ; cdecl; // TODO : COUPER LE RENDU A PARTIR D'ICI
 Begin
      Case nState Of
           PHASE_EXIT      : AskExit();
@@ -88,27 +91,14 @@ End;
 
 
 
-
+Procedure ExecNormal () ;
 Var k : Integer;
 Begin
      DO_NOT_RENDER := False;
 
-     // initialisation de l'application
-     Application.Initialize;
-     Application.CreateForm( TWindow, Window );
-
-     // affichage de la console
-     Window.Show();
-
-     // initialisation du générateur de nombres aléatoires
-     Randomize();
-     
-     // lecture du fichier atominsa.cfg
-     ReadSettings( 'atominsa.cfg' );
-
      // création de la pile de données
      InitDataStack();
-     
+
      // initialisation de FMod
      InitFMod();
 
@@ -155,7 +145,7 @@ Begin
 
      // chargement du son de l'invite de messages
      AddSound( './sounds/message.wav', SOUND_MESSAGE, False );
-     
+
      // chargement de la musique du menu
      AddSound( './musics/menu.mp3', SOUND_MENU, False );
 
@@ -190,6 +180,49 @@ Begin
      BindKeyStd( nKeyScreen, True, True, @SwitchDisplay );
 
      ExecGlut();
+End;
 
+Procedure ExecServer () ;
+Var nIndex, nHeader : Integer;
+    sData : String;
+    i, k : Integer;
+Begin
+     AddLineToConsole( 'Mode dedicated server.' );
+
+     nState := PHASE_MENU;
+
+     // attente des infos du master server
+     While True Do Begin
+           MainLoop();
+     End;
+End;
+
+
+
+Begin
+     // initialisation de l'application
+     Application.Initialize;
+     Application.CreateForm( TWindow, Window );
+
+     // affichage de la console
+     Window.Show();
+
+     // initialisation du générateur de nombres aléatoires
+     Randomize();
+     
+     // lecture du fichier atominsa.cfg
+     ReadSettings( 'atominsa.cfg' );
+
+     If ParamCount() = 1 Then Begin
+        If CompareStr( ParamStr(1), '/server' ) = 0 Then Begin
+           DEDICATED_SERVER := True;
+        End;
+     End;
+     
+     If DEDICATED_SERVER Then Begin
+        ExecServer();
+     End Else Begin
+        ExecNormal();
+     End;
 End.
 

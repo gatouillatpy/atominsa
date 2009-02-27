@@ -166,7 +166,7 @@ Begin
         bDown := False;
      End;
 
-
+     If DEDICATED_SERVER Then nState := PHASE_ONLINE;
 
      If GetKey( KEY_ENTER ) Then Begin
         If Not bEnter Then Begin

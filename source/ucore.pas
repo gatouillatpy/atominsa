@@ -366,6 +366,7 @@ Function GetWindowHeight : Integer;
 
 
 Var DO_NOT_RENDER : Boolean;
+Var DEDICATED_SERVER : Boolean;
 
 Var BackBuffer : GLUInt;
 
@@ -3646,9 +3647,6 @@ End;
 
 Procedure ExecGlut () ;
 Begin
-     //glutSetOption( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS );
-     //glutSetOption( 505, 1 );
-
      glutMainLoop();
 End;
 
