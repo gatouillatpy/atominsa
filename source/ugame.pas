@@ -1177,6 +1177,10 @@ Begin
             If Not bEnter Then Begin
                PlaySound( SOUND_MESSAGE );
                Send( nLocalIndex, HEADER_MESSAGE, sMessage );
+               If ( nLocalIndex = nClientIndex[0] ) Then Begin
+                  AddLineToConsole( sClientName[ClientIndex(nLocalIndex)] + ' says : ' + sMessage );
+                  AddStringToScreen( sClientName[ClientIndex(nLocalIndex)] + ' says : ' + sMessage );
+               End;
                bMessage := False;
                sMessage := '';
             End;
@@ -1361,9 +1365,24 @@ Begin
 
      If GetKey(KEY_ENTER) Then Begin
         InitMenu();
+        For k := 0 To 255 Do Begin
+            bClientBtnReady[k] := False;
+        End;
+        bClientBtnReady[0] := True;
         If bOnline Then
            SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
      End;
+     
+     If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) And DEDICATED_SERVER Then Begin
+        InitMenu();
+        For k := 0 To 255 Do Begin
+            bClientBtnReady[k] := False;
+        End;
+        bClientBtnReady[0] := True;
+        If bOnline Then
+           SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
+     End;
+     
 End;
 
 
@@ -1489,6 +1508,10 @@ Begin
           InitRound();
        End;
      End;
+     
+     // pour le serveur automatique
+     If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) And DEDICATED_SERVER And ( GetTime - fWaitTime > 8 )
+        Then InitRound();
 End;
 
 
@@ -2049,6 +2072,10 @@ Begin
             Send( nLocalIndex, HEADER_QUIT_GAME, sData );
             If bOnline Then SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
             PlaySound( SOUND_MENU_BACK );
+            For k := 0 To 255 Do Begin
+                bClientBtnReady[k] := False;
+            End;
+            bClientBtnReady[0] := True;
             InitMenu();
             ClearInput();
         End Else Begin
@@ -2648,7 +2675,10 @@ Begin
      SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
 
      // ajout du bouton fight
-     SetString( STRING_GAME_MENU(51), 'fight!', 0.0, 0.02, 600 );
+     If ( bMulti = True ) And ( nLocalIndex <> nClientIndex[ 0 ] ) Then
+        SetString( STRING_GAME_MENU(51), 'ready!', 0.2, 0.5, 600 )
+     Else
+         SetString( STRING_GAME_MENU(51), 'fight!', 0.2, 0.5, 600 );
 End;
 
 
@@ -2715,7 +2745,10 @@ Begin
      SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.2, 1.0, 600 );
 
      // ajout du bouton fight
-     SetString( STRING_GAME_MENU(51), 'fight!', 0.2, 0.5, 600 );
+     If ( bMulti = True ) And ( nLocalIndex <> nClientIndex[ 0 ] ) Then
+        SetString( STRING_GAME_MENU(51), 'ready!', 0.2, 0.5, 600 )
+     Else
+         SetString( STRING_GAME_MENU(51), 'fight!', 0.2, 0.5, 600 );
 
      // définition de la machine d'état interne
      nGame := GAME_MENU;
@@ -2742,7 +2775,7 @@ Procedure ProcessMenu () ;
 Var w, h : Single;
     t : Single;
     k : Integer;
-    bSend : Boolean;
+    bSend, bIsReady : Boolean;
     nbrPlayers : Integer;
     sData : String;
 Begin
@@ -2944,16 +2977,15 @@ Begin
      End;
      
      If DEDICATED_SERVER Then Begin
-        // TODO : Tim
-        // Si tous les joueurs sont prêts Alors
-        //   nMenu := MENU_FIGHT
-        // Sinon
-        //   nMenu := 0;
-        nMenu := 0;
+        bIsReady := (nClientCount > 1);
+        For k := 0 To nClientCount - 1 Do Begin
+            If ( bClientBtnReady[k] = False ) Then bIsReady := False;
+        End;
+        If ( bIsReady ) Then nMenu := MENU_FIGHT Else nMenu := 0;
      End;
      
      If GetKey( KEY_ENTER ) Or DEDICATED_SERVER Then Begin
-        If Not bEnter Then Begin
+        If Not bEnter OR DEDICATED_SERVER Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
                 MENU_PLAYER1 :
@@ -2974,43 +3006,48 @@ Begin
                      InitMenuPlayer(8);
                 MENU_FIGHT :
                 Begin
-                    nbrPlayers := 0;
-                    For k := 1 To 8 Do Begin
-                        If ( nPlayerType[k] <> PLAYER_NIL ) Then nbrPlayers += 1;
-                    End;
-                    If (nbrPlayers >= 2 ) Then Begin
-                        If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
-                            // Si un client est en train de choisir un personnage,
-                            // le serveur n'a pas le droit de lancer la partie.
-                            bSend := True;
-                            For k := 1 To 8 Do Begin
-                                If ( nPlayerClient[k] <> -1 ) And ( nPlayerType[k] = PLAYER_NIL ) Then
-                                   bSend := False;
-                            End;
-                            If ( bSend = True ) Then Begin
-                               For k := 0 To 255 Do Begin
-                                   bClientReady[k] := False;
-                               End;
-                               If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
-                                  If ( nScheme = - 1 ) Then
-                                     nSchemeMulti := Random(nSchemeCount)
-                                  Else
-                                      nSchemeMulti := -1;
-                                  sData := IntToStr(nScheme) + #31;
-                                  sData := sData + IntToStr(nSchemeMulti) + #31;
-                                  sData := sData + IntToStr(nMap) + #31;
-                                  sData := sData + IntToStr(nRoundCount) + #31;
-                                  Send( nLocalIndex, HEADER_SETUP, sData );
-                               End;
-                               nGame := GAME_INIT;
-                               sData := '';
-                               Send( nLocalIndex, HEADER_FIGHT, sData );
-                               If bOnline Then
-                                  SendOnline( nLocalIndex, HEADER_BEGIN_MATCH, '' );
-                            End;
-                        End Else If (bMulti = False) Then Begin
-                            nGame := GAME_INIT;
+                    If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+                        nbrPlayers := 0;
+                        For k := 1 To 8 Do Begin
+                            If ( nPlayerType[k] <> PLAYER_NIL ) Then nbrPlayers += 1;
                         End;
+                        If (nbrPlayers >= 2 ) Then Begin
+                            If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
+                                // Si un client est en train de choisir un personnage,
+                                // le serveur n'a pas le droit de lancer la partie.
+                                bSend := True;
+                                For k := 1 To 8 Do Begin
+                                    If ( nPlayerClient[k] <> -1 ) And ( nPlayerType[k] = PLAYER_NIL ) Then
+                                       bSend := False;
+                                End;
+                                If ( bSend = True ) Then Begin
+                                   For k := 0 To 255 Do Begin
+                                       bClientReady[k] := False;
+                                   End;
+                                   If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin
+                                      If ( nScheme = - 1 ) Then
+                                         nSchemeMulti := Random(nSchemeCount)
+                                      Else
+                                          nSchemeMulti := -1;
+                                      sData := IntToStr(nScheme) + #31;
+                                      sData := sData + IntToStr(nSchemeMulti) + #31;
+                                      sData := sData + IntToStr(nMap) + #31;
+                                      sData := sData + IntToStr(nRoundCount) + #31;
+                                      Send( nLocalIndex, HEADER_SETUP, sData );
+                                   End;
+                                   nGame := GAME_INIT;
+                                   sData := '';
+                                   Send( nLocalIndex, HEADER_FIGHT, sData );
+                                   If bOnline Then
+                                      SendOnline( nLocalIndex, HEADER_BEGIN_MATCH, '' );
+                                End;
+                            End Else If (bMulti = False) Then Begin
+                                nGame := GAME_INIT;
+                            End;
+                        End;
+                    End
+                    Else Begin
+                         Send( nLocalIndex, HEADER_BTN_READY, '' );
                     End;
                 End;
            End;

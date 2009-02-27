@@ -69,8 +69,8 @@ Begin
      Case nState Of
           PHASE_EXIT      : AskExit();
           STATE_EXIT      : Exit();
-          PHASE_INTRO     : InitIntro();
-          STATE_INTRO     : ProcessIntro();
+        //  PHASE_INTRO     : InitIntro();
+        //  STATE_INTRO     : ProcessIntro();
           PHASE_MENU      : InitMenu();
           STATE_MENU      : ProcessMenu();
           PHASE_PRACTICE  : InitPractice();
@@ -133,10 +133,10 @@ Begin
      AddTexture( './textures/charset1.jpg', SPRITE_CHARSET_DIGITAL );
 
      // chargement des images de l'intro
-     If bIntro Then Begin
+    { If bIntro Then Begin
         For k := 0 To 21 Do
             AddTexture( Format('./textures/layer%d.jpg', [k]), SPRITE_INTRO_LAYER(k) );
-     End;
+     End; }
 
      // chargement des sons du menu
      AddSound( './sounds/move.wav', SOUND_MENU_MOVE, False );
@@ -171,11 +171,11 @@ Begin
      InitShaderProgram();
 
      // initialisation de la machine d'état
-     If bIntro Then Begin
-        nState := PHASE_INTRO;
-     End Else Begin
+    // If bIntro Then Begin
+    //    nState := PHASE_INTRO;
+    // End Else Begin
         nState := PHASE_MENU;
-     End;
+    // End;
 
      // définition de la touche pour le passage en plein écran
      BindKeyStd( nKeyScreen, True, True, @SwitchDisplay );

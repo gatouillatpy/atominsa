@@ -25,6 +25,7 @@ Var sClientName : Array [0..255] Of String;
 Var sClientUserName : Array [0..255] Of String;
 Var sClientUserPassword : Array [0..255] Of String;
 Var bClientReady : Array [0..255] Of Boolean;
+Var bClientBtnReady : Array [0..255] Of Boolean;
 Var fPingTime, fPing, fCheckTime : Single;
 
 
@@ -249,7 +250,8 @@ Begin
                             nPlayerClient[k] := -2;      // Pour empêcher le choix de personnage avant d'avoir reçu la liste.
                         End;
                         InitMenu();
-                        sData := sLocalName + #31;
+                        sData := IntToStr( nNetworkVersion ) + #31;
+                        sData := sData + sLocalName + #31;
                         sData := sData + sUserName + #31;
                         sData := sData + sUserPassword + #31;
                         Send( nLocalIndex, HEADER_CONNECT, sData );
@@ -268,6 +270,10 @@ Begin
                             nPlayerType[k] := PLAYER_NIL;
                             nPlayerClient[k] := -1;
                         End;
+                        For k := 0 To 255 Do Begin
+                            bClientBtnReady[k] := False;
+                        End;
+                        bClientBtnReady[0] := True;
                         InitMenu();
                      End;
                 End;
@@ -489,40 +495,47 @@ Begin
           Case nHeader Of
                HEADER_CONNECT :
                Begin
-                    // ajout du client à la liste
-                    If ClientIndex(nIndex) = -1 Then Begin
-                       nClientIndex[nClientCount] := nIndex;
-                       sClientName[nClientCount] := GetString( sData, 1 );
-                       sClientUserName[nClientCount] := GetString( sData, 2 );
-                       sClientUserPassword[nClientCount] := GetString( sData, 3 );
-                       AddLineToConsole( sClientName[nClientCount] + ' entered the game.' );
-                       nClientCount += 1;
+                    TryStrToInt( GetString( sData, 1 ), nNbr );
+                    If ( nNbr = nNetworkVersion ) Then Begin
+                        // ajout du client à la liste
+                        If ClientIndex(nIndex) = -1 Then Begin
+                           nClientIndex[nClientCount] := nIndex;
+                           sClientName[nClientCount] := GetString( sData, 2 );
+                           sClientUserName[nClientCount] := GetString( sData, 3 );
+                           sClientUserPassword[nClientCount] := GetString( sData, 4 );
+                           AddLineToConsole( sClientName[nClientCount] + ' entered the game.' );
+                           nClientCount += 1;
+                        End;
+                        // renvoi de la liste des clients
+                        nIndex := nLocalIndex;
+                        nHeader := HEADER_LIST_CLIENT;
+                        sData := IntToStr(nClientCount);
+                        For k := 0 To nClientCount - 1 Do
+                            sData := sData + #31 + IntToStr(nClientIndex[k]) + #31 + sClientName[k];
+                        Send( nIndex, nHeader, sData );
+                        // renvoi de la liste des joueurs
+                        nIndex := nLocalIndex;
+                        nHeader := HEADER_LIST_PLAYER;
+                        sData := '';
+                        For k := 1 To 8 Do Begin
+                            sData := sData + IntToStr(nPlayerClient[k]) + #31;
+                            sData := sData + sPlayerName[k] + #31;
+                            sData := sData + pPlayerCharacter[k].Name + #31;
+                            sData := sData + IntToStr(nPlayerType[k]) + #31;
+                        End;
+                        Send( nIndex, nHeader, sData );
+                        // renvoi du scheme, de la map et du nombre de rounds.
+                        sData := IntToStr(nScheme) + #31;
+                        sData := sData + IntToStr(nSchemeMulti) + #31;
+                        sData := sData + IntToStr(nMap) + #31;
+                        sData := sData + IntToStr(nRoundCount) + #31;
+                        Send( nIndex, HEADER_SETUP, sData );
+                        UpdateMenu();
+                    End
+                    Else Begin
+                         sData := 'Versions not compatible!' + #31;
+                         Send( nLocalIndex, HEADER_SHOW, sData );
                     End;
-                    // renvoi de la liste des clients
-                    nIndex := nLocalIndex;
-                    nHeader := HEADER_LIST_CLIENT;
-                    sData := IntToStr(nClientCount);
-                    For k := 0 To nClientCount - 1 Do
-                        sData := sData + #31 + IntToStr(nClientIndex[k]) + #31 + sClientName[k];
-                    Send( nIndex, nHeader, sData );
-                    // renvoi de la liste des joueurs
-                    nIndex := nLocalIndex;
-                    nHeader := HEADER_LIST_PLAYER;
-                    sData := '';
-                    For k := 1 To 8 Do Begin
-                        sData := sData + IntToStr(nPlayerClient[k]) + #31;
-                        sData := sData + sPlayerName[k] + #31;
-                        sData := sData + pPlayerCharacter[k].Name + #31;
-                        sData := sData + IntToStr(nPlayerType[k]) + #31;
-                    End;
-                    Send( nIndex, nHeader, sData );
-                    // renvoi du scheme, de la map et du nombre de rounds.
-                    sData := IntToStr(nScheme) + #31;
-                    sData := sData + IntToStr(nSchemeMulti) + #31;
-                    sData := sData + IntToStr(nMap) + #31;
-                    sData := sData + IntToStr(nRoundCount) + #31;
-                    Send( nIndex, HEADER_SETUP, sData );
-                    UpdateMenu();
                End;
                HEADER_DISCONNECT :
                Begin
@@ -587,6 +600,11 @@ Begin
                     nPlayerType[k] := PLAYER_NIL;
                     Send( nIndex, nHeader, sData );
                     SetString( STRING_GAME_MENU(10 + k), PlayerInfo(k), 0.0, 0.02, 600 );
+               End;
+               HEADER_BTN_READY :
+               Begin
+                    bClientBtnReady[ClientIndex(nIndex)] := True;
+                    AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
                End;
                HEADER_PINGREQ :
                Begin
@@ -893,6 +911,11 @@ Var k, l, m, i : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
           Case nHeader Of
+               HEADER_SHOW :
+               Begin
+                    AddLineToConsole( sData );
+                    nState := PHASE_MENU;
+               End;
                HEADER_MESSAGE :
                Begin
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' says : ' + sData );
@@ -955,7 +978,7 @@ Begin
                HEADER_FIGHT :
                Begin
                     For k := 0 To 255 Do Begin
-                        bClientReady[ClientIndex(nIndex)] := False;
+                        bClientReady[k] := False;
                     End;
                     nGame := GAME_INIT;
                End;

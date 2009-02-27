@@ -235,6 +235,10 @@ Begin
                         nPlayerType[k] := PLAYER_NIL;
                         nPlayerClient[k] := -1;
                     End;
+                    For k := 0 To 255 Do Begin
+                        bClientBtnReady[k] := False;
+                    End;
+                    bClientBtnReady[0] := True;
                     InitMenu();
                 End;
            End
@@ -255,7 +259,8 @@ Begin
                       nPlayerClient[k] := -2;
                   End;
                   InitMenu();
-                  sData := sLocalName + #31;
+                  sData := IntToStr( nNetworkVersion ) + #31;
+                  sData := sData + sLocalName + #31;
                   sData := sData + sUserName + #31;
                   sData := sData + sUserPassword + #31;
                   Send( nLocalIndex, HEADER_CONNECT, sData );

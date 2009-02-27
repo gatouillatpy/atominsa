@@ -4,7 +4,7 @@ Unit UIntro;
 
 Interface
 
-
+{
 
 Uses Classes, SysUtils,
      UCore, UUtils, USetup, UForm;
@@ -14,11 +14,12 @@ Uses Classes, SysUtils,
 Procedure InitIntro () ;
 Procedure ProcessIntro () ;
 
+}
 
 
 Implementation
 
-
+{
 
 Var nIntroLayer : Integer;
     fIntroTime : Single;
@@ -86,7 +87,7 @@ Begin
      End;
 
 End;
-
+}
 
 
 End.

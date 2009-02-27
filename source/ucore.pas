@@ -17,6 +17,7 @@ Const HEADER_CONNECT           = 1001;
 Const HEADER_DISCONNECT        = 1002;
 
 Const HEADER_MESSAGE           = 1101;
+Const HEADER_SHOW              = 1102;
 
 Const HEADER_LIST_CLIENT       = 1201;
 Const HEADER_LIST_PLAYER       = 1202;
@@ -33,6 +34,7 @@ Const HEADER_PINGARY           = 1309;
 Const HEADER_WAIT              = 1310;
 Const HEADER_QUIT_GAME         = 1311;
 Const HEADER_QUIT_MENU         = 1312;
+Const HEADER_BTN_READY         = 1313;
 
 Const HEADER_MOVEUP            = 1401;
 Const HEADER_MOVEDOWN          = 1402;
@@ -595,9 +597,16 @@ End;
 
 
 Procedure TLEvents.OnConnect ( tSocket : TLSocket ) ;
+Var sData : String;
 Begin
      If (nGame <> GAME_MENU) And (nGame <> GAME_MENU_PLAYER) And (nGame <> GAME_MENU_MULTI) Then Begin
+        sData := 'This server is busy. Try again later.';
+        nSocket += 1;
+        aSocket[nSocket] := tSocket;
+        Send( nLocalIndex, HEADER_SHOW, sData );
         tSocket.Disconnect;
+        nSocket -= 1;
+        
      End Else Begin
          nSocket += 1;
          aSocket[nSocket] := tSocket;

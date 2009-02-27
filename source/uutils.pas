@@ -46,7 +46,7 @@ Const PI = 3.141592654;
 
 
 
-Const VERSION = 'v.1.0.b';
+Const VERSION = 'v.0.8.a';
 
 
 

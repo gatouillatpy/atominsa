@@ -26,12 +26,13 @@ Var sMasterAddress : String;
 Var nMasterPort : Word;
 
 Var nVersion : Integer;
+Var nNetworkVersion : Integer;
 
 Var bDebug : Boolean;
 
 Var bColor : Boolean; // a sauvegarder et afficher
 
-Var bIntro : Boolean;
+// Var bIntro : Boolean;
 
 Var bPlayer1 : Boolean;
 Var bPlayer2 : Boolean;
@@ -230,7 +231,7 @@ Procedure InitMenu () ;
 Begin
      SetString( STRING_SETUP_MENU(1), 'setup', 0.2, 1.0, 600 );
 
-     SetString( STRING_SETUP_MENU(11), 'show intro : ' + BoolToStr(bIntro), 0.2, 1.0, 600 );
+    // SetString( STRING_SETUP_MENU(11), 'show intro : ' + BoolToStr(bIntro), 0.2, 1.0, 600 );
      
      SetString( STRING_SETUP_MENU(21), 'desired framerate : ' + IntToStr(nFramerate), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(22), 'lighting : ' + BoolToStr(bLighting), 0.2, 1.0, 600 );
@@ -268,7 +269,7 @@ Begin
 
      fScroll := 0.0;
      
-     nMenu := MENU_INTRO;
+     nMenu := MENU_FRAMERATE;
      
      bUp := False;
      bDown := False;
@@ -383,9 +384,9 @@ Begin
 
      t := 0.0;
      
-     If fScroll <= t Then DrawString( STRING_SETUP_MENU(11), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_INTRO), IsActive(MENU_INTRO), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+    // If fScroll <= t Then DrawString( STRING_SETUP_MENU(11), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_INTRO), IsActive(MENU_INTRO), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
 
-     t += 0.2;
+    // t += 0.2;
      
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(21), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_FRAMERATE), IsActive(MENU_FRAMERATE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(22), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_LIGHTING), IsActive(MENU_LIGHTING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
@@ -438,7 +439,7 @@ Begin
      If GetKeyS( KEY_UP ) Then Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           If nMenu = MENU_FRAMERATE Then nMenu := MENU_INTRO Else
+         //  If nMenu = MENU_FRAMERATE Then nMenu := MENU_INTRO Else
            If nMenu = MENU_LIGHTING Then nMenu := MENU_FRAMERATE Else
            If nMenu = MENU_SHADOWING Then nMenu := MENU_LIGHTING Else
            If nMenu = MENU_REFLECTION Then nMenu := MENU_SHADOWING Else
@@ -467,11 +468,12 @@ Begin
            If nMenu = MENU_CHANGESCREEN Then nMenu := MENU_DRAWGAME Else
            If nMenu = MENU_SPEAK Then nMenu := MENU_CHANGESCREEN Else
            If nMenu = MENU_SHOWPING Then nMenu := MENU_SPEAK Else
-           If nMenu = MENU_INTRO Then nMenu := MENU_SHOWPING;
+         //  If nMenu = MENU_INTRO Then nMenu := MENU_SHOWPING;
+           If nMenu = MENU_FRAMERATE Then nMenu := MENU_SHOWPING;
 
            t := 0.0;
-           If (nMenu = MENU_INTRO) And (fScroll > t) Then fScroll := t; t += 0.2;
-           t += 0.2;
+         //  If (nMenu = MENU_INTRO) And (fScroll > t) Then fScroll := t; t += 0.2;
+         //  t += 0.2;
            If (nMenu = MENU_FRAMERATE) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_LIGHTING) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_SHADOWING) And (fScroll > t) Then fScroll := t; t += 0.2;
@@ -507,7 +509,8 @@ Begin
      If GetKeyS( KEY_DOWN ) Then Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           If nMenu = MENU_SHOWPING Then nMenu := MENU_INTRO Else
+         //  If nMenu = MENU_SHOWPING Then nMenu := MENU_INTRO Else
+           If nMenu = MENU_SHOWPING Then nMenu := MENU_FRAMERATE Else
            If nMenu = MENU_SPEAK Then nMenu := MENU_SHOWPING Else
            If nMenu = MENU_CHANGESCREEN Then nMenu := MENU_SPEAK Else
            If nMenu = MENU_DRAWGAME Then nMenu := MENU_CHANGESCREEN Else
@@ -535,13 +538,13 @@ Begin
            If nMenu = MENU_REFLECTION Then nMenu := MENU_EFFECTS Else
            If nMenu = MENU_SHADOWING Then nMenu := MENU_REFLECTION Else
            If nMenu = MENU_LIGHTING Then nMenu := MENU_SHADOWING Else
-           If nMenu = MENU_FRAMERATE Then nMenu := MENU_LIGHTING Else
-           If nMenu = MENU_INTRO Then nMenu := MENU_FRAMERATE;
+           If nMenu = MENU_FRAMERATE Then nMenu := MENU_LIGHTING; // Else
+        //   If nMenu = MENU_INTRO Then nMenu := MENU_FRAMERATE;
 
            t := 0.0;
-           If nMenu = MENU_INTRO Then fScroll := 0.0;
-           t += 0.2;
-           If (nMenu = MENU_TEXTURING) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If nMenu = MENU_FRAMERATE Then fScroll := 0.0;
+        //  t += 0.2;
+        //   If (nMenu = MENU_TEXTURING) And (fScroll < t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_SHADERMODEL) And (fScroll < t) Then fScroll := t; t += 0.2;
            t += 0.2;
            If (nMenu = MENU_FULLSCREEN) And (fScroll < t) Then fScroll := t; t += 0.2;
@@ -578,11 +581,11 @@ Begin
         If Not bLeft Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
-                MENU_INTRO :
+           {     MENU_INTRO :
                 Begin
                      bIntro := Not bIntro;
                      SetString( STRING_SETUP_MENU(11), 'show intro : ' + BoolToStr(bIntro), 0.0, 0.02, 600 );
-                End;
+                End; }
                 MENU_FRAMERATE :
                 Begin
                      nFramerate -= 5;
@@ -680,11 +683,11 @@ Begin
         If Not bRight Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
-                MENU_INTRO :
+              {  MENU_INTRO :
                 Begin
                      bIntro := Not bIntro;
                      SetString( STRING_SETUP_MENU(11), 'show intro : ' + BoolToStr(bIntro), 0.0, 0.02, 600 );
-                End;
+                End; }
                 MENU_FRAMERATE :
                 Begin
                      nFramerate += 5;
@@ -942,7 +945,7 @@ Begin
           If (sCommand[i] = '-') And (sCommand[i+1] = 'C') Then nStep := STEP_CHARACTER;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'K') Then nStep := STEP_KEY;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'M') Then nStep := STEP_MAP;
-          If (sCommand[i] = '-') And (sCommand[i+1] = 'I') Then nStep := STEP_INTRO;
+       //   If (sCommand[i] = '-') And (sCommand[i+1] = 'I') Then nStep := STEP_INTRO;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'D') Then nStep := STEP_DISPLAY;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'Q') Then nStep := STEP_QUALITY;
           If (sCommand[i] = '-') And (sCommand[i+1] = 'W') Then nStep := STEP_WINDOW;
@@ -1026,9 +1029,10 @@ Begin
      nMasterPort := 7070;
      sUserName := 'myname';
      sUserPassword := 'mypassword';
+     nNetworkVersion := 1;
 
-     bIntro := True;
-     
+   //  bIntro := False;
+   
      bColor := True;
 
      bDebug := False;
@@ -1229,12 +1233,12 @@ Begin
                        nCharacterCount += 1;
                     End;
                End;
-               STEP_INTRO :
+              { STEP_INTRO :
                Begin
                     If LowerCase(GetString(sLine, 1)) = 'true' Then bIntro := True;
                     If LowerCase(GetString(sLine, 1)) = 'false' Then bIntro := False;
                     If bIntro Then AddLineToConsole( 'Intro : Enabled' ) Else AddLineToConsole( 'Intro : Disabled' );
-               End;
+               End; }
                STEP_DISPLAY :
                Begin
                     If LowerCase(GetString(sLine, 1)) = 'true' Then bDisplayFullscreen := True;
@@ -1283,7 +1287,7 @@ Begin
                Begin
                     If LowerCase(GetString(sLine, 1)) = 'true' Then bDebug := True;
                     If LowerCase(GetString(sLine, 1)) = 'false' Then bDebug := False;
-                    If bIntro Then AddLineToConsole( 'Debug : Enabled' ) Else AddLineToConsole( 'Debug : Disabled' );
+                    If bDebug Then AddLineToConsole( 'Debug : Enabled' ) Else AddLineToConsole( 'Debug : Disabled' );
                End;
                STEP_ACCOUNT :
                Begin
@@ -1395,9 +1399,9 @@ Begin
      WriteLn( ioLine , '-K,3,chat,' + IntToStr(nKeyChat) );
      WriteLn( ioLine , '-K,3,ping,' + IntToStr(nKeyPing) );
      
-     WriteLn( ioLine );
-     WriteLn( ioLine , '; is the intro enabled ?' );
-     If bIntro Then WriteLn( ioLine , '-I,true' ) Else WriteLn( ioLine , '-I,false' );
+       //  WriteLn( ioLine );
+   //  WriteLn( ioLine , '; is the intro enabled ?' );
+   //  If bIntro Then WriteLn( ioLine , '-I,true' ) Else WriteLn( ioLine , '-I,false' );
 
      WriteLn( ioLine );
      WriteLn( ioLine , '; display settings (fullscreen, width, height, bpp, refreshrate)' );
