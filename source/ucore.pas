@@ -35,6 +35,7 @@ Const HEADER_WAIT              = 1310;
 Const HEADER_QUIT_GAME         = 1311;
 Const HEADER_QUIT_MENU         = 1312;
 Const HEADER_BTN_READY         = 1313;
+Const HEADER_BTN_NOTREADY      = 1314;
 
 Const HEADER_MOVEUP            = 1401;
 Const HEADER_MOVEDOWN          = 1402;

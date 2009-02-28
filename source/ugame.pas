@@ -147,6 +147,8 @@ Procedure InitGame () ;
 Procedure SynchroGame () ;
 Procedure ProcessGame () ;
 
+Procedure UpdatePlayerInfo () ;
+
 Procedure InitMenu () ;
 Procedure UpdateMenu () ;
 Procedure ProcessMenu () ;
@@ -1368,7 +1370,8 @@ Begin
         For k := 0 To 255 Do Begin
             bClientBtnReady[k] := False;
         End;
-        bClientBtnReady[0] := True;
+        // bClientBtnReady[0] := True;
+        bLocalReady := False;
         If bOnline Then
            SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
      End;
@@ -1378,7 +1381,8 @@ Begin
         For k := 0 To 255 Do Begin
             bClientBtnReady[k] := False;
         End;
-        bClientBtnReady[0] := True;
+        // bClientBtnReady[0] := True;
+        bLocalReady := False;
         If bOnline Then
            SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
      End;
@@ -2075,7 +2079,8 @@ Begin
             For k := 0 To 255 Do Begin
                 bClientBtnReady[k] := False;
             End;
-            bClientBtnReady[0] := True;
+            // bClientBtnReady[0] := True;
+            bLocalReady := False;
             InitMenu();
             ClearInput();
         End Else Begin
@@ -2154,7 +2159,18 @@ Begin
 
 
 Function PlayerInfo( nConst : Integer ) : String ;
+Var sReady : String;
+    k : Integer;
 Begin
+     If (bMulti = True) Then Begin
+         sReady := ' (NOT READY)';
+         For k := 0 To nClientCount - 1 Do Begin
+             If (nClientIndex[k] = nPlayerClient[nConst]) And bClientBtnReady[k] Then sReady := ' (READY)';
+         End;
+     End Else Begin
+         sReady := '';
+     End;
+     
      If (bMulti = True) And (nPlayerClient[nConst] <> nLocalIndex) Then Begin
        Case nPlayerType[nConst] Of
             PLAYER_NIL :
@@ -2163,15 +2179,15 @@ Begin
             End;
             PLAYER_KB1 :
             Begin
-                 PlayerInfo := 'network              : ' + sPlayerName[nConst];
+                 PlayerInfo := 'network              : ' + sPlayerName[nConst] + sReady;
             End;
             PLAYER_KB2 :
             Begin
-                 PlayerInfo := 'network              : ' + sPlayerName[nConst];
+                 PlayerInfo := 'network              : ' + sPlayerName[nConst] + sReady;
             End;
             PLAYER_COM :
             Begin
-                 PlayerInfo := 'network              : ' + sPlayerName[nConst];
+                 PlayerInfo := 'network              : ' + sPlayerName[nConst] + sReady;
             End;
        End;
      End Else Begin
@@ -2182,18 +2198,18 @@ Begin
             End;
             PLAYER_KB1 :
             Begin
-                 PlayerInfo := 'keyboard 1           : ' + sPlayerName[nConst];
+                 PlayerInfo := 'keyboard 1           : ' + sPlayerName[nConst] + sReady;
             End;
             PLAYER_KB2 :
             Begin
-                 PlayerInfo := 'keyboard 2           : ' + sPlayerName[nConst];
+                 PlayerInfo := 'keyboard 2           : ' + sPlayerName[nConst] + sReady;
             End;
             PLAYER_COM :
             Begin
-                 If nPlayerSkill[nConst] = 1 Then PlayerInfo := 'computer (novice)    : ' + sPlayerName[nConst];
-                 If nPlayerSkill[nConst] = 2 Then PlayerInfo := 'computer (average)   : ' + sPlayerName[nConst];
-                 If nPlayerSkill[nConst] = 3 Then PlayerInfo := 'computer (masterful) : ' + sPlayerName[nConst];
-                 If nPlayerSkill[nConst] = 4 Then PlayerInfo := 'computer (godlike)   : ' + sPlayerName[nConst];
+                 If nPlayerSkill[nConst] = 1 Then PlayerInfo := 'computer (novice)    : ' + sPlayerName[nConst] + sReady;
+                 If nPlayerSkill[nConst] = 2 Then PlayerInfo := 'computer (average)   : ' + sPlayerName[nConst] + sReady;
+                 If nPlayerSkill[nConst] = 3 Then PlayerInfo := 'computer (masterful) : ' + sPlayerName[nConst] + sReady;
+                 If nPlayerSkill[nConst] = 4 Then PlayerInfo := 'computer (godlike)   : ' + sPlayerName[nConst] + sReady;
             End;
        End;
      End;
@@ -2636,6 +2652,21 @@ End;
 
 
 
+Procedure UpdatePlayerInfo () ;
+Begin
+     // mise à jour de la liste de joueurs
+     SetString( STRING_GAME_MENU(11), PlayerInfo(1), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(12), PlayerInfo(2), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(13), PlayerInfo(3), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(14), PlayerInfo(4), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(15), PlayerInfo(5), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(16), PlayerInfo(6), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(17), PlayerInfo(7), 0.0, 0.02, 600 );
+     SetString( STRING_GAME_MENU(18), PlayerInfo(8), 0.0, 0.02, 600 );
+End;
+
+
+
 Procedure UpdateMenu () ;
 Begin
      // ajout du titre
@@ -2675,7 +2706,7 @@ Begin
      SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.0, 0.02, 600 );
 
      // ajout du bouton fight
-     If ( bMulti = True ) And ( nLocalIndex <> nClientIndex[ 0 ] ) Then
+     If ( bMulti = True ) Then
         SetString( STRING_GAME_MENU(51), 'ready!', 0.2, 0.5, 600 )
      Else
          SetString( STRING_GAME_MENU(51), 'fight!', 0.2, 0.5, 600 );
@@ -2745,7 +2776,7 @@ Begin
      SetString( STRING_GAME_MENU(41), 'round count : ' + IntToStr(nRoundCount), 0.2, 1.0, 600 );
 
      // ajout du bouton fight
-     If ( bMulti = True ) And ( nLocalIndex <> nClientIndex[ 0 ] ) Then
+     If ( bMulti = True ) Then
         SetString( STRING_GAME_MENU(51), 'ready!', 0.2, 0.5, 600 )
      Else
          SetString( STRING_GAME_MENU(51), 'fight!', 0.2, 0.5, 600 );
@@ -2755,6 +2786,9 @@ Begin
 
      // initialisation du menu
      nMenu := MENU_PLAYER1;
+     
+     // définit que le client local n'est pas prêt à démarrer la partie
+     bLocalReady := False;
 
      // remise à zéro des touches
      bUp := False;
@@ -2774,7 +2808,7 @@ Procedure ProcessMenu () ;
           End;
 Var w, h : Single;
     t : Single;
-    k : Integer;
+    k, i : Integer;
     bSend, bIsReady : Boolean;
     nbrPlayers : Integer;
     sData : String;
@@ -2824,6 +2858,12 @@ Begin
 
      If GetKey( KEY_ESC ) Then Begin
         PlaySound( SOUND_MENU_BACK );
+        If (bMulti = True) And (bLocalReady = True) Then Begin
+           Send( nLocalIndex, HEADER_BTN_NOTREADY, '' );
+           bLocalReady := False;
+           bClientBtnReady[ClientIndex(nLocalIndex)] := False;
+           UpdatePlayerInfo();
+        End;
         If (bMulti = True) Then Begin
            bGoToPhaseMenu := True;
            fKey := GetTime();
@@ -2847,6 +2887,12 @@ Begin
            If nMenu = MENU_ROUNDCOUNT Then nMenu := MENU_MAP Else
            If nMenu = MENU_FIGHT Then nMenu := MENU_ROUNDCOUNT Else
            If nMenu = MENU_PLAYER1 Then nMenu := MENU_FIGHT;
+           If (bMulti = True) And (bLocalReady = True) Then Begin
+              Send( nLocalIndex, HEADER_BTN_NOTREADY, '' );
+              bLocalReady := False;
+              bClientBtnReady[ClientIndex(nLocalIndex)] := False;
+              UpdatePlayerInfo();
+           End;
         End;
         bUp := True;
      End Else Begin
@@ -2868,6 +2914,12 @@ Begin
            If nMenu = MENU_PLAYER3 Then nMenu := MENU_PLAYER4 Else
            If nMenu = MENU_PLAYER2 Then nMenu := MENU_PLAYER3 Else
            If nMenu = MENU_PLAYER1 Then nMenu := MENU_PLAYER2;
+           If (bMulti = True) And (bLocalReady = True) Then Begin
+              Send( nLocalIndex, HEADER_BTN_NOTREADY, '' );
+              bLocalReady := False;
+              bClientBtnReady[ClientIndex(nLocalIndex)] := False;
+              UpdatePlayerInfo();
+           End;
         End;
         bDown := True;
      End Else Begin
@@ -2919,6 +2971,12 @@ Begin
                 sData := sData + IntToStr(nRoundCount) + #31;
                 Send( nLocalIndex, HEADER_SETUP, sData );
              End;
+             If (bMulti = True) And (bLocalReady = True) Then Begin
+                Send( nLocalIndex, HEADER_BTN_NOTREADY, '' );
+                bClientBtnReady[ClientIndex(nLocalIndex)] := False;
+                bLocalReady := False;
+                UpdatePlayerInfo();
+             End;
           End;
           bLeft := True;
        End Else Begin
@@ -2969,6 +3027,12 @@ Begin
                 sData := sData + IntToStr(nRoundCount) + #31;
                 Send( nLocalIndex, HEADER_SETUP, sData );
              End;
+             If (bMulti = True) And (bLocalReady = True) Then Begin
+                Send( nLocalIndex, HEADER_BTN_NOTREADY, '' );
+                bLocalReady := False;
+                bClientBtnReady[ClientIndex(nLocalIndex)] := False;
+                UpdatePlayerInfo();
+             End;
           End;
           bRight := True;
        End Else Begin
@@ -2976,16 +3040,28 @@ Begin
        End;
      End;
      
-     If DEDICATED_SERVER Then Begin
-        bIsReady := (nClientCount > 1);
-        For k := 0 To nClientCount - 1 Do Begin
-            If ( bClientBtnReady[k] = False ) Then bIsReady := False;
-        End;
-        If ( bIsReady ) Then nMenu := MENU_FIGHT Else nMenu := 0;
+     // vérifie que tous les joueurs sont prêts
+     If bMulti = True Then Begin
+         bIsReady := False;
+         For i := 1 To 8 Do Begin
+             If ( nPlayerType[i] <> PLAYER_NIL ) Then bIsReady := True;
+         End;
+         If bLocalReady = False Then bIsReady := False;
+         For i := 1 To 8 Do Begin
+             If ( nPlayerType[i] <> PLAYER_NIL ) Then Begin
+                 For k := 0 To nClientCount - 1 Do Begin
+                     If (bClientBtnReady[k] = False) And (nPlayerClient[i] = nClientIndex[k]) Then bIsReady := False;
+                 End;
+             End;
+         End;
+     End Else Begin
+         bIsReady := False;
      End;
      
-     If GetKey( KEY_ENTER ) Or DEDICATED_SERVER Then Begin
-        If Not bEnter OR DEDICATED_SERVER Then Begin
+     If DEDICATED_SERVER Then nMenu := MENU_FIGHT;
+
+     If GetKey( KEY_ENTER ) Or bIsReady Then Begin
+        If (Not bEnter) Or bIsReady Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
                 MENU_PLAYER1 :
@@ -3006,15 +3082,17 @@ Begin
                      InitMenuPlayer(8);
                 MENU_FIGHT :
                 Begin
-                    If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
+                    If (bMulti = False) Or (bIsReady = True) Then Begin
                         nbrPlayers := 0;
                         For k := 1 To 8 Do Begin
                             If ( nPlayerType[k] <> PLAYER_NIL ) Then nbrPlayers += 1;
                         End;
-                        If (nbrPlayers >= 2 ) Then Begin
-                            If (bMulti = True) And (nLocalIndex = nClientIndex[0]) Then Begin
+                        If ( nbrPlayers >= 2 ) Then Begin
+                            If (bIsReady = True) And (nLocalIndex = nClientIndex[0]) Then Begin
                                 // Si un client est en train de choisir un personnage,
                                 // le serveur n'a pas le droit de lancer la partie.
+                                // >> Sécurité inutile désormais dans la mesure où tout le monde doit être prêt
+                                //    pour que le serveur lance la partie... à virer donc ?
                                 bSend := True;
                                 For k := 1 To 8 Do Begin
                                     If ( nPlayerClient[k] <> -1 ) And ( nPlayerType[k] = PLAYER_NIL ) Then
@@ -3045,9 +3123,11 @@ Begin
                                 nGame := GAME_INIT;
                             End;
                         End;
-                    End
-                    Else Begin
-                         Send( nLocalIndex, HEADER_BTN_READY, '' );
+                    End Else If (bMulti = True) Then Begin
+                        Send( nLocalIndex, HEADER_BTN_READY, '' );
+                        bLocalReady := True;
+                        bClientBtnReady[ClientIndex(nLocalIndex)] := True;
+                        UpdatePlayerInfo();
                     End;
                 End;
            End;

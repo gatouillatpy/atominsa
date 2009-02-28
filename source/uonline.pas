@@ -238,7 +238,8 @@ Begin
                     For k := 0 To 255 Do Begin
                         bClientBtnReady[k] := False;
                     End;
-                    bClientBtnReady[0] := True;
+                    // bClientBtnReady[0] := True;
+                    bLocalReady := False;
                     InitMenu();
                 End;
            End

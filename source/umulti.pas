@@ -19,6 +19,7 @@ Const MULTI_SERVER     = 1;
 Const MULTI_CLIENT     = 2;
 Const MULTI_ERROR      = 3;
 
+Var bLocalReady : Boolean;
 Var nClientCount : Integer;
 Var nClientIndex : Array [0..255] Of Integer;
 Var sClientName : Array [0..255] Of String;
@@ -273,7 +274,8 @@ Begin
                         For k := 0 To 255 Do Begin
                             bClientBtnReady[k] := False;
                         End;
-                        bClientBtnReady[0] := True;
+                        bLocalReady := False;
+                        // bClientBtnReady[0] := True;
                         InitMenu();
                      End;
                 End;
@@ -510,8 +512,15 @@ Begin
                         nIndex := nLocalIndex;
                         nHeader := HEADER_LIST_CLIENT;
                         sData := IntToStr(nClientCount);
-                        For k := 0 To nClientCount - 1 Do
-                            sData := sData + #31 + IntToStr(nClientIndex[k]) + #31 + sClientName[k];
+                        For k := 0 To nClientCount - 1 Do Begin
+                            sData += #31 + IntToStr(nClientIndex[k]);
+                            sData += #31 + sClientName[k];
+                            If ( bClientBtnReady[k] ) Then Begin
+                               sData += #31 + IntToStr(1);
+                            End Else Begin
+                               sData += #31 + IntToStr(0);
+                            End;
+                        End;
                         Send( nIndex, nHeader, sData );
                         // renvoi de la liste des joueurs
                         nIndex := nLocalIndex;
@@ -605,6 +614,15 @@ Begin
                Begin
                     bClientBtnReady[ClientIndex(nIndex)] := True;
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
+                    Send( nIndex, nHeader, sData );
+                    UpdatePlayerInfo();
+               End;
+               HEADER_BTN_NOTREADY :
+               Begin
+                    bClientBtnReady[ClientIndex(nIndex)] := False;
+                    AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is not ready.' );
+                    Send( nIndex, nHeader, sData );
+                    UpdatePlayerInfo();
                End;
                HEADER_PINGREQ :
                Begin
@@ -928,6 +946,12 @@ Begin
                     For k := 0 To nClientCount - 1 Do Begin
                         TryStrToInt( GetString( sData, l ), nClientIndex[k] ); l += 1;
                         sClientName[k] := GetString( sData, l ); l += 1;
+                        TryStrToInt( GetString( sData, l ), i ); l += 1;
+                        If i = 1 Then Begin
+                           bClientBtnReady[k] := True;
+                        End Else Begin
+                           bClientBtnReady[k] := False;
+                        End;
                     End;
                End;
                HEADER_LIST_PLAYER :
@@ -986,6 +1010,18 @@ Begin
                Begin
                     bClientReady[ClientIndex(nIndex)] := True;
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
+               End;
+               HEADER_BTN_READY :
+               Begin
+                    bClientBtnReady[ClientIndex(nIndex)] := True;
+                    AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
+                    UpdatePlayerInfo();
+               End;
+               HEADER_BTN_NOTREADY :
+               Begin
+                    bClientBtnReady[ClientIndex(nIndex)] := False;
+                    AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is not ready.' );
+                    UpdatePlayerInfo();
                End;
                HEADER_PINGRES :
                Begin
