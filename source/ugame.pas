@@ -3046,6 +3046,7 @@ Begin
          For i := 1 To 8 Do Begin
              If ( nPlayerType[i] <> PLAYER_NIL ) Then bIsReady := True;
          End;
+         If DEDICATED_SERVER Then bLocalReady := True;
          If bLocalReady = False Then bIsReady := False;
          For i := 1 To 8 Do Begin
              If ( nPlayerType[i] <> PLAYER_NIL ) Then Begin
