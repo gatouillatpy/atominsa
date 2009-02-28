@@ -13,6 +13,7 @@ Uses Classes, SysUtils, UUtils, UMap, UScheme, UCharacter, UForm, UMulti;
 Var nServerCount : Integer;
     nPlayableCount : Integer;
     sServerIP : Array [2..255] Of String;
+    sServerPort : Array [2..255] Of Integer;
     sServerName : Array[2..255] Of String;
     nNbrPlayers : Array[2..255] Of Integer;
 
@@ -216,7 +217,9 @@ Begin
            If (nMenu = 1) Or (nMenu = 2) Or DEDICATED_SERVER Then Begin
                 nIndex := nLocalIndex;
                 nHeader := HEADER_ONLINE_HOST;
-                sData := sLocalName + #31;
+                sData := sServerAddress + #31;
+                sData += IntToStr( nServerPort ) + #31;
+                sData += sLocalName + #31;
                 If bOnline Then
                    SendOnline( nIndex, nHeader, sData );
                 nState := STATE_MULTI;
@@ -253,7 +256,7 @@ Begin
                 bGoToPhaseMenu := False;
                 // initialisation du compteur de clients
                 nClientCount := 0;
-                If ClientInit( sServerIP[ nMenu ], nServerPort ) Then Begin
+                If ClientInit( sServerIP[nMenu], sServerPort[nMenu] ) Then Begin
                   nMulti := MULTI_CLIENT;
                   For k := 1 To 8 Do Begin
                       nPlayerType[k] := PLAYER_NIL;
@@ -348,7 +351,8 @@ Begin
                     For k := 3 To nPlayableCount + 2 Do Begin
                         sServerName[k] := GetString( sData, l ); l += 1;
                         sServerIP[k] := GetString( sData, l ); l += 1;
-                        TryStrToInt( GetString( sData, 1 ), nNbrPlayers[k] ); l += 1;
+                        TryStrToInt( GetString( sData, l ), sServerPort[k] ); l += 1;
+                        TryStrToInt( GetString( sData, l ), nNbrPlayers[k] ); l += 1;
                         SetString( STRING_SETUP_MENU(k), sServerName[k] + ' [' + IntToStr( nNbrPlayers[k] ) + ']', 0.2, 1.0, 600 );
                     End;
                     TryStrToInt( GetString( sData, l ), k ); l += 1;
@@ -356,7 +360,8 @@ Begin
                     For k := nPlayableCount + 3 To nServerCount + 2 Do Begin
                         sServerName[k] := GetString( sData, l ); l += 1;
                         sServerIP[k] := GetString( sData, l ); l += 1;
-                        TryStrToInt( GetString( sData, 1 ), nNbrPlayers[k] ); l += 1;
+                        TryStrToInt( GetString( sData, l ), sServerPort[k] ); l += 1;
+                        TryStrToInt( GetString( sData, l ), nNbrPlayers[k] ); l += 1;
                         SetString( STRING_SETUP_MENU(k), sServerName[k] + ' [' + IntToStr( nNbrPlayers[k] ) + ']', 0.2, 1.0, 600 );
                     End;
                     nState := STATE_ONLINE;
