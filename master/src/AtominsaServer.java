@@ -7,6 +7,8 @@ public class AtominsaServer
 	
 	public String sAddress;
 	
+	public int nPort;
+	
 	public String sName;
 	
 	public ArrayList<AtominsaPlayer> aPlayer = new ArrayList<AtominsaPlayer>();

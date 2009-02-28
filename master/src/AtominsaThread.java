@@ -78,6 +78,7 @@ public class AtominsaThread extends Thread
 				
 				sMessage += tServer.sName + '\37';
 				sMessage += tServer.sAddress + '\37';
+				sMessage += String.valueOf(tServer.nPort) + '\37';
 				sMessage += String.valueOf(tServer.getPlayerCount()) + '\37';
 			}
 		}
@@ -94,6 +95,7 @@ public class AtominsaThread extends Thread
 				
 				sMessage += tServer.sName + '\37';
 				sMessage += tServer.sAddress + '\37';
+				sMessage += String.valueOf(tServer.nPort) + '\37';
 				sMessage += String.valueOf(tServer.getPlayerCount()) + '\37';
 			}
 		}
@@ -186,12 +188,13 @@ public class AtominsaThread extends Thread
 		if ( nHeader == HEADER_ONLINE_HOST )
 		{
 			tServer = new AtominsaServer();
-			tServer.sAddress = sRemoteIP;
-			tServer.sName = getStringFromData( sData, 0 );
+			tServer.sAddress = getStringFromData( sData, 0 );
+			tServer.nPort = getIntFromData( sData, 1 );
+			tServer.sName = getStringFromData( sData, 2 );
 			
 			tMaster.addServer(tServer);
 			
-			System.out.println( ">> #" + String.valueOf(nThreadID) + " hosted a game called '" + tServer.sName + "'." );
+			System.out.println( ">> #" + String.valueOf(nThreadID) + " hosted a game called '" + tServer.sName + "' @" + tServer.sAddress + ":" + String.valueOf(tServer.nPort) + "." );
 		}
 		else if ( nHeader == HEADER_ONLINE_QUIT )
 		{
@@ -353,7 +356,7 @@ public class AtominsaThread extends Thread
 		int arg1 = tSocket.getRemoteSocketAddress().toString().indexOf(":");
 		sRemoteIP = tSocket.getRemoteSocketAddress().toString().substring(arg0, arg1);
 
-	    System.out.println( ">> #" + String.valueOf(nThreadID) + " connected @" + sRemoteIP + "." );
+	    System.out.println( ">> #" + String.valueOf(nThreadID) + " connected." );
 	    
 	    try
 	    {
