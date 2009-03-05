@@ -148,6 +148,7 @@ Procedure SynchroGame () ;
 Procedure ProcessGame () ;
 
 Procedure UpdatePlayerInfo () ;
+Procedure UpdatePlayerScore () ;
 
 Procedure InitMenu () ;
 Procedure UpdateMenu () ;
@@ -1366,23 +1367,21 @@ Begin
             DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.7 - 0.2 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
      If GetKey(KEY_ENTER) Then Begin
-        InitMenu();
         For k := 0 To 255 Do Begin
             bClientBtnReady[k] := False;
         End;
-        // bClientBtnReady[0] := True;
         bLocalReady := False;
+        InitMenu();
         If bOnline Then
            SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
      End;
      
      If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) And DEDICATED_SERVER Then Begin
-        InitMenu();
         For k := 0 To 255 Do Begin
             bClientBtnReady[k] := False;
         End;
-        // bClientBtnReady[0] := True;
         bLocalReady := False;
+        InitMenu();
         If bOnline Then
            SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
      End;
@@ -1423,11 +1422,41 @@ End;
 
 
 
-Procedure InitWait () ;
+Procedure UpdatePlayerScore () ;
+    Function PlayerReady( nConst : Integer ) : String ;
+    Var k : Integer;
+    Begin
+         If bMulti = True Then Begin
+             PlayerReady := ' (NOT READY)';
+             For k := 0 To nClientCount - 1 Do Begin
+                 If (nClientIndex[k] = nPlayerClient[nConst]) And bClientBtnReady[k] Then PlayerReady := ' (READY)';
+             End;
+         End Else Begin
+             PlayerReady := '';
+         End;
+    End;
 Var i : Integer;
+Begin
+     If GetBombermanCount() <> 0 Then Begin
+        For i := 1 To GetBombermanCount() Do Begin
+            SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %2d ; %d kill(s), %d death(s) %s', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths, PlayerReady(i)]), Single(i) * 0.1 + 0.5, 1.0, 300.0 );
+        End;
+     End;
+End;
+
+
+
+Procedure InitWait () ;
+Var k : Integer;
 Begin
      // initialisation de la minuterie d'attente
      fWaitTime := GetTime;
+
+     // remise à zéro de l'attente
+     For k := 0 To 255 Do Begin
+         bClientBtnReady[k] := False;
+     End;
+     bLocalReady := False;
 
      // suppression des touches des joueurs
      BindKeyObj( nKey1MoveUp, True, False, NIL );
@@ -1458,10 +1487,8 @@ Begin
      End;
 
      // affichage des scores
-     If GetBombermanCount() <> 0 Then
-        For i := 1 To GetBombermanCount() Do
-            SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %2d ; %d kill(s), %d death(s).', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths]), Single(i) * 0.1 + 0.5, 1.0, 300.0 );
-
+     UpdatePlayerScore();
+     
      // mise à jour de la machine d'état interne
      nGame := GAME_WAIT;
 End;
@@ -1470,7 +1497,8 @@ End;
 
 Procedure ProcessWait () ;
 Var w, h : Single;
-    i : Integer;
+    i, k : Integer;
+    bIsReady : Boolean;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -1508,14 +1536,45 @@ Begin
             DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.7 - 0.2 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
      If GetKey(KEY_ENTER) Then Begin
-       If (bMulti = False) Or ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
-          InitRound();
-       End;
+       //If (bMulti = False) Or ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+       //   InitRound();
+       //End;
+         If bMulti = False Then Begin
+             InitRound();
+         End Else If bLocalReady = False Then Begin
+             Send( nLocalIndex, HEADER_BTN_READY, '' );
+             bLocalReady := True;
+             bClientBtnReady[ClientIndex(nLocalIndex)] := True;
+             UpdatePlayerScore();
+         End Else If bLocalReady = True Then Begin
+             Send( nLocalIndex, HEADER_BTN_NOTREADY, '' );
+             bLocalReady := False;
+             bClientBtnReady[ClientIndex(nLocalIndex)] := False;
+             UpdatePlayerScore();
+         End;
      End;
-     
+
+     // vérifie que tous les joueurs sont prêts
+     If bMulti = True Then Begin
+         bIsReady := False;
+         For i := 1 To 8 Do Begin
+             If ( nPlayerType[i] <> PLAYER_NIL ) Then bIsReady := True;
+         End;
+         If DEDICATED_SERVER Then bLocalReady := True;
+         If bLocalReady = False Then bIsReady := False;
+         For i := 1 To 8 Do Begin
+             If ( nPlayerType[i] <> PLAYER_NIL ) Then Begin
+                 For k := 0 To nClientCount - 1 Do Begin
+                     If (bClientBtnReady[k] = False) And (nPlayerClient[i] = nClientIndex[k]) Then bIsReady := False;
+                 End;
+             End;
+         End;
+         If bIsReady Then InitRound();
+     End;
+
      // pour le serveur automatique
-     If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) And DEDICATED_SERVER And ( GetTime - fWaitTime > 8 )
-        Then InitRound();
+     //If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) And DEDICATED_SERVER And ( GetTime - fWaitTime > 8 )
+     //   Then InitRound();
 End;
 
 
@@ -1725,6 +1784,8 @@ Procedure InitGame () ;
 Var  k: Integer;
      sData : String;
 Begin
+     AddLineToConsole('Begin InitGame');
+     
      // enregistrement des paramètres
      WriteSettings( 'atominsa.cfg' );
      
@@ -1746,7 +1807,6 @@ Begin
 
      // initialisation de la camera
      nCamera := CAMERA_OVERALL;
-
 
      // chargement du scheme
      If nScheme = -1 Then Begin
@@ -1807,6 +1867,8 @@ Begin
         nRound := 0;
         InitRound();
      End;
+     
+     AddLineToConsole('End InitGame');
 End;
 
 
@@ -1975,84 +2037,89 @@ Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
 
-     // gestion de l'effet de motion blur
-     If bBlur Then Begin
-        If bEffects Then Begin
-           // appel d'une texture de rendu
-           PutRenderTexture();
+     If Not DEDICATED_SERVER Then Begin
+         // gestion de l'effet de motion blur
+         If bBlur Then Begin
+            If bEffects Then Begin
+               // appel d'une texture de rendu
+               PutRenderTexture();
 
-           // rendu plus sombre
-           Render( 0.4 );
-            
-           glUseProgramObjectARB( ShaderProgram );
+               // rendu plus sombre
+               Render( 0.4 );
 
-           SetupEffect();
-           
-           // affichage du rendu précédent en transparence pour l'effet de flou
-           SetRenderTexture();
-           DrawImage( 0, 0, -1, 1, 1, 1.0, 1.0, 1.0, 0.8, True );
+               glUseProgramObjectARB( ShaderProgram );
 
-           glUseProgramObjectARB( 0 );
+               SetupEffect();
 
-           // récupération de la texture de rendu
-           GetRenderTexture();
+               // affichage du rendu précédent en transparence pour l'effet de flou
+               SetRenderTexture();
+               DrawImage( 0, 0, -1, 1, 1, 1.0, 1.0, 1.0, 0.8, True );
 
-           // remplissage noir de l'écran
-           Clear( 0.0, 0.0, 0.0, 0.0 );
+               glUseProgramObjectARB( 0 );
 
-           // affichage final du rendu
-           SetRenderTexture();
-           DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
-        End Else Begin
-           // appel d'une texture de rendu
-           PutRenderTexture();
+               // récupération de la texture de rendu
+               GetRenderTexture();
 
-           // rendu plus sombre
-           Render( 0.4 );
+               // remplissage noir de l'écran
+               Clear( 0.0, 0.0, 0.0, 0.0 );
 
-           // affichage du rendu précédent en transparence pour l'effet de flou
-           SetRenderTexture();
-           DrawImage( 0, 0, -1, 1, 1, 1.0, 1.0, 1.0, 0.8, True );
+               // affichage final du rendu
+               SetRenderTexture();
+               DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+            End Else Begin
+               // appel d'une texture de rendu
+               PutRenderTexture();
 
-           // récupération de la texture de rendu
-           GetRenderTexture();
+               // rendu plus sombre
+               Render( 0.4 );
 
-           // remplissage noir de l'écran
-           Clear( 0.0, 0.0, 0.0, 0.0 );
+               // affichage du rendu précédent en transparence pour l'effet de flou
+               SetRenderTexture();
+               DrawImage( 0, 0, -1, 1, 1, 1.0, 1.0, 1.0, 0.8, True );
 
-           // affichage final du rendu
-           SetRenderTexture();
-           DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
-        End;
+               // récupération de la texture de rendu
+               GetRenderTexture();
+
+               // remplissage noir de l'écran
+               Clear( 0.0, 0.0, 0.0, 0.0 );
+
+               // affichage final du rendu
+               SetRenderTexture();
+               DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+            End;
+         End Else Begin
+            If bEffects Then Begin
+               // appel d'une texture de rendu
+               PutRenderTexture();
+
+               // rendu normal
+               Render( 1.0 );
+
+               // récupération de la texture de rendu
+               GetRenderTexture();
+
+               // remplissage noir de l'écran
+               Clear( 0.0, 0.0, 0.0, 0.0 );
+
+               glUseProgramObjectARB( ShaderProgram );
+
+               SetupEffect();
+
+               // affichage final du rendu
+               SetRenderTexture();
+               DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
+
+               glUseProgramObjectARB( 0 );
+            End Else Begin
+               // rendu normal
+               Render( 1.0 );
+            End;
+         End;
      End Else Begin
-        If bEffects Then Begin
-           // appel d'une texture de rendu
-           PutRenderTexture();
-
-           // rendu normal
-           Render( 1.0 );
-
-           // récupération de la texture de rendu
-           GetRenderTexture();
-
-           // remplissage noir de l'écran
-           Clear( 0.0, 0.0, 0.0, 0.0 );
-
-           glUseProgramObjectARB( ShaderProgram );
-
-           SetupEffect();
-
-           // affichage final du rendu
-           SetRenderTexture();
-           DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, False );
-
-           glUseProgramObjectARB( 0 );
-        End Else Begin
-           // rendu normal
-           Render( 1.0 );
-        End;
+         // faux rendu, mise à jour des éléments du jeu
+         Render( 0.0 );
      End;
-
+     
      // gestion de l'intelligence artificielle
      For k := 1 To GetBombermanCount() Do Begin
          If ( GetBombermanByCount(k) Is CBomberman ) And ( GetBombermanByCount(k).Alive = true )
@@ -2123,7 +2190,6 @@ Begin
             For k := 0 To 255 Do Begin
                 bClientBtnReady[k] := False;
             End;
-            // bClientBtnReady[0] := True;
             bLocalReady := False;
             InitMenu();
             ClearInput();
@@ -2166,8 +2232,7 @@ Begin
          fKey := GetTime + 0.5;
          ClearInput();
      End;
-
- End;
+End;
 
 
 

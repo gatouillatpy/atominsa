@@ -277,7 +277,6 @@ Begin
                             bClientBtnReady[k] := False;
                         End;
                         bLocalReady := False;
-                        // bClientBtnReady[0] := True;
                         InitMenu();
                      End;
                 End;
@@ -1019,12 +1018,14 @@ Begin
                     bClientBtnReady[ClientIndex(nIndex)] := True;
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
                     UpdatePlayerInfo();
+                    UpdatePlayerScore();
                End;
                HEADER_BTN_NOTREADY :
                Begin
                     bClientBtnReady[ClientIndex(nIndex)] := False;
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is not ready.' );
                     UpdatePlayerInfo();
+                    UpdatePlayerScore();
                End;
                HEADER_PINGRES :
                Begin
