@@ -186,15 +186,18 @@ End;
 Procedure ExecServer () ;
 Var nIndex, nHeader : Integer;
     sData : String;
-    i, k : Integer;
+    nDelay : Integer;
 Begin
      AddLineToConsole( 'Mode dedicated server.' );
 
      nState := PHASE_MENU;
 
+     nDelay := 1000 Div nFramerate;
+     
      // attente des infos du master server
      While True Do Begin
            MainLoop();
+           Delay( nDelay );
      End;
 End;
 

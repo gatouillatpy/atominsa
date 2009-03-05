@@ -7,7 +7,7 @@
       <MainUnit Value="0"/>
       <IconPath Value=".\"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="5"/>
+      <ActiveEditorIndexAtStart Value="0"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -28,12 +28,12 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="37">
+    <Units Count="38">
       <Unit0>
         <Filename Value="atominsa.lpr"/>
         <UnitName Value="atominsa"/>
-        <CursorPos X="64" Y="10"/>
-        <TopLine Value="10"/>
+        <CursorPos X="66" Y="198"/>
+        <TopLine Value="176"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="126"/>
         <Loaded Value="True"/>
@@ -41,8 +41,8 @@
       <Unit1>
         <Filename Value="ucore.pas"/>
         <UnitName Value="UCore"/>
-        <CursorPos X="20" Y="392"/>
-        <TopLine Value="373"/>
+        <CursorPos X="29" Y="9"/>
+        <TopLine Value="1"/>
         <EditorIndex Value="14"/>
         <UsageCount Value="126"/>
         <Loaded Value="True"/>
@@ -69,8 +69,8 @@
       <Unit4>
         <Filename Value="usetup.pas"/>
         <UnitName Value="USetup"/>
-        <CursorPos X="1" Y="1327"/>
-        <TopLine Value="1308"/>
+        <CursorPos X="5" Y="48"/>
+        <TopLine Value="29"/>
         <EditorIndex Value="23"/>
         <UsageCount Value="109"/>
         <Loaded Value="True"/>
@@ -160,8 +160,8 @@
       <Unit15>
         <Filename Value="umulti.pas"/>
         <UnitName Value="UMulti"/>
-        <CursorPos X="41" Y="1025"/>
-        <TopLine Value="996"/>
+        <CursorPos X="65" Y="1022"/>
+        <TopLine Value="956"/>
         <EditorIndex Value="5"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -169,8 +169,8 @@
       <Unit16>
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="38" Y="1533"/>
-        <TopLine Value="1520"/>
+        <CursorPos X="15" Y="963"/>
+        <TopLine Value="945"/>
         <EditorIndex Value="10"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -341,8 +341,40 @@
         <TopLine Value="604"/>
         <UsageCount Value="9"/>
       </Unit36>
+      <Unit37>
+        <Filename Value="..\..\..\..\..\lazarus\lcl\forms.pp"/>
+        <UnitName Value="Forms"/>
+        <CursorPos X="3" Y="1292"/>
+        <TopLine Value="1273"/>
+        <UsageCount Value="10"/>
+      </Unit37>
     </Units>
-    <JumpHistory Count="0" HistoryIndex="-1"/>
+    <JumpHistory Count="6" HistoryIndex="5">
+      <Position1>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="8" Column="40" TopLine="1"/>
+      </Position1>
+      <Position2>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="396" Column="25" TopLine="388"/>
+      </Position2>
+      <Position3>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="8" Column="73" TopLine="1"/>
+      </Position3>
+      <Position4>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="39" Column="13" TopLine="15"/>
+      </Position4>
+      <Position5>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="195" Column="20" TopLine="177"/>
+      </Position5>
+      <Position6>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="200" Column="28" TopLine="177"/>
+      </Position6>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>

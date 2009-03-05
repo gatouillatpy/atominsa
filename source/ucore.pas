@@ -5,7 +5,7 @@ Unit UCore;
 
 Interface
 
-Uses Classes, SysUtils, LazJPEG, Math, Graphics, IntfGraphics,
+Uses Classes, SysUtils, LazJPEG, Math, Graphics, IntfGraphics, Windows, Forms,
      gl, glu, glut, glext,
      fmod, fmodtypes, fmoderrors,
      lnet,
@@ -396,6 +396,10 @@ Procedure ClientLoop () ;
 Function ClientInitOnline ( Const sAddress : String ; Const nPort : Word ) : Boolean ;
 Procedure ClientTerminateOnline () ;
 Procedure ClientLoopOnline () ;
+
+
+
+procedure Delay(Milliseconds: Integer);
 
 
 
@@ -3669,7 +3673,26 @@ End;
 
 
 
-
+procedure Delay(Milliseconds: Integer);
+  {by Hagen Reddmann}
+var
+  Tick: DWORD;
+  Event: THandle;
+begin
+  Event := CreateEvent(nil, False, False, nil);
+  try
+    Tick := GetTickCount + DWORD(Milliseconds);
+    while (Milliseconds > 0) and
+      (MsgWaitForMultipleObjects(1, Event, False, Milliseconds,
+      QS_ALLINPUT) <> WAIT_TIMEOUT) do
+    begin
+      Application.ProcessMessages;
+      Milliseconds := Tick - GetTickCount;
+    end;
+  finally
+    CloseHandle(Event);
+  end;
+end;
 
 
 
