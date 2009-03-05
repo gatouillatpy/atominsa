@@ -61,7 +61,7 @@ begin
    If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then
       AddBombMulti(aX, aY, aIndex, aBombSize, aBombTime, aJelly, aTrigger, aGrid, UpCount, IsBomberman, _nNetID);
 
-   If ( aX < 1 ) Or ( aY < 1 ) Then
+   If bDebug And ( aX < 1 ) Or ( aY < 1 ) Then
       AddLineToConsole( 'Bug in Add Bomb' );
    If ( bMulti = true ) Then Begin
       sData := IntToStr(aIndex) + #31;

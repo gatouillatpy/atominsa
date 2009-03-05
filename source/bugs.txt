@@ -1,6 +1,4 @@
-+ en caméra 3D, les shaders des flammes peuvent traverser les caisses s'il y a au moins une case libre entre
-= bug avec échap lorqu'on a quitté le multi en tant que client (sans autorisation du serveur?, manque un clearkey)
-- penser à mettre un numéro de version à la connexion pour les prochaines versions + n° de version dans le jeu (pas 1.0C)
+= en caméra 3D, les shaders des flammes peuvent traverser les caisses s'il y a au moins une case libre entre
 
 + pour fréquent, = pour régulier, - pour rare
 

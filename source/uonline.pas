@@ -55,8 +55,10 @@ Begin
 
 
      SetString( STRING_SETUP_MENU(0), 'online', 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(1), 'host (name):', 0.2, 1.0, 600 );
-     SetString( STRING_SETUP_MENU(2), sLocalName, 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(1), 'name : ' + sLocalName, 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(2), 'address : ' + sServerAddress, 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(3), 'port : ' + IntToStr(nServerPort), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(4), 'host', 0.2, 1.0, 600 );
 
      If Not ClientInitOnline( sMasterAddress, nMasterPort ) Then Begin
         nState := PHASE_MULTI;
@@ -88,7 +90,7 @@ Var w, h : Single;
     t : Single;
     i, j, l, m : Integer;
     nIndex, nHeader : Integer;
-    b1, b2 : Boolean;
+    b1, b2, b3 : Boolean;
     sData : String;
     bCursor : Boolean;
     fCTime : Single;
@@ -119,14 +121,16 @@ Begin
 
      DrawString( STRING_SETUP_MENU(0), -w / h * 0.5,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
      t := 0.0;
-     If fScroll <= t Then DrawString( STRING_SETUP_MENU(1), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(1), IsActive(1), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
-     If fScroll <= t Then DrawString( STRING_SETUP_MENU(2), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(2), IsActive(2), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(1), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(1), IsActive(1), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(2), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(2), IsActive(2), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(3), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(3), IsActive(3), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(4), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(4), IsActive(4), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
      t += 0.2;
-     For i := 3 To nPlayableCount + 2 Do Begin
+     For i := 5 To nPlayableCount + 4 Do Begin
          If fScroll <= t Then DrawString( STRING_SETUP_MENU(i), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(i), IsActive(i), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      End;
      If ( nPlayableCount < nServerCount ) And ( nPlayableCount <> 0 ) Then t += 0.2;
-     For i := nPlayableCount + 3 To nServerCount + 2 Do Begin
+     For i := nPlayableCount + 5 To nServerCount + 4 Do Begin
          If fScroll <= t Then DrawString( STRING_SETUP_MENU(i), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 0.5, IsActive(i), IsActive(i), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      End;
 
@@ -142,30 +146,33 @@ Begin
      If GetKeyS( KEY_UP ) Then Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           
-           If ( nMenu = 2 ) Then SetString( STRING_SETUP_MENU(2), sLocalName, 0.0, 0.02, 600 );
 
+           If ( nMenu = 1 ) Then  SetString( STRING_GAME_MENU(1), 'name : ' + sLocalName, 0.0, 0.02, 600 );
+           If ( nMenu = 2 ) Then SetString( STRING_GAME_MENU(2), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
+           If ( nMenu = 3 ) Then SetString( STRING_GAME_MENU(3), 'port : ' + IntToStr(nServerPort), 0.0, 0.02, 600 );
+           
            nMenu := nMenu - 1;
            If ( nMenu = 0 ) Then Begin
-              nMenu := nServerCount + 2;
+              nMenu := nServerCount + 4;
            End;
 
            b1 := nServerCount > 0;
            b2 := (nServerCount - nPlayableCount > 0) And (nPlayableCount > 0);
            t := 0.0;
            If (nMenu = 1) And (fScroll > t) Then fScroll := t;
-           j := nServerCount - 6;
+           j := nServerCount - 4;
            If b1 Then j += 1;
            If b2 Then j += 1;
            l := 1;
            For i := 1 To j Do Begin
-               If (b1 And (i = 3)) Or (b2 And (i = nPlayableCount + 4)) Then t += 0.2
+               If (b1 And (i = 5)) Or (b2 And (i = nPlayableCount + 6)) Then t += 0.2
                Else Begin
-                    If (nMenu = l) And (fScroll > t) Then fScroll := t; t += 0.2;
+                    If (nMenu = l) And (fScroll > t) Then fScroll := t;
+                    If (l <= 4) Then t += 0.12 Else t += 0.2;
                     l += 1;
                End;
            End;
-           If (nMenu = nServerCount + 2) Then fScroll := t;
+           If (nMenu = nServerCount + 4) Then fScroll := t;
         End;
         bUp := True;
      End Else Begin
@@ -177,10 +184,12 @@ Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
            
-           If ( nMenu = 2 ) Then SetString( STRING_SETUP_MENU(2), sLocalName, 0.0, 0.02, 600 );
-           
+           If ( nMenu = 1 ) Then SetString( STRING_GAME_MENU(1), 'name : ' + sLocalName, 0.0, 0.02, 600 );
+           If ( nMenu = 2 ) Then SetString( STRING_GAME_MENU(2), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
+           If ( nMenu = 3 ) Then SetString( STRING_GAME_MENU(3), 'port : ' + IntToStr(nServerPort), 0.0, 0.02, 600 );
+
            nMenu := nMenu + 1;
-           If ( nMenu = nServerCount + 3 ) Then Begin
+           If ( nMenu = nServerCount + 5 ) Then Begin
               nMenu := 1;
            End;
 
@@ -190,14 +199,16 @@ Begin
 
            If nMenu = 1 Then fScroll := t;
            t += 0.2;
-           j := 9;
-           m := nServerCount + 2;
+           j := 11;
+           m := nServerCount + 4;
            If b1 Then j -= 1;
-           If b2 And (nPlayableCount + 4 < j) Then j -= 1;
-           If b2 And (nPlayableCount + 4 >= j) Then m += 1;
+           b3 := nPlayableCount + 5 < j;
+           If b2 And b3 Then j -= 1;
+           If b2 And Not b3 Then m += 1;
            l := j;
            For i := j To m Do Begin
-               If b2 And (i = nPlayableCount + 3) Then t += 0.2
+               If b2 And ( (i = nPlayableCount + 4) And b3
+               Or ( (i = nPlayableCount + 5) And Not b3 ) ) Then t += 0.2
                Else Begin
                     If (nMenu = l) And (fScroll < t) Then fScroll := t; t += 0.2;
                     l += 1;
@@ -214,7 +225,7 @@ Begin
      If GetKey( KEY_ENTER ) Or DEDICATED_SERVER Then Begin
         If Not bEnter Then Begin
            PlaySound( SOUND_MENU_CLICK );
-           If (nMenu = 1) Or (nMenu = 2) Or DEDICATED_SERVER Then Begin
+           If (nMenu = 4) Or DEDICATED_SERVER Then Begin
                 nIndex := nLocalIndex;
                 nHeader := HEADER_ONLINE_HOST;
                 sData := sServerAddress + #31;
@@ -246,7 +257,7 @@ Begin
                     InitMenu();
                 End;
            End
-           Else Begin
+           Else If ( nMenu >= 5 ) Then Begin
                 nState := STATE_MULTI;
                 // désactivation de la souris
                 BindButton( BUTTON_LEFT, NIL );
@@ -283,14 +294,32 @@ Begin
         If GetTime > fKey Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
-                2 :
+                1 :
                 Begin
                      If Ord(CheckKey()) = 8 Then Begin
                         SetLength(sLocalName, Length(sLocalName) - 1);
                      End Else Begin
                         sLocalName := sLocalName + CheckKey();
                      End;
-                     SetString( STRING_SETUP_MENU(2), sLocalName, 0.0, 0.02, 600 );
+                     SetString( STRING_GAME_MENU(1), 'name : ' + sLocalName, 0.0, 0.02, 600 );
+                End;
+                2 :
+                Begin
+                     If Ord(CheckKey()) = 8 Then Begin
+                        SetLength(sServerAddress, Length(sServerAddress) - 1);
+                     End Else Begin
+                        sServerAddress := sServerAddress + CheckKey();
+                     End;
+                     SetString( STRING_GAME_MENU(2), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
+                End;
+                3 :
+                Begin
+                     If Ord(CheckKey()) = 8 Then Begin
+                        nServerPort := nServerPort div 10;
+                     End Else If ( Ord(CheckKey()) >= 48 ) And ( Ord(CheckKey()) <= 57 ) And ( nServerPort <= 999 ) Then Begin
+                        nServerPort := nServerPort * 10 + StrToInt( CheckKey() );
+                     End;
+                     SetString( STRING_GAME_MENU(3), 'port : ' + IntToStr(nServerPort), 0.0, 0.02, 600 );
                 End;
            End;
            fKey := GetTime + 0.1;
@@ -307,12 +336,28 @@ Begin
          bCursor := False;
      fCursorTime := fCTime;
      Case nMenu Of
+                1 :
+                Begin
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+                        SetString( STRING_GAME_MENU(1), 'name : ' + sLocalName, 0.0, 0.02, 600 );
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+                        SetString( STRING_GAME_MENU(1), 'name : ' + sLocalName + '*', 0.0, 0.02, 600 );
+                     bCursor := False;
+                End;
                 2 :
                 Begin
                      If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
-                        SetString( STRING_SETUP_MENU(2), sLocalName, 0.0, 0.02, 600 );
+                        SetString( STRING_GAME_MENU(2), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
                      If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
-                        SetString( STRING_SETUP_MENU(2), sLocalName + '*', 0.0, 0.02, 600 );
+                        SetString( STRING_GAME_MENU(2), 'address : ' + sServerAddress + '*', 0.0, 0.02, 600 );
+                     bCursor := False;
+                End;
+                3 :
+                Begin
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+                        SetString( STRING_GAME_MENU(3), 'port : ' + IntToStr(nServerPort), 0.0, 0.02, 600 );
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+                        SetString( STRING_GAME_MENU(3), 'port : ' + IntToStr(nServerPort) + '*', 0.0, 0.02, 600 );
                      bCursor := False;
                 End;
            End;
@@ -331,8 +376,8 @@ Begin
    {
      l := Random(19);
      For k := 1 To l Do Begin
-         sServerName[k+2] := 'Server ' + IntToStr(k);
-         SetString( STRING_SETUP_MENU(k+2), sServerName[k+2], 0.2, 1.0, 600 );
+         sServerName[k+4] := 'Server ' + IntToStr(k);
+         SetString( STRING_SETUP_MENU(k+4), sServerName[k+4], 0.2, 1.0, 600 );
      End;
      nServerCount := l;
      Repeat
@@ -348,7 +393,7 @@ Begin
                Begin
                     l := 1;
                     TryStrToInt( GetString( sData, l ), nPlayableCount ); l += 1;
-                    For k := 3 To nPlayableCount + 2 Do Begin
+                    For k := 5 To nPlayableCount + 4 Do Begin
                         sServerName[k] := GetString( sData, l ); l += 1;
                         sServerIP[k] := GetString( sData, l ); l += 1;
                         TryStrToInt( GetString( sData, l ), sServerPort[k] ); l += 1;
@@ -357,7 +402,7 @@ Begin
                     End;
                     TryStrToInt( GetString( sData, l ), k ); l += 1;
                     nServerCount := k + nPlayableCount;
-                    For k := nPlayableCount + 3 To nServerCount + 2 Do Begin
+                    For k := nPlayableCount + 5 To nServerCount + 4 Do Begin
                         sServerName[k] := GetString( sData, l ); l += 1;
                         sServerIP[k] := GetString( sData, l ); l += 1;
                         TryStrToInt( GetString( sData, l ), sServerPort[k] ); l += 1;

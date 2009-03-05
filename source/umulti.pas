@@ -53,7 +53,7 @@ Uses UBomberman, UListBomb, UBomb, UBlock, UItem, UGrid;
 
 Const MENU_MULTI_NAME         = 81;
 Const MENU_MULTI_ADDRESS      = 82;
-Const MENU_MULTI_TYPE         = 83;
+Const MENU_MULTI_PORT         = 83;
 
 Const MENU_MULTI_JOIN         = 91;
 Const MENU_MULTI_HOST         = 92;
@@ -108,11 +108,7 @@ Begin
      // ajout du menu
      SetString( STRING_GAME_MENU(81), 'name : ' + sLocalName, 0.2, 1.0, 600 );
      SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.2, 1.0, 600 );
-     Case nServerType Of
-          SERVER_UNKNOWN : SetString( STRING_GAME_MENU(83), 'type : unknown', 0.2, 1.0, 600 );
-          SERVER_STANDARD : SetString( STRING_GAME_MENU(83), 'type : standard', 0.2, 1.0, 600 );
-          SERVER_EXTENDED : SetString( STRING_GAME_MENU(83), 'type : extended', 0.2, 1.0, 600 );
-     End;
+     SetString( STRING_GAME_MENU(83), 'port : ' + IntToStr(nServerPort), 0.2, 1.0, 600 );
      
      // ajout des boutons join et host
      SetString( STRING_GAME_MENU(91), 'join', 0.2, 0.5, 600 );
@@ -184,7 +180,7 @@ Begin
      t += 0.12;
      DrawString( STRING_GAME_MENU(82), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_MULTI_ADDRESS), IsActive(MENU_MULTI_ADDRESS), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
      t += 0.12;
-     DrawString( STRING_GAME_MENU(83), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_MULTI_TYPE), IsActive(MENU_MULTI_TYPE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     DrawString( STRING_GAME_MENU(83), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_MULTI_PORT), IsActive(MENU_MULTI_PORT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
      t += 0.12;
      DrawString( STRING_GAME_MENU(91), -w / h * 0.6, -0.7, -1, 0.024 * w / h, 0.036, 1.0, IsActive(MENU_MULTI_JOIN), IsActive(MENU_MULTI_JOIN), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
      DrawString( STRING_GAME_MENU(92), -w / h * 0.2, -0.7, -1, 0.024 * w / h, 0.036, 1.0, IsActive(MENU_MULTI_HOST), IsActive(MENU_MULTI_HOST), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
@@ -204,8 +200,11 @@ Begin
               nMenu := MENU_MULTI_NAME;
               SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
            End Else
-           If nMenu = MENU_MULTI_TYPE Then nMenu := MENU_MULTI_ADDRESS Else
-           If nMenu = MENU_MULTI_JOIN Then nMenu := MENU_MULTI_TYPE Else
+           If nMenu = MENU_MULTI_PORT Then Begin
+              nMenu := MENU_MULTI_ADDRESS;
+              SetString( STRING_GAME_MENU(83), 'port : ' + IntToStr(nServerPort), 0.0, 0.02, 600 );
+           End Else
+           If nMenu = MENU_MULTI_JOIN Then nMenu := MENU_MULTI_PORT Else
            If nMenu = MENU_MULTI_HOST Then nMenu := MENU_MULTI_JOIN Else
            If nMenu = MENU_MULTI_NAME Then Begin
               nMenu := MENU_MULTI_HOST;
@@ -226,10 +225,13 @@ Begin
               SetString( STRING_GAME_MENU(81), 'name : ' + sLocalName, 0.0, 0.02, 600 );
            End Else
            If nMenu = MENU_MULTI_ADDRESS Then Begin
-              nMenu := MENU_MULTI_TYPE;
+              nMenu := MENU_MULTI_PORT;
               SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
            End Else
-           If nMenu = MENU_MULTI_TYPE Then nMenu := MENU_MULTI_JOIN Else
+           If nMenu = MENU_MULTI_PORT Then Begin
+              nMenu := MENU_MULTI_JOIN;
+              SetString( STRING_GAME_MENU(83), 'port : ' + IntToStr(nServerPort), 0.0, 0.02, 600 );
+           End Else
            If nMenu = MENU_MULTI_JOIN Then nMenu := MENU_MULTI_HOST;
         End;
         bDown := True;
@@ -290,14 +292,6 @@ Begin
         If Not bLeft Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
-                MENU_MULTI_TYPE :
-                Begin
-                     If nServerType = SERVER_EXTENDED Then nServerType := SERVER_STANDARD;
-                     Case nServerType Of
-                          SERVER_STANDARD : SetString( STRING_GAME_MENU(83), 'type : standard', 0.0, 0.02, 600 );
-                          SERVER_EXTENDED : SetString( STRING_GAME_MENU(83), 'type : extended', 0.0, 0.02, 600 );
-                     End;
-                End;
                 MENU_MULTI_JOIN :
                 Begin
                      nMenu := MENU_MULTI_HOST;
@@ -317,14 +311,6 @@ Begin
         If Not bRight Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
-                MENU_MULTI_TYPE :
-                Begin
-                     If nServerType = SERVER_STANDARD Then nServerType := SERVER_EXTENDED;
-                     Case nServerType Of
-                          SERVER_STANDARD : SetString( STRING_GAME_MENU(83), 'type : standard', 0.0, 0.02, 600 );
-                          SERVER_EXTENDED : SetString( STRING_GAME_MENU(83), 'type : extended', 0.0, 0.02, 600 );
-                     End;
-                End;
                 MENU_MULTI_JOIN :
                 Begin
                      nMenu := MENU_MULTI_HOST;
@@ -362,6 +348,15 @@ Begin
                      End;
                      SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
                 End;
+                MENU_MULTI_PORT :
+                Begin
+                     If Ord(CheckKey()) = 8 Then Begin
+                        nServerPort := nServerPort div 10;
+                     End Else If ( Ord(CheckKey()) >= 48 ) And ( Ord(CheckKey()) <= 57 ) And ( nServerPort <= 999 ) Then Begin
+                        nServerPort := nServerPort * 10 + StrToInt( CheckKey() );
+                     End;
+                     SetString( STRING_GAME_MENU(83), 'port : ' + IntToStr(nServerPort), 0.0, 0.02, 600 );
+                End;
            End;
            fKey := GetTime + 0.1;
            ClearInput();
@@ -391,6 +386,14 @@ Begin
                         SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress, 0.0, 0.02, 600 );
                      If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
                         SetString( STRING_GAME_MENU(82), 'address : ' + sServerAddress + '*', 0.0, 0.02, 600 );
+                     bCursor := False;
+                End;
+                MENU_MULTI_PORT :
+                Begin
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
+                        SetString( STRING_GAME_MENU(83), 'port : ' + IntToStr(nServerPort), 0.0, 0.02, 600 );
+                     If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
+                        SetString( STRING_GAME_MENU(83), 'port : ' + IntToStr(nServerPort) + '*', 0.0, 0.02, 600 );
                      bCursor := False;
                 End;
            End;
@@ -855,7 +858,7 @@ Begin
                sData := sData + FormatFloat('0.000',pBomb.Position.x) + #31;
                sData := sData + FormatFloat('0.000',pBomb.Position.y) + #31;
                sData := sData + FormatFloat('0.000',pBomb.Position.z) + #31;
-               If ( pBomb.Position.x < 1 ) Or ( pBomb.Position.y < 1 ) Then
+               If bDebug And ( pBomb.Position.x < 1 ) Or ( pBomb.Position.y < 1 ) Then
                   AddLineToConsole( 'Paquet Bug!' );  // C'est normal si la bombe est porté avec un grab!
            End;
            Send( nLocalIndex, HEADER_BOMB, sData );
@@ -1221,7 +1224,6 @@ Begin
                     TryStrToInt( GetString( sData, 3 ), nY );
                     If ( ( pGrid.GetBlock( nX, nY ) <> Nil ) And ( pGrid.GetBlock( nX, nY ) Is CBomb ) ) Then Begin
                         pBomberman.GrabBombMulti( nX, nY );
-                        AddLineToConsole( 'No bug : GrabBombMulti' );
                     End;
                End;
                HEADER_DROP_CLIENT :
@@ -1260,7 +1262,7 @@ Begin
                         pBomb.bMoveJump    := false;
                         pBomb.bMoving      := false;
                     End
-                    Else
+                    Else If bDebug Then
                         AddLineToConsole( 'Bug : Header_end_of_jump' );
                End;
                HEADER_BJUMPING :
@@ -1269,7 +1271,7 @@ Begin
                     pBomb := GetBombByNetID( _nNetID );
                     If ( pBomb <> Nil ) Then
                        pBomb.bJumping := False
-                    Else
+                    Else If bDebug Then
                         AddLineToConsole( 'Bug : Header_bjumping' );
                End;
                HEADER_CONTAMINATE :

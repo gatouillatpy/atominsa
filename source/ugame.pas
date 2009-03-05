@@ -1730,6 +1730,7 @@ Begin
      
      // on coupe la musique du menu
      StopSound( SOUND_MENU );
+     fWaitTime := GetTime();
 
      // initialisation de l'invite de messages
      bMessage := False;
@@ -1811,15 +1812,58 @@ End;
 
 
 Procedure SynchroGame () ;
-Var  k: Integer;
+Var  k, l: Integer;
      sData : String;
+     nIndex, nHeader : Integer;
 Begin
+     // teste l'absence d'un client
+     If ( GetTime - fWaitTime > 8.0 ) Then Begin
+        For k := 0 To nClientCount - 1 Do Begin
+            If ( bClientReady[k] = False ) Then Begin
+                  // suppression du client de la liste
+                  nIndex := nClientIndex[k];
+                  For l := k To nClientCount - 2 Do
+                      nClientIndex[l] := nClientIndex[l+1];
+                  nClientCount -= 1;
+                  AddLineToConsole( sClientName[k] + ' leaved the game.' );
+                  sData := '';
+                  SendTo( nIndex, HEADER_QUIT_MENU, sData );
+                  // supression des joueurs attribués s'il y en avait
+                  For l := 1 To 8 Do Begin
+                      If nPlayerClient[l] = nIndex Then Begin
+                         nPlayerClient[l] := -1;
+                         nPlayerType[l] := PLAYER_NIL;
+                      End;
+                  End;
+                  // renvoi de la liste des clients
+                  nIndex := nLocalIndex;
+                  nHeader := HEADER_LIST_CLIENT;
+                  sData := IntToStr(nClientCount);
+                  For l := 0 To nClientCount - 1 Do
+                      sData := sData + #31 + IntToStr(nClientIndex[l]) + #31 + sClientName[l];
+                  Send( nIndex, nHeader, sData );
+                  // renvoi de la liste des joueurs
+                  nIndex := nLocalIndex;
+                  nHeader := HEADER_LIST_PLAYER;
+                  sData := '';
+                  For l := 1 To 8 Do Begin
+                      sData := sData + IntToStr(nPlayerClient[l]) + #31;
+                      sData := sData + sPlayerName[l] + #31;
+                      sData := sData + pPlayerCharacter[l].Name + #31;
+                      sData := sData + IntToStr(nPlayerType[l]) + #31;
+                  End;
+                  Send( nIndex, nHeader, sData );
+            End;
+        End;
+     End;
+     
      // si l'un des client n'est pas ready alors on quitte violemment la procédure
      For k := 0 To nClientCount - 1 Do
          If bClientReady[k] = False Then Exit;
          
      // mise à zéro de la minuterie du jeu
      fGameTime := GetTime();
+
 
      // initialisation du premier round
      nRound := 0;
@@ -2087,6 +2131,7 @@ Begin
             PlaySound( SOUND_MENU_BACK );
             bGoToPhaseMenu := True;
             fKey := GetTime();
+            ClearInput();
         End;
      End;
      
@@ -2098,8 +2143,8 @@ Begin
      And ( GetTime > fKey ) Then Begin
          If ( nCamera = CAMERA_OVERALL ) Then Begin
             nCamera := CAMERA_FLY;
-            vCamera.x := GRIDWIDTH;
-            vCamera.z := GRIDHEIGHT;
+            vPointer.x := 0;
+            vPointer.z := 0;
             vAngle.x := PI/6;
             vAngle.y := -PI/8;
          End

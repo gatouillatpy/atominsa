@@ -690,7 +690,7 @@ Begin
         Repeat
            pTCP.CallAction;
            Sleep(1);
-           If GetTime > t + 10.0 Then Break;
+           If GetTime > t + 8.0 Then Break;
         Until pTCP.Connected;
         If pTCP.Connected Then Begin
            AddStringToConsole('success.');

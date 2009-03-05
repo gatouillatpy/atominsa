@@ -28,7 +28,7 @@ Procedure DangerWay( aX, aY, bX, bY, n : Integer; m_aState : Table; Var p_nDange
 
 Implementation
 
-Uses UGame, UItem, UDisease, USuperDisease, UBomb, UBlock, UTriggerBomb;
+Uses UGame, UItem, UDisease, USuperDisease, UBomb, UBlock, UTriggerBomb, USetup;
 
 
 Const SKILL_NOVICE         = 1;
@@ -93,7 +93,7 @@ Begin
          If ( GetFlameByCount(k) <> Nil ) And CheckCoordinates( GetFlameByCount(k).X, GetFlameByCount(k).Y ) Then
             aState[GetFlameByCount(k).X, GetFlameByCount(k).Y] += 1
          Else Begin
-             AddLineToConsole( 'Bug in GetFlame' );
+             If bDebug Then AddLineToConsole( 'Bug in GetFlame' );
              FreeFlame();
          End;
      End;
@@ -254,8 +254,8 @@ Begin
 
 
 
-// Si les touches sont inversées et que le niveau est godlike, alors les préférences sont inversées.
-   If ( nSkill = SKILL_GODLIKE ) And ( pBomberman.Reverse = true ) Then Begin
+// Si les touches sont inversées et que le niveau est godlike ou masterful, alors les préférences sont inversées.
+   If ( ( nSkill = SKILL_GODLIKE ) Or ( nSkill = SKILL_MASTERFUL ) ) And ( pBomberman.Reverse = true ) Then Begin
        dangerMin := pBomberman.DangerLeft;
        pBomberman.DangerLeft := pBomberman.DangerRight;
        pBomberman.DangerRight := dangerMin;
@@ -273,7 +273,7 @@ Begin
 
 
 // PunchBomb
-   If ( nSkill = SKILL_GODLIKE ) And ( pBomberman.bCanPunch ) Then
+   If ( ( nSkill = SKILL_GODLIKE ) Or ( nSkill = SKILL_MASTERFUL ) ) And ( pBomberman.bCanPunch ) Then
       pBomberman.PunchBomb( dt );
       
 
@@ -291,8 +291,8 @@ Begin
       If ( bY - (pBomberman.FlameSize - 1) <= 1 ) Then bUp := 1 Else bUp := bY - (pBomberman.FlameSize - 1);
       If ( bY + (pBomberman.FlameSize - 1) >= GRIDHEIGHT ) Then bDown := GRIDHEIGHT Else bDown := bY + (pBomberman.FlameSize - 1);
 
-      // Rechercher d'un bomberman pour le niveau godlike.
-      If ( nSkill = SKILL_GODLIKE ) Then Begin
+      // Rechercher d'un bomberman pour le niveau godlike ou masterful.
+      If ( nSkill = SKILL_GODLIKE ) Or ( nSkill = SKILL_MASTERFUL ) Then Begin
           // S'il y a quelqu'un sur la ligne/colonne de la bombe et qu'il n'y a pas de bloc ou de bonus entre alors on fait exploser la bombe
           // Gauche
           continue := true;
@@ -395,7 +395,8 @@ Begin
 
 
 // DropBomb pour le niveau Godlike.
-If ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.uGrabbedBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) Then Begin
+If ( ( nSkill = SKILL_GODLIKE ) Or ( nSkill = SKILL_MASTERFUL ) )
+And ( ( pBomberman.uGrabbedBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) Then Begin
      pBomberman.SumGrabGetDelta := pBomberman.SumGrabGetDelta + dt;
      // Si la case suivante est un bloc, le bout de la map ou un bomberman, alors on lance la bombe.
      If ( ( pBomberman.Direction = 0 ) And ( ( pY + 1 > GRIDHEIGHT )
@@ -610,16 +611,16 @@ End;
    If ( pY = GRIDHEIGHT ) Or ( aState[ pX, pY + 1 ] mod 16 >= 8 ) Then sum := sum - 8192;
 
    // Si le bomberman vient de bouger et qu'il n'y a pas trop de danger autour, alors il peut créer une bombe.
-   // Si le bomberman est malade et que le niveau est godlike, alors il ne pose pas la bombe.
-   If ( sum < 1024 ) And ( ( nSkill <> SKILL_GODLIKE ) Or ( pBomberman.ExploseBombTime >= 3 ) )
+   // Si le bomberman est malade et que le niveau est godlike ou masterful, alors il ne pose pas la bombe.
+   If ( sum < 1024 ) And ( ( nSkill = SKILL_NOVICE ) Or ( nSkill = SKILL_AVERAGE ) Or ( pBomberman.ExploseBombTime >= 3 ) )
    And ( PutBomb( Trunc( pBomberman.Position.X + 0.5), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill,
    pBomberman.SumBombGetDelta > 8 ) ) Then Begin
        pBomberman.CreateBomb( dt, Random( 1000000000 ) );
-       If ( pBomberman.bCanGrabBomb ) And ( nSkill = SKILL_GODLIKE ) Then Begin
+       If ( pBomberman.bCanGrabBomb ) And ( ( nSkill = SKILL_GODLIKE ) Or ( nSkill = SKILL_MASTERFUL ) ) Then Begin
           pBomberman.PrimaryKeyDown( dt );
           pBomberman.SumGrabGetDelta := 0;
        End;
-       If ( pBomberman.bCanSpoog ) And ( nSkill = SKILL_GODLIKE )
+       If ( pBomberman.bCanSpoog ) And ( ( nSkill = SKILL_GODLIKE ) Or ( nSkill = SKILL_MASTERFUL ) )
        And ( CanSpoog( Trunc( pBomberman.Position.X + 0.5), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill,
        pBomberman.Direction ) ) Then Begin
           pBomberman.CreateBomb( dt, Random( 1000000000 ) );
@@ -750,7 +751,7 @@ Begin
               If ( wState[i, j] mod 2 = 1 ) Then
                  result2 := result2 + 4096;
            // Traitement des bombes.
-              // Si le niveau est godlike est que le bomberman peut pousser la bombe, alors elle ne représente pas un danger.
+              // Si le niveau est godlike ou masterful est que le bomberman peut pousser la bombe, alors elle ne représente pas un danger.
               If ( wState[i, j] mod 4 >= 2 ) Then Begin
                  canPushThisBomb := True;
                  If  ( CanPush = False )
@@ -759,7 +760,7 @@ Begin
                  Or ( ( y < j ) And ( ( j >= GRIDHEIGHT ) Or ( wState[i, j+1] mod 16 >= 1 ) Or ( wState[i, j+1] mod 64 >= 32 ) ) )
                  Or ( ( y > j ) And ( ( j <= 1 ) Or ( wState[i, j-1] mod 16 >= 1 ) Or ( wState[i, j-1] mod 64 >= 32 ) ) ) Then
                     canPushThisBomb := False;
-                 If ( wSkill = SKILL_GODLIKE ) And ( canPushThisBomb = true )
+                 If ( ( wSkill = SKILL_GODLIKE ) Or ( wSkill = SKILL_MASTERFUL ) ) And ( canPushThisBomb = true )
                  And ( GetBombByGridCoo(i, j) Is CBomb ) And ( GetBombByGridCoo(i, j).Time + 1 < GetBombByGridCoo(i, j).ExploseTime ) Then
                     result2 := result2 - 64
                  Else Begin
@@ -955,7 +956,7 @@ Begin
                  blocked := true;
           End;
       End;
-      
+
       // Pour la case de gauche, s'il y a deux cases libres de suite alors, il n'y a pas de danger.
       If ( x > 1 ) And ( ( wState[x - 1, y] mod 16 = 0 ) Or ( wState[x - 1, y] mod 16 = 4 ) ) Then Begin
          sumFreeCases := sumFreeCases + 1;
@@ -1001,55 +1002,55 @@ Begin
       // se coince car il a peur des bombermans. Si ce coefficient est trop fort, alors il ne fait plus attention aux bombes.
       If ( blocked = true ) Then
          result2 := result2 + 512 div ( 8 + sumFreeCases );
-
-
-
-// Traitement des bombes pour les niveaux average, masterful et godlike.
-   // Ca sert à ne pas se coincer dans un coin juste après avoir poser une bombe et en sortir si c'est possible.
-      // Si le bomberman ne peut se déplacer que dans le sens dans la bombe qui est proche, alors il le fait.
-      blocked := false;
-      // Bombe à gauche : si pour le haut, la droite et le bas, il y a le bord, un obstacle ou qu'il y a une bombe
-      // qui menace la case, et qu'il y a une bombe à gauche du bomberman, alors il est bloqué.
-      If ( ( y = 1 ) Or ( ( wState[x, y - 1] mod 16 <> 0 ) And ( wState[x, y - 1] mod 16 <> 4 ) ) Or ( ( x > 1 )                 // Obstacle ou bombe au-dessus.
-      And ( wState[x - 1, y - 1] mod 4 >= 2 ) ) Or ( ( x > 2 ) And ( wState[x - 2, y - 1] mod 4 >= 2 ) ) )
-      And ( ( x = GRIDWIDTH ) Or ( (  wState[x + 1, y] mod 16 <> 0 ) And ( wState[x + 1, y] mod 16 <> 4 ) ) )                    // Obstacle à droite.
-      And ( ( y = GRIDHEIGHT ) Or ( ( wState[x, y + 1] mod 16 <> 0 ) And ( wState[x, y + 1] mod 16 <> 4 ) ) Or ( ( x > 1 )       // Obstacle ou bombe au-dessous.
-      And ( wState[x - 1, y + 1] mod 4 >= 2 ) ) Or ( ( x > 2 ) And ( wState[x - 2, y + 1] mod 4 >= 2 ) ) )
-      And ( ( ( x > 1 ) And ( wState[x - 1, y] mod 4 >= 2 ) )                                                                    // Bombe à gauche.
-      Or ( ( x > 2 ) And ( wState[x - 2, y] mod 4 >= 2 ) ) ) Then
-         blocked := true;
-      // Bombe en haut
-      If ( ( x = 1 ) Or ( ( wState[x - 1, y] mod 16 <> 0 ) And ( wState[x - 1, y] mod 16 <> 4 ) ) Or ( ( y > 1 )
-      And ( wState[x - 1, y - 1] mod 4 >= 2 ) ) Or ( ( y > 2 ) And ( wState[x - 1, y - 2] mod 4 >= 2 ) ) )
-      And ( ( x = GRIDWIDTH ) Or ( ( wState[x + 1, y] mod 16 <> 0 ) And ( wState[x + 1, y] mod 16 <> 4 ) ) Or ( ( y > 1 )
-      And ( wState[x + 1, y - 1] mod 4 >= 2 ) ) Or ( ( y > 2 ) And ( wState[x + 1, y - 2] mod 4 >= 2 ) ) )
-      And ( ( y = GRIDHEIGHT ) Or ( ( wState[x, y + 1] mod 16 <> 0 ) And ( wState[x, y + 1] mod 16 <> 4 ) ) )
-      And ( ( ( y > 1 ) And ( wState[x, y - 1] mod 4 >= 2 ) )
-      Or ( ( y > 2 ) And ( wState[x, y - 2] mod 4 >= 2 ) ) ) Then
-         blocked := true;
-      // Bombe à droite.
-      If ( ( x = 1 ) Or ( ( wState[x - 1, y] mod 16 <> 0 ) And ( wState[x - 1, y] mod 16 <> 4 ) ) )
-      And ( ( y = 1 ) Or ( ( wState[x, y - 1] mod 16 <> 0 ) And ( wState[x, y - 1] mod 16 <> 4 ) ) Or ( ( x < GRIDWIDTH )
-      And ( wState[x + 1, y - 1] mod 4 >= 2 ) ) Or ( ( x < GRIDWIDTH - 1 ) And ( wState[x + 2, y - 1] mod 4 >= 2 ) ) )
-      And ( ( y = GRIDHEIGHT ) Or ( ( wState[x, y + 1] mod 16 <> 0 ) And ( wState[x, y + 1] mod 16 <> 4 ) ) Or ( ( x < GRIDWIDTH )
-      And ( wState[x + 1, y + 1] mod 4 >= 2 ) ) Or ( ( x < GRIDWIDTH - 1 ) And ( wState[x + 2, y + 1] mod 4 >= 2 ) ) )
-      And ( ( ( x < GRIDWIDTH ) And ( wState[x + 1, y] mod 4 >= 2 ) )
-      Or ( ( x < GRIDWIDTH - 1 ) And ( wState[x + 2, y] mod 4 >= 2 ) ) ) Then
-         blocked := true;
-      // Bombe en bas.
-      If ( ( x = 1 ) Or ( ( wState[x - 1, y ] mod 16 <> 0 ) And ( wState[x - 1, y] mod 16 <> 4 ) ) Or ( ( y < GRIDHEIGHT )
-      And ( wState[x - 1, y + 1] mod 4 >= 2 ) ) Or ( ( y < GRIDHEIGHT - 1 ) And ( wState[x - 1, y + 2] mod 4 >= 2 ) ) )
-      And ( ( y = 1 ) Or ( ( wState[x, y - 1] mod 16 <> 0 ) And ( wState[x, y - 1] mod 16 <> 4 ) ) )
-      And ( ( x = GRIDWIDTH ) Or ( ( wState[x + 1, y] mod 16 <> 0 ) And ( wState[x + 1, y] mod 16 <> 4 ) ) Or ( ( y < GRIDHEIGHT )
-      And ( wState[x + 1, y + 2] mod 4 >= 2 ) ) Or ( ( y < GRIDHEIGHT - 1 ) And ( wState[x + 1, y + 2] mod 4 >= 2 ) ) )
-      And ( ( ( y < GRIDHEIGHT ) And ( wState[x, y + 1] mod 4 >= 2 ) )
-      Or ( ( y < GRIDHEIGHT - 1 ) And ( wState[x, y + 2] mod 4 >= 2 ) ) ) Then
-         blocked := true;
-
-      // Si le bomberman est bloqué, alors il est en danger. 1024 est-il trop fort?
-      If ( blocked = true ) Then
-        result2 := result2 + 1024;
    End;
+
+
+
+// Traitement des bombes
+   // Ca sert à ne pas se coincer dans un coin juste après avoir poser une bombe et en sortir si c'est possible.
+    // Si le bomberman ne peut se déplacer que dans le sens dans la bombe qui est proche, alors il le fait.
+    blocked := false;
+    // Bombe à gauche : si pour le haut, la droite et le bas, il y a le bord, un obstacle ou qu'il y a une bombe
+    // qui menace la case, et qu'il y a une bombe à gauche du bomberman, alors il est bloqué.
+    If ( ( y = 1 ) Or ( ( wState[x, y - 1] mod 16 <> 0 ) And ( wState[x, y - 1] mod 16 <> 4 ) ) Or ( ( x > 1 )                 // Obstacle ou bombe au-dessus.
+    And ( wState[x - 1, y - 1] mod 4 >= 2 ) ) Or ( ( x > 2 ) And ( wState[x - 2, y - 1] mod 4 >= 2 ) ) )
+    And ( ( x = GRIDWIDTH ) Or ( (  wState[x + 1, y] mod 16 <> 0 ) And ( wState[x + 1, y] mod 16 <> 4 ) ) )                    // Obstacle à droite.
+    And ( ( y = GRIDHEIGHT ) Or ( ( wState[x, y + 1] mod 16 <> 0 ) And ( wState[x, y + 1] mod 16 <> 4 ) ) Or ( ( x > 1 )       // Obstacle ou bombe au-dessous.
+    And ( wState[x - 1, y + 1] mod 4 >= 2 ) ) Or ( ( x > 2 ) And ( wState[x - 2, y + 1] mod 4 >= 2 ) ) )
+    And ( ( ( x > 1 ) And ( wState[x - 1, y] mod 4 >= 2 ) )                                                                    // Bombe à gauche.
+    Or ( ( x > 2 ) And ( wState[x - 2, y] mod 4 >= 2 ) ) ) Then
+       blocked := true;
+    // Bombe en haut
+    If ( ( x = 1 ) Or ( ( wState[x - 1, y] mod 16 <> 0 ) And ( wState[x - 1, y] mod 16 <> 4 ) ) Or ( ( y > 1 )
+    And ( wState[x - 1, y - 1] mod 4 >= 2 ) ) Or ( ( y > 2 ) And ( wState[x - 1, y - 2] mod 4 >= 2 ) ) )
+    And ( ( x = GRIDWIDTH ) Or ( ( wState[x + 1, y] mod 16 <> 0 ) And ( wState[x + 1, y] mod 16 <> 4 ) ) Or ( ( y > 1 )
+    And ( wState[x + 1, y - 1] mod 4 >= 2 ) ) Or ( ( y > 2 ) And ( wState[x + 1, y - 2] mod 4 >= 2 ) ) )
+    And ( ( y = GRIDHEIGHT ) Or ( ( wState[x, y + 1] mod 16 <> 0 ) And ( wState[x, y + 1] mod 16 <> 4 ) ) )
+    And ( ( ( y > 1 ) And ( wState[x, y - 1] mod 4 >= 2 ) )
+    Or ( ( y > 2 ) And ( wState[x, y - 2] mod 4 >= 2 ) ) ) Then
+       blocked := true;
+    // Bombe à droite.
+    If ( ( x = 1 ) Or ( ( wState[x - 1, y] mod 16 <> 0 ) And ( wState[x - 1, y] mod 16 <> 4 ) ) )
+    And ( ( y = 1 ) Or ( ( wState[x, y - 1] mod 16 <> 0 ) And ( wState[x, y - 1] mod 16 <> 4 ) ) Or ( ( x < GRIDWIDTH )
+    And ( wState[x + 1, y - 1] mod 4 >= 2 ) ) Or ( ( x < GRIDWIDTH - 1 ) And ( wState[x + 2, y - 1] mod 4 >= 2 ) ) )
+    And ( ( y = GRIDHEIGHT ) Or ( ( wState[x, y + 1] mod 16 <> 0 ) And ( wState[x, y + 1] mod 16 <> 4 ) ) Or ( ( x < GRIDWIDTH )
+    And ( wState[x + 1, y + 1] mod 4 >= 2 ) ) Or ( ( x < GRIDWIDTH - 1 ) And ( wState[x + 2, y + 1] mod 4 >= 2 ) ) )
+    And ( ( ( x < GRIDWIDTH ) And ( wState[x + 1, y] mod 4 >= 2 ) )
+    Or ( ( x < GRIDWIDTH - 1 ) And ( wState[x + 2, y] mod 4 >= 2 ) ) ) Then
+       blocked := true;
+    // Bombe en bas.
+    If ( ( x = 1 ) Or ( ( wState[x - 1, y ] mod 16 <> 0 ) And ( wState[x - 1, y] mod 16 <> 4 ) ) Or ( ( y < GRIDHEIGHT )
+    And ( wState[x - 1, y + 1] mod 4 >= 2 ) ) Or ( ( y < GRIDHEIGHT - 1 ) And ( wState[x - 1, y + 2] mod 4 >= 2 ) ) )
+    And ( ( y = 1 ) Or ( ( wState[x, y - 1] mod 16 <> 0 ) And ( wState[x, y - 1] mod 16 <> 4 ) ) )
+    And ( ( x = GRIDWIDTH ) Or ( ( wState[x + 1, y] mod 16 <> 0 ) And ( wState[x + 1, y] mod 16 <> 4 ) ) Or ( ( y < GRIDHEIGHT )
+    And ( wState[x + 1, y + 2] mod 4 >= 2 ) ) Or ( ( y < GRIDHEIGHT - 1 ) And ( wState[x + 1, y + 2] mod 4 >= 2 ) ) )
+    And ( ( ( y < GRIDHEIGHT ) And ( wState[x, y + 1] mod 4 >= 2 ) )
+    Or ( ( y < GRIDHEIGHT - 1 ) And ( wState[x, y + 2] mod 4 >= 2 ) ) ) Then
+       blocked := true;
+
+    // Si le bomberman est bloqué, alors il est en danger. 1024 est-il trop fort?
+    If ( blocked = true ) Then
+      result2 := result2 + 1024;
    
    
    
@@ -1145,6 +1146,7 @@ Begin
          If ( numFreeCase = 3 ) Or ( numFreeCase = 3 ) Then
             result2 := result2 + 16 * ( 8 + abs(iExit - y) ) ;
       End;
+   End;
             
 
               
@@ -1152,6 +1154,7 @@ Begin
    // Ca sert à sortir de l'impasse s'il y a sortie et qu'il y a de l'espoir.
    // Si une bombe est à plus de 3 cases de la sortie ou que la sortie est à moins de 6 cases du bomberman, alors il va vers la sortie.
    // Si une bombe est sur la ligne/colonne d'à côté, on considère qu'il n'y a pas de sortie de ce côté.
+   If ( wSkill <> SKILL_NOVICE ) Then Begin
       // Gauche : on ne continue que s'il y a une bombe à gauche et qu'il n'y a pas de sortie à droite.
       continue := false;
       upBomb := false;
@@ -1344,43 +1347,41 @@ Begin
 
 
 // Si le niveau est au moins average et que le bomberman se coince avec sa bombe, alors il ne la pose pas.
-   If ( wSkill <> SKILL_NOVICE) Then Begin
-      // On initialise le nombre de directions libres à 0.
-      FreeDirections := 0;
-      
-      // Pour la case de gauche, s'il y a deux cases libres de suite alors, il n'y a pas de danger.
-      If ( x > 1 ) And ( pState[x - 1, y] mod 16 mod 16 = 0 )
-      And ( ( ( x > 2 ) And ( pState[x - 2, y] mod 16 = 0 ) )
-      Or ( ( y > 1 ) And ( pState[x - 1, y - 1] mod 16 = 0 ) )
-      Or ( ( y < GRIDHEIGHT ) And ( pState[x - 1, y + 1] mod 16 = 0 ) ) ) Then
-         FreeDirections := FreeDirections + 1;
-      // Droite.
-      If ( x < GRIDWIDTH ) And ( pState[x + 1, y] mod 16 = 0 )
-      And ( ( ( x < GRIDWIDTH - 1 ) And ( pState[x + 2, y] mod 16 = 0 ) )
-      Or ( ( y > 1 ) And ( pState[x + 1, y - 1] mod 16 = 0 ) )
-      Or ( ( y < GRIDHEIGHT ) And ( pState[x + 1, y + 1] mod 16 = 0 ) ) ) Then
-         FreeDirections := FreeDirections + 1;
-      // Haut
-      If ( y > 1 ) And ( pState[x, y - 1] mod 16 = 0 )
-      And ( ( ( y > 2 ) And ( pState[x, y - 2] mod 16 = 0 ) )
-      Or ( ( x > 1 ) And ( pState[x - 1, y - 1] mod 16 = 0 ) )
-      Or ( ( x < GRIDWIDTH ) And ( pState[x + 1, y - 1] mod 16 = 0 ) ) ) Then
-         FreeDirections := FreeDirections + 1;
-      // Bas
-      If  ( y < GRIDHEIGHT ) And ( pState[x, y + 1] mod 16 = 0 )
-      And ( ( ( y < GRIDHEIGHT - 1 ) And  ( pState[x, y + 2] mod 16 = 0 ) )
-      Or ( ( x > 1 ) And ( pState[x - 1, y + 1] mod 16 = 0 ) )
-      Or ( ( x < GRIDWIDTH ) And ( pState[x + 1, y + 1] mod 16 = 0 ) ) ) Then
-         FreeDirections := FreeDirections + 1;
-      
-      // S'il n'y pas plus de deux directions libres, alors on ne pose pas la bombe.
-      If ( FreeDirections < 1 ) Then
-         CanPut := false;
-   End;
+    // On initialise le nombre de directions libres à 0.
+    FreeDirections := 0;
+    
+    // Pour la case de gauche, s'il y a deux cases libres de suite alors, il n'y a pas de danger.
+    If ( x > 1 ) And ( pState[x - 1, y] mod 16 mod 16 = 0 )
+    And ( ( ( x > 2 ) And ( pState[x - 2, y] mod 16 = 0 ) )
+    Or ( ( y > 1 ) And ( pState[x - 1, y - 1] mod 16 = 0 ) )
+    Or ( ( y < GRIDHEIGHT ) And ( pState[x - 1, y + 1] mod 16 = 0 ) ) ) Then
+       FreeDirections := FreeDirections + 1;
+    // Droite.
+    If ( x < GRIDWIDTH ) And ( pState[x + 1, y] mod 16 = 0 )
+    And ( ( ( x < GRIDWIDTH - 1 ) And ( pState[x + 2, y] mod 16 = 0 ) )
+    Or ( ( y > 1 ) And ( pState[x + 1, y - 1] mod 16 = 0 ) )
+    Or ( ( y < GRIDHEIGHT ) And ( pState[x + 1, y + 1] mod 16 = 0 ) ) ) Then
+       FreeDirections := FreeDirections + 1;
+    // Haut
+    If ( y > 1 ) And ( pState[x, y - 1] mod 16 = 0 )
+    And ( ( ( y > 2 ) And ( pState[x, y - 2] mod 16 = 0 ) )
+    Or ( ( x > 1 ) And ( pState[x - 1, y - 1] mod 16 = 0 ) )
+    Or ( ( x < GRIDWIDTH ) And ( pState[x + 1, y - 1] mod 16 = 0 ) ) ) Then
+       FreeDirections := FreeDirections + 1;
+    // Bas
+    If  ( y < GRIDHEIGHT ) And ( pState[x, y + 1] mod 16 = 0 )
+    And ( ( ( y < GRIDHEIGHT - 1 ) And  ( pState[x, y + 2] mod 16 = 0 ) )
+    Or ( ( x > 1 ) And ( pState[x - 1, y + 1] mod 16 = 0 ) )
+    Or ( ( x < GRIDWIDTH ) And ( pState[x + 1, y + 1] mod 16 = 0 ) ) ) Then
+       FreeDirections := FreeDirections + 1;
+    
+    // S'il n'y pas plus de deux directions libres, alors on ne pose pas la bombe.
+    If ( FreeDirections < 1 ) Then
+       CanPut := false;
 
    
-// Si le bomberman est dans une impasse, et que le niveau est au moins masterful alors il ne pose pas de bombe.
-   If ( wSkill = SKILL_MASTERFUL ) Or ( wSkill = SKILL_GODLIKE ) Then Begin
+// Si le bomberman est dans une impasse, et que le niveau est au moins average alors il ne pose pas de bombe.
+   If ( wSkill <> SKILL_NOVICE )  Then Begin
       FreeDirections := 0;
 
       // S'il y a une case de sortie ou un bomberman sur une autre ligne à gauche, alors gauche est une sortie.

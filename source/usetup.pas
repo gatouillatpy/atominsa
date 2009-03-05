@@ -21,7 +21,6 @@ Var sLocalName : String;
 Var nLocalIndex : DWord;
 Var sServerAddress : String;
 Var nServerPort : Word;
-Var nServerType : Integer;
 Var sMasterAddress : String;
 Var nMasterPort : Word;
 
@@ -1024,7 +1023,6 @@ Begin
      nLocalIndex := Random(1073741824);
      sServerAddress := '82.230.144.231';
      nServerPort := 554;
-     nServerType := SERVER_STANDARD;
      sMasterAddress := '82.230.144.231';
      nMasterPort := 7070;
      sUserName := 'myname';
@@ -1305,7 +1303,6 @@ Begin
                     If ( k = 2 ) Then Begin
                        sServerAddress := GetString(sLine, 2);
                        nServerPort := GetInteger(sLine, 3);
-                       nServerType := GetInteger(sLine, 4);
                     End;
                End;
           End;
@@ -1442,11 +1439,10 @@ Begin
      WriteLn( ioLine , '-A,2,' + sUserPassword );
      
      WriteLn( ioLine );
-     WriteLn( ioLine , '; network settings (name, address, port, type)' );
+     WriteLn( ioLine , '; network settings (name, address, port)' );
      WriteLn( ioLine , '-N,1,' + sLocalName );
      s := '-N,2,' + sServerAddress;
      s := s + ',' + IntToStr(nServerPort);
-     s := s + ',' + IntToStr(nServerType);
      WriteLn( ioLine , s );
      
      Close(ioLine);
