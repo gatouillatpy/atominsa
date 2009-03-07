@@ -493,6 +493,7 @@ Var nIndex : DWord;
     fBombTime : Single;
     _nNetID, nSum, nNbr : Integer;
     aX, aY, dX, dY : Integer;
+    bNoPlayers : Boolean;
 Var k, l : Integer;
 Begin
      While GetPacket( nIndex, nHeader, sData ) Do Begin
@@ -548,15 +549,13 @@ Begin
                          Send( nLocalIndex, HEADER_SHOW, sData );
                     End;
                End;
-               HEADER_DISCONNECT :
+            {   HEADER_DISCONNECT :
                Begin
                     // suppression du client de la liste
                     For k := ClientIndex(nIndex) To nClientCount - 2 Do
                         nClientIndex[k] := nClientIndex[k+1];
                     nClientCount -= 1;
                     AddLineToConsole( sData + ' leaved the game.' );
-                    sData := '';
-                    SendTo( nIndex, HEADER_QUIT_MENU, sData );
                     // supression des joueurs attribués s'il y en avait
                     For k := 1 To 8 Do Begin
                         If nPlayerClient[k] = nIndex Then Begin
@@ -565,14 +564,12 @@ Begin
                         End;
                     End;
                     // renvoi de la liste des clients
-                    nIndex := nLocalIndex;
                     nHeader := HEADER_LIST_CLIENT;
                     sData := IntToStr(nClientCount);
                     For k := 0 To nClientCount - 1 Do
                         sData := sData + #31 + IntToStr(nClientIndex[k]) + #31 + sClientName[k];
-                    Send( nIndex, nHeader, sData );
+                    Send( nLocalIndex, nHeader, sData );
                     // renvoi de la liste des joueurs
-                    nIndex := nLocalIndex;
                     nHeader := HEADER_LIST_PLAYER;
                     sData := '';
                     For k := 1 To 8 Do Begin
@@ -584,7 +581,24 @@ Begin
                     Send( nIndex, nHeader, sData );
                     If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then
                        UpdateMenu();
-               End;
+                    // Vérification qu'il y a encore des joueurs.
+                    bNoPlayers := True;
+                    For k := 1 To 8 Do Begin
+                        If nPlayerType[k] <> PLAYER_NIL Then bNoPlayers := False;
+                    End;
+                    If bNoPlayers Then Begin
+                        For k := 0 To 255 Do Begin
+                            bClientBtnReady[k] := False;
+                        End;
+                        bLocalReady := False;
+                        InitMenu();
+                        If bOnline Then
+                           SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
+                        Send( nLocalIndex, HEADER_END_GAME, '' );
+                    End;
+                    sData := '';
+                    SendTo( nIndex, HEADER_QUIT_MENU, sData );
+               End;      }
                HEADER_MESSAGE :
                Begin
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' says : ' + sData );
@@ -618,6 +632,8 @@ Begin
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
                     Send( nIndex, nHeader, sData );
                     UpdatePlayerInfo();
+                    If ( nGame <> GAME_MENU ) And ( nGame <> GAME_MENU_PLAYER ) And ( nGame <> GAME_MENU_MULTI ) Then
+                       UpdatePlayerScore();
                End;
                HEADER_BTN_NOTREADY :
                Begin
@@ -625,6 +641,8 @@ Begin
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is not ready.' );
                     Send( nIndex, nHeader, sData );
                     UpdatePlayerInfo();
+                    If ( nGame <> GAME_MENU ) And ( nGame <> GAME_MENU_PLAYER ) And ( nGame <> GAME_MENU_MULTI ) Then
+                       UpdatePlayerScore();
                End;
                HEADER_PINGREQ :
                Begin
@@ -965,7 +983,8 @@ Begin
                         nPlayerCharacter[k] := -1;
                         For m := 0 To nCharacterCount - 1 Do
                             If aCharacterList[m].Name = GetString( sData, l ) Then nPlayerCharacter[k] := m;
-                        LoadCharacter( k ); l += 1;
+                      //  LoadCharacter( k );
+                        l += 1;
                         TryStrToInt( GetString( sData, l ), nPlayerType[k] ); l += 1;
                     End;
                     If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then
@@ -1018,14 +1037,24 @@ Begin
                     bClientBtnReady[ClientIndex(nIndex)] := True;
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is ready.' );
                     UpdatePlayerInfo();
-                    UpdatePlayerScore();
+                    If ( nGame <> GAME_MENU ) And ( nGame <> GAME_MENU_PLAYER ) And ( nGame <> GAME_MENU_MULTI ) Then
+                       UpdatePlayerScore();
                End;
                HEADER_BTN_NOTREADY :
                Begin
                     bClientBtnReady[ClientIndex(nIndex)] := False;
                     AddLineToConsole( sClientName[ClientIndex(nIndex)] + ' is not ready.' );
                     UpdatePlayerInfo();
-                    UpdatePlayerScore();
+                    If ( nGame <> GAME_MENU ) And ( nGame <> GAME_MENU_PLAYER ) And ( nGame <> GAME_MENU_MULTI ) Then
+                       UpdatePlayerScore();
+               End;
+               HEADER_END_GAME :
+               Begin
+                    For k := 0 To 255 Do Begin
+                        bClientBtnReady[k] := False;
+                    End;
+                    bLocalReady := False;
+                    InitMenu();
                End;
                HEADER_PINGRES :
                Begin
@@ -1451,13 +1480,17 @@ Begin
                HEADER_QUIT_GAME :
                Begin
                     PlaySound( SOUND_MENU_BACK );
+                    For k := 0 To 255 Do Begin
+                        bClientBtnReady[k] := False;
+                    End;
+                    bLocalReady := False;
                     InitMenu();
                     ClearInput();
                End;
-               HEADER_QUIT_MENU :
+            {   HEADER_QUIT_MENU :
                Begin
                     nState := PHASE_MENU;
-               End;
+               End; }
           End;
      End;
      
@@ -1546,11 +1579,12 @@ Begin
         Else ServerLoop();
      End Else If nMulti = MULTI_CLIENT Then Begin
         If (nState = PHASE_MENU) Or (bGoToPhaseMenu) Then Begin
-           If Not bSendDisconnect Then Begin
+         {  If Not bSendDisconnect Then Begin
               Send( nLocalIndex, HEADER_DISCONNECT, sLocalName );
               bSendDisconnect := True;
            End;
-           If GetTime() > ( fKey + 8.0 ) Then nState := PHASE_MENU;
+           If GetTime() > ( fKey + 8.0 ) Then nState := PHASE_MENU; }
+           nState := PHASE_MENU;
         End;
         ProcessClient();
         If (nState = PHASE_MENU) Then Begin

@@ -1372,7 +1372,7 @@ Begin
         End;
         bLocalReady := False;
         InitMenu();
-        If bOnline Then
+        If bOnline And (nLocalIndex = nClientIndex[0]) Then
            SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
      End;
      
@@ -1451,6 +1451,7 @@ Var k : Integer;
 Begin
      // initialisation de la minuterie d'attente
      fWaitTime := GetTime;
+     fKey := GetTime;
 
      // remise à zéro de l'attente
      For k := 0 To 255 Do Begin
@@ -1499,6 +1500,7 @@ Procedure ProcessWait () ;
 Var w, h : Single;
     i, k : Integer;
     bIsReady : Boolean;
+    sData : String;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -1535,7 +1537,7 @@ Begin
         For i := 1 To GetBombermanCount() Do
             DrawString( STRING_SCORE_TABLE(i), -w / h * 0.9, 0.7 - 0.2 * Single(i), -1, 0.018 * w / h, 0.024, 1, 1, 1, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
-     If GetKey(KEY_ENTER) Then Begin
+     If GetKey(KEY_ENTER) And ( GetTime > fKey ) Then Begin
        //If (bMulti = False) Or ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
        //   InitRound();
        //End;
@@ -1552,10 +1554,36 @@ Begin
              bClientBtnReady[ClientIndex(nLocalIndex)] := False;
              UpdatePlayerScore();
          End;
+         ClearInput();
+         fKey := GetTime + 0.5;
+     End;
+
+     // force l'abandon du jeu
+     If GetKey( KEY_ESC ) Then Begin
+        If (bMulti = False) Then Begin
+           InitMenu();
+           ClearInput();
+        End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
+            sData := '';
+            Send( nLocalIndex, HEADER_QUIT_GAME, sData );
+            If bOnline Then SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
+            PlaySound( SOUND_MENU_BACK );
+            For k := 0 To 255 Do Begin
+                bClientBtnReady[k] := False;
+            End;
+            bLocalReady := False;
+            InitMenu();
+            ClearInput();
+        End Else Begin
+            PlaySound( SOUND_MENU_BACK );
+            bGoToPhaseMenu := True;
+            fKey := GetTime();
+            ClearInput();
+        End;
      End;
 
      // vérifie que tous les joueurs sont prêts
-     If bMulti = True Then Begin
+     If bMulti = True And ( ( nLocalIndex = nClientIndex[0] ) Or DEDICATED_SERVER )Then Begin
          bIsReady := False;
          For i := 1 To 8 Do Begin
              If ( nPlayerType[i] <> PLAYER_NIL ) Then bIsReady := True;
@@ -1572,9 +1600,8 @@ Begin
          If bIsReady Then InitRound();
      End;
 
-     // pour le serveur automatique
-     //If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) And DEDICATED_SERVER And ( GetTime - fWaitTime > 8 )
-     //   Then InitRound();
+     // delai maximal de 16 secondes
+     If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) And ( GetTime - fWaitTime > 16.0 ) Then InitRound();
 End;
 
 
@@ -1877,8 +1904,9 @@ Procedure SynchroGame () ;
 Var  k, l: Integer;
      sData : String;
      nIndex, nHeader : Integer;
+     bNoPlayers : Boolean;
 Begin
-     // teste l'absence d'un client
+     // teste l'absence d'un client (au cas où ça se produise)
      If ( GetTime - fWaitTime > 8.0 ) Then Begin
         For k := 0 To nClientCount - 1 Do Begin
             If ( bClientReady[k] = False ) Then Begin
@@ -1888,8 +1916,6 @@ Begin
                       nClientIndex[l] := nClientIndex[l+1];
                   nClientCount -= 1;
                   AddLineToConsole( sClientName[k] + ' leaved the game.' );
-                  sData := '';
-                  SendTo( nIndex, HEADER_QUIT_MENU, sData );
                   // supression des joueurs attribués s'il y en avait
                   For l := 1 To 8 Do Begin
                       If nPlayerClient[l] = nIndex Then Begin
@@ -1898,14 +1924,12 @@ Begin
                       End;
                   End;
                   // renvoi de la liste des clients
-                  nIndex := nLocalIndex;
                   nHeader := HEADER_LIST_CLIENT;
                   sData := IntToStr(nClientCount);
                   For l := 0 To nClientCount - 1 Do
                       sData := sData + #31 + IntToStr(nClientIndex[l]) + #31 + sClientName[l];
-                  Send( nIndex, nHeader, sData );
+                  Send( nLocalIndex, nHeader, sData );
                   // renvoi de la liste des joueurs
-                  nIndex := nLocalIndex;
                   nHeader := HEADER_LIST_PLAYER;
                   sData := '';
                   For l := 1 To 8 Do Begin
@@ -1914,7 +1938,24 @@ Begin
                       sData := sData + pPlayerCharacter[l].Name + #31;
                       sData := sData + IntToStr(nPlayerType[l]) + #31;
                   End;
-                  Send( nIndex, nHeader, sData );
+                  Send( nLocalIndex, nHeader, sData );
+                  If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then
+                       UpdateMenu();
+                  // Vérification qu'il y a encore des joueurs.
+                  bNoPlayers := True;
+                  For l := 1 To 8 Do Begin
+                        If nPlayerType[l] <> PLAYER_NIL Then bNoPlayers := False;
+                  End;
+                  If bNoPlayers Then Begin
+                       For l := 0 To 255 Do Begin
+                            bClientBtnReady[l] := False;
+                       End;
+                       bLocalReady := False;
+                       InitMenu();
+                       If bOnline Then
+                           SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
+                       Send( nLocalIndex, HEADER_END_GAME, '' );
+                  End;
             End;
         End;
      End;
@@ -3165,6 +3206,7 @@ Begin
                  End;
              End;
          End;
+         If nLocalIndex <> nClientIndex[0] Then bIsReady := False;
      End Else Begin
          bIsReady := False;
      End;

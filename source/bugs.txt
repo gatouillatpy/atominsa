@@ -1,4 +1,5 @@
-= en caméra 3D, les shaders des flammes peuvent traverser les caisses s'il y a au moins une case libre entre
+= bug avec le master serveur lorsqu'un client se déconnecte (ou un truc de ce style)
+- redemarrage du serveur à 6 h pour corriger les éventuels bugs.
 
 + pour fréquent, = pour régulier, - pour rare
 

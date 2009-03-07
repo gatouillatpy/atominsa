@@ -19,7 +19,6 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <CommandLineParams Value="/server"/>
         <LaunchingApplication PathPlusParams="\usr\X11R6\bin\xterm -T 'Lazarus Run Output' -e $(LazarusDir)\tools\runwait.sh $(TargetCmdLine)"/>
       </local>
     </RunParams>
@@ -32,8 +31,8 @@
       <Unit0>
         <Filename Value="atominsa.lpr"/>
         <UnitName Value="atominsa"/>
-        <CursorPos X="66" Y="198"/>
-        <TopLine Value="176"/>
+        <CursorPos X="32" Y="220"/>
+        <TopLine Value="203"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="126"/>
         <Loaded Value="True"/>
@@ -43,7 +42,7 @@
         <UnitName Value="UCore"/>
         <CursorPos X="29" Y="9"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="12"/>
         <UsageCount Value="126"/>
         <Loaded Value="True"/>
       </Unit1>
@@ -52,7 +51,7 @@
         <UnitName Value="UUtils"/>
         <CursorPos X="35" Y="234"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="7"/>
         <UsageCount Value="125"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -71,7 +70,7 @@
         <UnitName Value="USetup"/>
         <CursorPos X="5" Y="48"/>
         <TopLine Value="29"/>
-        <EditorIndex Value="23"/>
+        <EditorIndex Value="21"/>
         <UsageCount Value="109"/>
         <Loaded Value="True"/>
       </Unit4>
@@ -108,7 +107,7 @@
         <UnitName Value="UGrid"/>
         <CursorPos X="6" Y="135"/>
         <TopLine Value="113"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="5"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit9>
@@ -117,7 +116,7 @@
         <UnitName Value="UBomberman"/>
         <CursorPos X="3" Y="1387"/>
         <TopLine Value="1382"/>
-        <EditorIndex Value="16"/>
+        <EditorIndex Value="14"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit10>
@@ -126,7 +125,7 @@
         <UnitName Value="UDisease"/>
         <CursorPos X="45" Y="34"/>
         <TopLine Value="13"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="1"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -135,7 +134,7 @@
         <UnitName Value="UBomb"/>
         <CursorPos X="52" Y="353"/>
         <TopLine Value="368"/>
-        <EditorIndex Value="20"/>
+        <EditorIndex Value="18"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit12>
@@ -144,7 +143,7 @@
         <UnitName Value="UFlame"/>
         <CursorPos X="21" Y="290"/>
         <TopLine Value="286"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="6"/>
         <UsageCount Value="39"/>
         <Loaded Value="True"/>
       </Unit13>
@@ -153,7 +152,7 @@
         <UnitName Value="UBlock"/>
         <CursorPos X="13" Y="56"/>
         <TopLine Value="27"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="4"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit14>
@@ -162,7 +161,7 @@
         <UnitName Value="UMulti"/>
         <CursorPos X="65" Y="1022"/>
         <TopLine Value="956"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="3"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit15>
@@ -171,7 +170,7 @@
         <UnitName Value="UGame"/>
         <CursorPos X="15" Y="963"/>
         <TopLine Value="945"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="8"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit16>
@@ -180,7 +179,7 @@
         <UnitName Value="UItem"/>
         <CursorPos X="37" Y="46"/>
         <TopLine Value="34"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="2"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit17>
@@ -189,7 +188,7 @@
         <UnitName Value="UListBomb"/>
         <CursorPos X="1" Y="269"/>
         <TopLine Value="259"/>
-        <EditorIndex Value="18"/>
+        <EditorIndex Value="16"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit18>
@@ -199,7 +198,7 @@
         <UnitName Value="UOnline"/>
         <CursorPos X="1" Y="241"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="24"/>
+        <EditorIndex Value="22"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit19>
@@ -215,32 +214,28 @@
         <UnitName Value="URandomBonus"/>
         <CursorPos X="100" Y="41"/>
         <TopLine Value="11"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="10"/>
         <UsageCount Value="90"/>
         <Loaded Value="True"/>
       </Unit21>
       <Unit22>
-        <Filename Value="..\..\..\..\..\lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <Filename Value="..\..\..\lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
         <CursorPos X="10" Y="71"/>
         <TopLine Value="52"/>
-        <EditorIndex Value="1"/>
         <UsageCount Value="18"/>
-        <Loaded Value="True"/>
       </Unit22>
       <Unit23>
-        <Filename Value="..\..\..\..\..\lazarus\fpc\2.0.4\source\rtl\inc\systemh.inc"/>
+        <Filename Value="..\..\..\lazarus\fpc\2.0.4\source\rtl\inc\systemh.inc"/>
         <CursorPos X="11" Y="655"/>
         <TopLine Value="636"/>
-        <EditorIndex Value="2"/>
         <UsageCount Value="22"/>
-        <Loaded Value="True"/>
       </Unit23>
       <Unit24>
         <Filename Value="ucomputer.pas"/>
         <UnitName Value="UComputer"/>
         <CursorPos X="26" Y="92"/>
         <TopLine Value="84"/>
-        <EditorIndex Value="19"/>
+        <EditorIndex Value="17"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit24>
@@ -249,7 +244,7 @@
         <UnitName Value="UTriggerBomb"/>
         <CursorPos X="25" Y="39"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="17"/>
+        <EditorIndex Value="15"/>
         <UsageCount Value="35"/>
         <Loaded Value="True"/>
       </Unit25>
@@ -258,7 +253,7 @@
         <UnitName Value="UMenu"/>
         <CursorPos X="3" Y="165"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="11"/>
         <UsageCount Value="92"/>
         <Loaded Value="True"/>
       </Unit26>
@@ -282,7 +277,7 @@
         <UnitName Value="UNetwork"/>
         <CursorPos X="1" Y="241"/>
         <TopLine Value="199"/>
-        <EditorIndex Value="25"/>
+        <EditorIndex Value="23"/>
         <UsageCount Value="171"/>
         <Loaded Value="True"/>
       </Unit29>
@@ -298,7 +293,7 @@
         <UnitName Value="UPunch"/>
         <CursorPos X="22" Y="32"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="9"/>
         <UsageCount Value="55"/>
         <Loaded Value="True"/>
       </Unit31>
@@ -307,7 +302,7 @@
         <UnitName Value="UJelly"/>
         <CursorPos X="19" Y="32"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="22"/>
+        <EditorIndex Value="20"/>
         <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit32>
@@ -316,12 +311,12 @@
         <UnitName Value="UJellyBomb"/>
         <CursorPos X="10" Y="28"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="21"/>
+        <EditorIndex Value="19"/>
         <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit33>
       <Unit34>
-        <Filename Value="..\..\..\..\..\lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
+        <Filename Value="..\..\..\lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
         <CursorPos X="1" Y="74"/>
         <TopLine Value="57"/>
         <UsageCount Value="12"/>
@@ -331,50 +326,25 @@
         <UnitName Value="Glut"/>
         <CursorPos X="1" Y="478"/>
         <TopLine Value="590"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="13"/>
         <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit35>
       <Unit36>
-        <Filename Value="..\..\..\..\..\lazarus\fpc\2.0.4\source\rtl\inc\system.inc"/>
+        <Filename Value="..\..\..\lazarus\fpc\2.0.4\source\rtl\inc\system.inc"/>
         <CursorPos X="11" Y="621"/>
         <TopLine Value="604"/>
         <UsageCount Value="9"/>
       </Unit36>
       <Unit37>
-        <Filename Value="..\..\..\..\..\lazarus\lcl\forms.pp"/>
+        <Filename Value="..\..\..\lazarus\lcl\forms.pp"/>
         <UnitName Value="Forms"/>
         <CursorPos X="3" Y="1292"/>
         <TopLine Value="1273"/>
         <UsageCount Value="10"/>
       </Unit37>
     </Units>
-    <JumpHistory Count="6" HistoryIndex="5">
-      <Position1>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="8" Column="40" TopLine="1"/>
-      </Position1>
-      <Position2>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="396" Column="25" TopLine="388"/>
-      </Position2>
-      <Position3>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="8" Column="73" TopLine="1"/>
-      </Position3>
-      <Position4>
-        <Filename Value="atominsa.lpr"/>
-        <Caret Line="39" Column="13" TopLine="15"/>
-      </Position4>
-      <Position5>
-        <Filename Value="atominsa.lpr"/>
-        <Caret Line="195" Column="20" TopLine="177"/>
-      </Position5>
-      <Position6>
-        <Filename Value="atominsa.lpr"/>
-        <Caret Line="200" Column="28" TopLine="177"/>
-      </Position6>
-    </JumpHistory>
+    <JumpHistory Count="0" HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>

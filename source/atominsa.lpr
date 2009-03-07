@@ -217,6 +217,7 @@ Begin
      // lecture du fichier atominsa.cfg
      ReadSettings( 'atominsa.cfg' );
 
+     DEDICATED_SERVER := False;
      If ParamCount() = 1 Then Begin
         If CompareStr( ParamStr(1), '/server' ) = 0 Then Begin
            DEDICATED_SERVER := True;

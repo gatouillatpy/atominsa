@@ -36,6 +36,7 @@ Const HEADER_QUIT_GAME         = 1311;
 Const HEADER_QUIT_MENU         = 1312;
 Const HEADER_BTN_READY         = 1313;
 Const HEADER_BTN_NOTREADY      = 1314;
+Const HEADER_END_GAME          = 1315;
 
 Const HEADER_MOVEUP            = 1401;
 Const HEADER_MOVEDOWN          = 1402;
@@ -623,8 +624,11 @@ End;
 
 
 Procedure TLEvents.OnDisconnect ( tSocket : TLSocket ) ;
-Var p, q : Integer;
+Var p, q, k, l, nIndex, nHeader : Integer;
+    sData : String;
+    bNoPlayers : Boolean;
 Begin
+     q := -1;
      If nSocket > -1 Then Begin
         For p := 0 To nSocket Do
             If aSocket[p] = tSocket Then q := p;
@@ -635,6 +639,57 @@ Begin
          nState := PHASE_MENU;
      End;
      AddLineToConsole('Connection lost.');
+     If ( nLocalIndex = nClientIndex[0] ) Or DEDICATED_SERVER Then Begin
+         k := q + 1;
+         If k > 0 Then Begin
+                // suppression du client de la liste
+                nIndex := nClientIndex[k];
+                For l := k To nClientCount - 2 Do
+                    nClientIndex[l] := nClientIndex[l+1];
+                nClientCount -= 1;
+                AddLineToConsole( sClientName[k] + ' leaved the game.' );
+                // supression des joueurs attribués s'il y en avait
+                For l := 1 To 8 Do Begin
+                    If nPlayerClient[l] = nIndex Then Begin
+                       nPlayerClient[l] := -1;
+                       nPlayerType[l] := PLAYER_NIL;
+                    End;
+                End;
+                // renvoi de la liste des clients
+                nIndex := nLocalIndex;
+                nHeader := HEADER_LIST_CLIENT;
+                sData := IntToStr(nClientCount);
+                For l := 0 To nClientCount - 1 Do
+                    sData := sData + #31 + IntToStr(nClientIndex[l]) + #31 + sClientName[l];
+                Send( nIndex, nHeader, sData );
+                // renvoi de la liste des joueurs
+                nIndex := nLocalIndex;
+                nHeader := HEADER_LIST_PLAYER;
+                sData := '';
+                For l := 1 To 8 Do Begin
+                    sData := sData + IntToStr(nPlayerClient[l]) + #31;
+                    sData := sData + sPlayerName[l] + #31;
+                    sData := sData + pPlayerCharacter[l].Name + #31;
+                    sData := sData + IntToStr(nPlayerType[l]) + #31;
+                End;
+                Send( nIndex, nHeader, sData );
+                // Vérification qu'il y a encore des joueurs.
+                bNoPlayers := True;
+                For l := 1 To 8 Do Begin
+                      If nPlayerType[l] <> PLAYER_NIL Then bNoPlayers := False;
+                End;
+                If bNoPlayers Then Begin
+                     For l := 0 To 255 Do Begin
+                          bClientBtnReady[l] := False;
+                     End;
+                     bLocalReady := False;
+                     InitMenu();
+                     If bOnline Then
+                         SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
+                     Send( nLocalIndex, HEADER_END_GAME, '' );
+                End;
+         End;
+     End;
 End;
 
 
@@ -671,7 +726,8 @@ End;
 
 Procedure TLEvents.OnError ( Const sError : String ; tSocket : TLSocket ) ;
 Begin
-     AddLineToConsole( 'Network error : ' + sError );
+     AddLineToConsole( 'Network error' );
+     OnDisconnect( tSocket );
 End;
 
 
