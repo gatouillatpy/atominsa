@@ -48,7 +48,7 @@ public class AtominsaConsole extends Thread
 				System.out.flush();
 			}
 		}
-		catch ( IOException e )
+		catch ( Exception e )
 		{
 			System.out.println( ">> ERROR : " + e.getMessage() );
 		}

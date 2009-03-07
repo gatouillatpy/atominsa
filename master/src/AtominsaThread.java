@@ -206,7 +206,7 @@ public class AtominsaThread extends Thread
 			
 			tServer = null;
 		}
-		else if ( nHeader == HEADER_ONLINE_PLAYER )
+		else if ( nHeader == HEADER_ONLINE_PLAYER ) // TODO : vérifier s'il n'y a pas une erreur ici
 		{
 			int nPlayerPosition = getIntFromData( sData, 0 ); // 1..8
 			int nPlayerType = getIntFromData( sData, 1 ); // 0 = NIL ; 1 = KB1 ; 2 = KB2 ; 3 = IA

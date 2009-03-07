@@ -14,35 +14,16 @@ public class AtominsaDatabase
 	
 	static private Connection con;
 
-    static public boolean Connect()
+    static public void Connect() throws ClassNotFoundException, SQLException
     {
-		try
-		{
-			Class.forName("com.mysql.jdbc.Driver");
+		Class.forName("com.mysql.jdbc.Driver");
 			
-			con = DriverManager.getConnection( "jdbc:mysql://localhost:3306/atominsa", "root", "" );
-	    }
-		catch ( SQLException e )
-		{
-			return false;
-		}
-		catch ( ClassNotFoundException e )
-		{
-			return false;
-		}
-
-		return true;
+		con = DriverManager.getConnection( "jdbc:mysql://localhost:3306/atominsa", "root", "" );
     }    
     
-    static public void Disconnect()
+    static public void Disconnect() throws SQLException
     {
-		try
-		{
-	        con.close();
-	    }
-		catch ( SQLException e )
-		{
-		}
+    	con.close();
     }
 
     static public AtominsaPlayer GetPlayer( String _sUsername, String _sPassword )
