@@ -27,12 +27,12 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="38">
+    <Units Count="45">
       <Unit0>
         <Filename Value="atominsa.lpr"/>
         <UnitName Value="atominsa"/>
-        <CursorPos X="32" Y="220"/>
-        <TopLine Value="203"/>
+        <CursorPos X="10" Y="109"/>
+        <TopLine Value="122"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="126"/>
         <Loaded Value="True"/>
@@ -40,18 +40,16 @@
       <Unit1>
         <Filename Value="ucore.pas"/>
         <UnitName Value="UCore"/>
-        <CursorPos X="29" Y="9"/>
-        <TopLine Value="1"/>
-        <EditorIndex Value="12"/>
+        <CursorPos X="14" Y="357"/>
+        <TopLine Value="342"/>
         <UsageCount Value="126"/>
-        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="uutils.pas"/>
         <UnitName Value="UUtils"/>
-        <CursorPos X="35" Y="234"/>
-        <TopLine Value="1"/>
-        <EditorIndex Value="7"/>
+        <CursorPos X="36" Y="234"/>
+        <TopLine Value="219"/>
+        <EditorIndex Value="2"/>
         <UsageCount Value="125"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -61,16 +59,16 @@
         <HasResources Value="True"/>
         <ResourceFilename Value="uform.lrs"/>
         <UnitName Value="UForm"/>
-        <CursorPos X="11" Y="27"/>
-        <TopLine Value="27"/>
-        <UsageCount Value="76"/>
+        <CursorPos X="58" Y="36"/>
+        <TopLine Value="22"/>
+        <UsageCount Value="77"/>
       </Unit3>
       <Unit4>
         <Filename Value="usetup.pas"/>
         <UnitName Value="USetup"/>
-        <CursorPos X="5" Y="48"/>
-        <TopLine Value="29"/>
-        <EditorIndex Value="21"/>
+        <CursorPos X="33" Y="385"/>
+        <TopLine Value="377"/>
+        <EditorIndex Value="8"/>
         <UsageCount Value="109"/>
         <Loaded Value="True"/>
       </Unit4>
@@ -105,36 +103,32 @@
       <Unit9>
         <Filename Value="ugrid.pas"/>
         <UnitName Value="UGrid"/>
-        <CursorPos X="6" Y="135"/>
-        <TopLine Value="113"/>
-        <EditorIndex Value="5"/>
+        <CursorPos X="1" Y="143"/>
+        <TopLine Value="120"/>
         <UsageCount Value="101"/>
-        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="ubomberman.pas"/>
         <UnitName Value="UBomberman"/>
         <CursorPos X="3" Y="1387"/>
         <TopLine Value="1382"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="5"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit10>
       <Unit11>
         <Filename Value="udisease.pas"/>
         <UnitName Value="UDisease"/>
-        <CursorPos X="45" Y="34"/>
-        <TopLine Value="13"/>
-        <EditorIndex Value="1"/>
+        <CursorPos X="1" Y="32"/>
+        <TopLine Value="41"/>
         <UsageCount Value="100"/>
-        <Loaded Value="True"/>
       </Unit11>
       <Unit12>
         <Filename Value="ubomb.pas"/>
         <UnitName Value="UBomb"/>
-        <CursorPos X="52" Y="353"/>
-        <TopLine Value="368"/>
-        <EditorIndex Value="18"/>
+        <CursorPos X="44" Y="85"/>
+        <TopLine Value="81"/>
+        <EditorIndex Value="7"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit12>
@@ -143,34 +137,30 @@
         <UnitName Value="UFlame"/>
         <CursorPos X="21" Y="290"/>
         <TopLine Value="286"/>
-        <EditorIndex Value="6"/>
-        <UsageCount Value="39"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="42"/>
       </Unit13>
       <Unit14>
         <Filename Value="ublock.pas"/>
         <UnitName Value="UBlock"/>
         <CursorPos X="13" Y="56"/>
         <TopLine Value="27"/>
-        <EditorIndex Value="4"/>
         <UsageCount Value="100"/>
-        <Loaded Value="True"/>
       </Unit14>
       <Unit15>
         <Filename Value="umulti.pas"/>
         <UnitName Value="UMulti"/>
-        <CursorPos X="65" Y="1022"/>
-        <TopLine Value="956"/>
-        <EditorIndex Value="3"/>
+        <CursorPos X="27" Y="887"/>
+        <TopLine Value="872"/>
+        <EditorIndex Value="1"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="ugame.pas"/>
         <UnitName Value="UGame"/>
-        <CursorPos X="15" Y="963"/>
-        <TopLine Value="945"/>
-        <EditorIndex Value="8"/>
+        <CursorPos X="27" Y="2806"/>
+        <TopLine Value="2688"/>
+        <EditorIndex Value="3"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit16>
@@ -179,18 +169,14 @@
         <UnitName Value="UItem"/>
         <CursorPos X="37" Y="46"/>
         <TopLine Value="34"/>
-        <EditorIndex Value="2"/>
         <UsageCount Value="100"/>
-        <Loaded Value="True"/>
       </Unit17>
       <Unit18>
         <Filename Value="ulistbomb.pas"/>
         <UnitName Value="UListBomb"/>
         <CursorPos X="1" Y="269"/>
         <TopLine Value="259"/>
-        <EditorIndex Value="16"/>
         <UsageCount Value="102"/>
-        <Loaded Value="True"/>
       </Unit18>
       <Unit19>
         <Filename Value="uonline.pas"/>
@@ -198,7 +184,7 @@
         <UnitName Value="UOnline"/>
         <CursorPos X="1" Y="241"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="22"/>
+        <EditorIndex Value="9"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit19>
@@ -214,9 +200,7 @@
         <UnitName Value="URandomBonus"/>
         <CursorPos X="100" Y="41"/>
         <TopLine Value="11"/>
-        <EditorIndex Value="10"/>
-        <UsageCount Value="90"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="93"/>
       </Unit21>
       <Unit22>
         <Filename Value="..\..\..\lazarus\fpc\2.0.4\source\rtl\objpas\sysutils\sysstrh.inc"/>
@@ -233,9 +217,9 @@
       <Unit24>
         <Filename Value="ucomputer.pas"/>
         <UnitName Value="UComputer"/>
-        <CursorPos X="26" Y="92"/>
-        <TopLine Value="84"/>
-        <EditorIndex Value="17"/>
+        <CursorPos X="36" Y="619"/>
+        <TopLine Value="51"/>
+        <EditorIndex Value="6"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit24>
@@ -244,17 +228,15 @@
         <UnitName Value="UTriggerBomb"/>
         <CursorPos X="25" Y="39"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="15"/>
-        <UsageCount Value="35"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="38"/>
       </Unit25>
       <Unit26>
         <Filename Value="umenu.pas"/>
         <UnitName Value="UMenu"/>
-        <CursorPos X="3" Y="165"/>
-        <TopLine Value="1"/>
-        <EditorIndex Value="11"/>
-        <UsageCount Value="92"/>
+        <CursorPos X="61" Y="214"/>
+        <TopLine Value="194"/>
+        <EditorIndex Value="4"/>
+        <UsageCount Value="95"/>
         <Loaded Value="True"/>
       </Unit26>
       <Unit27>
@@ -275,10 +257,10 @@
         <Filename Value="unetwork.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UNetwork"/>
-        <CursorPos X="1" Y="241"/>
-        <TopLine Value="199"/>
-        <EditorIndex Value="23"/>
-        <UsageCount Value="171"/>
+        <CursorPos X="5" Y="32"/>
+        <TopLine Value="17"/>
+        <EditorIndex Value="10"/>
+        <UsageCount Value="178"/>
         <Loaded Value="True"/>
       </Unit29>
       <Unit30>
@@ -293,27 +275,21 @@
         <UnitName Value="UPunch"/>
         <CursorPos X="22" Y="32"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="9"/>
-        <UsageCount Value="55"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="58"/>
       </Unit31>
       <Unit32>
         <Filename Value="ujelly.pas"/>
         <UnitName Value="UJelly"/>
         <CursorPos X="19" Y="32"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="20"/>
-        <UsageCount Value="34"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="35"/>
       </Unit32>
       <Unit33>
         <Filename Value="ujellybomb.pas"/>
         <UnitName Value="UJellyBomb"/>
         <CursorPos X="10" Y="28"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="19"/>
-        <UsageCount Value="34"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="35"/>
       </Unit33>
       <Unit34>
         <Filename Value="..\..\..\lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
@@ -326,9 +302,7 @@
         <UnitName Value="Glut"/>
         <CursorPos X="1" Y="478"/>
         <TopLine Value="590"/>
-        <EditorIndex Value="13"/>
-        <UsageCount Value="26"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="27"/>
       </Unit35>
       <Unit36>
         <Filename Value="..\..\..\lazarus\fpc\2.0.4\source\rtl\inc\system.inc"/>
@@ -343,8 +317,174 @@
         <TopLine Value="1273"/>
         <UsageCount Value="10"/>
       </Unit37>
+      <Unit38>
+        <Filename Value="C:\Lazarus\lcl\graphics.pp"/>
+        <UnitName Value="Graphics"/>
+        <CursorPos X="3" Y="393"/>
+        <TopLine Value="375"/>
+        <UsageCount Value="10"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="C:\Lazarus\lcl\intfgraphics.pas"/>
+        <UnitName Value="IntfGraphics"/>
+        <CursorPos X="53" Y="187"/>
+        <TopLine Value="172"/>
+        <UsageCount Value="10"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="C:\Lazarus\lcl\extctrls.pp"/>
+        <UnitName Value="ExtCtrls"/>
+        <CursorPos X="26" Y="552"/>
+        <TopLine Value="539"/>
+        <UsageCount Value="10"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="C:\Lazarus\lcl\lcltype.pp"/>
+        <UnitName Value="LCLType"/>
+        <CursorPos X="19" Y="123"/>
+        <TopLine Value="108"/>
+        <UsageCount Value="10"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="C:\Lazarus\fpc\2.0.4\source\rtl\win32\windows.pp"/>
+        <UnitName Value="windows"/>
+        <CursorPos X="6" Y="15"/>
+        <TopLine Value="1"/>
+        <UsageCount Value="10"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="C:\Lazarus\lcl\forms.pp"/>
+        <UnitName Value="Forms"/>
+        <CursorPos X="15" Y="477"/>
+        <TopLine Value="462"/>
+        <UsageCount Value="11"/>
+      </Unit43>
+      <Unit44>
+        <Filename Value="C:\Lazarus\lcl\controls.pp"/>
+        <UnitName Value="Controls"/>
+        <CursorPos X="14" Y="1268"/>
+        <TopLine Value="1253"/>
+        <UsageCount Value="10"/>
+      </Unit44>
     </Units>
-    <JumpHistory Count="0" HistoryIndex="-1"/>
+    <JumpHistory Count="29" HistoryIndex="28">
+      <Position1>
+        <Filename Value="ucomputer.pas"/>
+        <Caret Line="73" Column="5" TopLine="234"/>
+      </Position1>
+      <Position2>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="1029" Column="21" TopLine="987"/>
+      </Position2>
+      <Position3>
+        <Filename Value="umulti.pas"/>
+        <Caret Line="887" Column="27" TopLine="872"/>
+      </Position3>
+      <Position4>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="221" Column="14" TopLine="206"/>
+      </Position4>
+      <Position5>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="221" Column="17" TopLine="206"/>
+      </Position5>
+      <Position6>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="82" Column="5" TopLine="67"/>
+      </Position6>
+      <Position7>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="1291" Column="74" TopLine="1272"/>
+      </Position7>
+      <Position8>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="390" Column="141" TopLine="372"/>
+      </Position8>
+      <Position9>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="704" Column="25" TopLine="851"/>
+      </Position9>
+      <Position10>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="601" Column="57" TopLine="586"/>
+      </Position10>
+      <Position11>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="187" Column="37" TopLine="184"/>
+      </Position11>
+      <Position12>
+        <Filename Value="unetwork.pas"/>
+        <Caret Line="241" Column="1" TopLine="199"/>
+      </Position12>
+      <Position13>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="187" Column="28" TopLine="176"/>
+      </Position13>
+      <Position14>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="595" Column="50" TopLine="588"/>
+      </Position14>
+      <Position15>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="607" Column="48" TopLine="592"/>
+      </Position15>
+      <Position16>
+        <Filename Value="uutils.pas"/>
+        <Caret Line="295" Column="43" TopLine="289"/>
+      </Position16>
+      <Position17>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="233" Column="29" TopLine="219"/>
+      </Position17>
+      <Position18>
+        <Filename Value="uutils.pas"/>
+        <Caret Line="295" Column="40" TopLine="293"/>
+      </Position18>
+      <Position19>
+        <Filename Value="umenu.pas"/>
+        <Caret Line="165" Column="3" TopLine="1"/>
+      </Position19>
+      <Position20>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="233" Column="39" TopLine="224"/>
+      </Position20>
+      <Position21>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="238" Column="41" TopLine="223"/>
+      </Position21>
+      <Position22>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="607" Column="57" TopLine="592"/>
+      </Position22>
+      <Position23>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="715" Column="57" TopLine="700"/>
+      </Position23>
+      <Position24>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="607" Column="57" TopLine="592"/>
+      </Position24>
+      <Position25>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="229" Column="78" TopLine="219"/>
+      </Position25>
+      <Position26>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="233" Column="46" TopLine="218"/>
+      </Position26>
+      <Position27>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="385" Column="33" TopLine="377"/>
+      </Position27>
+      <Position28>
+        <Filename Value="uutils.pas"/>
+        <Caret Line="285" Column="40" TopLine="283"/>
+      </Position28>
+      <Position29>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="109" Column="10" TopLine="101"/>
+      </Position29>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="5"/>
@@ -369,19 +509,11 @@
     </Other>
   </CompilerOptions>
   <Debugging>
-    <BreakPoints Count="3">
+    <BreakPoints Count="1">
       <Item1>
         <Source Value="ugrid.pas"/>
         <Line Value="151"/>
       </Item1>
-      <Item2>
-        <Source Value="ugrid.pas"/>
-        <Line Value="143"/>
-      </Item2>
-      <Item3>
-        <Source Value="ugrid.pas"/>
-        <Line Value="117"/>
-      </Item3>
     </BreakPoints>
     <Watches Count="1">
       <Item1>

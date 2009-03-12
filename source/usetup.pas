@@ -28,6 +28,7 @@ Var nVersion : Integer;
 Var nNetworkVersion : Integer;
 
 Var bDebug : Boolean;
+Var bConsole : Boolean;
 
 Var bColor : Boolean; // a sauvegarder et afficher
 
@@ -133,6 +134,7 @@ Var nSetup  : Integer;
 
 
 Const MENU_INTRO         = 11;
+Const MENU_CONSOLE       = 12;
 
 Const MENU_FRAMERATE     = 21;
 Const MENU_LIGHTING      = 22;
@@ -231,6 +233,7 @@ Begin
      SetString( STRING_SETUP_MENU(1), 'setup', 0.2, 1.0, 600 );
 
     // SetString( STRING_SETUP_MENU(11), 'show intro : ' + BoolToStr(bIntro), 0.2, 1.0, 600 );
+     SetString( STRING_SETUP_MENU(12), 'show console : ' + BoolToStr(bConsole), 0.2, 1.0, 600 );
      
      SetString( STRING_SETUP_MENU(21), 'desired framerate : ' + IntToStr(nFramerate), 0.2, 1.0, 600 );
      SetString( STRING_SETUP_MENU(22), 'lighting : ' + BoolToStr(bLighting), 0.2, 1.0, 600 );
@@ -268,7 +271,7 @@ Begin
 
      fScroll := 0.0;
      
-     nMenu := MENU_FRAMERATE;
+     nMenu := MENU_CONSOLE;
      
      bUp := False;
      bDown := False;
@@ -384,8 +387,10 @@ Begin
      t := 0.0;
      
     // If fScroll <= t Then DrawString( STRING_SETUP_MENU(11), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_INTRO), IsActive(MENU_INTRO), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+    
+     If fScroll <= t Then DrawString( STRING_SETUP_MENU(12), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_CONSOLE), IsActive(MENU_CONSOLE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
 
-    // t += 0.2;
+     t += 0.2;
      
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(21), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_FRAMERATE), IsActive(MENU_FRAMERATE), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      If fScroll <= t Then DrawString( STRING_SETUP_MENU(22), -w / h * 0.5, 0.6 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_LIGHTING), IsActive(MENU_LIGHTING), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
@@ -439,6 +444,7 @@ Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
          //  If nMenu = MENU_FRAMERATE Then nMenu := MENU_INTRO Else
+           If nMenu = MENU_FRAMERATE Then nMenu := MENU_CONSOLE Else
            If nMenu = MENU_LIGHTING Then nMenu := MENU_FRAMERATE Else
            If nMenu = MENU_SHADOWING Then nMenu := MENU_LIGHTING Else
            If nMenu = MENU_REFLECTION Then nMenu := MENU_SHADOWING Else
@@ -468,11 +474,12 @@ Begin
            If nMenu = MENU_SPEAK Then nMenu := MENU_CHANGESCREEN Else
            If nMenu = MENU_SHOWPING Then nMenu := MENU_SPEAK Else
          //  If nMenu = MENU_INTRO Then nMenu := MENU_SHOWPING;
-           If nMenu = MENU_FRAMERATE Then nMenu := MENU_SHOWPING;
+           If nMenu = MENU_CONSOLE Then nMenu := MENU_SHOWPING;
 
            t := 0.0;
          //  If (nMenu = MENU_INTRO) And (fScroll > t) Then fScroll := t; t += 0.2;
-         //  t += 0.2;
+           If (nMenu = MENU_CONSOLE) And (fScroll > t) Then fScroll := t; t += 0.2;
+           t += 0.2;
            If (nMenu = MENU_FRAMERATE) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_LIGHTING) And (fScroll > t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_SHADOWING) And (fScroll > t) Then fScroll := t; t += 0.2;
@@ -509,7 +516,8 @@ Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
          //  If nMenu = MENU_SHOWPING Then nMenu := MENU_INTRO Else
-           If nMenu = MENU_SHOWPING Then nMenu := MENU_FRAMERATE Else
+
+           If nMenu = MENU_SHOWPING Then nMenu := MENU_CONSOLE Else
            If nMenu = MENU_SPEAK Then nMenu := MENU_SHOWPING Else
            If nMenu = MENU_CHANGESCREEN Then nMenu := MENU_SPEAK Else
            If nMenu = MENU_DRAWGAME Then nMenu := MENU_CHANGESCREEN Else
@@ -537,13 +545,14 @@ Begin
            If nMenu = MENU_REFLECTION Then nMenu := MENU_EFFECTS Else
            If nMenu = MENU_SHADOWING Then nMenu := MENU_REFLECTION Else
            If nMenu = MENU_LIGHTING Then nMenu := MENU_SHADOWING Else
-           If nMenu = MENU_FRAMERATE Then nMenu := MENU_LIGHTING; // Else
+           If nMenu = MENU_FRAMERATE Then nMenu := MENU_LIGHTING Else
+           If nMenu = MENU_CONSOLE Then nMenu := MENU_FRAMERATE;
         //   If nMenu = MENU_INTRO Then nMenu := MENU_FRAMERATE;
 
            t := 0.0;
-           If nMenu = MENU_FRAMERATE Then fScroll := 0.0;
-        //  t += 0.2;
-        //   If (nMenu = MENU_TEXTURING) And (fScroll < t) Then fScroll := t; t += 0.2;
+           If nMenu = MENU_CONSOLE Then fScroll := 0.0;
+           t += 0.2;
+           If (nMenu = MENU_TEXTURING) And (fScroll < t) Then fScroll := t; t += 0.2;
            If (nMenu = MENU_SHADERMODEL) And (fScroll < t) Then fScroll := t; t += 0.2;
            t += 0.2;
            If (nMenu = MENU_FULLSCREEN) And (fScroll < t) Then fScroll := t; t += 0.2;
@@ -585,6 +594,12 @@ Begin
                      bIntro := Not bIntro;
                      SetString( STRING_SETUP_MENU(11), 'show intro : ' + BoolToStr(bIntro), 0.0, 0.02, 600 );
                 End; }
+                MENU_CONSOLE :
+                Begin
+                     bConsole := Not bConsole;
+                     SetString( STRING_SETUP_MENU(12), 'show console : ' + BoolToStr(bConsole), 0.0, 0.02, 600 );
+                     If bConsole Then Window.Show() Else Window.Hide();
+                End;
                 MENU_FRAMERATE :
                 Begin
                      nFramerate -= 5;
@@ -687,6 +702,12 @@ Begin
                      bIntro := Not bIntro;
                      SetString( STRING_SETUP_MENU(11), 'show intro : ' + BoolToStr(bIntro), 0.0, 0.02, 600 );
                 End; }
+                MENU_CONSOLE :
+                Begin
+                     bConsole := Not bConsole;
+                     SetString( STRING_SETUP_MENU(12), 'show console : ' + BoolToStr(bConsole), 0.0, 0.02, 600 );
+                     If bConsole Then Window.Show() Else Window.Hide();
+                End;
                 MENU_FRAMERATE :
                 Begin
                      nFramerate += 5;
@@ -1034,6 +1055,7 @@ Begin
      bColor := True;
 
      bDebug := False;
+     bConsole := True;
 
      nWindowLeft := 120;
      nWindowTop := 80;
@@ -1286,6 +1308,9 @@ Begin
                     If LowerCase(GetString(sLine, 1)) = 'true' Then bDebug := True;
                     If LowerCase(GetString(sLine, 1)) = 'false' Then bDebug := False;
                     If bDebug Then AddLineToConsole( 'Debug : Enabled' ) Else AddLineToConsole( 'Debug : Disabled' );
+                    If LowerCase(GetString(sLine, 2)) = 'true' Then bConsole := True;
+                    If LowerCase(GetString(sLine, 2)) = 'false' Then bConsole := False;
+                    If bDebug Then AddLineToConsole( 'Console : Enabled' ) Else AddLineToConsole( 'Console : Disabled' );
                End;
                STEP_ACCOUNT :
                Begin
@@ -1329,8 +1354,11 @@ Begin
      WriteLn( ioLine );
      WriteLn( ioLine );
 
-     WriteLn( ioLine , '; console debugging enabled ?' );
-     If bDebug Then WriteLn( ioLine , '-X,true' ) Else WriteLn( ioLine , '-X,false' );
+     WriteLn( ioLine , '; console debugging enabled ? console enabled' );
+     s := '-X';
+     If bDebug Then s := s + ',true' Else s := s + ',false';
+     If bConsole Then s := s + ',true' Else s := s +',false';
+     WriteLn( ioLine , s );
 
      WriteLn( ioLine );
      WriteLn( ioLine , '; version control number' );

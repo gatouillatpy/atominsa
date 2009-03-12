@@ -1,12 +1,15 @@
 object Window: TWindow
-  Left = 471
+  Left = 270
   Height = 297
-  Top = 437
+  Top = 133
   Width = 673
   HorzScrollBar.Page = 672
   VertScrollBar.Page = 296
   ActiveControl = Memo
   Caption = 'atominsa - Console'
+  ParentFont = True
+  SessionProperties = '""'
+  ShowHint = True
   object Image: TImage
     Left = 10
     Height = 100
@@ -23,7 +26,7 @@ object Window: TWindow
   object Memo: TMemo
     Left = 10
     Height = 278
-    Top = 10
+    Top = 8
     Width = 654
     Color = clBlack
     Font.CharSet = ANSI_CHARSET

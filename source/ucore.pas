@@ -673,6 +673,8 @@ Begin
                     sData := sData + IntToStr(nPlayerType[l]) + #31;
                 End;
                 Send( nIndex, nHeader, sData );
+                If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then
+                   UpdatePlayerInfo();
                 // Vérification qu'il y a encore des joueurs.
                 bNoPlayers := True;
                 For l := 1 To 8 Do Begin

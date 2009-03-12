@@ -625,6 +625,14 @@ Begin
                     nPlayerType[k] := PLAYER_NIL;
                     Send( nIndex, nHeader, sData );
                     SetString( STRING_GAME_MENU(10 + k), PlayerInfo(k), 0.0, 0.02, 600 );
+                    If ( bOnline ) Then Begin
+                       sData := IntToStr( k ) + #31;
+                       sData := sData + IntToStr( nPlayerType[k] ) + #31;
+                       sData := sData + sPlayerName[k] + #31;
+                       sData := sData + sClientUserName[ClientIndex(nIndex)] + #31;
+                       sData := sData + sClientUserPassword[ClientIndex(nIndex)] + #31;
+                       SendOnline( nLocalIndex, HEADER_ONLINE_PLAYER, sData );
+                    End;
                End;
                HEADER_BTN_READY :
                Begin
@@ -988,7 +996,7 @@ Begin
                         TryStrToInt( GetString( sData, l ), nPlayerType[k] ); l += 1;
                     End;
                     If ( nGame = GAME_MENU ) Or ( nGame = GAME_MENU_PLAYER ) Or ( nGame = GAME_MENU_MULTI ) Then
-                       UpdateMenu();
+                       UpdatePlayerInfo();
                End;
                HEADER_LOCK :
                Begin

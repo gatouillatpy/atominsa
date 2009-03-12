@@ -28,10 +28,13 @@ Procedure AddLineToConsole( s : String ) ;
 
 Implementation
 
+Uses USetup;
+
 Procedure AddStringToConsole( s : String ) ;
 Begin
      Window.Memo.Lines.Strings[Window.Memo.Lines.Count-1] := Window.Memo.Lines.Strings[Window.Memo.Lines.Count-1] + s;
      Application.ProcessMessages;
+
 End;
 
 Procedure AddLineToConsole( s : String ) ;

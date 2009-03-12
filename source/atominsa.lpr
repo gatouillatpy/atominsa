@@ -2,6 +2,9 @@ Program atominsa;
 
 {$mode objfpc}{$H+}
 
+{$R atominsa.rc}
+
+
 Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics, Glut,
      UCore, UUtils, UBlock, UItem, UScheme, USpawn, UBomberman, UDisease,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
@@ -179,6 +182,9 @@ Begin
 
      // définition de la touche pour le passage en plein écran
      BindKeyStd( nKeyScreen, True, True, @SwitchDisplay );
+     
+     // On arrête d'afficher la console
+     If Not bConsole Then Window.Hide();
 
      ExecGlut();
 End;
@@ -210,7 +216,7 @@ Begin
 
      // affichage de la console
      Window.Show();
-
+     
      // initialisation du générateur de nombres aléatoires
      Randomize();
      

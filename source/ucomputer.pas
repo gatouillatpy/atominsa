@@ -70,7 +70,7 @@ Begin
    dangerMin := 10000;
    isBombermanFound := false;
    
-   pGrid.DelBlock(pX,pY);
+  // pGrid.DelBlock(pX,pY);
    
    If ( ( nSkill = SKILL_GODLIKE ) And ( ( pBomberman.DiseaseNumber <> DISEASE_NONE )
    Or ( pBomberman.uGrabbedBomb <> Nil ) Or ( pBomberman.bGrabbed = True ) ) ) Then
@@ -916,7 +916,7 @@ Begin
    End;
    
    // Traitement des bombes sur la même case que le bomberman pour qu'il ne soit pas coincé.
-   If ( GetBombByGridCoo( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) is CBomb ) Then Begin
+ {  If ( GetBombByGridCoo( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) is CBomb ) Then Begin
       pBomb := GetBombByGridCoo( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) );
       // Si le bomberman est un peu à gauche de la bombe, alors il doit aller à gauche.
       // De même pour les autres directions.
@@ -928,7 +928,7 @@ Begin
          If ( pBomb.Time + 1 >= pBomb.ExploseTime ) Then
             result2 := result2 - 512;
       End;
-   End;
+   End; }
    
    // Traitement des cases hors plateau.
    If ( x < 1 ) Or ( x > GRIDWIDTH ) Or ( y < 1 ) Or ( y > GRIDHEIGHT ) Then
@@ -1052,7 +1052,103 @@ Begin
     If ( blocked = true ) Then
       result2 := result2 + 1024;
    
-   
+
+
+// Traitement des bombes pour éviter d'être coincé.
+    // Ca sert à ne pas se coincer dans un axe juste après avoir poser une bombe et en sortir si c'est possible.
+    If ( wSkill <> SKILL_NOVICE ) Then Begin
+        blocked := false;
+        numFreeCase := 256;
+        // Bombe à gauche
+        If ( x > 1 ) And ( wState[x - 1, y] mod 4 >= 2 ) Then Begin        // S'il y a une bombe à gauche
+            continue := true;
+            i := x + 1;
+            While ( continue = true ) And ( i <= GRIDWIDTH ) Do Begin
+                  If ( wState[i, y] mod 16 <> 0 ) And ( wState[i, y] mod 16 <> 4 ) Then Begin // Si la case à droite est bloqué, c'est fini.
+                     blocked := true;
+                     numFreeCase := i - x;
+                     continue := false;
+                  End
+                  Else If ( ( y > 1 ) And ( ( wState[i, y - 1] mod 16 = 0 ) Or ( wState[i, y - 1] mod 16 = 4 ) ) )   // S'il y a une case libre
+                  Or ( ( y < GRIDHEIGHT ) And ( ( wState[i, y + 1] mod 16 = 0 ) Or ( wState[i, y + 1] mod 16 = 4 ) ) ) Then Begin
+                     continue := false;
+                  End;
+                  i := i + 1;
+            End;
+            If ( continue = true ) Then Begin
+               blocked := true;
+               numFreeCase := i - x;
+            End;
+        End;
+        // Bombe à droite
+        If ( x < GRIDWIDTH ) And ( wState[x + 1, y] mod 4 >= 2 ) Then Begin
+            continue := true;
+            i := x - 1;
+            While ( continue = true ) And ( i >= 1 ) Do Begin
+                  If ( wState[i, y] mod 16 <> 0 ) And ( wState[i, y] mod 16 <> 4 ) Then Begin
+                     If ( numFreeCase < x - i ) Then numFreeCase := x - i;
+                     blocked := true;
+                     continue := false;
+                  End
+                  Else If ( ( y > 1 ) And ( ( wState[i, y - 1] mod 16 = 0 ) Or ( wState[i, y - 1] mod 16 = 4 ) ) )
+                  Or ( ( y < GRIDHEIGHT ) And ( ( wState[i, y + 1] mod 16 = 0 ) Or ( wState[i, y + 1] mod 16 = 4 ) ) ) Then Begin
+                     continue := false;
+                  End;
+                  i := i - 1;
+            End;
+            If ( continue = true ) Then Begin
+               If ( numFreeCase < x - i ) Then numFreeCase := x - i;
+               blocked := true;
+            End;
+        End;
+        // Bombe en haut
+        If ( y > 1 ) And ( wState[x, y - 1] mod 4 >= 2 ) Then Begin
+            continue := true;
+            j := y + 1;
+            While ( continue = true ) And ( j <= GRIDHEIGHT ) Do Begin
+                  If ( wState[x, j] mod 16 <> 0 ) And ( wState[x, j] mod 16 <> 4 ) Then Begin
+                     If ( numFreeCase < j - y ) Then numFreeCase := j - y;
+                     blocked := true;
+                     continue := false;
+                  End
+                  Else If ( ( x > 1 ) And ( ( wState[x - 1, j] mod 16 = 0 ) Or ( wState[x - 1, j] mod 16 = 4 ) ) )
+                  Or ( ( x < GRIDWIDTH ) And ( ( wState[x + 1, j] mod 16 = 0 ) Or ( wState[x + 1, j] mod 16 = 4 ) ) ) Then Begin
+                     continue := false;
+                  End;
+                  j := j + 1;
+            End;
+            If ( continue = true ) Then Begin
+               If ( numFreeCase < j - y ) Then numFreeCase := j - y;
+               blocked := true;
+            End;
+        End;
+        // Bombe en bas
+        If ( y < GRIDHEIGHT ) And ( wState[x, y + 1] mod 4 >= 2 ) Then Begin
+            continue := true;
+            j := y - 1;
+            While ( continue = true ) And ( j >= 1 ) Do Begin
+                  If ( wState[x, j] mod 16 <> 0 ) And ( wState[x, j] mod 16 <> 4 ) Then Begin
+                     If ( numFreeCase < y - j ) Then numFreeCase := y - j;
+                     blocked := true;
+                     continue := false;
+                  End
+                  Else If ( ( x > 1 ) And ( ( wState[x - 1, j] mod 16 = 0 ) Or ( wState[x - 1, j] mod 16 = 4 ) ) )
+                  Or ( ( x < GRIDWIDTH ) And ( ( wState[x + 1, j] mod 16 = 0 ) Or ( wState[x + 1, j] mod 16 = 4 ) ) ) Then Begin
+                     continue := false;
+                  End;
+                  j := j - 1;
+            End;
+            If ( continue = true ) Then Begin
+               If ( numFreeCase < y - j ) Then numFreeCase := y - j;
+               blocked := true;
+            End;
+        End;
+        
+        // Si le bomberman est bloqué, alors il est en danger.
+        If ( blocked = true ) And ( numFreeCase >= 2 )Then
+           result2 := result2 + 2048 div numFreeCase;
+    End;
+
    
 // Niveaux masterful et godlike
    // Traitement des cases sans planques pour les niveaux masterful et godlike
@@ -1079,8 +1175,8 @@ Begin
       While ( continue = true ) And ( i >= 1 ) Do Begin
             If ( wState[i, y] mod 16 <> 0 ) And ( wState[i, y] mod 16 <> 4 ) Then
                continue := false
-            Else If ( ( y > 1 ) And ( ( wState[i, y - 1] mod 16 mod 16 = 0 ) Or ( wState[i, y - 1] mod 16 mod 16 = 4 ) ) )
-            Or ( ( y < GRIDHEIGHT ) And ( ( wState[i, y + 1] mod 16 mod 16 = 0 ) Or ( wState[i, y + 1] mod 16 mod 16 = 4 ) ) ) Then Begin
+            Else If ( ( y > 1 ) And ( ( wState[i, y - 1] mod 16 = 0 ) Or ( wState[i, y - 1] mod 16 = 4 ) ) )
+            Or ( ( y < GRIDHEIGHT ) And ( ( wState[i, y + 1] mod 16 = 0 ) Or ( wState[i, y + 1] mod 16 = 4 ) ) ) Then Begin
                numFreeCase := 1;
                iExit := i;
                continue := false;
@@ -1150,11 +1246,11 @@ Begin
             
 
               
-// Traitement des bombes qui sont sur la même rangée.
+// Traitement des bombes qui sont sur la même rangée. Notion d'espoir.
    // Ca sert à sortir de l'impasse s'il y a sortie et qu'il y a de l'espoir.
    // Si une bombe est à plus de 3 cases de la sortie ou que la sortie est à moins de 6 cases du bomberman, alors il va vers la sortie.
    // Si une bombe est sur la ligne/colonne d'à côté, on considère qu'il n'y a pas de sortie de ce côté.
-   If ( wSkill <> SKILL_NOVICE ) Then Begin
+   If ( wSkill = SKILL_MASTERFUL ) Or ( wSkill = SKILL_GODLIKE ) Then Begin
       // Gauche : on ne continue que s'il y a une bombe à gauche et qu'il n'y a pas de sortie à droite.
       continue := false;
       upBomb := false;
