@@ -752,7 +752,7 @@ Begin
         Repeat
            pTCP.CallAction;
            Sleep(1);
-           If GetTime > t + 8.0 Then Break;
+           If GetTime > t + 4.0 Then Break;
         Until pTCP.Connected;
         If pTCP.Connected Then Begin
            AddStringToConsole('success.');
@@ -3540,7 +3540,7 @@ Begin
 
      glDisable(GL_LIGHTING);
 
-     DrawText( 10, 20, 1, 1, 1, FONT_HELVETICA, Format( 'atominsa - %.3f FPS',[GetFPS()] ) );
+     If bDebug Then DrawText( 10, 20, 1, 1, 1, FONT_HELVETICA, Format( 'fps: %.0f',[GetFPS()] ) );
 
      glutSwapBuffers;
 

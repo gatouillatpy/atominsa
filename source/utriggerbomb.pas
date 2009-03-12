@@ -13,7 +13,7 @@ type
         CTriggerBomb = class(CBomb)
         public
           bIgnition : boolean;
-          Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);OverRide;
+          Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single ;aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);OverRide;
           function UpdateBomb():boolean;override;
           procedure Ignition();
         end;
@@ -24,10 +24,10 @@ uses UListBomb;
 
 constructor CTriggerBomb.create(aX, aY: Single; aIndex, aBombSize: integer;
   aBombTime: Single; aGrid: CGrid; UpCount: LPUpCount;
-  IsBomberman: LPGetBomberman; _nNetID : Integer);
+  IsBomberman: LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);
 begin
   inherited create(aX, aY, aIndex, aBombSize, aBombTime, aGrid, UpCount,
-    IsBomberman, _nNetID);
+    IsBomberman, _nNetID, wIsChecked);
   bIgnition    := false;
   bUpdateTime  := bIgnition;
   fExploseTime := 0.01;

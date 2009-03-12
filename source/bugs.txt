@@ -1,6 +1,2 @@
-+ déconnexion du serveur quand un client tente de se connecter à une partie en cours en online
-- redemarrage du serveur à 6 h pour corriger les éventuels bugs.
-
-+ pour fréquent, = pour régulier, - pour rare
-
+- on attend les bêta-testeurs.
 

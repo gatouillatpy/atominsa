@@ -975,7 +975,7 @@ begin
       RemoveThisBomb(uTriggerBomb^.Bomb);
       uTriggerBomb^.Bomb.Destroy();
 
-      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID);
+      AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,false,false,uGrid,@UpBombCount,@IsBombermanAtCoo, _nNetID, True);
       DelTriggerBomb();
     end;//while
   end;//if uTriggerBomb
@@ -1014,15 +1014,13 @@ begin
       if uGrid.GetBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil then
       begin
         bTrigger := nTriggerBomb>0;
-        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID);
-        If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
-            Dec(nBombCount);
-            if bTrigger then
-            begin
-              AddTriggerBomb();
-              Dec(nTriggerBomb);
-            end;
-        End;
+        AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID, False);
+        Dec(nBombCount);
+        if bTrigger then
+        begin
+          AddTriggerBomb();
+          Dec(nTriggerBomb);
+        end;
       end
       else if bCanSpoog then
       begin
@@ -1061,16 +1059,14 @@ begin
               end
               else
               begin
-                bTrigger := nTriggerBomb>0;
-                AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000));
-                 If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
-                    Dec(nBombCount);
-                    if bTrigger then
-                    begin
-                      AddTriggerBomb();
-                      Dec(nTriggerBomb);
-                    end;
-                 End;
+                  bTrigger := nTriggerBomb>0;
+                  AddBomb(aX,aY,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, Random(1000000), False);
+                  Dec(nBombCount);
+                  if bTrigger then
+                  begin
+                    AddTriggerBomb();
+                    Dec(nTriggerBomb);
+                  end;
               end;
             end;
           end;
@@ -1084,7 +1080,7 @@ procedure CBomberman.CreateBombMulti(fX, fY : Single; nBombSize : Integer; fExpl
 Var bTrigger : Boolean;
 Begin
      bTrigger := nTriggerBomb > 0;
-     AddBombMulti(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,_nNetID);
+     AddBombMulti(fX,fY,nIndex,nBombSize,fExploseTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo,_nNetID,True);
      Dec(nBombCount);
      if bTrigger then
      begin

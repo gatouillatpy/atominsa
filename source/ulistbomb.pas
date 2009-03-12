@@ -21,9 +21,10 @@ Type LPBombItem = ^BombItem;
 
 
     procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid;
-              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
+              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);
     procedure AddBombMulti(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid;
-              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
+              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);
+    procedure CheckBomb();
     procedure RemoveBombByCount(i : integer);
     procedure RemoveBombByGridCoo(aX,aY : integer);
     procedure RemoveThisBomb(wBomb: CBomb);
@@ -36,7 +37,7 @@ Type LPBombItem = ^BombItem;
 
 implementation
 
-Uses UGame, UCore, USetup, SysUtils, UForm, UMulti;
+Uses UGame, UCore, USetup, SysUtils, UForm, UMulti, UBomberman;
 
 {                                                                               }
 {                           Liste Bombes                                        }
@@ -55,11 +56,11 @@ Procedure UpdateCountList();Forward;                                 // pour lui
 {*******************************************************************************}
 // ajout
 procedure AddBomb(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid;
-              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
+              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);
 var sData : String;
 begin
-   If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then
-      AddBombMulti(aX, aY, aIndex, aBombSize, aBombTime, aJelly, aTrigger, aGrid, UpCount, IsBomberman, _nNetID);
+   If ( bMulti = False ) Or ( nLocalIndex = nClientIndex[0] ) Then wIsChecked := True;
+   AddBombMulti(aX, aY, aIndex, aBombSize, aBombTime, aJelly, aTrigger, aGrid, UpCount, IsBomberman, _nNetID, wIsChecked);
 
    If bDebug And ( aX < 1 ) Or ( aY < 1 ) Then
       AddLineToConsole( 'Bug in Add Bomb' );
@@ -76,7 +77,7 @@ end;
 
 
 procedure AddBombMulti(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single;aJelly : boolean; aTrigger : boolean; aGrid : CGrid;
-              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
+              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);
 var pTemp : LPBombItem;
 begin
    Inc(BombCount);
@@ -84,9 +85,9 @@ begin
    begin
      New(pBombItem);
      pBombItem^.Next:=Nil;
-     if aJelly then pBombItem^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID)
-     else if aTrigger then pBombItem^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID)
-     else pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID);
+     if aJelly then pBombItem^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID, wIsChecked)
+     else if aTrigger then pBombItem^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID, wIsChecked)
+     else pBombItem^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID, wIsChecked);
      pBombItem^.Count:=BombCount;
    end
    else
@@ -98,12 +99,33 @@ begin
      pTemp:=pTemp^.Next;
      pTemp^.Count:=BombCount;
      pTemp^.Next:=Nil;
-     if aJelly then pTemp^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID)
-     else if aTrigger then pTemp^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID)
-     else pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID);
+     if aJelly then pTemp^.Bomb:=CJellyBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID, wIsChecked)
+     else if aTrigger then pTemp^.Bomb:=CTriggerBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID, wIsChecked)
+     else pTemp^.Bomb:=CBomb.Create(aX,aY,aIndex,aBombSize,aBombTime,aGrid,UpCount,IsBomberman, _nNetID, wIsChecked);
    end;
 End;
 
+
+// Vérification des bombes.
+procedure CheckBomb();
+Var i : Integer;
+    pBomb : CBomb;
+    pBomberman : CBomberman;
+Begin
+     For i := 1 To GetBombCount() Do Begin
+         pBomb := GetBombByCount(i);
+         // Si la bombe n'est pas sur le serveur.
+         If ( pBomb.IsChecked = False ) And ( pBomb.fTimeCreatedMulti >= 5.0 ) Then Begin
+              If ( pBomb Is CTriggerBomb ) Then Begin
+                 (pBomb AS CTriggerBomb).Ignition();
+                 pBomberman := GetBombermanByIndex( pBomb.nIndex );
+                 If ( pBomberman <> Nil ) Then pBomberman.DelTriggerBomb();
+              End
+              Else
+                  pBomb.Explose();
+         End;
+     End;
+End;
 
 
 // suppression par numero

@@ -20,6 +20,7 @@ CBomb = Class(CBlock)
        bMoving,                                               // defini si la bombe est en cours de mouvement ou non
        bJumping,                                              // definit si la bombe est en cours de saut ...
        bMoveJump   : Boolean;                                 // definit si la bombe bouge en rebondissant ...
+       bIsChecked : Boolean;                                  // définit si la bombe est aussi chez le serveur en multi
        uGrid       : CGrid;
        nPunch,                                                // nombre de cases restantes pour un mouvement dû à un punch
        nOriginX,
@@ -31,7 +32,8 @@ CBomb = Class(CBlock)
        fExploseTime,                                          // temps avant explosion
        fJumpingTime : Single;                                 // temps en saut
        fLastTime    : Single;                                 // Dernier appel a checktimer
-       fTimeCreated : Single;                                 // temps depuis lequel la bombe a ete creee
+       fTimeCreated : Single;                                 // temps depuis lequel la bombe a ete creee (pour l'explosion)
+       fTimeCreatedMulti : Single;                            // temps depuis lequel la bombe a ete creee (pour le multi)
        pUpCount : LPUpcount;                                  // pointe sur la fonction du bomberman qui a pose la bombe pour lui augmenter son score
        pIsBomberman : LPGetBomberman;                         // pointe sur la fonction pour savoir s'il y a un bomberman en telle position
 
@@ -41,7 +43,7 @@ CBomb = Class(CBlock)
 
      Public
        nNetID : Integer;
-       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);Virtual;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
+       Constructor create(aX, aY : Single; aIndex, aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);Virtual;     // permet de creer une bombe a partir de coordonnees et du bomberman qui la pose
        Destructor Destroy();Override;
        function UpdateBomb():boolean;virtual;                         // check le temps + mouvement
        procedure StartTime();
@@ -60,6 +62,7 @@ CBomb = Class(CBlock)
        property ExploseTime : Single Read fExploseTime;
        property JumpMovement : boolean Read bMoveJump Write bMoveJump;
        property BIndex : integer Read nIndex Write nIndex;
+       property IsChecked : Boolean Read bIsChecked Write bIsChecked;
 
 
 end;
@@ -440,7 +443,8 @@ end;
 {*******************************************************************************}
 { Creation / destruction                                                        }
 {*******************************************************************************}
-constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid; UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer);
+constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid;
+                              UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);
 begin
    if (aBombTime=BOMBTIME) and (bMulti = false) and ((random(100)+1)<=10)then
       aBombtime := (random(200)+1)*BOMBTIME/100;
@@ -454,6 +458,7 @@ begin
    bMoving         := False;
    bMoveJump       := False;
    bJumping        := false;
+   bIsChecked      := wIsChecked;
    nMoveDir        := NONE;
    uGrid           := aGrid;
    nPunch          := -1;
@@ -466,6 +471,7 @@ begin
    fPosition.x     := nX;                                                       //abscisse ordonnee reelles
    fPosition.y     := nY;
    fTimeCreated    := 0;
+   fTimeCreatedMulti := 0;
    fJumpingTime    := 0;
    fLastTime       := GetTime();
    fExploseTime    := aBombTime;                                                // temps au bout duquel al bombe doit exploser
@@ -602,6 +608,7 @@ begin
   aLastTime:=GetTime();
   dt:=aLastTime - fLastTime;
   fLastTime:=aLastTime;
+  fTimeCreatedMulti += dt;
   if (Not(bMoveJump) and bUpdateTime) then fTimeCreated += dt;
   If ( bMulti = false ) Or ( nLocalIndex = nClientIndex[0] ) Then Begin
       if Not(bUpdateTime and bMoveJump) then

@@ -1439,7 +1439,7 @@ Var i : Integer;
 Begin
      If GetBombermanCount() <> 0 Then Begin
         For i := 1 To GetBombermanCount() Do Begin
-            SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %2d ; %d kill(s), %d death(s) %s', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths, PlayerReady(i)]), Single(i) * 0.01 + 0.05, 0.1, 300.0 );
+            SetString( STRING_SCORE_TABLE(i), GetBombermanByCount(i).Name + Format(' : %2d ; %d kill(s), %d death(s) %s', [GetBombermanByCount(i).Score, GetBombermanByCount(i).Kills, GetBombermanByCount(i).Deaths, PlayerReady(GetBombermanByCount(i).BIndex)]), Single(i) * 0.01 + 0.05, 0.1, 300.0 );
         End;
      End;
 End;
@@ -2169,6 +2169,9 @@ Begin
                ProcessComputer( GetBombermanByCount(k), nPlayerSkill[GetBombermanByCount(k).BIndex] );
          End;
      End;
+     
+     // Vérification des bombes.
+     CheckBomb();
      
      // mise à jour de la minuterie
      CheckTimer();

@@ -1197,6 +1197,9 @@ Begin
                     fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
                     If Not ( GetBombByNetID( _nNetId ) Is CBomb ) Then Begin
                         pBomberman.CreateBombMulti( fX, fY, nBombSize, fBombTime, _nNetID );
+                    End
+                    Else Begin
+                        GetBombByNetID( _nNetId).IsChecked := True;
                     End;
                End;
                HEADER_ACTION1 :
