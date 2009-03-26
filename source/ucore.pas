@@ -2911,6 +2911,8 @@ Begin
           FSOUND_Close();
           Exit;
      End;
+     
+     FSOUND_SetPriority( 31, 95 );
 End;
 
 
@@ -3012,10 +3014,10 @@ Begin
      If pSound = NIL Then Exit;
      
      // lecture du son
-     If (nIndex <> SOUND_MENU) Then
-        FSOUND_PlaySound( 1, pSound )
+     If nIndex = SOUND_MENU Then
+        FSOUND_PlaySound( 31, pSound )
      Else
-         FSOUND_PlaySound( 0, pSound );
+         FSOUND_PlaySound( FSOUND_FREE, pSound );
 End;
 
 
@@ -3025,11 +3027,9 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 Procedure StopSound ( nIndex : LongInt ) ;
 Begin
-     // arr�t du son
-     If (nIndex <> SOUND_MENU) Then
-        FSOUND_StopSound( 1 )
-     Else
-         FSOUND_StopSound( 0 );
+     // lecture du son
+     If nIndex = SOUND_MENU Then
+        FSOUND_StopSound( 31 );
 End;
 
 
@@ -3391,7 +3391,9 @@ End;
 Function GetMouseDX : Single ;
 Begin
      GetMouseDX := dX;
-     dX := 0;
+     If ( nX < 10 ) Then dX := 0.004
+     Else If ( nX > GetWindowWidth - 10 ) Then dX := -0.004
+     Else dX := 0;
 End;
 
 
@@ -3399,7 +3401,9 @@ End;
 Function GetMouseDY : Single ;
 Begin
      GetMouseDY := dY;
-     dY := 0;
+     If ( nY < 10 ) Then dY := 0.004
+     Else If ( nY > GetWindowHeight - 10 ) Then dY := -0.004
+     Else dY := 0;
 End;
 
 
@@ -3564,8 +3568,12 @@ End;
 
 Procedure OGLMouseButton ( button, state, x, y : Integer ) ; cdecl;
 Begin
-     dX := (nX - x) * 0.001;
-     dY := (nY - y) * 0.001;
+     If ( x < 10 ) Then dX := 0.004
+     Else If ( x > GetWindowWidth - 10 ) Then dX := -0.004
+     Else dX := (nX - x) * 0.004;
+     If ( y < 10 ) Then dY := 0.01
+     Else If ( y > GetWindowHeight - 10 ) Then dY := -0.004
+     Else dY := (nY - y) * 0.004;
 
      nX := x;
      nY := y;
@@ -3583,8 +3591,12 @@ End;
 
 Procedure OGLMouseMove ( x, y : Integer ) ; cdecl;
 Begin
-     dX := (nX - x) * 0.001;
-     dY := (nY - y) * 0.001;
+     If ( x < 10 ) Then dX := 0.004
+     Else If ( x > GetWindowWidth - 10 ) Then dX := -0.004
+     Else dX := (nX - x) * 0.001;
+     If ( y < 10 ) Then dY := 0.004
+     Else If ( y > GetWindowHeight - 10 ) Then dY := -0.004
+     Else dY := (nY - y) * 0.001;
 
      nX := x;
      nY := y;

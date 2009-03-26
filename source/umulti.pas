@@ -775,6 +775,8 @@ Begin
                               180  :  CBomb(pGrid.GetBlock(dX,dY)).Punch(UP,dt);
                               -90  :  CBomb(pGrid.GetBlock(dX,dY)).Punch(RIGHT,dt);
                             End;
+                    PlaySound( SOUND_KICK( Random(4) + 1 ) );
+                    Send( nLocalIndex, HEADER_PUNCH, '' );
                End;
                HEADER_MOVEBOMB :
                Begin
@@ -786,6 +788,8 @@ Begin
                     TryStrToInt( GetString( sData, 5 ), dY );
                     dt := StrToFloat( GetString( sData, 6 ) );
                     pBomberman.MoveBomb(aX,aY,aX,aY,dX,dY,dt);
+                    PlaySound( SOUND_KICK( Random(4) + 1 ) );
+
                End;
                HEADER_CHECK_BONUS :
                Begin
@@ -1281,6 +1285,7 @@ Begin
                         pBomberman.uGrabbedBomb.Position.Z := 0;
                         pBomberman.uGrabbedBomb.JumpMovement := True;
                         pBomberman.uGrabbedBomb := Nil;
+                        PlaySound( SOUND_THROW( Random(4) + 1 ) );
                     End;
                End;
                HEADER_END_OF_JUMP :
@@ -1327,6 +1332,10 @@ Begin
                        pDisease := CDisease.Create(1,1);
                        pDisease.BonusForced( pSecondBomberman, pBomberman.nDisease );
                     End;
+               End;
+               HEADER_PUNCH :
+               Begin
+                    PlaySound( SOUND_KICK( Random(4) + 1 ) );
                End;
                HEADER_WAIT :
                Begin
@@ -1485,8 +1494,10 @@ Begin
                Begin
                     TryStrToInt( GetString( sData, 1 ), k );
                     pBomberman := GetBombermanByIndex( k );
-                    If ( pBomberman <> Nil ) Then
+                    If ( pBomberman <> Nil ) Then Begin
+                       If ( pBomberman.Alive = True ) Then PlaySound( SOUND_DIE( Random( 2 ) + 1 ) );
                        pBomberman.Alive := false;
+                    End;
                End;
                HEADER_QUIT_GAME :
                Begin

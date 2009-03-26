@@ -214,6 +214,7 @@ begin
         //bMoving := false;
         if ((nMoveDir=RIGHT) or (nMoveDir=DOWN)) then DoMove(_X,_Y,_X,_Y);
         bMoving:=False;
+        PlaySound( SOUND_STOP( Random(2) + 1 ) );
       end;
     end;
   end;
@@ -562,8 +563,8 @@ Procedure CBomb.Explose();
 var k : integer;
     sData : String;
 begin
-  k := (Random(3) + 1) * 10;
-  PlaySound( SOUND_BOMB(k + nIndex) );
+  k := (Random(30) + 1);
+  PlaySound( SOUND_BOMB(k) );
   RemoveThisBomb(Self);                                                         //On supprime la bombe de la liste
   bExplosive:=False;                                                            //elle pete elle peut plus exploser ... pour eviter qu'une bombe fasse sauter une bombe et celle ci fasse resaute la meme qu au debut ...
   AddExplosion(fPosition.x, fPosition.y);

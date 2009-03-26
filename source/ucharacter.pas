@@ -15,7 +15,6 @@ Type
 { CCharacter}
 
 StringArray8 = Array [1..8] Of String;
-StringArray3 = Array [1..3] Of String;
 
 CCharacter = Class
 
@@ -31,7 +30,6 @@ CCharacter = Class
 
                  sBombMesh     : String                                        	;
                  sBombSkin     : String                       	                ;
-                 aBombSound    : StringArray3                           	;
 
                  sFlameTexture : String                       	                ;
                  
@@ -49,7 +47,6 @@ CCharacter = Class
 
                 Property BombMesh : String Read sBombMesh ;
                 Property BombSkin : String Read sBombSkin ;
-                Property BombSound : StringArray3 Read aBombSound ;
                 
                 Property FlameTexture : String Read sFlameTexture ;
 
@@ -239,21 +236,6 @@ Begin
                     If LowerCase(GetString(sLine, 1)) = 'flame' Then Begin
                        sFlameTexture := GetString(sLine, 2);
                        If bDebug Then AddLineToConsole( 'Flame texture : ' + sFlameTexture );
-                    End;
-               End;
-               STEP_SOUND         :
-               Begin
-                    If LowerCase(GetString(sLine, 1)) = 'bomb1' Then Begin
-                       aBombSound[1] := GetString(sLine, 2);
-                       If bDebug Then AddLineToConsole( 'Bomb sound 1 : ' + aBombSound[1] );
-                    End;
-                    If LowerCase(GetString(sLine, 1)) = 'bomb2' Then Begin
-                       aBombSound[2] := GetString(sLine, 2);
-                       If bDebug Then AddLineToConsole( 'Bomb sound 2 : ' + aBombSound[2] );
-                    End;
-                    If LowerCase(GetString(sLine, 1)) = 'bomb3' Then Begin
-                       aBombSound[3] := GetString(sLine, 2);
-                       If bDebug Then AddLineToConsole( 'Bomb sound 3 : ' + aBombSound[3] );
                     End;
                End;
 	  End;

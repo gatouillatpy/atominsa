@@ -142,13 +142,94 @@ Begin
      End; }
 
      // chargement des sons du menu
-     AddSound( './sounds/move.wav', SOUND_MENU_MOVE, False );
-     AddSound( './sounds/select.wav', SOUND_MENU_SELECT, False );
-     AddSound( './sounds/back.wav', SOUND_MENU_BACK, False );
-     AddSound( './sounds/click.wav', SOUND_MENU_CLICK, False );
+     AddSound( './sounds/move.mp3', SOUND_MENU_MOVE, False );
+     AddSound( './sounds/select.mp3', SOUND_MENU_SELECT, False );
+     AddSound( './sounds/back.mp3', SOUND_MENU_BACK, False );
+     AddSound( './sounds/click.mp3', SOUND_MENU_CLICK, False );
 
      // chargement du son de l'invite de messages
-     AddSound( './sounds/message.wav', SOUND_MESSAGE, False );
+     AddSound( './sounds/message.mp3', SOUND_MESSAGE, False );
+     
+     // chargement du son des bombes
+     AddSound( './sounds/bomb0.mp3', SOUND_BOMB(1), False );
+     AddSound( './sounds/bomb1.mp3', SOUND_BOMB(2), False );
+     AddSound( './sounds/bomb2.mp3', SOUND_BOMB(3), False );
+     AddSound( './sounds/bomb3.mp3', SOUND_BOMB(4), False );
+     AddSound( './sounds/bomb4.mp3', SOUND_BOMB(5), False );
+     AddSound( './sounds/bomb5.mp3', SOUND_BOMB(6), False );
+     AddSound( './sounds/bomb6.mp3', SOUND_BOMB(7), False );
+     AddSound( './sounds/bomb7.mp3', SOUND_BOMB(8), False );
+     AddSound( './sounds/bomb8.mp3', SOUND_BOMB(9), False );
+     AddSound( './sounds/bomb9.mp3', SOUND_BOMB(10), False );
+     AddSound( './sounds/bomb10.mp3', SOUND_BOMB(11), False );
+     AddSound( './sounds/bomb11.mp3', SOUND_BOMB(12), False );
+     AddSound( './sounds/bomb12.mp3', SOUND_BOMB(13), False );
+     AddSound( './sounds/bomb13.mp3', SOUND_BOMB(14), False );
+     AddSound( './sounds/bomb14.mp3', SOUND_BOMB(15), False );
+     AddSound( './sounds/bomb15.mp3', SOUND_BOMB(16), False );
+     AddSound( './sounds/bomb16.mp3', SOUND_BOMB(17), False );
+     AddSound( './sounds/bomb17.mp3', SOUND_BOMB(18), False );
+     AddSound( './sounds/bomb18.mp3', SOUND_BOMB(19), False );
+     AddSound( './sounds/bomb19.mp3', SOUND_BOMB(20), False );
+     AddSound( './sounds/bomb20.mp3', SOUND_BOMB(21), False );
+     AddSound( './sounds/bomb21.mp3', SOUND_BOMB(22), False );
+     AddSound( './sounds/bomb22.mp3', SOUND_BOMB(23), False );
+     AddSound( './sounds/bomb23.mp3', SOUND_BOMB(24), False );
+     AddSound( './sounds/bomb24.mp3', SOUND_BOMB(25), False );
+     AddSound( './sounds/bomb25.mp3', SOUND_BOMB(26), False );
+     AddSound( './sounds/bomb26.mp3', SOUND_BOMB(27), False );
+     AddSound( './sounds/bomb27.mp3', SOUND_BOMB(28), False );
+     AddSound( './sounds/bomb28.mp3', SOUND_BOMB(29), False );
+     AddSound( './sounds/bomb29.mp3', SOUND_BOMB(30), False );
+     
+     // chargement des sons des posages du bombe
+     AddSound( './sounds/drop0.mp3', SOUND_DROP(1), False );
+     AddSound( './sounds/drop1.mp3', SOUND_DROP(2), False );
+     AddSound( './sounds/drop2.mp3', SOUND_DROP(3), False );
+     
+     // chargement des sons pour les morts
+     AddSound( './sounds/die0.mp3', SOUND_DIE(1), False );
+     AddSound( './sounds/die1.mp3', SOUND_DIE(2), False );
+     
+     // chargement des sons pour les maladies
+     AddSound( './sounds/disease0.mp3', SOUND_DISEASE(1), False );
+     AddSound( './sounds/disease1.mp3', SOUND_DISEASE(2), False );
+     AddSound( './sounds/disease2.mp3', SOUND_DISEASE(3), False );
+     AddSound( './sounds/disease3.mp3', SOUND_DISEASE(4), False );
+     AddSound( './sounds/disease4.mp3', SOUND_DISEASE(5), False );
+     AddSound( './sounds/disease5.mp3', SOUND_DISEASE(6), False );
+     AddSound( './sounds/disease6.mp3', SOUND_DISEASE(7), False );
+     AddSound( './sounds/disease7.mp3', SOUND_DISEASE(8), False );
+     
+     // chargement des sons pour les grab
+     AddSound( './sounds/grab0.mp3', SOUND_GRAB(1), False );
+     AddSound( './sounds/grab1.mp3', SOUND_GRAB(2), False );
+
+     // chargement des sons pour les kick
+     AddSound( './sounds/kick0.mp3', SOUND_KICK(1), False );
+     AddSound( './sounds/kick1.mp3', SOUND_KICK(2), False );
+     AddSound( './sounds/kick2.mp3', SOUND_KICK(3), False );
+     AddSound( './sounds/kick3.mp3', SOUND_KICK(4), False );
+     
+     // chargement des sons pour les dropages
+     AddSound( './sounds/throw0.mp3', SOUND_THROW(1), False );
+     AddSound( './sounds/throw1.mp3', SOUND_THROW(2), False );
+     AddSound( './sounds/throw2.mp3', SOUND_THROW(3), False );
+     AddSound( './sounds/throw3.mp3', SOUND_THROW(4), False );
+     
+     // chargement des sons de rebondissement
+     AddSound( './sounds/bounce0.mp3', SOUND_BOUNCE(1), False );
+     AddSound( './sounds/bounce1.mp3', SOUND_BOUNCE(2), False );
+     
+     // chargement des sons des bonus
+     AddSound( './sounds/bonus0.mp3', SOUND_BONUS(1), False );
+     AddSound( './sounds/bonus1.mp3', SOUND_BONUS(2), False );
+     AddSound( './sounds/bonus2.mp3', SOUND_BONUS(3), False );
+     AddSound( './sounds/bonus3.mp3', SOUND_BONUS(4), False );
+     
+     // chargement des sons des stops
+     AddSound( './sounds/stop0.mp3', SOUND_STOP(1), False );
+     AddSound( './sounds/stop1.mp3', SOUND_STOP(2), False );
 
      // chargement de la musique du menu
      AddSound( './musics/menu.mp3', SOUND_MENU, False );
@@ -165,9 +246,6 @@ Begin
          AddTexture( './characters/' + pPlayerCharacter[k].PlayerSkin[k], TEXTURE_BOMBERMAN(k) );
          AddTexture( './characters/' + pPlayerCharacter[k].BombSkin, TEXTURE_BOMB(k) );
          AddTexture( './characters/' + pPlayerCharacter[k].FlameTexture, TEXTURE_FLAME(k) );
-         AddSound( './characters/' + pPlayerCharacter[k].BombSound[1], SOUND_BOMB(10+k), False );
-         AddSound( './characters/' + pPlayerCharacter[k].BombSound[2], SOUND_BOMB(20+k), False );
-         AddSound( './characters/' + pPlayerCharacter[k].BombSound[3], SOUND_BOMB(30+k), False );
          AddAnimation( './characters/' + pPlayerCharacter[k].PlayerAnim, ANIMATION_BOMBERMAN(k), MESH_BOMBERMAN(k), False );
      End;
 

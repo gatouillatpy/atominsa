@@ -143,8 +143,27 @@ Const SOUND_MENU_MOVE    = 101;
       
       SOUND_MENU         = 400;
 
-Function SOUND_BOMB( k : Integer ) : Integer ;
+      SOUND_BONUS_NULL   = 500;
+      SOUND_DROP_NULL    = 600;
+      SOUND_DIE_NULL     = 700;
+      SOUND_DISEASE_NULL = 800;
+      SOUND_GRAB_NULL    = 900;
+      SOUND_KICK_NULL    = 1000;
+      SOUND_THROW_NULL   = 1100;
+      SOUND_BOUNCE_NULL  = 1200;
+      SOUND_STOP_NULL    = 1300;
+      
 
+Function SOUND_BOMB( k : Integer ) : Integer ;
+Function SOUND_BONUS( k : Integer ) : Integer ;
+Function SOUND_DROP( k : Integer ) : Integer ;
+Function SOUND_DIE( k : Integer ) : Integer ;
+Function SOUND_DISEASE( k : Integer ) : Integer ;
+Function SOUND_GRAB( k : Integer ) : Integer ;
+Function SOUND_KICK( k : Integer ) : Integer ;
+Function SOUND_THROW( k : Integer ) : Integer ;
+Function SOUND_BOUNCE( k : Integer ) : Integer ;
+Function SOUND_STOP( k : Integer ) : Integer ;
 
 
 // constantes de définition des animations
@@ -318,6 +337,51 @@ End;
 Function SOUND_BOMB( k : Integer ) : Integer ;
 Begin
      SOUND_BOMB := k + SOUND_BOMB_NULL;
+End;
+
+Function SOUND_BONUS( k : Integer ) : Integer ;
+Begin
+     SOUND_BONUS := k + SOUND_BONUS_NULL;
+End;
+
+Function SOUND_DROP( k : Integer ) : Integer ;
+Begin
+     SOUND_DROP := k + SOUND_DROP_NULL;
+End;
+
+Function SOUND_DIE( k : Integer ) : Integer ;
+Begin
+     SOUND_DIE := k + SOUND_DIE_NULL;
+End;
+
+Function SOUND_DISEASE( k : Integer ) : Integer ;
+Begin
+     SOUND_DISEASE := k + SOUND_DISEASE_NULL;
+End;
+
+Function SOUND_GRAB( k : Integer ) : Integer ;
+Begin
+     SOUND_GRAB := k + SOUND_GRAB_NULL;
+End;
+
+Function SOUND_KICK( k : Integer ) : Integer ;
+Begin
+     SOUND_KICK := k + SOUND_KICK_NULL;
+End;
+
+Function SOUND_THROW( k : Integer ) : Integer ;
+Begin
+     SOUND_THROW := k + SOUND_THROW_NULL;
+End;
+
+Function SOUND_BOUNCE( k : Integer ) : Integer ;
+Begin
+     SOUND_BOUNCE := k + SOUND_BOUNCE_NULL;
+End;
+
+Function SOUND_STOP( k : Integer ) : Integer ;
+Begin
+     SOUND_STOP := k + SOUND_STOP_NULL;
 End;
 
 Function MESH_BOMBERMAN( k : Integer ) : Integer ;

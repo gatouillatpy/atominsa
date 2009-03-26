@@ -8,9 +8,9 @@ Interface
 
 Uses Classes, SysUtils, UUtils, UForm;
 
-Type
-
 { CMap}
+
+Type
 
 CMap = Class
 
@@ -57,6 +57,7 @@ CMap = Class
                 Property SkyboxBack   : String Read sSkyboxBack ;
                 Property SkyboxLeft   : String Read sSkyboxLeft ;
                 Property SkyboxRight  : String Read sSkyboxRight ;
+
                 
 End;
 

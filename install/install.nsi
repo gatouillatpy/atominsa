@@ -78,12 +78,6 @@ Section "SectionPrincipale" SEC01
   File "D:\Programmation\atominsa\source\exec\characters\bomberman\flame.jpg"
   SetOutPath "$INSTDIR\characters"
   File "D:\Programmation\atominsa\source\exec\characters\bomberman.chr"
-  SetOutPath "$INSTDIR"
-  File "D:\Programmation\atominsa\source\exec\fmod.dll"
-  File "D:\Programmation\atominsa\source\exec\glut.dll"
-  File "D:\Programmation\atominsa\source\exec\glut.lib"
-  File "D:\Programmation\atominsa\source\exec\glut32.dll"
-  File "D:\Programmation\atominsa\source\exec\glut32.lib"
   SetOutPath "$INSTDIR\maps\night"
   File "D:\Programmation\atominsa\source\exec\maps\night\brick.jpg"
   File "D:\Programmation\atominsa\source\exec\maps\night\brick.m12"
@@ -214,6 +208,12 @@ Section "SectionPrincipale" SEC01
   File "D:\Programmation\atominsa\source\exec\textures\mainbt4.jpg"
   File "D:\Programmation\atominsa\source\exec\textures\mainbt5.jpg"
   File "D:\Programmation\atominsa\source\exec\textures\mask.bmp"
+  SetOutPath "$INSTDIR"
+  File "D:\Programmation\atominsa\source\exec\fmod.dll"
+  File "D:\Programmation\atominsa\source\exec\glut.dll"
+  File "D:\Programmation\atominsa\source\exec\glut.lib"
+  File "D:\Programmation\atominsa\source\exec\glut32.dll"
+  File "D:\Programmation\atominsa\source\exec\glut32.lib"
 
 ; Shortcuts
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application

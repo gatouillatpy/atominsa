@@ -860,6 +860,7 @@ if bAlive then
         Send( nLocalIndex, HEADER_DEAD, sData );
      End;
   End;
+  PlaySound( SOUND_DIE( Random( 2 ) + 1 ) );
  end;
 end;
 
@@ -1013,6 +1014,7 @@ begin
     begin
       if uGrid.GetBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil then
       begin
+        PlaySound( SOUND_DROP( Random(3) + 1 ) );
         bTrigger := nTriggerBomb>0;
         AddBomb(fPosition.x+0.5,fPosition.y+0.5,nIndex,nFlameSize,fBombTime,bJelly,bTrigger,uGrid,@UpBombCount,@IsBombermanAtCoo, nNetID, False);
         Dec(nBombCount);
@@ -1024,6 +1026,7 @@ begin
       end
       else if bCanSpoog then
       begin
+          PlaySound( SOUND_DROP( Random(3) + 1 ) );
           //creation en ligne de bombes
           dX := 0;
           dY := 0;
@@ -1087,6 +1090,7 @@ Begin
           AddTriggerBomb();
           Dec(nTriggerBomb);
      end;
+     PlaySound( SOUND_DROP( Random(3) + 1 ) );
 End;
 
 
@@ -1107,6 +1111,8 @@ begin
           Else If dX = -1 Then _Bomb.MoveLeft(dt)
           Else If dY = 1 Then _Bomb.MoveDown(dt)
           Else If dY = -1 Then _Bomb.MoveUp(dt);
+          PlaySound( SOUND_KICK( Random(4) + 1 ) );
+          If bMulti = True Then Send( nLocalIndex, HEADER_PUNCH, '' );
        End;
     End
     Else Begin
@@ -1170,6 +1176,7 @@ Begin
      uGrid.DelBlock(dX,dY);
      uGrabbedBomb.StopTime();
      uGrabbedBomb.Position.z:=0.85;
+     PlaySound( SOUND_GRAB( Random(2) + 1 ) );
 End;
 
 
@@ -1221,6 +1228,7 @@ begin
          -90  : uGrabbedBomb.MoveRight(dt);
        end;
        uGrabbedBomb:=nil;
+       PlaySound( SOUND_THROW( Random(4) + 1 ) );
   end;
 end;
 
@@ -1264,6 +1272,8 @@ begin
             180  :  CBomb(uGrid.GetBlock(dX,dY)).Punch(UP,dt);
             -90  :  CBomb(uGrid.GetBlock(dX,dY)).Punch(RIGHT,dt);
           end;
+          PlaySound( SOUND_KICK( Random(4) + 1 ) );
+          If bMulti = True Then Send( nLocalIndex, HEADER_PUNCH, '' );
        End
        Else Begin
              sData := sData + IntToStr( nIndex ) + #31;
@@ -1381,7 +1391,13 @@ end;
 procedure CBomberman.Update(dt : Single);
 begin
   CheckBonus;
-  if nDisease<>0 then ContaminateBomberman();
+  if nDisease<>0 then begin
+     ContaminateBomberman();
+     If ( GetTime > fDiseaseTime ) Then Begin
+        PlaySound( SOUND_DISEASE( Random( 8 ) + 1 ) );
+        fDiseaseTime := GetTime + 3 + Random( 300 ) / 100;
+     End;
+  end;
   if (bEjectBomb) And ((bMulti = False) Or (nLocalIndex = nClientIndex[0])) then
      CreateBomb(dt, Random(1000000000));
   if (uGrabbedBomb<>nil) then
@@ -1417,6 +1433,7 @@ begin
   And Not(uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5))=Nil) then
     if (uGrid.getBlock(Trunc(fPosition.x+0.5),Trunc(fPosition.y+0.5)) is CItem) then
       begin
+         PlaySound( SOUND_BONUS( Random(4) + 1 ) );
          oldX:=Trunc(fPosition.x+0.5);                                                   //a cause de la maladie SWITCH il faut se souvenir de ou il etait
          oldY:=Trunc(fPosition.y+0.5);
          If ( bMulti = True ) And ( nLocalIndex = nClientIndex[0] ) Then Begin

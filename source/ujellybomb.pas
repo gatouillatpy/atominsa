@@ -18,7 +18,7 @@ type
         
         end;
 implementation
-uses UListBomb;
+uses UListBomb, UUtils, UCore;
 
 { CJellyBomb }
 
@@ -29,6 +29,7 @@ begin
   begin
     bMoving:=True;
     nMoveDir:=-nMoveDir;
+    PlaySound( SOUND_BOUNCE( Random(2) + 1 ) );
   end;
 end;
 

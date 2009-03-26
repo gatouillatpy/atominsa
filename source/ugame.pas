@@ -105,6 +105,7 @@ Var nRound : Integer;
     fGameTime : Single;
     fWaitTime : Single;
     fCursorTime : Single;
+    fDiseaseTime : Single;
 
 
 
@@ -216,9 +217,6 @@ Begin
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].PlayerSkin[tPlayer], TEXTURE_BOMBERMAN(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].BombSkin, TEXTURE_BOMB(tPlayer) );
      AddTexture( './characters/' + pPlayerCharacter[tPlayer].FlameTexture, TEXTURE_FLAME(tPlayer) );
-     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[1], SOUND_BOMB(10+tPlayer), False );
-     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[2], SOUND_BOMB(20+tPlayer), False );
-     AddSound( './characters/' + pPlayerCharacter[tPlayer].BombSound[3], SOUND_BOMB(30+tPlayer), False );
 End;
 
 
@@ -1819,6 +1817,7 @@ Begin
      // on coupe la musique du menu
      StopSound( SOUND_MENU );
      fWaitTime := GetTime();
+     fDiseaseTime := GetTime();
 
      // initialisation de l'invite de messages
      bMessage := False;
