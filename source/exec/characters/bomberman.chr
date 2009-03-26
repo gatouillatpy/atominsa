@@ -30,5 +30,5 @@
 
 ; sound file
 -S,bomb1,./bomberman/bomb0.mp3
--S,bomb2,./bomberman/bomb1.wav
--S,bomb3,./bomberman/bomb2.wav
+-S,bomb2,./bomberman/bomb1.mp3
+-S,bomb3,./bomberman/bomb2.mp3
