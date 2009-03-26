@@ -2,7 +2,7 @@ Program atominsa;
 
 {$mode objfpc}{$H+}
 
-{$R atominsa.rc}
+{$R atominsa.res}
 
 
 Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics, Glut,
