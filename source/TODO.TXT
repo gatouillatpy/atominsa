@@ -1,15 +1,25 @@
-Technique :
- - mode réseau :
-   - QUESTION : comment gérer la synchronisation des ressources?
-   - dès la connexion établie le serveur renvoie toutes les données sur les joueurs
-   - à chaque frame le client s'occupe de ses joueurs uniquement (prévoir un boolean dans CBomberman)
-   - le client renvoie les données concernant ses joueurs
-   - le serveur renvoie a tout le monde
+ - ajouter des paroles dites aléatoirement
+ - mettre la licence en entête de chaque fichier
+ - résoudre le problème de plantage du serveur dédié lorsque tout le monde se déconnecte
+ - faire en sorte de ne plus envoyer des chaines en réseau mais des byte buffers
  - faire l'ajustement des titres du setup, et de multi
- - faire l'ajustement des noms dans les scores
- - ajouter au setup le nombre et le temps de round
- - ajouter au setup l'activation des couleurs
- - ajouter au setup les paramètres réseau : nom local, adresse, port?
+ - refaire les bonus pour qu'ils soient plus distincts sur le plateau
+ - lorsqu'un bomberman choppe un bonus, faire en sorte qu'il y ait un petit billboard fondant en alpha permettant de distinguer le bonus pris avec un petit + à coté
+ - de même lorsqu'un bomberman choppe une maladie
+ - lorsqu'un bomberman contamine un autre, faire en sorte qu'il y ait une petit billboard fondant en alpha sur lequel il y a marqué "STAPHANED !!"
+ - virer la notification textuelle de prise des bonus et des maladies
+ - ajouter au hud à gauche et à droite pour le joueur keyb1 et keyb2 respectivement, une liste verticale des bonus sous forme de petites vignettes (comme celles qui apparaissent  au dessus de la tête des bombermen) pris avec un numéro indiquant le nombre (genre taille des flammes)
+ - faire en sorte que les messages écrits en réseau s'affichent à la place de l'ancienne notification textuelle de prise des bonus
+ - virer l'affichage des messages réseau dans l'écran
+ - afficher des messages fun de manière aléatoire dans l'écran, genre "do not use drugs"
+ - ajouter une zone d'échange de messages réseau dans le lobby
+ - ajouter au lobby le paramétrage du temps de round
+ - corriger le problème de billboarding des flammes
+ - faire une vidéo d'intro
+ - réaliser un mode solo
+ - terminer le site web
+ - ajouter des objets au décor
+ - multiplier le nombre de maps et de personnages
  - éditeur de static mesh
  - éditeur de skeletal mesh
  - éditeur d'animation
@@ -17,54 +27,6 @@ Technique :
  - éditeur de map
  - éditeur de scheme
  - éditeur de voice pack
- - terminer l'intro
- - mode online
- - mode solo
-
-Gameplay :
- - facultatif : creer des Jelly Trigger bombes .....
-
-
-
-Divers :
- - mettre la licence en entête de chaque fichier
- - maintenir le site web
-
-Graphismes :
- - chercher modèle de sphere + textures Terre, Lune, Soleil, nuages
- - trouver différents modèles représentant les bonus
- - faire les animations une fois l'éditeur terminé
 
 Rappels :
  - voir ce site pour l'inspiration http://www.geocities.com/mheid.geo/about.html
-
- Liste des bonus :
-  - extrabomb    > ajoute la possibilité de poser une bombe supplémentaire    > terminé
-  - flameup      > ajoute un degré d'expansion de flammes                     > terminé
-  - disease      > maladie aléatoire                                          > à compléter
-  - punch         > permet de shooter dans les bombes avec l'action 2         > fait manque le mesh
-  - kick        > permet de pousser les bombes dans une direction au contact  > fait manque le mesh
-  - grab         > permet de prendre une bombe dans ses mains avec l'action 1 
-                   lorsqu'elle vient d'être posée                             > fait manque le mesh
-  - spooger      > permet d'aligner tout son stock de bombes dans une
-                   direction avec l'action 1 lorsqu'une première bombe vient
-                   d'être posée                                               > fait manque le mesh
-  - goldflame    > met le degré d'expansion de flammes au maximum             > fait manque le mesh
-  - trigger      > transforme les trois bombes suivantes en pipe bombes
-                   déclenchables à distance avec l'action 2                   > fait manque le mesh
-  - jelly        > transforme les bombes posées en bombes rebondissantes
-                   contre les murs lorsque quelqu'un les pousse avec le kick > fait manque le mesh
-  - superdisease > 3 maladies aléatoires                                      > fait manque le mesh
-  - random       > bonus random                                               > fait manque le mesh
-
- Liste des maladies :
-  - joueur ralenti (vitesse minimum)					> terminé
-  - joueur accéléré (vitesse maximum					> terminé
-  - joueur ne peut plus poser de bombes					> terminé
-  - joueur téléporté à la place d'un autre				> terminé
-  - joueur chie des bombes et est plus rapide 				> terminé
-  - joueur chie des bombes et les kick automatiquement			> terminé
-  - joueur a les touches inversées					> terminé
-  - taille des flammes au max						> terminé
-  - taille des flammes au min						> terminé
-  - les bombes explosent trois fois plus vite 				> terminé
