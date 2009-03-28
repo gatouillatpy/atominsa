@@ -1395,9 +1395,13 @@ begin
      ContaminateBomberman();
      If ( GetTime > fDiseaseTime ) Then Begin
         PlaySound( SOUND_DISEASE( Random( 8 ) + 1 ) );
-        fDiseaseTime := GetTime + 3 + Random( 300 ) / 100;
+        fDiseaseTime := GetTime + 1 + Random( 200 ) / 100;
      End;
   end;
+  If ( GetTime > fSpeechTime ) Then Begin
+    PlaySound( SOUND_SPEECH( Random( 87 ) + 1 ) );
+    fSpeechTime := GetTime + 2 + Random( 500 ) / 100;
+  End;
   if (bEjectBomb) And ((bMulti = False) Or (nLocalIndex = nClientIndex[0])) then
      CreateBomb(dt, Random(1000000000));
   if (uGrabbedBomb<>nil) then

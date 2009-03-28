@@ -174,7 +174,7 @@ Begin
      DrawImage( 0, 0, -1, w / h, 1, 1, 1, 1, 1, True );
 
      // affichage du menu
-     DrawString( STRING_GAME_MENU(3), -w / h * 0.4,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     DrawString( STRING_GAME_MENU(3), -w / h * 0.2,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
      t := 0.3;
      DrawString( STRING_GAME_MENU(81), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_MULTI_NAME), IsActive(MENU_MULTI_NAME), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
      t += 0.12;

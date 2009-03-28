@@ -106,7 +106,7 @@ Var nRound : Integer;
     fWaitTime : Single;
     fCursorTime : Single;
     fDiseaseTime : Single;
-
+    fSpeechTime : Single;
 
 
 Var pPlayer1 : CBomberman;
@@ -1818,6 +1818,7 @@ Begin
      StopSound( SOUND_MENU );
      fWaitTime := GetTime();
      fDiseaseTime := GetTime();
+     fSpeechTime := GetTime();
 
      // initialisation de l'invite de messages
      bMessage := False;
@@ -2824,7 +2825,7 @@ Procedure UpdateMenu () ;
 Begin
      // ajout du titre
      If (bMulti = True) Then Begin
-          SetString( STRING_GAME_MENU(1), '  multi', 0.0, 0.02, 600 );
+          SetString( STRING_GAME_MENU(1), 'multi', 0.0, 0.02, 600 );
      End Else Begin
           SetString( STRING_GAME_MENU(1), 'practice', 0.0, 0.02, 600 );
      End;
@@ -2874,7 +2875,7 @@ Begin
      
      // ajout du titre
      If (bMulti = True) Then Begin
-          SetString( STRING_GAME_MENU(1), '   multi', 0.2, 0.2, 600 );
+          SetString( STRING_GAME_MENU(1), 'multi', 0.2, 0.2, 600 );
      End Else Begin
           SetString( STRING_GAME_MENU(1), 'practice', 0.2, 0.2, 600 );
      End;
@@ -2982,7 +2983,11 @@ Begin
      DrawSkybox( 0.9, 0.9, 0.9, 0.9, TEXTURE_MAP_SKYBOX(0) );
 
      // affichage du menu
-     DrawString( STRING_GAME_MENU(1), -w / h * 0.4,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     If (bMulti = True) Then Begin
+        DrawString( STRING_GAME_MENU(1), -w / h * 0.2,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     End Else Begin
+         DrawString( STRING_GAME_MENU(1), -w / h * 0.35,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     End;
      t := 0.0;
      DrawString( STRING_GAME_MENU(11), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER1), IsActive(MENU_PLAYER1), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
      DrawString( STRING_GAME_MENU(12), -w / h * 0.8, 0.7 - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER2), IsActive(MENU_PLAYER2), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;

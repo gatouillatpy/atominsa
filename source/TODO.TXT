@@ -1,8 +1,6 @@
- - ajouter des paroles dites aléatoirement
  - mettre la licence en entête de chaque fichier
- - résoudre le problème de plantage du serveur dédié lorsque tout le monde se déconnecte
  - faire en sorte de ne plus envoyer des chaines en réseau mais des byte buffers
- - faire l'ajustement des titres du setup, et de multi
+ - faire en sorte que lorsqu'un bomberman meurt, ses bonus soient redisposés aléatoirement sur la grille
  - refaire les bonus pour qu'ils soient plus distincts sur le plateau
  - lorsqu'un bomberman choppe un bonus, faire en sorte qu'il y ait un petit billboard fondant en alpha permettant de distinguer le bonus pris avec un petit + à coté
  - de même lorsqu'un bomberman choppe une maladie

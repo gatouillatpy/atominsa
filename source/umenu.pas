@@ -183,7 +183,6 @@ Begin
      i := Round(x / w * Window.Mask.Picture.Width);
      j := Round(y / h * Window.Mask.Picture.Height);
      k := 3 * (j * Window.Mask.Picture.Width + i);
-     AddLineToConsole(Format('w=%f ; h=%f ; x=%f ; y=%f ; i=%d ; j=%d ; k=%d', [w, h, x, y, i, j, k] ));
      b := MaskIntfImg.PixelData[k+0];
      g := MaskIntfImg.PixelData[k+1];
      r := MaskIntfImg.PixelData[k+2];

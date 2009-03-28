@@ -152,7 +152,8 @@ Const SOUND_MENU_MOVE    = 101;
       SOUND_THROW_NULL   = 1100;
       SOUND_BOUNCE_NULL  = 1200;
       SOUND_STOP_NULL    = 1300;
-      
+      SOUND_SPEECH_NULL    = 1400;
+
 
 Function SOUND_BOMB( k : Integer ) : Integer ;
 Function SOUND_BONUS( k : Integer ) : Integer ;
@@ -164,6 +165,7 @@ Function SOUND_KICK( k : Integer ) : Integer ;
 Function SOUND_THROW( k : Integer ) : Integer ;
 Function SOUND_BOUNCE( k : Integer ) : Integer ;
 Function SOUND_STOP( k : Integer ) : Integer ;
+Function SOUND_SPEECH( k : Integer ) : Integer ;
 
 
 // constantes de définition des animations
@@ -382,6 +384,11 @@ End;
 Function SOUND_STOP( k : Integer ) : Integer ;
 Begin
      SOUND_STOP := k + SOUND_STOP_NULL;
+End;
+
+Function SOUND_SPEECH( k : Integer ) : Integer ;
+Begin
+     SOUND_SPEECH := k + SOUND_SPEECH_NULL;
 End;
 
 Function MESH_BOMBERMAN( k : Integer ) : Integer ;

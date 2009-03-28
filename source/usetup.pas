@@ -382,7 +382,7 @@ Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
 
-     DrawString( STRING_SCORE_TABLE(1), -w / h * 0.5,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
+     DrawString( STRING_SETUP_MENU(1), -w / h * 0.25,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
      t := 0.0;
      

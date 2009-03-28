@@ -231,6 +231,10 @@ Begin
      AddSound( './sounds/stop0.mp3', SOUND_STOP(1), False );
      AddSound( './sounds/stop1.mp3', SOUND_STOP(2), False );
 
+     // chargement des voix
+     For k := 0 To 86 Do
+         AddSound( Format('./sounds/speech%d.mp3', [k]), SOUND_SPEECH(k), False );
+
      // chargement de la musique du menu
      AddSound( './musics/menu.mp3', SOUND_MENU, False );
 
