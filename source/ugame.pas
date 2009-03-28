@@ -378,16 +378,16 @@ Begin
         vAngle.y += GetMouseDY() * 200.0 * GetDelta();
         If vAngle.x < 0.0 Then vAngle.x += PI2;
         If vAngle.x > PI2 Then vAngle.x -= PI2;
-        If vAngle.y < -PI*0.5 Then vAngle.y := -PI*0.5;
-        If vAngle.y > +PI*0.5 Then vAngle.y := +PI*0.5;
+        If vAngle.y <= -PI*0.5 Then vAngle.y := -PI*0.5+0.001;
+        If vAngle.y >= +PI*0.5 Then vAngle.y := +PI*0.5-0.001;
         If GetKeyS(KEY_UP) Then Begin
-           vPointer.x += GetDelta() * 1.0 * cos(vAngle.x);
+           vPointer.x += GetDelta() * 1.0 * cos(vAngle.x)*cos(vAngle.y);
            vPointer.y += GetDelta() * 1.0 * sin(vAngle.y);
-           vPointer.z += GetDelta() * 1.0 * sin(vAngle.x);
+           vPointer.z += GetDelta() * 1.0 * sin(vAngle.x)*cos(vAngle.y);
         End Else If GetKeyS(KEY_DOWN) Then Begin
-           vPointer.x -= GetDelta() * 1.0 * cos(vAngle.x);
+           vPointer.x -= GetDelta() * 1.0 * cos(vAngle.x)*cos(vAngle.y);
            vPointer.y -= GetDelta() * 1.0 * sin(vAngle.y);
-           vPointer.z -= GetDelta() * 1.0 * sin(vAngle.x);
+           vPointer.z -= GetDelta() * 1.0 * sin(vAngle.x)*cos(vAngle.y);
         End Else If GetKeyS(KEY_RIGHT) Then Begin
            vPointer.x += GetDelta() * 1.0 * cos(vAngle.x + PI*0.5);
            vPointer.z += GetDelta() * 1.0 * sin(vAngle.x + PI*0.5);
@@ -400,9 +400,9 @@ Begin
            vCamera.y := vPointer.y
         Else vCamera.y := 0.05;
         vCamera.z := vPointer.z;
-        vCenter.x := vCamera.x + cos(vAngle.x);
+        vCenter.x := vCamera.x + cos(vAngle.x)*cos(vAngle.y);
         vCenter.y := vCamera.y + sin(vAngle.y);
-        vCenter.z := vCamera.z + sin(vAngle.x);
+        vCenter.z := vCamera.z + sin(vAngle.x)*cos(vAngle.y);
      End Else Begin
      // caméra en mode suivi de bomberman
         bFollow := True;
