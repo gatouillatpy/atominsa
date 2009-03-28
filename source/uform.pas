@@ -15,6 +15,7 @@ Type
     Image : TImage ;
     Mask: TImage;
     Memo : TMemo ;
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
   Private
     { private declarations }
   Public
@@ -22,6 +23,8 @@ Type
   End;
 
 Var Window : TWindow ;
+
+Var FORCE_QUIT : Boolean;
 
 Procedure AddStringToConsole( s : String ) ;
 Procedure AddLineToConsole( s : String ) ;
@@ -44,7 +47,12 @@ Begin
      Application.ProcessMessages;
 End;
 
-{ TWindow }
+{ TWindow }              
+
+procedure TWindow.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+     FORCE_QUIT := True;
+end;
 
 Initialization
   {$I uform.lrs}

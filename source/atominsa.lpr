@@ -274,15 +274,20 @@ Var nIndex, nHeader : Integer;
 Begin
      AddLineToConsole( 'Mode dedicated server.' );
 
+     // initialisation de FMod
+     InitFMod();
+
      nState := PHASE_MENU;
 
      nDelay := 1000 Div nFramerate;
      
      // attente des infos du master server
-     While True Do Begin
+     While Not FORCE_QUIT Do Begin
            MainLoop();
            Delay( nDelay );
      End;
+
+     ExitFMod();
 End;
 
 

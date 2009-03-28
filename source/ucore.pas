@@ -841,7 +841,9 @@ End;
 Function ServerInit ( Const nPort : Word ) : Boolean;
 Begin
      nSocket := -1;
-     
+
+     If ( pTCP <> NIL ) Then ServerTerminate();
+
      pEvent := TLEvents.Create;
      pTCP := TLTcp.Create( NIL );
      pTCP.OnError := @pEvent.OnError;

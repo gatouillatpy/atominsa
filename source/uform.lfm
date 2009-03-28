@@ -1,15 +1,17 @@
 object Window: TWindow
-  Left = 34
-  Height = 297
-  Top = 306
+  Left = 262
+  Height = 295
+  Top = 271
   Width = 673
-  HorzScrollBar.Page = 672
-  VertScrollBar.Page = 296
   ActiveControl = Memo
   Caption = 'atominsa - Console'
+  ClientHeight = 295
+  ClientWidth = 673
+  OnClose = FormClose
   ParentFont = True
   SessionProperties = '""'
   ShowHint = True
+  LCLVersion = '0.9.26.2'
   object Image: TImage
     Left = 10
     Height = 100
@@ -34,6 +36,7 @@ object Window: TWindow
     Font.Height = -11
     Font.Name = 'Courier New'
     Font.Pitch = fpFixed
+    ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 0
   end
