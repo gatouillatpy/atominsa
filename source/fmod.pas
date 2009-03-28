@@ -240,7 +240,7 @@ procedure FSOUND_3D_Listener_SetAttributes(Pos: PFSoundVector; Vel: PFSoundVecto
                                            fx: Single; fy: Single; fz: Single;
                                            tx: Single; ty: Single; tz: Single); {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
 procedure FSOUND_3D_Listener_GetAttributes(Pos: PFSoundVector; Vel: PFSoundVector;
-                                           fx: PSingle; fy: PSingle; fz: PSingle;  
+                                           fx: PSingle; fy: PSingle; fz: PSingle;
                                            tx: PSingle; ty: PSingle; tz: PSingle); {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
 procedure FSOUND_3D_SetDopplerFactor(Scale: Single); {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
 procedure FSOUND_3D_SetDistanceFactor(Scale: Single); {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
@@ -265,7 +265,7 @@ procedure FSOUND_3D_SetRolloffFactor(Scale: Single); {$IFDEF LINUX} cdecl {$ELSE
 }
 
 function FSOUND_FX_Enable(Channel: Integer; Fx: TFSoundFXModes): Integer; {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
-function FSOUND_FX_Disable(Channel: Integer): ByteBool; {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};    
+function FSOUND_FX_Disable(Channel: Integer): ByteBool; {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
 
 function FSOUND_FX_SetChorus(FXId: Integer; WetDryMix, Depth, Feedback, Frequency: Single; Waveform: Integer; Delay: Single; Phase: Integer): ByteBool; {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
 function FSOUND_FX_SetCompressor(FXId: Integer; Gain, Attack, Release, Threshold, Ratio, Predelay: Single): ByteBool; {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
@@ -346,7 +346,7 @@ function FSOUND_Stream_Net_GetStatus(Stream: PFSoundStream; var Status: TFSoundS
 { =================== }
 
 {
-    Note : 0 = default cdrom.  Otherwise specify the drive letter, for example. 'D'. 
+    Note : 0 = default cdrom.  Otherwise specify the drive letter, for example. 'D'.
 }
 
 function FSOUND_CD_Play(Drive: Byte; Track: Integer): ByteBool; {$IFDEF LINUX} cdecl {$ELSE} stdcall {$ENDIF};
@@ -764,7 +764,7 @@ var
 const
   Default8087CW = $1332; //according to the FPC site it's the value used in the
                          //startup code.
-procedure Set8087CW( value :word ); Assembler; oldfpccall;
+procedure Set8087CW( value :word ); oldfpccall; Assembler;
 asm
    FLDCW  value
 end;

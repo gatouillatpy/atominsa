@@ -5,9 +5,9 @@ Unit UCore;
 
 Interface
 
-Uses Classes, SysUtils, LazJPEG, Math, Graphics, IntfGraphics, Windows, Forms,
+Uses Classes, SysUtils, Math, Graphics, IntfGraphics, Windows, Forms,
      gl, glu, glut, glext,
-     fmod, fmodtypes, fmoderrors,
+     fmoddyn, fmodtypes, fmoderrors,
      lnet,
      UForm, UUtils, USetup;
 
@@ -2899,10 +2899,7 @@ End;
 ////////////////////////////////////////////////////////////////////////////////
 Procedure InitFMod () ;
 Begin
-     If FMOD_VERSION > FSOUND_GetVersion Then Begin
-          AddLineToConsole( 'ERROR Initializing FMOD : Invalid version.' );
-          Exit;
-     End;
+     FMOD_Load( 'fmod.dll' );
 
      If Not FSOUND_Init( 44100, 32, 0 ) Then
      Begin
@@ -2923,6 +2920,8 @@ End;
 Procedure ExitFMod () ;
 Begin
      FSOUND_Close();
+
+     FMOD_Unload();
 End;
 
 
