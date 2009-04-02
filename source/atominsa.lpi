@@ -9,7 +9,7 @@
       </Flags>
       <MainUnit Value="0"/>
       <TargetFileExt Value=".exe"/>
-      <ActiveEditorIndexAtStart Value="22"/>
+      <ActiveEditorIndexAtStart Value="4"/>
     </General>
     <PublishOptions>
       <Version Value="2"/>
@@ -33,8 +33,8 @@
       <Unit0>
         <Filename Value="atominsa.lpr"/>
         <UnitName Value="atominsa"/>
-        <CursorPos X="25" Y="224"/>
-        <TopLine Value="290"/>
+        <CursorPos X="1" Y="271"/>
+        <TopLine Value="253"/>
         <EditorIndex Value="0"/>
         <UsageCount Value="126"/>
         <Loaded Value="True"/>
@@ -42,8 +42,8 @@
       <Unit1>
         <Filename Value="ucore.pas"/>
         <UnitName Value="UCore"/>
-        <CursorPos X="25" Y="3708"/>
-        <TopLine Value="3674"/>
+        <CursorPos X="46" Y="1883"/>
+        <TopLine Value="1874"/>
         <EditorIndex Value="4"/>
         <UsageCount Value="126"/>
         <Loaded Value="True"/>
@@ -63,7 +63,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UForm"/>
-        <CursorPos X="41" Y="15"/>
+        <CursorPos X="30" Y="27"/>
         <TopLine Value="22"/>
         <EditorIndex Value="7"/>
         <UsageCount Value="82"/>
@@ -72,8 +72,8 @@
       <Unit4>
         <Filename Value="usetup.pas"/>
         <UnitName Value="USetup"/>
-        <CursorPos X="37" Y="379"/>
-        <TopLine Value="367"/>
+        <CursorPos X="32" Y="384"/>
+        <TopLine Value="289"/>
         <EditorIndex Value="22"/>
         <UsageCount Value="109"/>
         <Loaded Value="True"/>
@@ -496,124 +496,124 @@
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="2155" Column="25" TopLine="2132"/>
+        <Filename Value="usetup.pas"/>
+        <Caret Line="384" Column="32" TopLine="289"/>
       </Position1>
       <Position2>
         <Filename Value="ucore.pas"/>
-        <Caret Line="2163" Column="25" TopLine="2132"/>
+        <Caret Line="1971" Column="31" TopLine="1958"/>
       </Position2>
       <Position3>
         <Filename Value="ucore.pas"/>
-        <Caret Line="2168" Column="25" TopLine="2150"/>
+        <Caret Line="2065" Column="23" TopLine="2051"/>
       </Position3>
       <Position4>
         <Filename Value="ucore.pas"/>
-        <Caret Line="2908" Column="27" TopLine="2890"/>
+        <Caret Line="1512" Column="1" TopLine="1494"/>
       </Position4>
       <Position5>
         <Filename Value="ucore.pas"/>
-        <Caret Line="2941" Column="25" TopLine="2923"/>
+        <Caret Line="1076" Column="1" TopLine="1052"/>
       </Position5>
       <Position6>
         <Filename Value="ucore.pas"/>
-        <Caret Line="2946" Column="22" TopLine="2923"/>
+        <Caret Line="1508" Column="10" TopLine="1494"/>
       </Position6>
       <Position7>
         <Filename Value="ucore.pas"/>
-        <Caret Line="2989" Column="22" TopLine="2971"/>
+        <Caret Line="1506" Column="45" TopLine="1494"/>
       </Position7>
       <Position8>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3688" Column="25" TopLine="3670"/>
+        <Caret Line="1522" Column="1" TopLine="1504"/>
       </Position8>
       <Position9>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3689" Column="25" TopLine="3670"/>
+        <Caret Line="1524" Column="1" TopLine="1506"/>
       </Position9>
       <Position10>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3690" Column="25" TopLine="3670"/>
+        <Caret Line="1512" Column="1" TopLine="1494"/>
       </Position10>
       <Position11>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3691" Column="25" TopLine="3706"/>
+        <Caret Line="1522" Column="1" TopLine="1504"/>
       </Position11>
       <Position12>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3692" Column="25" TopLine="3674"/>
+        <Caret Line="1512" Column="1" TopLine="1494"/>
       </Position12>
       <Position13>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3696" Column="25" TopLine="3674"/>
+        <Caret Line="1522" Column="1" TopLine="1504"/>
       </Position13>
       <Position14>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3699" Column="25" TopLine="3674"/>
+        <Caret Line="1512" Column="1" TopLine="1494"/>
       </Position14>
       <Position15>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3702" Column="25" TopLine="3674"/>
+        <Caret Line="1522" Column="1" TopLine="1504"/>
       </Position15>
       <Position16>
         <Filename Value="ucore.pas"/>
-        <Caret Line="3705" Column="25" TopLine="3674"/>
+        <Caret Line="1512" Column="1" TopLine="1494"/>
       </Position16>
       <Position17>
-        <Filename Value="umenu.pas"/>
-        <Caret Line="185" Column="33" TopLine="169"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1522" Column="1" TopLine="1504"/>
       </Position17>
       <Position18>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="1816" Column="30" TopLine="1802"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1512" Column="1" TopLine="1494"/>
       </Position18>
       <Position19>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="2830" Column="22" TopLine="2812"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1522" Column="1" TopLine="1504"/>
       </Position19>
       <Position20>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="2873" Column="44" TopLine="2860"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1512" Column="1" TopLine="1494"/>
       </Position20>
       <Position21>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="1306" Column="59" TopLine="1272"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1522" Column="1" TopLine="1504"/>
       </Position21>
       <Position22>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="2986" Column="18" TopLine="2968"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1505" Column="41" TopLine="1494"/>
       </Position22>
       <Position23>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="179" Column="32" TopLine="162"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1512" Column="1" TopLine="1494"/>
       </Position23>
       <Position24>
-        <Filename Value="umulti.pas"/>
-        <Caret Line="106" Column="49" TopLine="88"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1498" Column="52" TopLine="1482"/>
       </Position24>
       <Position25>
-        <Filename Value="ugame.pas"/>
-        <Caret Line="2976" Column="29" TopLine="2964"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1506" Column="36" TopLine="1494"/>
       </Position25>
       <Position26>
-        <Filename Value="usetup.pas"/>
-        <Caret Line="1238" Column="41" TopLine="1231"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1513" Column="13" TopLine="1517"/>
       </Position26>
       <Position27>
-        <Filename Value="usetup.pas"/>
-        <Caret Line="233" Column="37" TopLine="215"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="1042" Column="33" TopLine="1022"/>
       </Position27>
       <Position28>
-        <Filename Value="uonline.pas"/>
-        <Caret Line="120" Column="60" TopLine="356"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="3735" Column="1" TopLine="3717"/>
       </Position28>
       <Position29>
-        <Filename Value="unetwork.pas"/>
-        <Caret Line="78" Column="5" TopLine="69"/>
+        <Filename Value="atominsa.lpr"/>
+        <Caret Line="271" Column="1" TopLine="253"/>
       </Position29>
       <Position30>
-        <Filename Value="usetup.pas"/>
-        <Caret Line="365" Column="46" TopLine="347"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="5" Column="57" TopLine="1"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

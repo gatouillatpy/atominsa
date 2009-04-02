@@ -1032,27 +1032,27 @@ Begin
                    DATA_MESH :
                    Begin
                         pMesh := pDataTemp^.item;
-                        If pMesh <> NIL Then FreeMesh( pMesh );
+                        //If pMesh <> NIL Then FreeMesh( pMesh );
                    End;
                    DATA_ANIMATION :
                    Begin
                         pAnimation := pDataTemp^.item;
-                        If pAnimation <> NIL Then FreeAnimation( pAnimation );
+                        //If pAnimation <> NIL Then FreeAnimation( pAnimation );
                    End;
                    DATA_TEXTURE :
                    Begin
                         pTexture := pDataTemp^.item;
-                        If pTexture <> NIL Then FreeTexture( pTexture );
+                        //If pTexture <> NIL Then FreeTexture( pTexture );
                    End;
                    DATA_SOUND :
                    Begin
                         pSound := pDataTemp^.item;
-                        If pSound <> NIL Then FSOUND_Sample_Free( pSound );
+                        //If pSound <> NIL Then FSOUND_Sample_Free( pSound );
                    End;
                    DATA_MUSIC :
                    Begin
                         pMusic := pDataTemp^.item;
-                        If pMusic <> NIL Then FMUSIC_FreeSong( pMusic );
+                        //If pMusic <> NIL Then FMUSIC_FreeSong( pMusic );
                    End;
               End;
           End;
@@ -1496,7 +1496,7 @@ Begin
      // attribution de la taille de la texture
      pTexture^.Width := Window.Image.Picture.Width;
      pTexture^.Height := Window.Image.Picture.Height;
-     If (Window.Image.Picture.Width < Round(pow(2,nTexturing))) Or (Window.Image.Picture.Height < Round(pow(2,nTexturing))) Then Begin
+     If (Window.Image.Picture.Width > Round(pow(2,nTexturing))) And (Window.Image.Picture.Height > Round(pow(2,nTexturing))) Then Begin
         p := Round(pow(2,nTexturing)) - 1;
         q := Round(pow(2,nTexturing)) - 1;
      End Else Begin
@@ -2073,7 +2073,7 @@ Procedure FreeAnimation ( pAnimation : LPOGLAnimation ) ;
 Var i : Integer;
 Begin
      glDeleteBuffersARB( 1, @pAnimation^.VectorID );
-     For i := 0 To pAnimation^.FrameCount Do
+     For i := 0 To pAnimation^.FrameCount - 1 Do
      Begin
           Finalize( pAnimation^.FrameArray[i].VectorArray );
      End;
