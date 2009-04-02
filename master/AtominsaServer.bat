@@ -1,5 +1,5 @@
 @echo off
-set path=%path%;"C:\Program Files\Java\jdk1.6.0_12\bin"
+set path=%path%;"C:\Program Files\Java\jdk1.6.0_05\bin"
 mkdir bin
 cd src
 javac *.java

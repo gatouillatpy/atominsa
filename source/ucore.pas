@@ -866,8 +866,10 @@ Begin
      If ( bOnline ) Then Begin
         SendOnline( nLocalIndex, HEADER_ONLINE_QUIT, '' );
      End;
+     If ( pTCP = NIL ) Then Exit;
      pTCP.Disconnect;
      pTCP.Free;
+     pTCP := NIL;
      pEvent.Free;
      AddLineToConsole('Disconnected.');
 End;
