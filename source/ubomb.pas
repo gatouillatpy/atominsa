@@ -447,8 +447,8 @@ end;
 constructor CBomb.create(aX, aY : Single; aIndex,aBombSize : integer; aBombTime : Single; aGrid : CGrid;
                               UpCount : LPUpCount; IsBomberman : LPGetBomberman; _nNetID : Integer; wIsChecked : Boolean);
 begin
-   if (aBombTime=BOMBTIME) and (bMulti = false) and ((random(100)+1)<=10)then
-      aBombtime := (random(200)+1)*BOMBTIME/100;
+  // if (aBombTime=BOMBTIME) and (bMulti = false) and ((random(100)+1)<=10)then
+  //    aBombtime := (random(200)+1)*BOMBTIME/100;
    //play sound moisi !!!
 
    pUpCount        := UpCount;

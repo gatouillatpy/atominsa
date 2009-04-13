@@ -46,7 +46,7 @@ Const PI = 3.141592654;
 
 
 
-Const VERSION = 'v.0.8.a';
+Const VERSION = 'v.0.8.b';
 
 
 
@@ -69,8 +69,11 @@ Const STATE_ONLINE        = 17;
 Const REFRESH_ONLINE      = 27;
 Const PHASE_NETWORK       =  8;
 Const STATE_NETWORK       = 18;
+Const PHASE_SOLO          =  9;
+Const STATE_SOLO          = 19;
 
 Var nState : Integer;
+Var bSolo : Boolean;
 
 
 

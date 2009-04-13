@@ -239,8 +239,8 @@ Begin
    
    
    // Empecher de rester fixe
-   If ( pBomberman.SumFixGetDelta > 5 ) Then
-   pBomberman.Danger := pBomberman.Danger + Trunc( ( pBomberman.SumFixGetDelta - 2.0 ) * ( pBomberman.SumFixGetDelta - 2.0 ) * 16 );
+   If ( pBomberman.SumFixGetDelta > 4 ) Then
+      pBomberman.Danger := pBomberman.Danger + Trunc( ( pBomberman.SumFixGetDelta - 4.0 ) * ( pBomberman.SumFixGetDelta - 4.0 ) * 8 );
    If ( pBomberman.SumFixGetDelta < 12 ) Then
       pBomberman.SumFixGetDelta := pBomberman.SumFixGetDelta + dt;
    
@@ -437,8 +437,8 @@ End;
              pBomberman.SumDirGetDelta := 0.125;
              pBomberman.Direction2 := 135;
           End;
-          pBomberman.MoveLeft( GetDelta() );
-          pBomberman.MoveUp( GetDelta() );
+          pBomberman.MoveLeft( dt );
+          pBomberman.MoveUp( dt );
           pBomberman.CanCalculate := false;
       End
       Else  If ( pBomberman.DangerUR <= pBomberman.DangerDL )
@@ -449,8 +449,8 @@ End;
              pBomberman.SumDirGetDelta := 0.125;
              pBomberman.Direction2 := -135;
           End;
-          pBomberman.MoveUp( GetDelta() );
-          pBomberman.MoveRight( GetDelta() );
+          pBomberman.MoveUp( dt );
+          pBomberman.MoveRight( dt );
           pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerDL <= pBomberman.DangerDR ) And ( pBomberman.DangerDL <= pBomberman.DangerLeft )
@@ -460,8 +460,8 @@ End;
               pBomberman.SumDirGetDelta := 0.125;
               pBomberman.Direction2 := 45;
           End;
-          pBomberman.MoveDown( GetDelta() );
-          pBomberman.MoveLeft( GetDelta() );
+          pBomberman.MoveDown( dt );
+          pBomberman.MoveLeft( dt );
           pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerDR <= pBomberman.DangerLeft )
@@ -471,8 +471,8 @@ End;
               pBomberman.SumDirGetDelta := 0.125;
               pBomberman.Direction2 := -45;
           End;
-          pBomberman.MoveRight( GetDelta() );
-          pBomberman.MoveDown( GetDelta() );
+          pBomberman.MoveRight( dt );
+          pBomberman.MoveDown( dt );
           pBomberman.CanCalculate := false;
       End
       Else If ( pBomberman.DangerLeft < pBomberman.Danger ) And ( pBomberman.DangerLeft <= pBomberman.DangerRight )
@@ -675,6 +675,7 @@ Var
    sumFreeCases,                                 // Nombres de cases libres.
    result2 : Integer;                            // Résultat renvoyé
    i, j, k : Integer;
+   bEnd,
    continue,                                     // Vrai si on doit continuer la boucle while
    isDangerous,                                  // Vrai si la bombe est dangereuse
    freeCase,                                     // Vrai si une case est libre
@@ -764,7 +765,7 @@ Begin
                  And ( GetBombByGridCoo(i, j) Is CBomb ) And ( GetBombByGridCoo(i, j).Time + 1 < GetBombByGridCoo(i, j).ExploseTime ) Then
                     result2 := result2 - 64
                  Else Begin
-                     result2 := result2 + 1024;
+                     result2 := result2 + 2048;
                      If ( GetBombByGridCoo(i, j) Is CBomb ) And ( GetBombByGridCoo(i, j).Time + 1 >= GetBombByGridCoo(i, j).ExploseTime ) Then
                         result2 := result2 + 1024;
                      End;
@@ -1058,7 +1059,7 @@ Begin
     // Ca sert à ne pas se coincer dans un axe juste après avoir poser une bombe et en sortir si c'est possible.
     If ( wSkill <> SKILL_NOVICE ) Then Begin
         blocked := false;
-        numFreeCase := 256;
+        numFreeCase := 4096;
         // Bombe à gauche
         If ( x > 1 ) And ( wState[x - 1, y] mod 4 >= 2 ) Then Begin        // S'il y a une bombe à gauche
             continue := true;
@@ -1097,7 +1098,7 @@ Begin
                   i := i - 1;
             End;
             If ( continue = true ) Then Begin
-               If ( numFreeCase < x - i ) Then numFreeCase := x - i;
+               If ( numFreeCase > x - i ) Then numFreeCase := x - i;
                blocked := true;
             End;
         End;
@@ -1118,7 +1119,7 @@ Begin
                   j := j + 1;
             End;
             If ( continue = true ) Then Begin
-               If ( numFreeCase < j - y ) Then numFreeCase := j - y;
+               If ( numFreeCase > j - y ) Then numFreeCase := j - y;
                blocked := true;
             End;
         End;
@@ -1139,7 +1140,7 @@ Begin
                   j := j - 1;
             End;
             If ( continue = true ) Then Begin
-               If ( numFreeCase < y - j ) Then numFreeCase := y - j;
+               If ( numFreeCase > y - j ) Then numFreeCase := y - j;
                blocked := true;
             End;
         End;
@@ -1253,12 +1254,17 @@ Begin
    If ( wSkill = SKILL_MASTERFUL ) Or ( wSkill = SKILL_GODLIKE ) Then Begin
       // Gauche : on ne continue que s'il y a une bombe à gauche et qu'il n'y a pas de sortie à droite.
       continue := false;
+      bEnd := False;
       upBomb := false;
       downBomb := false;
-      For i := 1 To x - 1 Do Begin
+      i := x - 1;
+      While ( i >= 1 ) And ( Not bEnd ) Do Begin
           If ( wState[i, y] mod 4 >= 2 ) Then Begin
              continue := true;
              iBomb := i;
+          End;
+          If ( wState[i, y] mod 16 >= 8 ) Then Begin
+             bEnd := true;
           End;
           // S'il y a une bombe à la ligne du dessous et qu'il n'y a pas de bloc entre, alors il n'y a pas de sortie en dessous.
           If ( y > 1 ) And ( wState[i, y - 1] mod 4 >= 2 ) And ( upBomb = false ) Then Begin
@@ -1279,13 +1285,14 @@ Begin
                    j := j + 1;
              End;
           End;
+          i := i - 1;
       End;
       // Si le bomberman peut sortir par la droite, c'est bien.
       For i := x To GRIDWIDTH Do
           If ( ( y > 1 ) And ( upBomb = false ) And ( ( wState[i, y - 1] mod 16 = 0 ) Or ( wState[i, y - 1] mod 16 = 4 ) ) )
           Or ( ( y < GRIDHEIGHT ) And ( downBomb = false ) And ( ( wState[i, y + 1] mod 16 = 0 ) Or ( wState[i, y + 1] mod 16 = 4 ) ) ) Then
              continue := false;
-      // S'il y a une sortie à gauche et que la sortie est à moins de 3 cases de la bombe ou à moins de 6 cases du bomberman,
+      // S'il y a une sortie à gauche et que la sortie est à plus de 3 cases de la bombe ou à moins de 6 cases du bomberman,
       // alors le danger est proportionnel à la distance de la sortie.
       If ( continue = true ) Then
          For i := iBomb + 1 To x - 1 Do
@@ -1295,12 +1302,17 @@ Begin
                  result2 := result2 + 512 * abs( x - i );
       // Droite
       continue := false;
+      bEnd := false;
       upBomb := false;
       downBomb := false;
-      For i := x + 1 To GRIDWIDTH Do Begin
+      i := x + 1;
+      While ( i <= GRIDWIDTH ) And ( Not bEnd ) Do Begin
           If ( wState[i, y] mod 4 >= 2 ) Then Begin
              continue := true;
              iBomb := i;
+          End;
+          If ( wState[i, y] mod 16 >= 8 ) Then Begin
+             bEnd := true;
           End;
           If ( y > 1 ) And ( wState[i, y - 1] mod 4 >= 2 ) And ( upBomb = false ) Then Begin
              upBomb := true;
@@ -1320,6 +1332,7 @@ Begin
                    j := j - 1;
              End;
           End;
+          i += 1;
       End;
       For i := 1 To x Do
           If ( ( y > 1 ) And ( upBomb = false ) And ( ( wState[i, y - 1] mod 16 = 0 ) Or ( wState[i, y - 1] mod 16 = 4 ) ) )
@@ -1333,12 +1346,17 @@ Begin
                  result2 := result2 + 512 * abs( x - i );
       // Haut
       continue := false;
+      bEnd := false;
       upBomb := false;       // upBomb = leftBomb
       downBomb := false;     // downBomb = rightBomb
-      For j := 1 To y - 1 Do Begin
+      j := y - 1;
+      While ( j >= 1 ) And ( Not bEnd ) Do Begin
           If ( wState[x, j] mod 4 >= 2 ) Then Begin
              continue := true;
              iBomb := j;
+          End;
+          If ( wState[x, j] mod 16 >= 8 ) Then Begin
+             bEnd := true;
           End;
           If ( x > 1 ) And ( wState[x - 1, j] mod 4 >= 2 ) And ( upBomb = false ) Then Begin
              upBomb := true;
@@ -1358,6 +1376,7 @@ Begin
                    i := i + 1;
              End;
           End;
+          j -= 1;
       End;
       For j := y To GRIDHEIGHT Do
           If ( ( x > 1 ) And ( upBomb = false ) And ( ( wState[x - 1, j] mod 16 = 0 ) Or ( wState[x - 1, j] mod 16 = 4 ) ) )
@@ -1371,12 +1390,17 @@ Begin
                  result2 := result2 + 512 * abs( y - i );
       // Bas
       continue := false;
+      bEnd := false;
       upBomb := false;
       downBomb := false;
-      For j := y + 1 To GRIDHEIGHT Do Begin
+      j := y + 1;
+      While ( j <= GRIDHEIGHT ) And ( Not bEnd ) Do Begin
           If ( wState[x, j] mod 4 >= 2 ) Then Begin
              continue := true;
              iBomb := j;
+          End;
+          If ( wState[x, j] mod 16 >= 8 ) Then Begin
+             bEnd := True;
           End;
           If ( x > 1 ) And ( wState[x - 1, j] mod 4 >= 2 ) And ( upBomb = false ) Then Begin
              upBomb := true;
@@ -1396,6 +1420,7 @@ Begin
                    i := i - 1;
              End;
           End;
+          j += 1;
       End;
       For j := 1 To y Do
           If ( ( x > 1 ) And ( upBomb = false ) And ( ( wState[x - 1, j] mod 16 = 0 ) Or ( wState[x - 1, j] mod 16 = 4 ) ) )
@@ -1411,7 +1436,7 @@ Begin
 
 
 
-CalculateDanger := result2;
+   CalculateDanger := result2;
 End;
 
 

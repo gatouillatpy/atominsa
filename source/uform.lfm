@@ -1,7 +1,7 @@
 object Window: TWindow
-  Left = 599
+  Left = 328
   Height = 295
-  Top = 610
+  Top = 282
   Width = 673
   ActiveControl = Memo
   Caption = 'atominsa - Console'
@@ -11,6 +11,7 @@ object Window: TWindow
   ParentFont = True
   SessionProperties = '""'
   ShowHint = True
+  LCLVersion = '0.9.26.2'
   object Image: TImage
     Left = 10
     Height = 100

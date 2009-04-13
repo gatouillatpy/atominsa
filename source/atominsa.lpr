@@ -10,7 +10,7 @@ Uses Classes, Forms, Interfaces, Graphics, SysUtils, IntfGraphics, Glut,
      USpeedUp, UExtraBomb, UFlameUp, UGrid, UFlame, UBomb, USetup, UForm,
      UPractice, UMenu, UIntro, UEditor, UMulti, UGrab, uJelly, UJellyBomb,
      UListBomb, UPunch, USpoog, UGoldFlame, UTriggerBomb, UTrigger,
-     USuperDisease, URandomBonus, UExplosion, UOnline, UNetwork;
+     USuperDisease, URandomBonus, UExplosion, UOnline, UNetwork, USolo;
 
 
 
@@ -74,6 +74,8 @@ Begin
           STATE_EXIT      : Exit();
         //  PHASE_INTRO     : InitIntro();
         //  STATE_INTRO     : ProcessIntro();
+          PHASE_SOLO      : InitSolo();
+          STATE_SOLO      : ProcessSolo();
           PHASE_MENU      : InitMenu();
           STATE_MENU      : ProcessMenu();
           PHASE_PRACTICE  : InitPractice();
@@ -233,7 +235,7 @@ Begin
 
      // chargement des voix
      For k := 0 To 86 Do
-         AddSound( Format('./sounds/speech%d.mp3', [k]), SOUND_SPEECH(k), False );
+         AddSound( Format('./sounds/speech%d.mp3', [k]), SOUND_SPEECH(k+1), False );
 
      // chargement de la musique du menu
      AddSound( './musics/menu.mp3', SOUND_MENU, False );

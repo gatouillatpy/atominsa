@@ -49,6 +49,8 @@ Begin
 
      nMenu := 1;
 
+     bSolo := False;
+
      bUp := False;
      bDown := False;
      bLeft := False;

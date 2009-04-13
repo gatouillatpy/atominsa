@@ -20,6 +20,8 @@ CScheme = Class
 
                  sPath         : String                                         ;
 
+                 nSolo         : Integer                                        ;
+
                  nBrickDensity : Integer                                        ;
 
                  aBlock        : Array [1..GRIDWIDTH,1..GRIDHEIGHT] Of Integer  ;
@@ -39,6 +41,8 @@ CScheme = Class
                 Property Version : Integer Read nVersion ;
 
                 Property Path : String Read sPath ;
+
+                Property Solo : Integer Read nSolo Write nSolo;
 
                 Property BrickDensity : Integer Read nBrickDensity ;
                 
@@ -168,6 +172,8 @@ Begin
      
      sPath := sFile;
      sFile := PATH_SCHEME + sFile;
+
+     nSolo := 0;
 
      nSpawn := 0;
      For i := 1 To SPAWNCOUNT Do

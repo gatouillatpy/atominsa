@@ -30,6 +30,7 @@ Begin
 
      // désactivation du mode multi
      bMulti := False;
+     bSolo := False;
 
      // initialisation du menu
      InitMenu();

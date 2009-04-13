@@ -31,6 +31,8 @@ Const GAME_WAIT         = 5;
 Const GAME_SCORE        = 6;
 Const GAME_MENU_PLAYER  = 11;
 Const GAME_MENU_MULTI   = 12;
+Const GAME_PHASE_LEVEL  = 21;
+Const GAME_STATE_LEVEL  = 22;
 
 Var nGame  : Integer;
 
@@ -165,7 +167,7 @@ Function GetMultiState () : Integer ;
 
 Implementation
 
-Uses UMulti;
+Uses UMulti, USolo;
 
 
 
@@ -388,7 +390,8 @@ Begin
            vPointer.x -= GetDelta() * 1.0 * cos(vAngle.x)*cos(vAngle.y);
            vPointer.y -= GetDelta() * 1.0 * sin(vAngle.y);
            vPointer.z -= GetDelta() * 1.0 * sin(vAngle.x)*cos(vAngle.y);
-        End Else If GetKeyS(KEY_RIGHT) Then Begin
+        End;
+        If GetKeyS(KEY_RIGHT) Then Begin
            vPointer.x += GetDelta() * 1.0 * cos(vAngle.x + PI*0.5);
            vPointer.z += GetDelta() * 1.0 * sin(vAngle.x + PI*0.5);
         End Else If GetKeyS(KEY_LEFT) Then Begin
@@ -1369,7 +1372,18 @@ Begin
             bClientBtnReady[k] := False;
         End;
         bLocalReady := False;
-        InitMenu();
+        If bSolo Then Begin
+            // mise à jour du mode solo
+            If GetBombermanByCount(1).Score = nRoundCount Then Begin
+                If aSchemeList[nScheme].Solo < nPlayerSkill[2] Then Begin
+                   aSchemeList[nScheme].Solo := nPlayerSkill[2];
+                End;
+            End;
+            InitSolo();
+        End
+        Else Begin
+             InitMenu();
+        End;
         If bOnline And (nLocalIndex = nClientIndex[0]) Then
            SendOnline( nLocalIndex, HEADER_END_MATCH, '' );
      End;
@@ -1559,7 +1573,7 @@ Begin
      // force l'abandon du jeu
      If GetKey( KEY_ESC ) Then Begin
         If (bMulti = False) Then Begin
-           InitMenu();
+           If bSolo Then InitSolo() Else InitMenu();
            ClearInput();
         End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
             sData := '';
@@ -2224,7 +2238,7 @@ Begin
         BindKeyObj( nKey2Secondary, False, False, NIL );
         
         If (bMulti = False) Then Begin
-           InitMenu();
+           If bSolo Then InitSolo Else InitMenu();
            ClearInput();
         End Else If ((bMulti = True) And (nLocalIndex = nClientIndex[0])) Then Begin
             sData := '';
@@ -2260,7 +2274,13 @@ Begin
          End
          Else Begin
               If ( nCamera > 0 ) Or ( nCamera = CAMERA_FLY ) Then Begin
-                 If ( nCamera = CAMERA_FLY ) Then k := 1 Else k := nCamera + 1;
+                 If ( nCamera = CAMERA_FLY ) Then Begin
+                    k := 1;
+                    vSpeed.x := 0;
+                    vSpeed.y := 0;
+                    vSpeed.z := 0;
+                 End
+                 Else k := nCamera + 1;
                  bFound := False;
                  While ( bFound = False ) And ( k <= 8 ) Do Begin
                        If ( GetBombermanByCount(k) Is CBomberman )

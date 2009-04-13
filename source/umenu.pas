@@ -63,6 +63,11 @@ Begin
                PlaySound( SOUND_MENU_SELECT );
                nState := PHASE_SETUP;
           End;
+          BUTTON_SOLO :
+          Begin
+               PlaySound( SOUND_MENU_SELECT );
+               nState := PHASE_SOLO;
+          End;
          { BUTTON_EDITOR :
           Begin
                PlaySound( SOUND_MENU_SELECT );
@@ -106,7 +111,7 @@ Begin
          If (r = 0) And (g = 255) And (b = 255) Then nButton := BUTTON_EXIT;
          If (r = 255) And (g = 0) And (b = 0) Then nButton := BUTTON_PRACTICE;
          If (r = 0) And (g = 255) And (b = 0) Then nButton := BUTTON_MULTI;
-        // If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLO;
+         If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLO;
          If (r = 255) And (g = 255) And (b = 0) Then nButton := BUTTON_SETUP;
         // If (r = 255) And (g = 0) And (b = 255) Then nButton := BUTTON_EDITOR;
 
@@ -136,6 +141,8 @@ Begin
 
          Clear( 1, 1, 1, 1 );
          GetRenderTexture();
+
+         nLastButton := BUTTON_NONE;
 
          bMulti := False;
          If ( bOnline = True ) Then Begin
@@ -190,7 +197,7 @@ Begin
      If (r = 0) And (g = 255) And (b = 255) Then nButton := BUTTON_EXIT;
      If (r = 255) And (g = 0) And (b = 0) Then nButton := BUTTON_PRACTICE;
      If (r = 0) And (g = 255) And (b = 0) Then nButton := BUTTON_MULTI;
-    // If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLO;
+     If (r = 0) And (g = 0) And (b = 255) Then nButton := BUTTON_SOLO;
      If (r = 255) And (g = 255) And (b = 0) Then nButton := BUTTON_SETUP;
     // If (r = 255) And (g = 0) And (b = 255) Then nButton := BUTTON_EDITOR;
 

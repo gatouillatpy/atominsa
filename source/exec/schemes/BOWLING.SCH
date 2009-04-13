@@ -7,7 +7,7 @@
 -V,2
 
 ; this is the textual name of the scheme
--N,Bowlin 4 Bombers (1+)
+-N,Bowlin 4 Bombers (10)
 
 ; scheme brick density (0-100 percent)
 -B,100

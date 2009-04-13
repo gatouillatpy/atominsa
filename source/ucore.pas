@@ -3628,7 +3628,7 @@ End;
 
 Procedure SwitchDisplay () ; cdecl;
 Begin
-     If bDisplayFullscreen Then Begin
+     {If bDisplayFullscreen Then Begin
         bDisplayFullscreen := False;
         glutLeaveGameMode();
         glutInitDisplayMode( GLUT_RGB or GLUT_DOUBLE or GLUT_DEPTH );
@@ -3653,7 +3653,7 @@ Begin
      glutMouseFunc( @OGLMouseButton );
      glutPassiveMotionFunc( @OGLMouseMove );
 
-     ReloadDataStack();
+     ReloadDataStack();}
 End;
 
 Procedure InitGlut ( sTitle : String ; pCallback : GameCallback ) ;
