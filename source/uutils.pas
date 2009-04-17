@@ -255,7 +255,7 @@ Const POWERUP_NONE                 = -1;
 
 
 // constantes de définition des chaines de caractères affichées avec effet
-Const STRING_SCORE_TABLE_NULL   =  0;
+Const STRING_SCORE_TABLE_NULL   =  200;
       STRING_MENU_MAIN          =  1;
       STRING_EDITOR_MENU_NULL   =  0;
       STRING_SETUP_MENU_NULL    =  0;

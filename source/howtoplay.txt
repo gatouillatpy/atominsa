@@ -2,7 +2,7 @@ GOAL:
 You're a bomberman and your goal is to survive and kill other bombermen with your bombs.
 
 BONUS:
-Red         : one of eight diseases
+Red         : one of nine diseases
 Green       : additional bomb
 Blue        : increases your walking speed
 Yellow      : increases the blast radius of bomb explosions 
@@ -12,3 +12,14 @@ Pale Yellow : allows you to punch bombs (secondary key)
 Transparent : lets you pick up bombs to throw them (primary key)
 Pale White  : allows you to place all your bombs (primary key)
 Pale Blue   : bombs rebound
+
+DISEASES:
+Speed Up
+Speed Down
+No Bomb
+Change Keys
+Switch Bombermen
+Fast Bomb  
+Small Flame
+Eject Bomb Fast
+Eject Bomb Fast + Kick

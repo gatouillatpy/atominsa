@@ -747,7 +747,7 @@ Begin
                     fY := StrToFloat( GetString( sData, l ) ); l += 1;
                     TryStrToInt( GetString( sData, l ), nBombSize ); l += 1;
                     fBombTime := StrToFloat( GetString( sData, l ) ); l += 1;
-                    If Not ( GetBombByNetID( _nNetId ) Is CBomb ) Then Begin
+                    If Not ( GetBombByNetID( _nNetId ) Is CBomb ) And pBomberman.Alive Then Begin
                         pBomberman.CreateBombMulti( fX, fY, nBombSize, fBombTime, _nNetID );
                         Send( nLocalIndex, HEADER_ACTION0, sData );
                     End;
@@ -1260,6 +1260,7 @@ Begin
                     pGrid.DelBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) );
                     pSecondBomberman.Position.X := fX;
                     pSecondBomberman.Position.Y := fY;
+                    Send( nLocalIndex, HEADER_SWITCH, sData );
                End;
                HEADER_GRAB_CLIENT :
                Begin
