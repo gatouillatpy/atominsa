@@ -3017,7 +3017,7 @@ Begin
      If pSound = NIL Then Exit;
      
      // lecture du son
-     If nIndex = SOUND_MENU Then
+     If (nIndex = SOUND_MENU) Or ((nIndex > SOUND_MUSIC(0)) And (nIndex <= SOUND_MUSIC(2))) Then
         FSOUND_PlaySound( 31, pSound )
      Else
          FSOUND_PlaySound( FSOUND_FREE, pSound );
@@ -3031,7 +3031,7 @@ End;
 Procedure StopSound ( nIndex : LongInt ) ;
 Begin
      // lecture du son
-     If nIndex = SOUND_MENU Then
+     If (nIndex = SOUND_MENU) Or ((nIndex > SOUND_MUSIC(0)) And (nIndex <= SOUND_MUSIC(2))) Then
         FSOUND_StopSound( 31 );
 End;
 

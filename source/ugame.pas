@@ -1689,6 +1689,8 @@ Begin
      fPingTime := GetTime();
      fCheckTime := GetTime();
      
+     PlaySound( SOUND_MUSIC( Random(2) + 1 ) );
+
      // affectation des touches au joueur 1
      If pPlayer1 <> NIL Then Begin
         BindKeyObj( nKey1MoveUp, True, False, @pPlayer1.MoveUp );

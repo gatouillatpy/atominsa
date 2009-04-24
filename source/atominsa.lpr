@@ -240,6 +240,10 @@ Begin
      // chargement de la musique du menu
      AddSound( './musics/menu.mp3', SOUND_MENU, False );
 
+     // chargement des musiques du jeu
+     AddSound( './musics/game0.mp3', SOUND_MUSIC(1), False );
+     AddSound( './musics/game1.mp3', SOUND_MUSIC(2), False );
+
      // chargement des bombermen
      For k := 1 To 8 Do Begin
          If nPlayerCharacter[k] = -1 Then Begin
