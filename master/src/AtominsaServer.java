@@ -45,6 +45,16 @@ public class AtominsaServer
 		aPlayer.remove( tPlayer );
 	}
 
+	synchronized public void delPlayer( int id )
+	{
+		for ( int k = 0 ; k < aPlayer.size() ; k++ )
+		{
+			AtominsaPlayer tPlayer = aPlayer.get(k);
+			
+			if ( tPlayer.nThreadID == id ) delPlayer( tPlayer );
+		}
+	}
+
 	synchronized public void updatePlayers()
 	{
 		for ( int k = 0 ; k < aPlayer.size() ; k++ )

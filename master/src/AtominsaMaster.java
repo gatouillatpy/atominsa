@@ -95,6 +95,16 @@ public class AtominsaMaster
 		return aServer.size();
 	}
 	
+	synchronized public void delPlayer( int id )
+	{
+		for ( int k = 0 ; k < aServer.size() ; k++ )
+		{
+			AtominsaServer tServer = aServer.get( k );
+			
+			tServer.delPlayer( id );
+		}
+	}
+
 	synchronized public ArrayList<AtominsaServer> getPlayableServerList()
 	{
 		ArrayList<AtominsaServer> list = new ArrayList<AtominsaServer>();

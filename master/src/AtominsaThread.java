@@ -332,6 +332,8 @@ public class AtominsaThread extends Thread
 					}
 				}
 			}
+			
+			tServer.updatePlayers();
 		}
 		else if ( nHeader == HEADER_ONLINE_BEGIN_GAME )
 		{
@@ -420,6 +422,9 @@ public class AtominsaThread extends Thread
 	    {
 			try
 			{
+				// TODO : le server ne connait pas le threadID de chacun de ses joueurs
+				tMaster.delPlayer( nThreadID );
+				
 			    System.out.println( ">> #" + String.valueOf(nThreadID) + " disconnected." );
 			    
 			    if ( tServer != null )

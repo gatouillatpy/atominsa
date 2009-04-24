@@ -6,22 +6,85 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.GregorianCalendar;
 import java.util.Random;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import dbwConnection.*;
 
 public class AtominsaDatabase
 {
 	static private Random tRandom = new Random();
 	static private GregorianCalendar tCalendar = new GregorianCalendar();
 	
-	static private Connection con;
+	static private DbwConnection con;
+	
+	static private String location;
+	static private String hostname;
+	static private String username;
+	static private String password;
+	static private String database;
 
-    static public void Connect() throws ClassNotFoundException, SQLException
+    static private void LoadInfo()
     {
-		Class.forName("com.mysql.jdbc.Driver");
+		FileInputStream fstream = null;
+		
+    	try
+    	{
+			fstream = new FileInputStream( "login.inf" );
+		}
+    	catch ( FileNotFoundException e )
+    	{
+    		System.out.println( "Database login file login.inf not found." );
+		}
+		
+		DataInputStream dstream = new DataInputStream( fstream );
+		
+		try
+		{
+			while ( true )
+			{
+				String line = dstream.readLine();
+				if ( line == null ) break;
+				
+				try
+				{
+					if ( line.substring( 0, 8 ).equalsIgnoreCase( "location" ) ) location = line.substring( 9 );
+					if ( line.substring( 0, 8 ).equalsIgnoreCase( "hostname" ) ) hostname = line.substring( 9 );
+					if ( line.substring( 0, 8 ).equalsIgnoreCase( "username" ) ) username = line.substring( 9 );
+					if ( line.substring( 0, 8 ).equalsIgnoreCase( "password" ) ) password = line.substring( 9 );
+					if ( line.substring( 0, 8 ).equalsIgnoreCase( "database" ) ) database = line.substring( 9 );
+				}
+				catch ( Exception e )
+				{
+				}				
+			}
+		}
+		catch ( Exception e )
+		{
+			e.printStackTrace();
+		}
+    }    
+
+    static public void Connect() throws Exception
+    {
+		LoadInfo();
+		
+		//System.out.println(location);
+		//System.out.println(username);
+		//System.out.println(password);
+		//System.out.println(hostname);
+		//System.out.println(database);
 			
-		con = DriverManager.getConnection( "jdbc:mysql://localhost:3306/atominsa", "root", "" );
+		con = new DbwConnection( location, username, password, hostname, database );
     }    
     
-    static public void Disconnect() throws SQLException
+    static public void Disconnect() throws Exception
     {
     	con.close();
     }
@@ -34,8 +97,7 @@ public class AtominsaDatabase
         
 		try
 		{
-	        Statement statement = con.createStatement();
-	        ResultSet result = statement.executeQuery(query);
+	        ResultSet result = con.executeQuery(query);
 	        
 	        result.next();
 	        
@@ -65,11 +127,10 @@ public class AtominsaDatabase
 	        tPlayer.nTotal = result.getInt("total");
 
 	        result.close();
-	        statement.close();
 
 	        return tPlayer;
 		}
-		catch ( SQLException e )
+		catch ( Exception e )
 		{
 			return null;
 		}
@@ -84,17 +145,15 @@ public class AtominsaDatabase
         
 		try
 		{
-	        Statement statement = con.createStatement();
-	        ResultSet result = statement.executeQuery(query);
+	        ResultSet result = con.executeQuery(query);
 	            
 	        result.next();
 	        
 	        if ( result.getInt("id") != 0 ) bResult = true; else bResult = false;
 	
 	        result.close();
-	        statement.close();
 	    }
-		catch ( SQLException e )
+		catch ( Exception e )
 		{
 			return false;
 		}
@@ -112,17 +171,15 @@ public class AtominsaDatabase
         
 		try
 		{
-	        Statement statement = con.createStatement();
-	        ResultSet result = statement.executeQuery(query);
+	        ResultSet result = con.executeQuery(query);
 	            
 	        result.next();
 	        
 	        if ( result.getInt("id") != 0 ) bResult = true; else bResult = false;
 	
 	        result.close();
-	        statement.close();
 	    }
-		catch ( SQLException e )
+		catch ( Exception e )
 		{
 			return false;
 		}
@@ -175,12 +232,9 @@ public class AtominsaDatabase
         
 		try
 		{
-	        Statement statement = con.createStatement();
-	        statement.executeUpdate(query);
-	
-	        statement.close();
+	        con.executeUpdate(query);
 	    }
-		catch ( SQLException e )
+		catch ( Exception e )
 		{
 			return false;
 		}
@@ -202,12 +256,10 @@ public class AtominsaDatabase
         
 		try
 		{
-	        Statement statement = con.createStatement();
-	        statement.executeUpdate(query);
-	
-	        statement.close();
+	        con.executeUpdate(query);
+			System.out.println(query);
 	    }
-		catch ( SQLException e )
+		catch ( Exception e )
 		{
 			return false;
 		}

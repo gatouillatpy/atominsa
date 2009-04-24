@@ -8,6 +8,8 @@ public class AtominsaPlayer
 	static public int STATE_SOLDIER = 4; // joueur définitivement inscrit
 	static public int STATE_DEAD = 5; // joueur banni
 	
+	public int nThreadID; // TODO : à completer
+
 	public int nPosition;
 
 	public String sNickname;
