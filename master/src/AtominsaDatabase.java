@@ -257,7 +257,6 @@ public class AtominsaDatabase
 		try
 		{
 	        con.executeUpdate(query);
-			System.out.println(query);
 	    }
 		catch ( Exception e )
 		{
