@@ -2,9 +2,9 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Atominsa"
-!define PRODUCT_VERSION "0.8c"
+!define PRODUCT_VERSION "0.8d"
 !define PRODUCT_PUBLISHER "IGC"
-!define PRODUCT_WEB_SITE "http://atominsa.free.fr/flash"
+!define PRODUCT_WEB_SITE "http://atominsa.sf.net"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\atominsa.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -37,6 +37,11 @@ var ICONS_GROUP
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
 !define MUI_FINISHPAGE_RUN "$INSTDIR\atominsa.exe"
+!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\readme.txt"
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Show readme.txt"
+!define MUI_FINISHPAGE_LINK "atominsa.sf.net"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://atominsa.sf.net"
+!define MUI_FINISHPAGE_LINK_COLOR 000080
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -48,7 +53,7 @@ var ICONS_GROUP
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "atominsa-setup.exe"
+OutFile "setup-atominsa_0.8d.exe"
 InstallDir "$PROGRAMFILES\Atominsa"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
@@ -88,6 +93,7 @@ Section "SectionPrincipale" SEC01
   SetOverwrite try
   File "..\source\exec\atominsa.cfg"
   File "..\source\exec\atominsa.exe"
+  File "..\source\exec\readme.txt"
   SetOutPath "$INSTDIR\characters\bomberman"
   File "..\source\exec\characters\bomberman\bomb.jpg"
   File "..\source\exec\characters\bomberman\bomb.m12"
@@ -142,6 +148,8 @@ Section "SectionPrincipale" SEC01
   File "..\source\exec\meshes\speedup.m12"
   SetOutPath "$INSTDIR\musics"
   File "..\source\exec\musics\menu.mp3"
+  File "..\source\exec\musics\game0.mp3"
+  File "..\source\exec\musics\game1.mp3"
   SetOutPath "$INSTDIR\schemes"
   File "..\source\exec\schemes\4CORNERS.SCH"
   File "..\source\exec\schemes\AIRCHAOS.SCH"
@@ -666,6 +674,8 @@ Section Uninstall
   Delete "$INSTDIR\schemes\AIRCHAOS.SCH"
   Delete "$INSTDIR\schemes\4CORNERS.SCH"
   Delete "$INSTDIR\musics\menu.mp3"
+  Delete "$INSTDIR\musics\game0.mp3"
+  Delete "$INSTDIR\musics\game1.mp3"
   Delete "$INSTDIR\meshes\speedup.m12"
   Delete "$INSTDIR\meshes\flameup.m12"
   Delete "$INSTDIR\meshes\extrabomb.m12"
@@ -716,6 +726,7 @@ Section Uninstall
   Delete "$INSTDIR\characters\bomberman\bomberman.a12"
   Delete "$INSTDIR\characters\bomberman\bomb.m12"
   Delete "$INSTDIR\characters\bomberman\bomb.jpg"
+  Delete "$INSTDIR\readme.txt"
   Delete "$INSTDIR\atominsa.exe"
   Delete "$INSTDIR\atominsa.cfg"
 
