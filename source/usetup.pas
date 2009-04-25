@@ -1245,6 +1245,7 @@ Begin
                     If LowerCase(GetString(sLine, 1)) = 'scheme' Then Begin
                        k := GetInteger(sLine, 2);
                        aSchemeList[k] := CScheme.Create( GetString(sLine, 3), bDebug );
+                       aSchemeList[k].Solo := GetInteger(sLine,4);
                        nSchemeCount += 1;
                     End;
                     If LowerCase(GetString(sLine, 1)) = 'character' Then Begin
@@ -1380,7 +1381,7 @@ Begin
      WriteLn( ioLine , '; this is the list of installed schemes (index, file)' );
 
      For i := 0 To nSchemeCount - 1 Do
-         WriteLn( ioLine , '-P,scheme,' + IntToStr(i) + ',' + aSchemeList[i].Path );
+         WriteLn( ioLine , '-P,scheme,' + IntToStr(i) + ',' + aSchemeList[i].Path + ',' + IntToStr(aSchemeList[i].Solo) );
 
      WriteLn( ioLine );
      WriteLn( ioLine , '; index of the current scheme (-1 for random)' );
