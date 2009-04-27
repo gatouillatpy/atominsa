@@ -811,23 +811,6 @@ Begin
                     Else If ( nDirection = 3 ) Then pBomberman.Direction := -90;
                     pBomberman.CheckBonus();
                End;
-               HEADER_SWITCH :
-               Begin
-                    TryStrToInt( GetString( sData, 1 ), k );
-                    pBomberman := GetBombermanByIndex( k );
-                    pBomberman.DiseaseNumber := DISEASE_NONE;
-                    pBomberman.Position.X := StrToFloat( GetString( sData, 2 ) );
-                    pBomberman.Position.Y := StrToFloat( GetString( sData, 3 ) );
-                    TryStrToInt( GetString( sData, 4 ), l );
-                    pSecondBomberman := GetBombermanByIndex( l );
-                    fX := StrToFloat( GetString( sData, 5 ) );
-                    fY := StrToFloat( GetString( sData, 6 ) );
-                    If ( pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) <> Nil ) Then
-                       pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ).Destroy();
-                    pGrid.aBlock[ Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ] := Nil;
-                    pSecondBomberman.Position.X := fX;
-                    pSecondBomberman.Position.Y := fY;
-               End;
                HEADER_GRAB_SERVER :
                Begin
                     TryStrToInt( GetString( sData, 1 ), k );
@@ -1255,12 +1238,12 @@ Begin
                     pSecondBomberman := GetBombermanByIndex( l );
                     fX := StrToFloat( GetString( sData, 5 ) );
                     fY := StrToFloat( GetString( sData, 6 ) );
-                    If ( pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) <> Nil ) Then
+                    If ( pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) <> Nil )
+                    And ( pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ) Is CItem ) Then
                        pGrid.GetBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) ).ExploseMulti();
                     pGrid.DelBlock( Trunc( fX + 0.5 ), Trunc( fY + 0.5 ) );
                     pSecondBomberman.Position.X := fX;
                     pSecondBomberman.Position.Y := fY;
-                    Send( nLocalIndex, HEADER_SWITCH, sData );
                End;
                HEADER_GRAB_CLIENT :
                Begin

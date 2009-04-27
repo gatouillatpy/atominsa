@@ -43,7 +43,7 @@ End;
 
 Implementation
 
-Uses UGame, USetup;
+Uses UGame, USetup, UMulti;
 
 { CDisease }
 
@@ -206,7 +206,7 @@ var i : Integer;                                  // variable qui va definir l'i
     xtemp,ytemp : Single;                         // variable temporaire pour echanger les coordonnees des deux joueurs
     sData : String;
 BEGIN
-     If ( bMulti = false ) Or ( nPlayerClient[uPlayer.nIndex] = nLocalIndex ) Then Begin
+     If ( bMulti = false ) Or ( nClientIndex[0] = nLocalIndex ) Then Begin
          i := 1;                                       // initialisation de la variable
 
          Repeat                                        // boucle pour trouver un autre bomberman pour echanger de coordonnees
@@ -225,7 +225,7 @@ BEGIN
      
      uPlayer.DiseaseNumber := DISEASE_NONE;
 
-     If ( bMulti = true ) And ( nPlayerClient[uPlayer.nIndex] = nLocalIndex ) Then Begin
+     If ( bMulti = true ) And ( nClientIndex[0] = nLocalIndex ) Then Begin
          sData := IntToStr( uPlayer.nIndex ) + #31;
          sData := sData + FormatFloat( '0.000', uPlayer.Position.X ) + #31;
          sData := sData + FormatFloat( '0.000', uPlayer.Position.Y ) + #31;
