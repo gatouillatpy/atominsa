@@ -658,8 +658,8 @@ Begin
                            sData := IntToStr( l ) + #31;
                            sData := sData + IntToStr( nPlayerType[l] ) + #31;
                            sData := sData + sPlayerName[l] + #31;
-                           sData := sData + sClientUserName[nIndex] + #31;
-                           sData := sData + sClientUserPassword[nIndex] + #31;
+                           sData := sData + sClientUserName[ClientIndex(nIndex)] + #31;
+                           sData := sData + sClientUserPassword[ClientIndex(nIndex)] + #31;
                            SendOnline( nLocalIndex, HEADER_ONLINE_PLAYER, sData );
                        End;
                     End;

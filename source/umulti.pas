@@ -846,18 +846,15 @@ Begin
             If pBomberman <> Nil Then Begin
                sData := sData + FormatFloat('0.000',pBomberman.Position.x) + #31;
                sData := sData + FormatFloat('0.000',pBomberman.Position.y) + #31;
-               sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
-               sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
+               //sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
+               //sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
                If (pBomberman.Direction = 0) Then nDirection := 0
                Else If (pBomberman.Direction = 90) Then nDirection := 1
                Else If (pBomberman.Direction = 180) Then nDirection := 2
                Else If (pBomberman.Direction = -90) Then nDirection := 3
-               Else nDirection := -1;
+               Else nDirection := 4;
+               If pBomberman.IsMoving() Then nDirection += 5;
                sData := sData + IntToStr(nDirection) + #31;
-               If pBomberman.IsMoving() Then
-                  sData := sData + 'M' + #31
-               Else
-                  sData := sData + 'I' + #31;
             End;
         End;
         Send( nLocalIndex, HEADER_BOMBERMAN, sData );
@@ -1153,20 +1150,39 @@ Begin
                               fY := StrToFloat( GetString( sData, l ) ); l += 1;
                               pBomberman.Position.x := fX;
                               pBomberman.Position.y := fY;
-                              TryStrToInt( GetString( sData, l ), nX ); l += 1;
+                             {TryStrToInt( GetString( sData, l ), nX ); l += 1;
                               TryStrToInt( GetString( sData, l ), nY ); l += 1;
                               pBomberman.LastDirN.x := nX;
-                              pBomberman.LastDirN.y := nY;
+                              pBomberman.LastDirN.y := nY;}
                               TryStrToInt( GetString( sData, l ), nDirection ); l += 1;
-                              If ( nDirection = 0 ) Then pBomberman.Direction := 0
-                              Else If ( nDirection = 1 ) Then pBomberman.Direction := 90
-                              Else If ( nDirection = 2 ) Then pBomberman.Direction := 180
-                              Else If ( nDirection = 3 ) Then pBomberman.Direction := -90;
-                              sState := GetString( sData, l ); l += 1;
-                              If ( sState = 'M' ) Then pBomberman.fMoveTime := GetTime();
+                              Case ( nDirection mod 5 ) Of
+                                   0:Begin
+                                          pBomberman.Direction := 0;
+                                          pBomberman.LastDirN.x := 0;
+                                          pBomberman.LastDirN.y := 1;
+                                   End;
+                                   1:Begin
+                                          pBomberman.Direction := 90;
+                                          pBomberman.LastDirN.x := -1;
+                                          pBomberman.LastDirN.y := 0;
+                                   End;
+                                   2:Begin
+                                          pBomberman.Direction := 180;
+                                          pBomberman.LastDirN.x := 0;
+                                          pBomberman.LastDirN.y := -1;
+                                   End;
+                                   3:Begin
+                                          pBomberman.Direction := -90;
+                                          pBomberman.LastDirN.x := 1;
+                                          pBomberman.LastDirN.y := 0;
+                                   End;
+                              End;
+                              //sState := GetString( sData, l ); l += 1;
+                              //If ( sState = 'M' ) Then pBomberman.fMoveTime := GetTime();
+                              If ( nDirection >= 5 ) Then pBomberman.fMoveTime := GetTime();
                            End
                            Else Begin
-                                l += 6;
+                                l += 3;
                            End;
                            pBomberman.CheckBonus();
                         End;

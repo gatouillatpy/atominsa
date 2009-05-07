@@ -1447,19 +1447,16 @@ begin
               If pBomberman <> Nil Then Begin
                  sData := sData + FormatFloat('0.000',pBomberman.Position.x) + #31;
                  sData := sData + FormatFloat('0.000',pBomberman.Position.y) + #31;
-                 sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
-                 sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
-                 If (pBomberman.Direction = 0) Then mDirection := 0
-                 Else If (pBomberman.Direction = 90) Then mDirection := 1
-                 Else If (pBomberman.Direction = 180) Then mDirection := 2
-                 Else If (pBomberman.Direction = -90) Then mDirection := 3
-                 Else mDirection := -1;
-                 sData := sData + IntToStr(mDirection) + #31;
-                 If pBomberman.IsMoving() Then
-                    sData := sData + 'M' + #31
-                 Else
-                    sData := sData + 'I' + #31;
-                 End;
+                 //sData := sData + IntToStr(pBomberman.LastDirN.x) + #31;
+                 //sData := sData + IntToStr(pBomberman.LastDirN.y) + #31;
+                 If (pBomberman.Direction = 0) Then nDirection := 0
+                 Else If (pBomberman.Direction = 90) Then nDirection := 1
+                 Else If (pBomberman.Direction = 180) Then nDirection := 2
+                 Else If (pBomberman.Direction = -90) Then nDirection := 3
+                 Else nDirection := 4;
+                 If pBomberman.IsMoving() Then nDirection += 5;
+                 sData := sData + IntToStr(nDirection) + #31;
+              End;
             End;
             Send( nLocalIndex, HEADER_BOMBERMAN, sData );
          End;
