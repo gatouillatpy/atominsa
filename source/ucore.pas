@@ -653,6 +653,15 @@ Begin
                     If nPlayerClient[l] = nIndex Then Begin
                        nPlayerClient[l] := -1;
                        nPlayerType[l] := PLAYER_NIL;
+                       // mise à jour au niveau du master server
+                       If bOnline Then Begin
+                           sData := IntToStr( l ) + #31;
+                           sData := sData + IntToStr( nPlayerType[l] ) + #31;
+                           sData := sData + sPlayerName[l] + #31;
+                           sData := sData + sClientUserName[nIndex] + #31;
+                           sData := sData + sClientUserPassword[nIndex] + #31;
+                           SendOnline( nLocalIndex, HEADER_ONLINE_PLAYER, sData );
+                       End;
                     End;
                 End;
                 // renvoi de la liste des clients
