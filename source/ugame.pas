@@ -109,6 +109,7 @@ Var nRound : Integer;
     fCursorTime : Single;
     fDiseaseTime : Single;
     fSpeechTime : Single;
+    fInterpolationTime : Single;
 
 
 Var pPlayer1 : CBomberman;

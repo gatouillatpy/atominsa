@@ -1179,7 +1179,12 @@ Begin
                               End;
                               //sState := GetString( sData, l ); l += 1;
                               //If ( sState = 'M' ) Then pBomberman.fMoveTime := GetTime();
-                              If ( nDirection >= 5 ) Then pBomberman.fMoveTime := GetTime();
+                              If ( nDirection >= 5 ) Then Begin
+                                 pBomberman.fMoveTime := GetTime();
+                                 fInterpolationTime := GetTime();
+                              End
+                              Else
+                                  fInterpolationTime := GetTime() - 1;
                            End
                            Else Begin
                                 l += 3;
@@ -1370,30 +1375,16 @@ Begin
                     nNbrNetId := 0;
                     While ( GetString( sData, l ) <> 'NULL' ) Do Begin
                         TryStrToInt( GetString( sData, l ), _nNetID ); l += 1;
-                     {   nNbrNetId += 1;
-                        If ( nNbrNetId <= 64 ) Then
-                           tNetId[ nNbrNetId ] := _nNetId; }
                         pBomb := GetBombByNetID( _nNetID );
                         If pBomb <> Nil Then Begin
                            fX := StrToFloat( GetString( sData, l ) ); l += 1;
                            fY := StrToFloat( GetString( sData, l ) ); l += 1;
                            fZ := StrToFloat( GetString( sData, l ) ); l += 1;
                            If ( abs( pBomb.Position.x - fX ) > 0.001 ) Or ( abs( pBomb.Position.y - fY ) > 0.001 ) Then Begin
-                             { If ( pBomb.JumpMovement = False ) Then Begin
-                            //  Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) ) Then Begin
-                            //  And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
-                                 pGrid.DelBlock( pBomb.xGrid, pBomb.yGrid );
-                                 AddLineToConsole( 'Bug : delblock for dropped bomb' );
-                              End; }
                               pBomb.Position.x := fX;
                               pBomb.Position.y := fY;
                               pBomb.xGrid := Trunc( fX );
                               pBomb.yGrid := Trunc( fY );
-                            //  If ( pBomb.JumpMovement = False )
-                            //  And ( IsBombermanAtCoo( pBomb.xGrid, pBomb.yGrid ) = False ) Then
-                             { If ( pBomb.JumpMovement = False ) Then
-                             // Or ( pGrid.GetBlock( pBomb.xGrid, pBomb.yGrid ) = Nil ) ) Then
-                                 pGrid.AddBlock( pBomb.xGrid, pBomb.yGrid, pBomb ); }
                            End;
                            pBomb.xGrid := Trunc( fX );
                            pBomb.yGrid := Trunc( fY );
@@ -1402,42 +1393,9 @@ Begin
                             l += 3;
                         End;
                     End;
-                  {  If ( nNbrNetId >= 0 ) And ( nNbrNetId <= 64 ) Then Begin
-                        For k := 1 To GetBombCount() Do Begin
-                            pBomb := GetBombByCount( k );
-                            If ( pBomb <> Nil ) Then
-                               isBomb := False;
-                               l := 1;
-                               While ( l <= nNbrNetId ) And ( isBomb = False ) Do Begin
-                                    If ( tNetId[ l ] = pBomb.nNetId ) Then
-                                       isBomb := True;
-                                    l += 1;
-                               End;
-                               If ( isBomb = False ) Then Begin
-                                  If ( pBomb Is CTriggerBomb ) Then Begin
-                                     (pBomb AS CTriggerBomb).Ignition();
-                                     pBomberman := GetBombermanByIndex( pBomb.nIndex );
-                                     If ( pBomberman <> Nil ) Then pBomberman.DelTriggerBomb();
-                                  End
-                                  Else
-                                      pBomb.Explose();
-                               End;
-                        End;
-                    End;  }
                End;
                HEADER_BOMB_DOMOVE :
                Begin
-                    {
-                      uGrid.DelBlock(nX,nY);
-                     if nPunch>0 then
-                       if ((aX<>nX) or (aY<>nY)) then
-                         if (abs(afX-aX)<0.1) and (abs(afY-aY)<0.1) then nPunch -= 1;
-                     nX:=aX;
-                     nY:=aY;
-                     fPosition.x:=afX;
-                     fPosition.y:=afY;
-                     uGrid.AddBlock(nX,nY,Self);
-                    }
                     l := 1;
                     TryStrToInt( GetString( sData, l ), _nNetID ); l += 1;
                     pBomb := GetBombByNetID( _nNetID );
