@@ -543,7 +543,7 @@ End;
 
 function CBomberman.IsMoving():boolean;
 begin
-     If (GetTime() - fMoveTime < 0.3) Then IsMoving := true Else IsMoving := false;
+     If (GetTime() - fMoveTime < 0.2) Then IsMoving := true Else IsMoving := false;
 end;
 
 function CBomberman.TestBomb(aX,aY : integer):boolean;
@@ -1410,9 +1410,8 @@ begin
     uGrabbedBomb.Position.y:=fPosition.y-0.1;
   end;
 
-  // Interpolation des trajectoires des bombermans
-  If (bMulti = True) And (GetTime - fInterpolationTime <= 0.5)
-  And (nPlayerClient[nIndex] <> nLocalIndex) And (nLocalIndex <> nClientIndex[0]) Then Begin
+  If (bMulti = True) And (nLocalIndex <> nClientIndex[0])
+  And (nPlayerClient[nIndex] <> nLocalIndex)  And ((GetTime - fInterpolationTime) < 0.5) Then Begin
      fMoveTime := GetTime();
      Case nDirection Of
             0:DoMove(fPosition.x, fPosition.y + fSpeed*dt);

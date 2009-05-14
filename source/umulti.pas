@@ -853,7 +853,7 @@ Begin
                Else If (pBomberman.Direction = 180) Then nDirection := 2
                Else If (pBomberman.Direction = -90) Then nDirection := 3
                Else nDirection := 4;
-               If pBomberman.IsMoving() Then nDirection += 5;
+               If GetTime() - pBomberman.fMoveTime <= 0.5 Then nDirection += 5;
                sData := sData + IntToStr(nDirection) + #31;
             End;
         End;
