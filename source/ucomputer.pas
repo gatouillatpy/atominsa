@@ -613,7 +613,7 @@ End;
    // Si le bomberman vient de bouger et qu'il n'y a pas trop de danger autour, alors il peut créer une bombe.
    // Si le bomberman est malade et que le niveau est godlike ou masterful, alors il ne pose pas la bombe.
    If ( sum < 1024 ) And ( ( nSkill = SKILL_NOVICE ) Or ( nSkill = SKILL_AVERAGE ) Or ( pBomberman.ExploseBombTime >= 3 ) )
-   And ( PutBomb( Trunc( pBomberman.Position.X + 0.5), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill,
+   And ( PutBomb( Trunc( pBomberman.Position.X + 0.5 ), Trunc( pBomberman.Position.Y + 0.5 ), aState, nSkill,
    pBomberman.SumBombGetDelta > 8 ) ) Then Begin
        pBomberman.CreateBomb( dt, Random( 1000000000 ) );
        If ( pBomberman.bCanGrabBomb ) And ( ( nSkill = SKILL_GODLIKE ) Or ( nSkill = SKILL_MASTERFUL ) ) Then Begin
@@ -683,9 +683,14 @@ Var
    canPushThisBomb,                              // Vrai s'il peut pousser la bombe en question.
    blocked : Boolean;                            // Vrai si le bomberman est coincé ( avec au maximum une case de liberté ).
    pBomb : CBomb;
+   pPlayer : CBomberman;
+   aTableIndex : ArrayIndex;
+   bIsPlayer : Boolean;
+   bBackupIsAfraid : Boolean;
 Begin
 // Initialisation des variables
    result2 := 0;                                 // Le minimum est 0, le maximum est autour de 10000.
+   bBackupIsAfraid := IsAfraid;
    If ( xMin < 1 ) Then xMin := 1;
    If ( xMax > GRIDWIDTH ) Then xMax := GRIDWIDTH;
    If ( yMin < 1 ) Then yMin := 1;
@@ -729,6 +734,22 @@ Begin
               End;
            // Traitement des bombermans si le bomberman n'est pas sur la même case.
               If ( wState[i, j] mod 8 >= 4 ) Then Begin
+                 IsAfraid := bBackupIsAfraid;
+                 If bSolo = True Then Begin
+                     aTableIndex := GetBombermanIndexByCoo( i, y );
+                     bIsPlayer := False;
+                     For k := 1 To aTableIndex.Count Do Begin
+                         If aTableIndex.Tab[k] = 1 Then
+                            bIsPlayer := True;
+                     End;
+                     pPlayer := GetBombermanByIndex( 1 );
+                     // Si ce n'est pas le joueur humain, on ne l'attaque pas en solo
+                     If ( pPlayer <> Nil ) And ( pPlayer.Alive = True ) And ( bIsPlayer = True ) Then Begin
+                         isAfraid := False;
+                         If ( ( abs(x - i) + abs(y - j) ) <= 16 ) Then
+                            result2 := result2 - 224 + 14 * ( abs(x - i) + abs(y - j) );
+                     End;
+                 End;
                  If ( ( abs(x - i) + abs(y - j) ) <= 4 ) And ( isAfraid = true ) Then
                     result2 := result2 + 32 - 2 * ( abs(x - i) + abs(y - j) );
                  If ( ( abs(x - i) + abs(y - j) ) >= 6 ) And ( isAfraid = true ) Then
@@ -771,8 +792,27 @@ Begin
                      End;
               End;
            // Traitement des bombermans situés sur le même case.
-              If ( wState[i, j] mod 8 >= 4 ) Then
-                 result2 := result2 + 32;
+              If ( wState[i, j] mod 8 >= 4 ) Then Begin
+                 IsAfraid := bBackupIsAfraid;
+                 If bSolo = True Then Begin
+                     aTableIndex := GetBombermanIndexByCoo( i, y );
+                     bIsPlayer := False;
+                     For k := 1 To aTableIndex.Count Do Begin
+                         If aTableIndex.Tab[k] = 1 Then
+                            bIsPlayer := True;
+                     End;
+                     pPlayer := GetBombermanByIndex( 1 );
+                     // Si ce n'est pas le joueur humain, on ne l'attaque pas en solo
+                     If ( pPlayer <> Nil ) And ( pPlayer.Alive = True ) And ( bIsPlayer = True ) Then Begin
+                         isAfraid := False;
+                         result2 := result2 - 224;
+                     End;
+                 End;
+                 If isAfraid Then
+                    result2 := result2 + 32
+                 Else
+                     result2 := result2 - 32;
+              End;
            // Traitement des blocks.
               If ( wState[i, j] mod 16 >= 8 ) Then
                  result2 := result2 + 8192;
@@ -1446,7 +1486,10 @@ Function PutBomb( x, y : Integer; pState : Table; wSkill : Integer; m_bMustPut :
 Var
    CanPut, continue : Boolean;
    FreeDirections : Integer;                // Nombres de directions sans danger.
-   i, j, cLeft, cRight, cUp, cDown : Integer;
+   i, j, k, cLeft, cRight, cUp, cDown : Integer;
+   aTableIndex : ArrayIndex;
+   pPlayer : CBomberman;
+   bIsPlayer : Boolean;
 Begin
 // Initialisation des variables
    CanPut := false;
@@ -1457,12 +1500,39 @@ Begin
 
          
 // Si un bomberman est proche, alors on peut poser une bombe.
-   For i := cLeft To cRight Do
-       If ( pState[ i, y ] mod 8 >= 4 ) Then
+   For i := cLeft To cRight Do Begin
+       If ( pState[ i, y ] mod 8 >= 4 ) Then Begin
           CanPut := true;
+          If bSolo = True Then Begin
+             aTableIndex := GetBombermanIndexByCoo( i, y );
+             bIsPlayer := False;
+             For k := 1 To aTableIndex.Count Do Begin
+                 If aTableIndex.Tab[k] = 1 Then
+                    bIsPlayer := True;
+             End;
+             pPlayer := GetBombermanByIndex( 1 );
+             // Si ce n'est pas le joueur humain, on ne l'attaque pas en solo
+             If ( pPlayer <> Nil ) And ( pPlayer.Alive = True ) And ( bIsPlayer = False ) Then
+                 CanPut := False;
+          End;
+       End
+   End;;
    For i := cUp To cDown Do
-       If ( pState[ x, i ] mod 8 >= 4 ) Then
+       If ( pState[ x, i ] mod 8 >= 4 ) Then Begin
           CanPut := true;
+          If bSolo = True Then Begin
+             aTableIndex := GetBombermanIndexByCoo( i, y );
+             bIsPlayer := False;
+             For k := 1 To aTableIndex.Count Do Begin
+                 If aTableIndex.Tab[k] = 1 Then
+                    bIsPlayer := True;
+             End;
+             pPlayer := GetBombermanByIndex( 1 );
+             // Si ce n'est pas le joueur humain, on ne l'attaque pas en solo
+             If ( pPlayer <> Nil ) And ( pPlayer.Alive = True ) And ( bIsPlayer = False ) Then
+                 CanPut := False;
+          End;
+       End;
    If ( m_bMustPut = true ) Then
       CanPut := true;
 

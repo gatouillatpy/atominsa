@@ -31,8 +31,8 @@ Const GAME_WAIT         = 5;
 Const GAME_SCORE        = 6;
 Const GAME_MENU_PLAYER  = 11;
 Const GAME_MENU_MULTI   = 12;
-Const GAME_PHASE_LEVEL  = 21;
-Const GAME_STATE_LEVEL  = 22;
+Const GAME_PHASE_NAME   = 21;
+Const GAME_STATE_NAME   = 22;
 
 Var nGame  : Integer;
 
@@ -1376,9 +1376,7 @@ Begin
         If bSolo Then Begin
             // mise à jour du mode solo
             If GetBombermanByCount(1).Score = nRoundCount Then Begin
-                If aSchemeList[nScheme].Solo < nPlayerSkill[2] Then Begin
-                   aSchemeList[nScheme].Solo := nPlayerSkill[2];
-                End;
+               aSchemeList[nScheme].Solo := 1;
             End;
             InitSolo();
         End

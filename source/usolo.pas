@@ -10,8 +10,8 @@ Uses
 Procedure InitSolo();
 Procedure ProcessSolo();
 Procedure ProcessMenuSolo();
-Procedure InitMenuLevel();
-Procedure ProcessMenuLevel();
+Procedure InitMenuName();
+Procedure ProcessMenuName();
 
 
 
@@ -21,30 +21,25 @@ Implementation
 
 Uses UBomberman;
 
-Const MENU_TITLE_NAME   = 240;
-      MENU_SELECT_NAME  = 241;
-      MENU_TITLE_LEVEL  = 242;
-      MENU_SELECT_LEVEL = 243;
-      MENU_FIGHT        = 244;
+Const MENU_NAME         = 240;
+      MENU_PLAYER2      = 242;
+      MENU_PLAYER3      = 243;
+      MENU_PLAYER4      = 244;
+      MENU_PLAYER5      = 245;
+      MENU_PLAYER6      = 246;
+      MENU_PLAYER7      = 247;
+      MENU_PLAYER8      = 248;
+      MENU_FIGHT        = 249;
+      MENU_DONE         = 250;
 
 Var nMenu : Integer;
+    nNbPlayers : Integer;
 Var bUp : Boolean;
     bDown : Boolean;
     bLeft : Boolean;
     bRight : Boolean;
     bEnter : Boolean;
 Var fScroll : Single;
-
-Function PlayerLevel( n : Integer ) : String;
-Begin
-     Case nPlayerSkill[n] Of
-          SKILL_NOVICE    : PlayerLevel := 'novice';
-          SKILL_AVERAGE   : PlayerLevel := 'average';
-          SKILL_MASTERFUL : PlayerLevel := 'masterful';
-          SKILL_GODLIKE   : PlayerLevel := 'godlike'
-          Else PlayerLevel := 'player';
-     End;
-End;
 
 Procedure InitSolo();
 Var k : Integer;
@@ -74,11 +69,7 @@ Begin
      End;
 
      // Ajout de la couleur
-     SetString( STRING_GAME_MENU(250), 'X', 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(251), 'N', 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(252), 'A', 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(253), 'M', 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(254), 'G', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_DONE), 'done', 0.2, 1.0, 600 );
 
      // initialisation du menu
      nGame := GAME_MENU;
@@ -104,8 +95,8 @@ Procedure ProcessSolo();
 Begin
      Case nGame Of
           GAME_MENU : ProcessMenuSolo();
-          GAME_PHASE_LEVEL : InitMenuLevel();
-          GAME_STATE_LEVEL : ProcessMenuLevel();
+          GAME_PHASE_NAME : InitMenuName();
+          GAME_STATE_NAME : ProcessMenuName();
           GAME_INIT : InitGame();
           GAME_ROUND : ProcessGame();
           GAME_WAIT : ProcessWait();
@@ -122,6 +113,7 @@ Procedure ProcessMenuSolo();
 Var w, h : Integer;
     k : Integer;
     t : Single;
+    nLevel : Integer;
 Begin
      w := GetRenderWidth();
      h := GetRenderHeight();
@@ -144,13 +136,8 @@ Begin
      t := 0.0;
      For k := 0 To nSchemeCount - 1 Do Begin
          If fScroll <= t Then DrawString( STRING_GAME_MENU(k+10), -w / h * 0.6, 0.7 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(k+10), IsActive(k+10), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
-         Case aSchemeList[k].Solo Of
-              0:If fScroll <= t Then DrawString( STRING_GAME_MENU(250), -w / h * 0.95, 0.7 + fScroll - t, -1, 0.012 * w / h, 0.024, 1, 1, 1, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE );
-              1:If fScroll <= t Then DrawString( STRING_GAME_MENU(251), -w / h * 0.90, 0.7 + fScroll - t, -1, 0.012 * w / h, 0.024, 0, 0, 1, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE );
-              2:If fScroll <= t Then DrawString( STRING_GAME_MENU(252), -w / h * 0.85, 0.7 + fScroll - t, -1, 0.012 * w / h, 0.024, 0.63, 0.33, 0.93, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE );
-              3:If fScroll <= t Then DrawString( STRING_GAME_MENU(253), -w / h * 0.80, 0.7 + fScroll - t, -1, 0.012 * w / h, 0.024, 0.2, 0.2, 0.2, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE );
-              4:If fScroll <= t Then DrawString( STRING_GAME_MENU(254), -w / h * 0.75, 0.7 + fScroll - t, -1, 0.012 * w / h, 0.024, 1, 1, 0, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE );
-        End;
+         If ( aSchemeList[k].Solo = 1 ) And ( fScroll <= t ) Then
+            DrawString( STRING_GAME_MENU(MENU_DONE), -w / h * 0.90, 0.7 + fScroll - t, -1, 0.012 * w / h, 0.024, 1, 1, 0, 1.0, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE );
         t += 0.12;
      End;
 
@@ -208,15 +195,100 @@ Begin
            nMap := 1;
            nRoundCount := 1;
            nScheme := nMenu - 10;
+           If ( nScheme <= 62 ) Then Begin
+              nNbPlayers := 1 + ( nScheme mod 7 );
+              nLevel := 1 + nScheme div 7;
+           End
+           Else Begin
+                nNbPlayers := 7;
+                nLevel := 9;
+           End;
 
            // initialisation des joueurs
            nPlayerType[1] := PLAYER_KB1;
-           nPlayerType[2] := PLAYER_COM;
-           sPlayerName[2] := 'computer';
-           For k := 3 To 8 Do Begin
+           For k := 2 To nNbPlayers + 1 Do Begin
+               nPlayerType[k] := PLAYER_COM;
+               Case nLevel Of
+                    1:Begin
+                           sPlayerName[k] := 'novice ' + IntToStr( k );
+                           nPlayerSkill[k] := SKILL_NOVICE;
+                    End;
+                    2:Begin
+                           If ( k mod 2 = 0 ) Then Begin
+                              sPlayerName[k] := 'average ' + IntToStr( k );
+                              nPlayerSkill[k] := SKILL_AVERAGE;
+                           End
+                           Else Begin
+                               sPlayerName[k] := 'novice ' + IntToStr( k );
+                               nPlayerSkill[k] := SKILL_NOVICE;
+                           End;
+                    End;
+                    3:Begin
+                           sPlayerName[k] := 'average ' + IntToStr( k );
+                           nPlayerSkill[k] := SKILL_AVERAGE;
+                    End;
+                    4:Begin
+                           If ( k mod 3 = 0 ) Then Begin
+                              sPlayerName[k] := 'masterful ' + IntToStr( k );
+                              nPlayerSkill[k] := SKILL_MASTERFUL;
+                           End
+                           Else If ( k mod 3 = 1 ) Then Begin
+                               sPlayerName[k] := 'average ' + IntToStr( k );
+                               nPlayerSkill[k] := SKILL_AVERAGE;
+                           End
+                           Else Begin
+                               sPlayerName[k] := 'novice ' + IntToStr( k );
+                               nPlayerSkill[k] := SKILL_NOVICE;
+                           End;
+                    End;
+                    5:Begin
+                           If ( k mod 2 = 0 ) Then Begin
+                              sPlayerName[k] := 'masterful ' + IntToStr( k );
+                              nPlayerSkill[k] := SKILL_MASTERFUL;
+                           End
+                           Else Begin
+                               sPlayerName[k] := 'average ' + IntToStr( k );
+                               nPlayerSkill[k] := SKILL_AVERAGE;
+                           End;
+                    End;
+                    6:Begin
+                           sPlayerName[k] := 'masterful ' + IntToStr( k );
+                           nPlayerSkill[k] := SKILL_MASTERFUL;
+                    End;
+                    7:Begin
+                           If ( k mod 3 = 0 ) Then Begin
+                              sPlayerName[k] := 'godlike ' + IntToStr( k );
+                              nPlayerSkill[k] := SKILL_GODLIKE;
+                           End
+                           Else If ( k mod 3 = 1 ) Then Begin
+                               sPlayerName[k] := 'masterful ' + IntToStr( k );
+                               nPlayerSkill[k] := SKILL_MASTERFUL;
+                           End
+                           Else Begin
+                               sPlayerName[k] := 'average ' + IntToStr( k );
+                               nPlayerSkill[k] := SKILL_AVERAGE;
+                           End;
+                    End;
+                    8:Begin
+                           If ( k mod 2 = 0 ) Then Begin
+                              sPlayerName[k] := 'godlike ' + IntToStr( k );
+                              nPlayerSkill[k] := SKILL_GODLIKE;
+                           End
+                           Else Begin
+                               sPlayerName[k] := 'masterful ' + IntToStr( k );
+                               nPlayerSkill[k] := SKILL_MASTERFUL;
+                           End;
+                    End;
+                    9:Begin
+                           sPlayerName[k] := 'godlike ' + IntToStr( k );
+                           nPlayerSkill[k] := SKILL_GODLIKE;
+                    End;
+               End;
+           End;
+           For k := nNbPlayers + 2 To 8 Do Begin
                nPlayerType[k] := PLAYER_NIL;
            End;
-           nGame := GAME_PHASE_LEVEL;
+           nGame := GAME_PHASE_NAME;
        End;
        bEnter := True;
      End Else Begin
@@ -225,17 +297,21 @@ Begin
 End;
 
 
-Procedure InitMenuLevel();
+Procedure InitMenuName();
 Begin
       // Ajout du nom et du level
-     SetString( STRING_GAME_MENU(240), 'name:', 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(241), sPlayerName[1], 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(242), 'level:', 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(243), PlayerLevel(2), 0.2, 1.0, 600 );
-     SetString( STRING_GAME_MENU(244), 'fight', 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_NAME), 'name: ' + sPlayerName[1], 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_PLAYER2), 'player2: ' + sPlayerName[2], 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_PLAYER3), 'player3: ' + sPlayerName[3], 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_PLAYER4), 'player4: ' + sPlayerName[4], 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_PLAYER5), 'player5: ' + sPlayerName[5], 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_PLAYER6), 'player6: ' + sPlayerName[6], 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_PLAYER7), 'player7: ' + sPlayerName[7], 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_PLAYER8), 'player8: ' + sPlayerName[8], 0.2, 1.0, 600 );
+     SetString( STRING_GAME_MENU(MENU_FIGHT), 'fight', 0.2, 1.0, 600 );
 
      // initialisation du menu
-     nMenu := MENU_TITLE_NAME;
+     nMenu := MENU_NAME;
 
      // remise à zéro des touches
      bUp := False;
@@ -248,10 +324,10 @@ Begin
      // remise à zéro du scrolling
      fScroll := 0.0;
 
-     nGame := GAME_STATE_LEVEL;
+     nGame := GAME_STATE_NAME;
 End;
 
-Procedure ProcessMenuLevel();
+Procedure ProcessMenuName();
           Function IsActive( nConst : Integer ) : Single ;
           Begin
                If nConst = nMenu Then IsActive := 0.0 Else IsActive := 1.0;
@@ -278,12 +354,15 @@ Begin
 
      DrawString( STRING_GAME_MENU(1), -w / h * 0.35,  0.9, -1, 0.048 * w / h, 0.064, 1.0, 1.0, 1.0, 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL );
 
-     t := 0.2;
-     DrawString( STRING_GAME_MENU(MENU_TITLE_NAME), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_TITLE_NAME), IsActive(MENU_TITLE_NAME), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
-     DrawString( STRING_GAME_MENU(MENU_SELECT_NAME), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_SELECT_NAME), IsActive(MENU_SELECT_NAME), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.2;
-     DrawString( STRING_GAME_MENU(MENU_TITLE_LEVEL), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_TITLE_LEVEL), IsActive(MENU_TITLE_LEVEL), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
-     DrawString( STRING_GAME_MENU(MENU_SELECT_LEVEL), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_SELECT_LEVEL), IsActive(MENU_SELECT_LEVEL), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_NONE ); t += 0.2;
-     t += 0.2;
+     t := 0.0;
+     DrawString( STRING_GAME_MENU(MENU_NAME), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.024 * w / h, 0.032, 1.0, IsActive(MENU_NAME), IsActive(MENU_NAME), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
+     DrawString( STRING_GAME_MENU(MENU_PLAYER2), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER2), IsActive(MENU_PLAYER2), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If nNbPlayers >= 2 Then DrawString( STRING_GAME_MENU(MENU_PLAYER3), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER3), IsActive(MENU_PLAYER3), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If nNbPlayers >= 3 Then DrawString( STRING_GAME_MENU(MENU_PLAYER4), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER4), IsActive(MENU_PLAYER4), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If nNbPlayers >= 4 Then DrawString( STRING_GAME_MENU(MENU_PLAYER5), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER5), IsActive(MENU_PLAYER5), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If nNbPlayers >= 5 Then DrawString( STRING_GAME_MENU(MENU_PLAYER6), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER6), IsActive(MENU_PLAYER6), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If nNbPlayers >= 6 Then DrawString( STRING_GAME_MENU(MENU_PLAYER7), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER7), IsActive(MENU_PLAYER7), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.12;
+     If nNbPlayers >= 7 Then DrawString( STRING_GAME_MENU(MENU_PLAYER8), -w / h * 0.8, 0.7 + fScroll - t, -1, 0.018 * w / h, 0.024, 1.0, IsActive(MENU_PLAYER8), IsActive(MENU_PLAYER8), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
      DrawString( STRING_GAME_MENU(MENU_FIGHT), w / h * 0.5, 0.7 + fScroll - t, -1, 0.036 * w / h, 0.048, 1.0, IsActive(MENU_FIGHT), IsActive(MENU_FIGHT), 0.8, True, SPRITE_CHARSET_TERMINAL, SPRITE_CHARSET_TERMINALX, EFFECT_TERMINAL ); t += 0.2;
 
      If GetKey( KEY_ESC ) Then Begin
@@ -292,53 +371,12 @@ Begin
         ClearInput();
      End;
 
-     If GetKeyS( KEY_LEFT ) Then Begin
-        If Not bLeft Then Begin
-           PlaySound( SOUND_MENU_CLICK );
-           If ( nMenu = MENU_SELECT_LEVEL ) Then Begin
-              Case nPlayerSkill[2] Of
-                   SKILL_NOVICE    : nPlayerSkill[2] := SKILL_GODLIKE;
-                   SKILL_AVERAGE   : nPlayerSkill[2] := SKILL_NOVICE;
-                   SKILL_MASTERFUL : nPlayerSkill[2] := SKILL_AVERAGE;
-                   SKILL_GODLIKE   : nPlayerSkill[2] := SKILL_MASTERFUL;
-              End;
-              SetString( STRING_GAME_MENU(MENU_SELECT_LEVEL), PlayerLevel(2), 0.2, 1.0, 600 );
-           End;
-        End;
-        ClearInput();
-        bLeft := True;
-     End Else Begin
-        bLeft := False;
-     End;
-
-     If GetKeyS( KEY_RIGHT ) Then Begin
-        If Not bRight Then Begin
-           PlaySound( SOUND_MENU_CLICK );
-           If ( nMenu = MENU_SELECT_LEVEL ) Then Begin
-              Case nPlayerSkill[2] Of
-                   SKILL_NOVICE    : nPlayerSkill[2] := SKILL_AVERAGE;
-                   SKILL_AVERAGE   : nPlayerSkill[2] := SKILL_MASTERFUL;
-                   SKILL_MASTERFUL : nPlayerSkill[2] := SKILL_GODLIKE;
-                   SKILL_GODLIKE   : nPlayerSkill[2] := SKILL_NOVICE;
-              End;
-              SetString( STRING_GAME_MENU(MENU_SELECT_LEVEL), PlayerLevel(2), 0.2, 1.0, 600 );
-           End;
-        End;
-        ClearInput();
-        bRight := True;
-     End Else Begin
-        bRight := False;
-     End;
-
      If GetKeyS( KEY_DOWN ) Then Begin
         If Not bDown Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
-                MENU_TITLE_NAME   : nMenu := MENU_SELECT_NAME;
-                MENU_SELECT_NAME  : nMenu := MENU_TITLE_LEVEL;
-                MENU_TITLE_LEVEL  : nMenu := MENU_SELECT_LEVEL;
-                MENU_SELECT_LEVEL : nMenu := MENU_FIGHT;
-                MENU_FIGHT        : nMenu := MENU_TITLE_NAME;
+                MENU_NAME         : nMenu := MENU_FIGHT;
+                MENU_FIGHT        : nMenu := MENU_NAME;
            End;
         End;
         ClearInput();
@@ -351,11 +389,8 @@ Begin
         If Not bUp Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
-                MENU_TITLE_NAME   : nMenu := MENU_FIGHT;
-                MENU_SELECT_NAME  : nMenu := MENU_TITLE_NAME;
-                MENU_TITLE_LEVEL  : nMenu := MENU_SELECT_NAME;
-                MENU_SELECT_LEVEL : nMenu := MENU_TITLE_LEVEL;
-                MENU_FIGHT        : nMenu := MENU_SELECT_LEVEL;
+                MENU_NAME         : nMenu := MENU_FIGHT;
+                MENU_FIGHT        : nMenu := MENU_NAME;
            End;
         End;
         ClearInput();
@@ -377,14 +412,14 @@ Begin
         If GetTime > fKey Then Begin
            PlaySound( SOUND_MENU_CLICK );
            Case nMenu Of
-                MENU_SELECT_NAME :
+                MENU_NAME :
                 Begin
                      If Ord(CheckKey()) = 8 Then Begin
                         SetLength(sPlayerName[1], Length(sPlayerName[1]) - 1);
                      End Else Begin
                         sPlayerName[1] := sPlayerName[1] + CheckKey();
                      End;
-                     SetString( STRING_GAME_MENU(MENU_SELECT_NAME), sPlayerName[1], 0.0, 0.02, 600 );
+                     SetString( STRING_GAME_MENU(MENU_NAME), 'name: ' + sPlayerName[1], 0.0, 0.02, 600 );
                 End;
            End;
            fKey := GetTime + 0.1;
@@ -401,12 +436,12 @@ Begin
          bCursor := False;
      fCursorTime := fCTime;
      Case nMenu Of
-                MENU_SELECT_NAME  :
+                MENU_NAME  :
                 Begin
                      If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 0 ) Then
-                        SetString( STRING_GAME_MENU(MENU_SELECT_NAME), sPlayerName[1], 0.0, 0.02, 600 );
+                        SetString( STRING_GAME_MENU(MENU_NAME), 'name: ' + sPlayerName[1], 0.0, 0.02, 600 );
                      If ( bCursor ) And ( Trunc(fCTime*2) mod 2 = 1 ) Then
-                        SetString( STRING_GAME_MENU(MENU_SELECT_NAME), sPlayerName[1] + '*', 0.0, 0.02, 600 );
+                        SetString( STRING_GAME_MENU(MENU_NAME), 'name: ' + sPlayerName[1] + '*', 0.0, 0.02, 600 );
                      bCursor := False;
                 End;
            End;
