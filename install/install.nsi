@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Atominsa"
-!define PRODUCT_VERSION "0.8d"
+!define PRODUCT_VERSION "0.8e"
 !define PRODUCT_PUBLISHER "IGC"
 !define PRODUCT_WEB_SITE "http://atominsa.sf.net"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\atominsa.exe"
@@ -53,7 +53,7 @@ var ICONS_GROUP
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "setup-atominsa_0.8d.exe"
+OutFile "setup-atominsa_0.8e.exe"
 InstallDir "$PROGRAMFILES\Atominsa"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
@@ -150,6 +150,8 @@ Section "SectionPrincipale" SEC01
   File "..\source\exec\musics\menu.mp3"
   File "..\source\exec\musics\game0.mp3"
   File "..\source\exec\musics\game1.mp3"
+  File "..\source\exec\musics\game2.mp3"
+  File "..\source\exec\musics\game3.mp3"
   SetOutPath "$INSTDIR\schemes"
   File "..\source\exec\schemes\4CORNERS.SCH"
   File "..\source\exec\schemes\AIRCHAOS.SCH"
@@ -676,6 +678,8 @@ Section Uninstall
   Delete "$INSTDIR\musics\menu.mp3"
   Delete "$INSTDIR\musics\game0.mp3"
   Delete "$INSTDIR\musics\game1.mp3"
+  Delete "$INSTDIR\musics\game2.mp3"
+  Delete "$INSTDIR\musics\game3.mp3"
   Delete "$INSTDIR\meshes\speedup.m12"
   Delete "$INSTDIR\meshes\flameup.m12"
   Delete "$INSTDIR\meshes\extrabomb.m12"
