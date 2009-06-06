@@ -243,6 +243,8 @@ Begin
      // chargement des musiques du jeu
      AddSound( './musics/game0.mp3', SOUND_MUSIC(1), False );
      AddSound( './musics/game1.mp3', SOUND_MUSIC(2), False );
+     AddSound( './musics/game2.mp3', SOUND_MUSIC(3), False );
+     AddSound( './musics/game3.mp3', SOUND_MUSIC(4), False );
 
      // chargement des bombermen
      For k := 1 To 8 Do Begin

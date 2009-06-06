@@ -1,7 +1,7 @@
 object Window: TWindow
-  Left = 328
+  Left = 410
   Height = 295
-  Top = 282
+  Top = 353
   Width = 673
   ActiveControl = Memo
   Caption = 'atominsa - Console'
