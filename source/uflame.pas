@@ -338,7 +338,7 @@ begin
 
 
 
-  if GetTime() >= fTime then                                       //Si le temps depuis lequel la flame a ete cree
+  if GetTime() >= fTime then                                      //Si le temps depuis lequel la flame a ete cree
   begin                                                           //et superieur au temps de duree d'une flame
    RemoveThisFlame(Self);                                         //alors elle est supprimee de la liste et detruite
    result:=True;
@@ -354,9 +354,8 @@ Var f : Single;
 Begin
      //Result := Pow(1.0 - Abs(2.0 * (fTime - GetTime()) / FLAMETIME - 1.0), 2.0);
      f := 1.0 + (GetTime() - fTime) / FLAMETIME;
-     If (f >= 0.0) And (f <= 0.2) Then Result := f * 5.0;
-     If (f >= 0.2) And (f <= 0.6) Then Result := 1.0;
-     If (f >= 0.6) And (f <= 1.0) Then Result := (1.0 - f) * 2.5;
+     If (f >= 0.0) And (f <= 0.5) Then Result := 0.2 + 0.8 * (1 - exp(-f*10))
+     Else Result := 0.2 + 0.8 * (1 - exp((f - 1)*10));
 End;
 
 
