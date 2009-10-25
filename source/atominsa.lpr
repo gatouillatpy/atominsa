@@ -274,7 +274,10 @@ Begin
      BindKeyStd( nKeyScreen, True, True, @SwitchDisplay );
      
      // On arrête d'afficher la console
-     If Not bConsole Then Window.Hide();
+     If Not bConsole Then
+        Window.Hide()
+     Else
+         Window.Memo.Visible := True;
 
      ExecGlut();
 End;

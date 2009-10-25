@@ -52,7 +52,7 @@ End;
 procedure TWindow.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
      FORCE_QUIT := True;
-end;
+end; 
 
 Initialization
   {$I uform.lrs}
